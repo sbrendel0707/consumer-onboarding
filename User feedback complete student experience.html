@@ -234,6 +234,35 @@ const BackBtn = ({onClick, label='Back'}) => (
   </button>
 );
 
+// Decide Later — subtle link button, less prominent than primary CTA
+const DecideLaterBtn = ({onClick}) => (
+  <button onClick={onClick}
+    className="w-full text-center text-hz-hint text-[12px] py-2 mt-1 hover:text-hz-muted transition-colors underline-offset-2 hover:underline">
+    I don't have this information right now
+  </button>
+);
+
+// Decide Later — bottom-sheet confirmation modal
+const DecideLaterModal = ({stepName, onConfirm, onCancel}) => (
+  <div className="absolute inset-0 bg-black/50 z-50 flex items-end" role="dialog" aria-modal="true" aria-labelledby="dl-title">
+    <div className="bg-hz-card w-full rounded-t-[20px] px-5 pt-5 pb-8 space-y-4">
+      <div className="w-10 h-1 bg-[rgba(100,92,220,0.2)] rounded-full mx-auto mb-1"/>
+      <p id="dl-title" className="text-[17px] font-bold text-hz-text">Decide later?</p>
+      <p className="text-[13px] text-hz-muted leading-relaxed">
+        If you skip <span className="font-semibold text-hz-text">{stepName}</span> now, a task will be added to your account and we'll send you reminders to complete it. You'll need to finish this in a timely manner — leaving it incomplete may affect your enrollment or payment status.
+      </p>
+      <div className="bg-hz-amber-bg border border-hz-amber/40 rounded-hz-sm px-3 py-2.5 flex gap-2 items-start">
+        <span aria-hidden="true" className="flex-shrink-0 text-hz-amber">⏰</span>
+        <p className="text-[11px] text-hz-muted leading-relaxed">You'll receive email and portal notifications until this is resolved.</p>
+      </div>
+      <Btn onClick={onConfirm}>OK, I'll finish this later</Btn>
+      <button onClick={onCancel} className="w-full text-center text-hz-muted text-[13px] py-1 hover:text-hz-text transition-colors">
+        Go back
+      </button>
+    </div>
+  </div>
+);
+
 const Header = ({title, onBack, right}) => (
   <div className="sticky top-0 bg-hz-card border-b border-[rgba(100,92,220,0.1)] px-2 py-2.5 flex items-center gap-1 z-10">
     {onBack && (
@@ -573,6 +602,7 @@ const SecurityQuestionsScreen = ({nav, goBack, S, setS}) => {
     {q:'', a:''},
   ]);
   const [showA, setShowA] = React.useState([false, false]);
+  const [showDL, setShowDL] = React.useState(false);
 
   const setQ = (i,val) => setQs(prev=>prev.map((x,j)=>j===i?{...x,q:val}:x));
   const setA = (i,val) => setQs(prev=>prev.map((x,j)=>j===i?{...x,a:val}:x));
@@ -633,6 +663,12 @@ const SecurityQuestionsScreen = ({nav, goBack, S, setS}) => {
         </div>
       </div>
 
+      {showDL && (
+        <DecideLaterModal
+          stepName="Security Questions"
+          onConfirm={()=>{ setS(p=>({...p, secQsDeferred:true})); nav('payer'); }}
+          onCancel={()=>setShowDL(false)}/>
+      )}
       <div className="absolute bottom-0 left-0 right-0 bg-hz-card border-t border-[rgba(100,92,220,0.1)] px-4 py-3">
         <button onClick={()=>{ if(canContinue) nav('payer'); }}
           disabled={!canContinue} aria-disabled={!canContinue}
@@ -641,6 +677,7 @@ const SecurityQuestionsScreen = ({nav, goBack, S, setS}) => {
             ${canContinue ? 'bg-hz-indigo text-white hover:opacity-90' : 'bg-hz-cloud text-hz-hint cursor-not-allowed'}`}>
           Save &amp; continue
         </button>
+        <DecideLaterBtn onClick={()=>setShowDL(true)}/>
       </div>
     </ScreenWrap>
   );
@@ -824,7 +861,7 @@ const InviteScreen = ({nav, goBack, S, setS}) => {
       ? [...sent, {first, last, email, rel, pct: pctMode==='ask' ? null : pct, pctMode}]
       : sent;
     setS(p=>({...p, authPayers: finalSent, studentPct: studentPctSet ? Number(studentPct) : null}));
-    nav('insurance');
+    nav(S.payer === 'other' ? 'payer-handoff' : 'insurance');
   };
 
   const canFinish = sent.length > 0 || (first.trim() && email.includes('@') &&
@@ -1071,6 +1108,48 @@ const InviteScreen = ({nav, goBack, S, setS}) => {
   );
 };
 
+// ─── PayerHandoffScreen ───────────────────────────────────────────────────
+const PayerHandoffScreen = ({nav, goBack, S, setS}) => (
+  <ScreenWrap>
+    <StepBar current={4} nav={nav}/>
+    <div className="px-5 pt-5 pb-24 space-y-4 overflow-y-auto">
+      <div className="flex flex-col items-center text-center py-2">
+        <div className="w-16 h-16 rounded-full bg-hz-cloud flex items-center justify-center text-3xl mb-4" aria-hidden="true">👥</div>
+        <p className="text-[18px] font-bold text-hz-text mb-2">Your payers take it from here</p>
+        <p className="text-hz-muted text-[13px] leading-relaxed max-w-xs">
+          Since someone else is handling your payments, steps 4 and 5 are theirs to complete — not yours.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint mb-1">Your payers will complete</p>
+        {[
+          {n:4, icon:'🛡️', title:'Insurance', desc:'They will review and decide on tuition protection coverage.'},
+          {n:5, icon:'💳', title:'Payment',   desc:'They will set up how they will pay and on what schedule.'},
+        ].map(s=>(
+          <div key={s.n} className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3 flex items-center gap-3">
+            <div className="w-7 h-7 rounded-full bg-hz-cloud flex items-center justify-center text-[11px] font-bold text-hz-hint flex-shrink-0">{s.n}</div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-hz-text">{s.title}</p>
+              <p className="text-[11px] text-hz-muted mt-0.5 leading-snug">{s.desc}</p>
+            </div>
+            <span className="text-xl" aria-hidden="true">{s.icon}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-hz-teal-bg border border-hz-teal/25 rounded-hz-sm px-3 py-2.5 flex gap-2">
+        <span aria-hidden="true" className="text-hz-teal text-sm flex-shrink-0">✓</span>
+        <p className="text-[11px] text-hz-muted leading-relaxed">Invites sent. We'll notify you when your payer completes their setup.</p>
+      </div>
+    </div>
+
+    <div className="absolute bottom-0 left-0 right-0 bg-hz-card border-t border-[rgba(100,92,220,0.1)] px-4 py-3">
+      <Btn onClick={()=>nav('comms')}>Continue to Communications</Btn>
+    </div>
+  </ScreenWrap>
+);
+
 // ─── InsuranceScreen ─────────────────────────────────────────────────────
 const InsuranceScreen = ({nav, goBack, S, setS}) => {
   const [step, setStep] = React.useState('A');
@@ -1079,6 +1158,7 @@ const InsuranceScreen = ({nav, goBack, S, setS}) => {
   const [method, setMethod] = React.useState('ach');
   const [acct, setAcct] = React.useState('');
   const [routing, setRouting] = React.useState('');
+  const [showDLIns, setShowDLIns] = React.useState(false);
 
   const rate = inState === 'in' ? 0.019 : 0.022;
   const premium = Math.round(TOTAL_CHARGES * rate * 100) / 100;
@@ -1139,7 +1219,14 @@ const InsuranceScreen = ({nav, goBack, S, setS}) => {
               <p className="text-[12px] text-hz-muted mt-0.5">I'll skip insurance for now</p>
             </RadioCard>
             <Btn onClick={handleChoiceNext} disabled={!choice || (choice==='yes' && !inState)}>Continue</Btn>
+            <DecideLaterBtn onClick={()=>setShowDLIns(true)}/>
           </>
+        )}
+        {showDLIns && (
+          <DecideLaterModal
+            stepName="Insurance"
+            onConfirm={()=>{ setS(p=>({...p, insDeferred:true})); nextAfterInsurance(); }}
+            onCancel={()=>setShowDLIns(false)}/>
         )}
         {step === 'C' && (
           <>
@@ -1219,6 +1306,7 @@ const InsuranceScreen = ({nav, goBack, S, setS}) => {
 const HowPayScreen = ({nav, goBack, S, setS}) => {
   const [expanded, setExpanded] = React.useState(false);
   const [plan, setPlan] = React.useState('');
+  const [showDL, setShowDL] = React.useState(false);
 
   const next = () => {
     if (!plan) return;
@@ -1277,7 +1365,14 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
         </RadioCard>
 
         <Btn onClick={next} disabled={!plan}>Continue</Btn>
+        <DecideLaterBtn onClick={()=>setShowDL(true)}/>
       </div>
+      {showDL && (
+        <DecideLaterModal
+          stepName="Payment Setup"
+          onConfirm={()=>{ setS(p=>({...p, payDeferred:true})); nav('comms'); }}
+          onCancel={()=>setShowDL(false)}/>
+      )}
     </ScreenWrap>
   );
 };
@@ -2518,6 +2613,7 @@ const App = () => {
     'comms':             <CommsScreen           nav={nav} goBack={goBack} S={S} setS={setS}/>,
     'payer':             <PayerScreen           nav={nav} goBack={goBack} S={S} setS={setS}/>,
     'invite':            <InviteScreen          nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'payer-handoff':     <PayerHandoffScreen    nav={nav} goBack={goBack} S={S} setS={setS}/>,
     'insurance':         <InsuranceScreen       nav={nav} goBack={goBack} S={S} setS={setS}/>,
     'howpay':            <HowPayScreen          nav={nav} goBack={goBack} S={S} setS={setS}/>,
     'pot':               <PotSetupScreen        nav={nav} goBack={goBack} S={S} setS={setS}/>,
@@ -2569,6 +2665,7 @@ const App = () => {
           <optgroup label="── Step 3: Who's Paying">
             <option value="payer">Choose payer type</option>
             <option value="invite">Invite payers</option>
+            <option value="payer-handoff">Payer handoff (others only)</option>
           </optgroup>
           <optgroup label="── Step 4: Insurance">
             <option value="insurance">Tuition protection</option>
