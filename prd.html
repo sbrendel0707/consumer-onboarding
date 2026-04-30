@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Horizon Consumer — Product Requirements</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --hz-indigo:    #2D1FA3;
+  --hz-accent:    #645CDC;
+  --hz-cloud:     #EEF0FF;
+  --hz-teal:      #0D7A55;
+  --hz-teal-bg:   #E1F5EE;
+  --hz-amber:     #EF9F27;
+  --hz-amber-bg:  #FAEEDA;
+  --hz-danger:    #E24B4A;
+  --hz-bg:        #F4F5FF;
+  --hz-card:      #FFFFFF;
+  --hz-border:    rgba(100,92,220,0.14);
+  --hz-text:      #1A1060;
+  --hz-muted:     #57548D;
+  --hz-hint:      #6B6899;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background: var(--hz-bg);
+  color: var(--hz-text);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* ── Layout ── */
+.layout { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 232px;
+  flex-shrink: 0;
+  background: var(--hz-card);
+  border-right: 1px solid var(--hz-border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 28px 14px 40px;
+  scrollbar-width: thin;
+}
+.nav-logo {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.3px;
+  color: var(--hz-accent);
+  padding: 0 8px;
+  margin-bottom: 24px;
+}
+.nav-group { margin-bottom: 18px; }
+.nav-group-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .9px;
+  color: var(--hz-hint);
+  padding: 0 8px;
+  margin-bottom: 4px;
+}
+.nav-link {
+  display: block;
+  padding: 7px 8px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--hz-muted);
+  text-decoration: none;
+  transition: background .12s, color .12s;
+  line-height: 1.3;
+}
+.nav-link:hover { background: var(--hz-cloud); color: var(--hz-indigo); }
+.nav-link.active { background: var(--hz-cloud); color: var(--hz-indigo); font-weight: 600; }
+.nav-link.soon { opacity: .4; pointer-events: none; }
+.nav-link .nav-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--hz-hint);
+  margin-top: 1px;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 52px 52px 100px;
+  max-width: 860px;
+}
+
+/* ── Name overlay ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,16,96,.5);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.overlay-card {
+  background: var(--hz-card);
+  border-radius: 20px;
+  padding: 40px 36px;
+  width: min(420px, 92vw);
+  box-shadow: 0 28px 56px rgba(45,31,163,.2);
+}
+.overlay-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+  color: var(--hz-accent);
+  margin-bottom: 10px;
+}
+.overlay-title { font-size: 22px; font-weight: 700; color: var(--hz-text); margin-bottom: 8px; }
+.overlay-sub { font-size: 13px; color: var(--hz-muted); line-height: 1.65; margin-bottom: 28px; }
+.overlay-input {
+  width: 100%;
+  border: 1.5px solid var(--hz-border);
+  border-radius: 11px;
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--hz-text);
+  background: var(--hz-bg);
+  outline: none;
+  margin-bottom: 12px;
+  transition: border-color .15s;
+}
+.overlay-input:focus { border-color: var(--hz-accent); }
+.overlay-btn {
+  width: 100%;
+  background: var(--hz-indigo);
+  color: white;
+  border: none;
+  border-radius: 11px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.overlay-btn:hover { opacity: .87; }
+.overlay-note { font-size: 11px; color: var(--hz-hint); text-align: center; margin-top: 14px; }
+
+/* ── Visitor bar ── */
+.visitor-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--hz-cloud);
+  border-bottom: 1px solid rgba(100,92,220,.18);
+  padding: 9px 52px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--hz-muted);
+}
+.visitor-name { font-weight: 600; color: var(--hz-indigo); }
+.visitor-change-pill {
+  display: none;
+  background: var(--hz-amber);
+  color: white;
+  font-weight: 700;
+  font-size: 10px;
+  padding: 2px 9px;
+  border-radius: 99px;
+}
+.visitor-switch {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--hz-accent);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-decoration: underline;
+  padding: 0;
+}
+
+/* ── Doc header ── */
+.doc-header { margin-bottom: 44px; }
+.doc-eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--hz-accent);
+  margin-bottom: 8px;
+}
+.doc-title { font-size: 30px; font-weight: 700; color: var(--hz-text); line-height: 1.2; margin-bottom: 10px; }
+.doc-meta { font-size: 12px; color: var(--hz-hint); }
+.share-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 14px;
+  background: var(--hz-teal-bg);
+  border: 1px solid rgba(13,122,85,.2);
+  border-radius: 9px;
+  padding: 7px 13px;
+  font-size: 11.5px;
+  color: var(--hz-teal);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* ── Change banner ── */
+.change-banner {
+  display: none;
+  background: #FFFBF0;
+  border: 1px solid rgba(239,159,39,.4);
+  border-left: 3px solid var(--hz-amber);
+  border-radius: 11px;
+  padding: 13px 16px;
+  font-size: 13px;
+  color: var(--hz-text);
+  line-height: 1.55;
+  margin-bottom: 28px;
+}
+.change-banner strong { color: #946000; }
+
+/* ── Sections ── */
+.prd-section { margin-bottom: 56px; }
+.section-divider {
+  border: none;
+  border-top: 2px solid var(--hz-border);
+  margin-bottom: 20px;
+}
+.section-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+  color: var(--hz-hint);
+  margin-bottom: 5px;
+}
+.section-title { font-size: 21px; font-weight: 700; color: var(--hz-text); margin-bottom: 20px; }
+.subsection { margin-bottom: 28px; }
+.subsection-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: var(--hz-muted);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--hz-border);
+}
+
+/* ── Vision items ── */
+.vision-item {
+  display: flex;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--hz-card);
+  border: 1px solid var(--hz-border);
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+.vision-icon { font-size: 19px; flex-shrink: 0; margin-top: 1px; }
+.vision-title { font-size: 13px; font-weight: 700; color: var(--hz-text); margin-bottom: 3px; }
+.vision-body { font-size: 12.5px; color: var(--hz-muted); line-height: 1.55; }
+
+/* ── Requirement items ── */
+.req-item {
+  background: var(--hz-card);
+  border: 1px solid var(--hz-border);
+  border-radius: 11px;
+  padding: 13px 15px;
+  margin-bottom: 7px;
+  position: relative;
+  transition: background .2s, border-color .2s;
+}
+.req-item.changed {
+  background: #FFFBEE;
+  border-color: rgba(239,159,39,.45);
+  border-left: 3px solid var(--hz-amber);
+}
+.req-item.changed::after {
+  content: 'Updated';
+  position: absolute;
+  top: 10px; right: 12px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: #946000;
+  background: var(--hz-amber-bg);
+  border-radius: 5px;
+  padding: 2px 7px;
+}
+.req-text { font-size: 13.5px; color: var(--hz-text); line-height: 1.55; }
+.req-text strong { font-weight: 700; }
+.req-why {
+  font-size: 12px;
+  color: var(--hz-muted);
+  line-height: 1.5;
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid var(--hz-border);
+}
+.req-why strong { color: var(--hz-text); font-weight: 600; }
+.req-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .3px;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+.tag-if   { background: var(--hz-cloud); color: var(--hz-indigo); }
+.tag-erp  { background: var(--hz-teal-bg); color: var(--hz-teal); }
+.tag-inst { background: #F0EBF8; color: #6B35A8; }
+.tag-req  { background: var(--hz-bg); color: var(--hz-muted); border: 1px solid var(--hz-border); }
+
+/* ── Step headers ── */
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 30px 0 12px;
+}
+.step-num {
+  width: 27px; height: 27px;
+  background: var(--hz-indigo);
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step-title { font-size: 15px; font-weight: 700; color: var(--hz-text); }
+.inst-pill {
+  font-size: 9.5px;
+  font-weight: 600;
+  background: #F0EBF8;
+  color: #6B35A8;
+  border-radius: 6px;
+  padding: 2px 8px;
+  margin-left: 2px;
+}
+
+/* ── Conditional / IF blocks ── */
+.if-block {
+  background: var(--hz-cloud);
+  border: 1px solid rgba(100,92,220,.2);
+  border-left: 3px solid var(--hz-accent);
+  border-radius: 12px;
+  padding: 13px 15px 13px 15px;
+  margin: 10px 0 10px 20px;
+}
+.if-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--hz-accent);
+  margin-bottom: 9px;
+}
+.if-block .req-item { background: white; }
+
+/* ── Config table ── */
+.config-table {
+  background: var(--hz-card);
+  border: 1px solid var(--hz-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.config-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--hz-border);
+  font-size: 13px;
+}
+.config-row:last-child { border-bottom: none; }
+.config-key { width: 196px; flex-shrink: 0; color: var(--hz-hint); font-size: 12px; padding-top: 1px; }
+.config-val { color: var(--hz-text); font-weight: 500; }
+
+/* ── Scenario description ── */
+.scenario-desc {
+  background: var(--hz-card);
+  border: 1px solid var(--hz-border);
+  border-radius: 13px;
+  padding: 18px 20px;
+  margin-bottom: 28px;
+}
+.scenario-desc-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--hz-hint);
+  margin-bottom: 8px;
+}
+.scenario-desc p {
+  font-size: 13px;
+  color: var(--hz-muted);
+  line-height: 1.65;
+  margin-bottom: 7px;
+}
+.scenario-desc p:last-child { margin-bottom: 0; }
+
+/* ── Sub-section heading (post-onboarding) ── */
+.sub-section-header {
+  margin: 36px 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid var(--hz-border);
+}
+.sub-section-eyebrow {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .9px;
+  color: var(--hz-hint);
+  margin-bottom: 3px;
+}
+.sub-section-title { font-size: 16px; font-weight: 700; color: var(--hz-text); }
+
+/* ── Coming soon ── */
+.coming-soon {
+  background: var(--hz-card);
+  border: 1px dashed rgba(100,92,220,.25);
+  border-radius: 13px;
+  padding: 28px 22px;
+  text-align: center;
+  color: var(--hz-hint);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ── Impact summary table ── */
+.impact-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  background: var(--hz-card);
+  border: 1px solid var(--hz-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.impact-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--hz-hint);
+  background: var(--hz-bg);
+  border-bottom: 1px solid var(--hz-border);
+}
+.impact-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--hz-border);
+  color: var(--hz-text);
+  vertical-align: top;
+}
+.impact-table tr:last-child td { border-bottom: none; }
+.impact-table td:first-child { color: var(--hz-accent); font-weight: 600; }
+.impact-table td code {
+  background: var(--hz-cloud);
+  color: var(--hz-indigo);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+}
+
+@media (max-width: 800px) {
+  .sidebar { display: none; }
+  .main { padding: 28px 20px 72px; }
+  .visitor-bar { padding: 9px 20px; }
+  .if-block { margin-left: 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     NAME OVERLAY
+════════════════════════════════════════ -->
+<div id="name-overlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
+  <div class="overlay-card">
+    <div class="overlay-eyebrow">Horizon · Consumer Onboarding</div>
+    <h1 class="overlay-title" id="overlay-title">Who's reviewing?</h1>
+    <p class="overlay-sub">Enter your name and we'll highlight any requirements that changed since you last opened this document—so you only need to read what's new.</p>
+    <form id="name-form" novalidate>
+      <input id="name-input" class="overlay-input" type="text" placeholder="Your full name"
+        autocomplete="off" autocorrect="off" spellcheck="false" required/>
+      <button type="submit" class="overlay-btn">View Requirements</button>
+    </form>
+    <p class="overlay-note">Your name is saved in your browser only — never sent anywhere.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     VISITOR BAR
+════════════════════════════════════════ -->
+<div id="visitor-bar" class="visitor-bar" role="status">
+  <span>Viewing as <span id="visitor-name" class="visitor-name"></span></span>
+  <span id="visitor-change-pill" class="visitor-change-pill"></span>
+  <button class="visitor-switch" onclick="switchViewer()">Not you?</button>
+</div>
+
+<!-- ════════════════════════════════════════
+     LAYOUT
+════════════════════════════════════════ -->
+<div class="layout">
+
+  <!-- Sidebar nav -->
+  <nav class="sidebar" aria-label="Document sections">
+    <div class="nav-logo">Horizon PRD</div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Foundation</div>
+      <a href="#vision"            class="nav-link">Product Vision</a>
+      <a href="#onboarding-vision" class="nav-link">Onboarding Vision</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Scenarios</div>
+      <a href="#s1" class="nav-link">
+        1 · First Time Student
+        <span class="nav-sub">New student, full onboarding</span>
+      </a>
+      <a href="#s2" class="nav-link soon">
+        2 · Returning Student
+        <span class="nav-sub">Coming soon</span>
+      </a>
+      <a href="#s3" class="nav-link soon">
+        3 · New AP — Single Payer
+        <span class="nav-sub">Coming soon</span>
+      </a>
+      <a href="#s4" class="nav-link soon">
+        4 · New AP — Multi Payer
+        <span class="nav-sub">Coming soon</span>
+      </a>
+      <a href="#s5" class="nav-link soon">
+        5 · AP — Non-Payer
+        <span class="nav-sub">Coming soon</span>
+      </a>
+      <a href="#s6" class="nav-link soon">
+        6 · Returning AP
+        <span class="nav-sub">Coming soon</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main" id="main-content">
+
+    <!-- Doc header -->
+    <header class="doc-header">
+      <div class="doc-eyebrow">Nelnet · Horizon</div>
+      <h1 class="doc-title">Consumer Onboarding — Product Requirements</h1>
+      <p class="doc-meta">Living document · updated alongside prototype iterations · Last updated April 30, 2026</p>
+      <div class="share-tip">
+        🔗 <span>This page can be shared directly. It contains no links to prototype files — recipients will only see requirements.</span>
+      </div>
+    </header>
+
+    <!-- Change banner (shown after name entry when there are updates) -->
+    <div id="change-banner" class="change-banner" role="alert"></div>
+
+
+    <!-- ════════════════════════════════════════
+         HORIZON CONSUMER VISION
+    ════════════════════════════════════════ -->
+    <section id="vision" class="prd-section">
+      <div class="section-eyebrow">Foundation</div>
+      <h2 class="section-title">Horizon Consumer Product Vision</h2>
+      <hr class="section-divider"/>
+
+      <div class="vision-item" data-modified="2026-04-30">
+        <div class="vision-icon">🧭</div>
+        <div>
+          <div class="vision-title">Guided by Situation</div>
+          <div class="vision-body">Horizon guides each consumer through the experience they need, based on their current financial situation and the choices they've already made — without unnecessary friction.</div>
+        </div>
+      </div>
+
+      <div class="vision-item" data-modified="2026-04-30">
+        <div class="vision-icon">🔗</div>
+        <div>
+          <div class="vision-title">End-to-End Continuity</div>
+          <div class="vision-body">One continuous experience — from deciding how to pay when amounts are still estimated, to completing payment once balances are final — so consumers always see the next action, understand why it matters, and move seamlessly from planning to payment.</div>
+        </div>
+      </div>
+
+      <div class="vision-item" data-modified="2026-04-30">
+        <div class="vision-icon">🎯</div>
+        <div>
+          <div class="vision-title">Guided and Personalized, Not Generic</div>
+          <div class="vision-body">The experience adapts to each user's situation, decisions, account changes, and constraints — showing what matters to them, not every possible option at once.</div>
+        </div>
+      </div>
+
+      <div class="vision-item" data-modified="2026-04-30">
+        <div class="vision-icon">💡</div>
+        <div>
+          <div class="vision-title">Decision-First Experiences</div>
+          <div class="vision-body">Don't just tell users what they owe, when it's due, and how to pay. Present what they need to decide on, based on their situation, and clearly explain why that decision matters.</div>
+        </div>
+      </div>
+
+      <div class="vision-item" data-modified="2026-04-30">
+        <div class="vision-icon">📊</div>
+        <div>
+          <div class="vision-title">Relevance Without Overload</div>
+          <div class="vision-body">Empower users with timely, relevant information — starting with what they need to know, with seamless access to full details when deeper understanding is required.</div>
+        </div>
+      </div>
+
+      <div class="vision-item" data-modified="2026-04-30">
+        <div class="vision-icon">💬</div>
+        <div>
+          <div class="vision-title">Changes Communicated in Natural Language</div>
+          <div class="vision-body">Users don't understand change through labels — they understand it through reasons and outcomes. Communicate using a clear cause → effect model: what triggered the change and what it means for the user.</div>
+        </div>
+      </div>
+
+      <div class="vision-item" data-modified="2026-04-30">
+        <div class="vision-icon">⚡</div>
+        <div>
+          <div class="vision-title">Fewer Clicks, Fewer Screens</div>
+          <div class="vision-body">Consumers come here to pay for school. Remove unnecessary steps and screens so users complete what they came to do — quickly and confidently.</div>
+        </div>
+      </div>
+
+      <div class="vision-item" data-modified="2026-04-30">
+        <div class="vision-icon">🚫</div>
+        <div>
+          <div class="vision-title">No Duplicate Entry. Ever.</div>
+          <div class="vision-body">Students are never asked to re-enter information the school already has. Horizon pulls data directly from the institution's ERP and uses existing Nelnet payment history term over term — confirming or adjusting only what's changed.</div>
+        </div>
+      </div>
+
+      <div class="vision-item" data-modified="2026-04-30">
+        <div class="vision-icon">💳</div>
+        <div>
+          <div class="vision-title">Modern Payment Experience</div>
+          <div class="vision-body">Horizon looks and feels like the modern payment systems consumers use every day — Apple Pay and other modern methods — without workarounds or barriers.</div>
+        </div>
+      </div>
+
+      <div class="vision-item" data-modified="2026-04-30">
+        <div class="vision-icon">📱</div>
+        <div>
+          <div class="vision-title">Phone &amp; Text First</div>
+          <div class="vision-body">Text and phone are primary — not secondary — channels for communication and support. Meet users where they already are.</div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         ONBOARDING VISION
+    ════════════════════════════════════════ -->
+    <section id="onboarding-vision" class="prd-section">
+      <div class="section-eyebrow">Foundation</div>
+      <h2 class="section-title">Onboarding Vision</h2>
+      <hr class="section-divider"/>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text"><strong>Set-it-and-forget-it outcome.</strong> Once onboarding is complete, a student who makes no changes to their account or payment method should realistically never need to re-enter the system during the term if they don't want to. All required decisions, preferences, and payment setup must be fully captured upfront.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text"><strong>One decision at a time.</strong> Onboarding is structured around presenting one decision at a time. Each question reveals the next only after the previous is answered. If a later decision would logically prompt reconsideration of an earlier answer, editing backward is always possible — but the student is never asked to handle two open decisions at once.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text"><strong>ERP-first data strategy.</strong> Any value the ERP already holds — name, student ID, charges, financial aid, enrollment status, contact info from SSO — must be pre-populated. Students are never asked to type what the system already knows. The experience confirms or adjusts existing data; it does not re-collect it.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text"><strong>Scenario-driven communication setup.</strong> Onboarding collects the specific information needed to personalize every subsequent communication and to-do for that student's exact situation: payment plan type, authorized parties added, insurance decisions, and communication preferences all feed into what the student sees and receives after signup.</p>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         SCENARIO 1: FIRST TIME STUDENT
+    ════════════════════════════════════════ -->
+    <section id="s1" class="prd-section">
+      <div class="section-eyebrow">Scenario 1 · Student</div>
+      <h2 class="section-title">First Time Student</h2>
+      <hr class="section-divider"/>
+
+      <!-- Scenario description -->
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>A student arriving at the Nelnet payment portal for the very first time. They authenticate via SAML SSO from their university's student portal — no separate Nelnet login is created. Upon authentication, a full ERP sync delivers all account data automatically.</p>
+        <p>This student has no existing payment methods, authorized parties, or communication preferences on file. Every decision in this flow is being made for the first time this term. The prototype for this scenario is the "First Time Student" prototype on the index page.</p>
+      </div>
+
+      <!-- Institution config -->
+      <div class="subsection">
+        <div class="subsection-label">Institution Configuration — This Scenario</div>
+        <div class="config-table">
+          <div class="config-row"><span class="config-key">Authentication</span><span class="config-val">SAML SSO from university portal</span></div>
+          <div class="config-row"><span class="config-key">ERP integration</span><span class="config-val">Full sync — charges, aid, enrollment</span></div>
+          <div class="config-row"><span class="config-key">Tuition insurance</span><span class="config-val">Enabled (GradGuard)</span></div>
+          <div class="config-row"><span class="config-key">Payment plan offers</span><span class="config-val">1 — Pay Over Time</span></div>
+          <div class="config-row"><span class="config-key">Accepted payment methods</span><span class="config-val">ACH (bank) + Credit Card</span></div>
+          <div class="config-row"><span class="config-key">University disclosures</span><span class="config-val">3 (individually acknowledged)</span></div>
+          <div class="config-row"><span class="config-key">POT first payment window</span><span class="config-val">Must be within 30 days of today</span></div>
+          <div class="config-row"><span class="config-key">POT minimum down payment</span><span class="config-val">5% of plan balance</span></div>
+        </div>
+      </div>
+
+      <!-- Auth & data -->
+      <div class="subsection">
+        <div class="subsection-label">Authentication &amp; Data Pre-population</div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">The student arrives exclusively via SAML SSO from the university portal. No Nelnet-specific username or password entry occurs within Horizon.</p>
+          <div class="req-tags"><span class="tag tag-erp">ERP / SSO</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Upon authentication, the system must automatically populate: student first name, last name, preferred name (if available), student ID, current term, total charges, applied financial aid, anticipated financial aid, balance due, primary email address, and phone number — all sourced from the ERP. None of these require manual entry.</p>
+          <p class="req-why"><strong>Why:</strong> No duplicate entry. The student should never type what the institution already knows. This is a core product principle.</p>
+          <div class="req-tags"><span class="tag tag-erp">ERP / SSO</span><span class="tag tag-req">Required</span></div>
+        </div>
+      </div>
+
+      <!-- ── STEP 1 ── -->
+      <div class="step-header" id="s1-step1">
+        <div class="step-num">1</div>
+        <div class="step-title">Balance Overview</div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">Present the student's full account balance breakdown: total charges, applied financial aid, anticipated financial aid, and resulting balance due. All values are sourced from the ERP — no manual entry.</p>
+        <p class="req-why"><strong>Why:</strong> Students must understand what they owe before making any payment decision. This is the anchor for all downstream choices in the flow.</p>
+        <div class="req-tags"><span class="tag tag-erp">ERP / SSO</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">The term "Anticipated" (adjacent to the anticipated aid figure) must be interactive — tapping or clicking it opens an inline explanation: anticipated aid has been subtracted from the balance shown, but is not yet officially applied to the student's school account. If it does not finalize, the student may still owe that amount.</p>
+        <p class="req-why"><strong>Why:</strong> Anticipated aid is a leading driver of student confusion and support contacts. An inline explanation surfaces at the moment of need without adding a screen.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">The balance breakdown must remain accessible to the student throughout the entire onboarding flow. They should be able to reference their balance at any point while making decisions.</p>
+      </div>
+
+
+      <!-- ── STEP 2 ── -->
+      <div class="step-header" id="s1-step2">
+        <div class="step-num">2</div>
+        <div class="step-title">Tuition Insurance <span class="inst-pill">Institution: GradGuard enabled</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">This step is shown only when the institution has tuition insurance (GradGuard) enabled. If not enabled, the flow proceeds directly to Step 3.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution setting</span><span class="tag tag-if">IF: GradGuard enabled → show step</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">The insurance offer must not be presented until the correct premium can be calculated. Premium varies by the student's state of residence. Ask first: "Do you live in [institution state]?" — Yes / No. This is the only question shown initially.</p>
+        <p class="req-why"><strong>Why:</strong> Showing an offer before knowing the applicable premium is either misleading or requires a rate percentage — which means nothing actionable to most consumers.</p>
+      </div>
+
+      <div class="if-block">
+        <div class="if-label">IF: Student answers "No, I live out of state"</div>
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Reveal a state selector so the student can indicate their state of residence. Once a state is selected, the correct premium is calculated and the offer can be shown.</p>
+        </div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">Once state is resolved (either "Yes, I live in [state]" or an out-of-state selection is made), show the tuition insurance offer card. Display the premium as a dollar amount only — do not show a rate percentage.</p>
+        <p class="req-why"><strong>Why:</strong> A percentage rate is not actionable. The dollar cost is what allows the student to make a real decision.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">The student must have three response options: Accept, Decline, or Decide Later.</p>
+      </div>
+
+      <div class="if-block">
+        <div class="if-label">IF: Student accepts tuition insurance</div>
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Display an immediate confirmation note at the point of acceptance: "[Premium amount] will be added to your sign-up costs today." The student must know the premium is part of today's payment before they proceed.</p>
+        </div>
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">The insurance premium must be included in every downstream total-due-today calculation: the Pay Over Time down payment breakdown (Step 3), the payment confirmation screen (Step 4), and the success screen. The total must never show just the down payment or enrollment fee in isolation.</p>
+          <div class="req-tags"><span class="tag tag-if">Cascades to: Step 3 · Step 4 · Success screen</span></div>
+        </div>
+      </div>
+
+
+      <!-- ── STEP 3 ── -->
+      <div class="step-header" id="s1-step3">
+        <div class="step-num">3</div>
+        <div class="step-title">How to Pay</div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">Present the available payment paths. Options are determined by institution settings. Always available: Pay in Full, Schedule a Payment. Conditional: Pay Over Time (shown only if the institution offers a payment plan).</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution setting</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">Each option must describe what it means for the student — not just label the option. The Pay Over Time option description: "Split your balance into multiple payments over a longer period of time." Do not surface plan details (installment count, fees) at this selection step — those are determined in the inline setup that follows.</p>
+        <p class="req-why"><strong>Why:</strong> Decision-first principle — explain the outcome, not the mechanics. Details are surfaced only when the student has chosen this path.</p>
+      </div>
+
+      <!-- Pay in Full path -->
+      <div class="if-block">
+        <div class="if-label">PATH: Pay in Full</div>
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Show the full balance due. Student proceeds to Step 4 (payment method collection) for the full amount.</p>
+        </div>
+      </div>
+
+      <!-- Schedule path -->
+      <div class="if-block">
+        <div class="if-label">PATH: Schedule a Payment</div>
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Allow the student to select a future payment date. Student then proceeds to Step 4 to enter their payment method for the scheduled amount.</p>
+        </div>
+      </div>
+
+      <!-- Pay Over Time path -->
+      <div class="if-block">
+        <div class="if-label">PATH: Pay Over Time <span class="inst-pill" style="font-size:9px">Institution: plan offered</span></div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">The entire Pay Over Time setup must happen inline on the same screen where the student selected "Pay Over Time." The system must not navigate to a separate setup screen. The balance card must remain visible at the top of the screen throughout the setup.</p>
+          <p class="req-why"><strong>Why:</strong> Keeping the balance context visible while making payment structure decisions reduces cognitive load and prevents the student from losing track of what they're paying.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Setup uses a progressive reveal pattern across 4 sequential decisions. Each decision step collapses to a summary row (with an Edit button) once confirmed. Editing any step resets all downstream confirmations — for example, editing frequency invalidates the installment count and down payment, since those depend on frequency.</p>
+          <p class="req-why"><strong>Why:</strong> Downstream choices (installment count, last payment date) depend directly on upstream choices (frequency, first date). Preventing stale combinations avoids the student accidentally committing to an invalid plan.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text"><strong>Sub-step A — Payment Frequency.</strong> Options: Weekly, Every 2 weeks, Monthly. Once confirmed, collapses to a summary row showing the selected frequency, with an Edit button.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text"><strong>Sub-step B — First Payment Date.</strong> The institution's date constraint must be displayed prominently before the student selects a date: "Your first payment must be within 30 days of today." The date picker must enforce this: minimum = tomorrow, maximum = 30 days from today. Once confirmed, collapses to a summary row showing the selected date.</p>
+          <p class="req-why"><strong>Why:</strong> Institution requirements must be communicated upfront — not as a validation error after the student picks an invalid date. This is a decision-framing requirement, not just a validation rule.</p>
+          <div class="req-tags"><span class="tag tag-inst">Institution setting: 30-day window</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text"><strong>Sub-step C — Number of Installments.</strong> The options shown depend on the frequency chosen in Sub-step A:<br/>
+          &nbsp;· Weekly: 4, 8, 13, or 26 installments<br/>
+          &nbsp;· Every 2 weeks: 3, 6, 9, or 12 installments<br/>
+          &nbsp;· Monthly: 3, 6, 9, or 12 installments<br/>
+          The collapsed summary row must show: "[N] installments — last payment [calculated date] — [frequency]." The last payment date is calculated from Sub-steps A + B + C.</p>
+          <p class="req-why"><strong>Why:</strong> The last payment date is the most meaningful signal of commitment length. Surfacing it in the summary immediately after selection confirms the student understands when the plan ends.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text"><strong>Sub-step D — Down Payment.</strong> A slider allowing the student to choose how much to pay today as a down payment. Slider minimum = 5% of the plan balance (the institution-required minimum), clearly labeled as "School min (5%)." Slider maximum = full balance. As the slider moves, the per-installment payment amount updates dynamically.</p>
+          <p class="req-why"><strong>Why:</strong> Giving students control over the down payment empowers cash flow management. The 5% floor is a school requirement and must be communicated proactively — not encountered as a blocking error.</p>
+          <div class="req-tags"><span class="tag tag-inst">Institution setting: 5% minimum</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Throughout Sub-step D, display a live breakdown of the total due today — updated in real time as the slider moves. The breakdown must include:<br/>
+          &nbsp;· Down payment (selected amount)<br/>
+          &nbsp;· Nelnet enrollment fee<br/>
+          &nbsp;· Tuition insurance premium (only if accepted in Step 2)<br/>
+          &nbsp;· Total due today</p>
+          <p class="req-why"><strong>Why:</strong> The student is deciding how much leaves their account today. They need to see the complete picture in real time — not just the down payment value in isolation.</p>
+          <div class="req-tags"><span class="tag tag-if">IF: Insurance accepted → include premium in breakdown</span></div>
+        </div>
+      </div>
+
+
+      <!-- ── STEP 4 ── -->
+      <div class="step-header" id="s1-step4">
+        <div class="step-num">4</div>
+        <div class="step-title">Payment Method &amp; Confirmation</div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">Collect the payment method for the amount due today (full balance, scheduled amount, or Pay Over Time total). Accepted methods are determined by institution settings. This scenario: ACH (bank account) and Credit Card.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution setting: accepted methods</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">If a saved payment method exists from a previous term, pre-select and display it. Only request new payment details if no saved method is on file.</p>
+        <p class="req-why"><strong>Why:</strong> No duplicate entry. Payment methods carry forward term over term.</p>
+        <div class="req-tags"><span class="tag tag-if">IF: Saved method on file → pre-populate</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">Before charging, present a full confirmation screen showing a complete breakdown of everything due today. For Pay Over Time, this includes: down payment, Nelnet enrollment fee, tuition insurance premium (if applicable), total due today, plus the plan summary — installment count × installment amount, payment frequency, first payment date, and remaining balance after today's payment.</p>
+        <div class="req-tags"><span class="tag tag-if">IF: Insurance accepted → show premium row</span><span class="tag tag-if">IF: POT path → show plan summary</span></div>
+      </div>
+
+
+      <!-- ── STEP 5 ── -->
+      <div class="step-header" id="s1-step5">
+        <div class="step-num">5</div>
+        <div class="step-title">Authorized Parties</div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">Allow the student to designate authorized parties — individuals who can access and pay on the student's behalf. Authorized parties are managed within Nelnet's system, not by the institution. The student controls who has access.</p>
+        <p class="req-why"><strong>Why:</strong> Many students have parents or guardians who manage payments. Capturing this during onboarding means the AP can be active immediately, without a separate re-entry loop later.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">Collect name and email for each authorized party. Send each AP an invitation email with their account setup link immediately upon submission.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">The student can add multiple authorized parties, or skip this step entirely.</p>
+      </div>
+
+      <div class="if-block">
+        <div class="if-label">IF: One or more authorized parties added</div>
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Post-onboarding: the Manage Authorized Parties quick action on the home screen must show the names of the APs added here, not just a generic label.</p>
+          <div class="req-tags"><span class="tag tag-if">Cascades to: Home screen quick actions</span></div>
+        </div>
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Post-onboarding: if any authorized party subsequently sets up a Pay Over Time plan, a new "AP Pay Over Time Plans" quick action must appear on the student's home screen.</p>
+          <div class="req-tags"><span class="tag tag-if">Cascades to: Home screen · IF AP creates POT plan</span></div>
+        </div>
+      </div>
+
+
+      <!-- ── STEP 6 ── -->
+      <div class="step-header" id="s1-step6">
+        <div class="step-num">6</div>
+        <div class="step-title">Communication Preferences</div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">Transactional SMS (payment confirmations, reminders, account alerts) must be enabled and is not toggleable. Label it as required for account activity.</p>
+        <p class="req-why"><strong>Why:</strong> Transactional messages are required to service the account. Opt-out is not available for this category.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">Marketing/promotional SMS is opt-in and toggleable. The default for a first-time student is off unless the institution has configured a different default. Whatever state the student sets here carries forward to their Account Details screen.</p>
+        <div class="req-tags"><span class="tag tag-if">Cascades to: Account Details · SMS opt-in state</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">The student's email address is pre-populated from SSO/ERP. No re-entry required.</p>
+        <div class="req-tags"><span class="tag tag-erp">ERP / SSO</span></div>
+      </div>
+
+
+      <!-- ── STEP 7 ── -->
+      <div class="step-header" id="s1-step7">
+        <div class="step-num">7</div>
+        <div class="step-title">Security Questions</div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">The student must set security questions for account recovery. Answers are stored and accessible (masked) from the Account Details screen post-onboarding, with a "Change" option to update them.</p>
+      </div>
+
+
+      <!-- ── STEP 8 ── -->
+      <div class="step-header" id="s1-step8">
+        <div class="step-num">8</div>
+        <div class="step-title">Disclosures <span class="inst-pill">Institution setting: count</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-04-30">
+        <p class="req-text">Display the institution-configured number of disclosures (this scenario: 3). Each disclosure must be individually acknowledged before the student can complete onboarding.</p>
+        <p class="req-why"><strong>Why:</strong> Legal requirement. Disclosure count and content vary per institution.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution setting: disclosure count</span></div>
+      </div>
+
+
+      <!-- ── POST-ONBOARDING: HOME SCREEN ── -->
+      <div class="sub-section-header">
+        <div class="sub-section-eyebrow">Post-Onboarding</div>
+        <div class="sub-section-title">Consumer Home Screen</div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-label">Greeting &amp; Identity Area</div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Greet the student by first name — large, left-aligned. Account access (initials avatar + "Account" label) is positioned on the right side of the greeting area and is always tappable to reach Account Details. The initials avatar is the only account access entry point; no duplicate link elsewhere in the header.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-label">To-dos Section</div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">A "To dos" section appears above the account summary. To-do items are entirely dynamic — generated from the student's current account state. Show nothing in this section if there are no actionable to-dos.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">If an open (unpaid, unscheduled) balance exists: show a to-do card displaying the open amount, with the copy "Hasn't been paid or scheduled to be paid yet."</p>
+          <div class="req-tags"><span class="tag tag-if">IF: Open balance exists</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">If a payment is due within the next 30 days: surface it as a to-do with the amount and due date.</p>
+          <div class="req-tags"><span class="tag tag-if">IF: Payment due within 30 days</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Account activity from the last 30 days must be surfaced in this area as context — payments made, plan changes, etc.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-label">Account Summary Section</div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Show a visual balance bar below the "Account summary" section label. The bar is composed of up to two segments representing how the total balance is distributed:</p>
+          <p class="req-text" style="margin-top:6px">&nbsp;· <strong>On Pay Over Time plan</strong> (teal/green segment) — only present if student has an active POT plan<br/>
+          &nbsp;· <strong>Open balance</strong> (accent color segment) — always present if there is any open/unpaid balance</p>
+          <p class="req-text" style="margin-top:6px">The proportions of each segment reflect the actual split of the student's total balance.</p>
+          <div class="req-tags">
+            <span class="tag tag-if">IF: POT plan active → two-segment bar</span>
+            <span class="tag tag-if">IF: No POT plan → single segment</span>
+          </div>
+        </div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Below the balance bar: display the open balance dollar amount prominently on the left. The label "Open balance" appears to the right of the number. Brief supporting text explains what "open balance" means in this context.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">A "View full statement" button must be present within the account summary section — not in the quick actions. It is a secondary/outline-style button (not a primary CTA).</p>
+          <p class="req-why"><strong>Why:</strong> Statement access is contextually adjacent to the balance — that's where students will look for it. It does not belong in quick actions as a distinct action.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-label">Quick Actions (Dynamic, Priority Ordered)</div>
+
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Quick actions are shown and ordered dynamically based on the student's account state. The full ordered list:</p>
+          <p class="req-text" style="margin-top:8px">
+            <strong>1. My Pay Over Time Plan</strong> — shown only if the student has an active POT plan<br/>
+            <strong>2. Manage Authorized Parties</strong> — always shown; sub-label: "People with full payment access to your account"<br/>
+            <strong>3. Guest Payment Link</strong> — always shown; framed as sending a one-time payment link<br/>
+            <strong>4. Make a Payment</strong> — always shown; sub-label sets expectation: make a payment now<br/>
+            <strong>5. Account History</strong> — always shown<br/>
+            <strong>6. AP Pay Over Time Plans</strong> — shown only if at least one authorized party has an active POT plan
+          </p>
+          <div class="req-tags">
+            <span class="tag tag-if">IF: Student has POT → show #1</span>
+            <span class="tag tag-if">IF: Any AP has POT → show #6</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decision Impact Summary -->
+      <div class="subsection">
+        <div class="subsection-label">Decision Impact Summary — How Onboarding Choices Affect the Home Screen</div>
+        <p style="font-size:12.5px;color:var(--hz-muted);margin-bottom:12px;line-height:1.55;">The table below consolidates how decisions made during onboarding directly shape what the student sees on their home screen.</p>
+        <table class="impact-table">
+          <thead>
+            <tr>
+              <th>Onboarding decision</th>
+              <th>Home screen impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Student selects Pay Over Time</td>
+              <td>Balance bar gains a teal "on-plan" segment. "My Pay Over Time Plan" quick action (position #1) appears. Open balance reflects only the unpaid, un-planned portion.</td>
+            </tr>
+            <tr>
+              <td>Student accepts tuition insurance</td>
+              <td>Insurance premium was included in today's payment — no recurring home screen impact. Plan confirmation and success screens reflect the correct totals.</td>
+            </tr>
+            <tr>
+              <td>Student adds one or more authorized parties</td>
+              <td>"Manage Authorized Parties" quick action shows the AP names. If any AP later sets up a POT plan, "AP Pay Over Time Plans" quick action (position #6) activates.</td>
+            </tr>
+            <tr>
+              <td>Student sets marketing SMS to on</td>
+              <td>Marketing SMS preference is reflected as "on" in Account Details → Communication Preferences section.</td>
+            </tr>
+            <tr>
+              <td>Student pays in full today</td>
+              <td>No open-balance to-do on home screen. Balance bar shows single green segment (paid). No POT quick action.</td>
+            </tr>
+            <tr>
+              <td>No authorized parties added</td>
+              <td>"Manage Authorized Parties" still shown — allows the student to add APs post-onboarding. "AP Pay Over Time Plans" is hidden until an AP is added and sets up a plan.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+
+      <!-- ── POST-ONBOARDING: SUB-SCREENS ── -->
+      <div class="sub-section-header">
+        <div class="sub-section-eyebrow">Post-Onboarding Sub-screens</div>
+        <div class="sub-section-title">Supporting Screens</div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-label">Account Details</div>
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Accessible from the initials avatar on the home screen. Must display: first name, last name, preferred name (editable), student ID (read-only — from ERP). Contact section: email addresses and phone numbers, each individually editable and addable. SMS opt-in section: transactional (locked on, labeled as required), marketing (toggleable). Security questions section: answers masked, with a "Change" action that launches the security question update flow.</p>
+          <div class="req-tags"><span class="tag tag-erp">Student ID: ERP / read-only</span></div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-label">Manage Authorized Parties</div>
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Show all authorized parties with their current active/inactive status. Student can toggle any AP between active and inactive. Deactivating an AP must require an explicit confirmation step to prevent accidental removal. Student can invite additional APs directly from this screen.</p>
+          <p class="req-why"><strong>Why:</strong> The student owns access control. A confirmation step on deactivation protects against accidentally cutting off someone who is actively managing payments.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-label">Guest Payment Link</div>
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Frame this as a one-time payment link — not account access. Show the student's current open balance as context. Allow the student to set a cap amount (must be ≤ open balance) and an optional note to the guest. Explicitly and clearly distinguish this from an authorized party: the guest has zero ongoing account access — they can only pay once via this link.</p>
+          <p class="req-why"><strong>Why:</strong> Some students want a family member to make a single payment without granting ongoing account visibility or control. The distinction between "guest payer" and "authorized party" must be unambiguous — otherwise students may unknowingly grant more access than intended, or be confused when the guest can't pay again.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-label">AP Pay Over Time Plans</div>
+        <div class="req-item" data-modified="2026-04-30">
+          <p class="req-text">Read-only view of Pay Over Time plans set up by the student's authorized parties. Accessible from quick action #6 on the home screen, which is only shown when at least one AP has an active POT plan.</p>
+          <div class="req-tags"><span class="tag tag-if">IF: AP has active POT plan → quick action visible</span></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         SCENARIOS 2–6 (Coming Soon)
+    ════════════════════════════════════════ -->
+    <section id="s2" class="prd-section">
+      <div class="section-eyebrow">Scenario 2 · Student</div>
+      <h2 class="section-title">Returning Student</h2>
+      <hr class="section-divider"/>
+      <div class="coming-soon">
+        Requirements coming soon. This scenario covers a student returning from a previous term with existing Nelnet history — saved payment methods, prior authorized parties, and previously set communication preferences — experiencing a streamlined re-onboarding that confirms only what may have changed.
+      </div>
+    </section>
+
+    <section id="s3" class="prd-section">
+      <div class="section-eyebrow">Scenario 3 · Authorized Party</div>
+      <h2 class="section-title">New Authorized Party — Single Payer</h2>
+      <hr class="section-divider"/>
+      <div class="coming-soon">Requirements coming soon.</div>
+    </section>
+
+    <section id="s4" class="prd-section">
+      <div class="section-eyebrow">Scenario 4 · Authorized Party</div>
+      <h2 class="section-title">New Authorized Party — Multiple Payers</h2>
+      <hr class="section-divider"/>
+      <div class="coming-soon">Requirements coming soon.</div>
+    </section>
+
+    <section id="s5" class="prd-section">
+      <div class="section-eyebrow">Scenario 5 · Authorized Party</div>
+      <h2 class="section-title">Authorized Party — Non-Payer</h2>
+      <hr class="section-divider"/>
+      <div class="coming-soon">Requirements coming soon.</div>
+    </section>
+
+    <section id="s6" class="prd-section">
+      <div class="section-eyebrow">Scenario 6 · Authorized Party</div>
+      <h2 class="section-title">Returning Authorized Party</h2>
+      <hr class="section-divider"/>
+      <div class="coming-soon">Requirements coming soon.</div>
+    </section>
+
+  </main>
+</div><!-- end layout -->
+
+
+<script>
+const DOC_DATE = '2026-04-30';
+
+function storageKey(name) {
+  return 'hz_prd_seen_' + name.toLowerCase().replace(/\s+/g, '_');
+}
+
+document.getElementById('name-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const name = document.getElementById('name-input').value.trim();
+  if (!name) return;
+  openAsViewer(name);
+});
+
+function openAsViewer(name) {
+  const key      = storageKey(name);
+  const lastSeen = localStorage.getItem(key) || '2000-01-01';
+
+  // Highlight every element with a data-modified date newer than last visit
+  const items = document.querySelectorAll('[data-modified]');
+  let count = 0;
+  items.forEach(function(el) {
+    if (el.dataset.modified > lastSeen) {
+      el.classList.add('changed');
+      count++;
+    }
+  });
+
+  // Record today as their new last-seen date
+  localStorage.setItem(key, DOC_DATE);
+
+  // Dismiss overlay
+  document.getElementById('name-overlay').style.display = 'none';
+
+  // Show visitor bar
+  document.getElementById('visitor-name').textContent = name;
+  var bar = document.getElementById('visitor-bar');
+  bar.style.display = 'flex';
+
+  // Show change pill + banner if there are updates
+  if (count > 0) {
+    var pill = document.getElementById('visitor-change-pill');
+    pill.textContent = count + ' updated';
+    pill.style.display = 'inline-block';
+
+    var banner = document.getElementById('change-banner');
+    banner.innerHTML =
+      '<strong>' + count + ' requirement' + (count !== 1 ? 's' : '') +
+      ' updated since your last visit.</strong> Items are highlighted in amber throughout the document — scroll through or jump to a section from the left nav.';
+    banner.style.display = 'block';
+  }
+}
+
+function switchViewer() {
+  // Clear highlights
+  document.querySelectorAll('.changed').forEach(function(el) {
+    el.classList.remove('changed');
+  });
+  document.getElementById('visitor-bar').style.display  = 'none';
+  document.getElementById('change-banner').style.display = 'none';
+  document.getElementById('visitor-change-pill').style.display = 'none';
+  document.getElementById('name-input').value = '';
+  document.getElementById('name-overlay').style.display = 'flex';
+}
+
+// ── Active nav highlight on scroll ──
+var sections  = document.querySelectorAll('section[id]');
+var navLinks  = document.querySelectorAll('.nav-link[href^="#"]');
+
+var io = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      navLinks.forEach(function(l) { l.classList.remove('active'); });
+      var match = document.querySelector('.nav-link[href="#' + entry.target.id + '"]');
+      if (match) match.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -72% 0px' });
+
+sections.forEach(function(s) { io.observe(s); });
+</script>
+</body>
+</html>
