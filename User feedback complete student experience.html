@@ -1946,9 +1946,9 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
   // To-do actions (derived from S state)
   const actions = [];
   if (openBal > 0 && !paidFull && S.payPlan !== 'later')
-    actions.push({id:'open-bal', icon:'⚡', color:'amber',
+    actions.push({id:'open-bal', icon:'⚡', color:'blue',
       title:'Open balance needs attention',
-      sub:`${fmt(openBal)} hasn't been scheduled or added to a plan yet`,
+      sub:`${fmt(openBal)} hasn't been paid or scheduled to be paid yet`,
       screen:'howpay', cta:'Address now'});
   if (S.payPlan === 'later')
     actions.push({id:'scheduled', icon:'📅', color:'blue',
@@ -1999,48 +1999,46 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
   return (
     <ScreenWrap portal={true}>
 
-      {/* Greeting — AJ bubble is the account link; no duplicate in header */}
-      <div className="px-4 pt-4 pb-2 flex items-center gap-3">
+      {/* Greeting — Hi Alex left, AJ account button right */}
+      <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+        <p className="text-[24px] font-bold text-hz-text leading-none">Hi, Alex 👋</p>
         <button onClick={()=>nav('account-details')} aria-label="Go to my account"
-          className="w-9 h-9 rounded-full bg-hz-cloud border border-hz-accent/20 flex items-center justify-center text-[13px] font-bold text-hz-indigo flex-shrink-0 hover:bg-hz-cloud/80 hover:border-hz-accent/40 active:scale-95 transition-all">
-          AJ
+          className="flex flex-col items-center gap-0.5 group active:scale-95 transition-transform">
+          <div className="w-10 h-10 rounded-full bg-hz-cloud border border-hz-accent/20 flex items-center justify-center text-[13px] font-bold text-hz-indigo group-hover:bg-hz-cloud/80 group-hover:border-hz-accent/40 transition-colors">AJ</div>
+          <span className="text-[9px] font-semibold text-hz-hint uppercase tracking-wide">Account</span>
         </button>
-        <div>
-          <p className="text-[16px] font-bold text-hz-text leading-tight">Hi, Alex 👋</p>
-          <p className="text-[11px] text-hz-hint">Student ID 1234567</p>
-        </div>
       </div>
 
       <div className="px-4 pb-8 space-y-5 pt-2">
 
-        {/* ── To Do — above balance card ── */}
+        {/* ── To Dos — above balance card ── */}
         {actions.length > 0 && (
-          <div className="space-y-2">
-            {actions.map(a=>(
-              <div key={a.id}
-                className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz overflow-hidden flex"
-                role="alert">
-                {/* Left accent stripe */}
-                <div className={`w-1 flex-shrink-0 ${a.color==='amber'?'bg-hz-amber':'bg-hz-accent'}`}/>
-                <div className="flex-1 px-4 py-3 flex items-center justify-between gap-3 min-w-0">
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-semibold text-hz-text leading-tight">{a.title}</p>
-                    <p className="text-[11px] text-hz-muted mt-0.5 leading-snug">{a.sub}</p>
+          <div>
+            <p className="text-[11px] font-semibold text-hz-hint mb-2.5">To dos</p>
+            <div className="space-y-2">
+              {actions.map(a=>(
+                <div key={a.id}
+                  className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz overflow-hidden flex"
+                  role="alert">
+                  <div className="w-1 flex-shrink-0 bg-hz-accent"/>
+                  <div className="flex-1 px-4 py-3 flex items-center justify-between gap-3 min-w-0">
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-hz-text leading-tight">{a.title}</p>
+                      <p className="text-[11px] text-hz-muted mt-0.5 leading-snug">{a.sub}</p>
+                    </div>
+                    <button onClick={()=>nav(a.screen)}
+                      className="flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-hz-indigo text-white hover:opacity-85 transition-opacity">
+                      {a.cta}
+                    </button>
                   </div>
-                  <button onClick={()=>nav(a.screen)}
-                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-opacity hover:opacity-80
-                      ${a.color==='amber'
-                        ? 'bg-hz-amber/15 text-hz-text border border-hz-amber/40'
-                        : 'bg-hz-indigo text-white'}`}>
-                    {a.cta}
-                  </button>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
         {/* ── Balance Card ── */}
+        <p className="text-[11px] font-semibold text-hz-hint mb-2.5">Account summary</p>
         <Card className="p-0 overflow-hidden">
           {paidFull ? (
             <div className="px-5 py-4 flex items-center gap-3">
@@ -2081,11 +2079,11 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
                 </div>
                 <div className="w-full h-1.5 rounded-full overflow-hidden flex bg-[rgba(100,92,220,0.08)]">
                   {planPct > 0 && <div style={{width:planPct+'%'}} className="bg-hz-teal h-full rounded-l-full"/>}
-                  {openPct > 0 && <div style={{width:openPct+'%'}} className={`bg-hz-amber/60 h-full ${planPct===0?'rounded-full':'rounded-r-full'}`}/>}
+                  {openPct > 0 && <div style={{width:openPct+'%'}} className={`bg-hz-accent/50 h-full ${planPct===0?'rounded-full':'rounded-r-full'}`}/>}
                 </div>
                 <div className="flex gap-3">
                   {planPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-full bg-hz-teal inline-block"/>On plan</span>}
-                  {openPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-full bg-hz-amber/60 inline-block"/>Open</span>}
+                  {openPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-full bg-hz-accent/50 inline-block"/>Open</span>}
                 </div>
               </div>
             </div>
@@ -2094,11 +2092,8 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
           {/* View statement — pill button row */}
           <div className="px-5 pb-4">
             <button onClick={()=>nav('costs')}
-              className="w-full flex items-center justify-center gap-1.5 py-2 rounded-full border border-[rgba(100,92,220,0.2)] text-[12px] font-semibold text-hz-indigo hover:bg-hz-cloud transition-colors">
+              className="w-full flex items-center justify-center py-2 rounded-full border border-[rgba(100,92,220,0.2)] text-[12px] font-semibold text-hz-indigo hover:bg-hz-cloud transition-colors">
               View full statement
-              <svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
             </button>
           </div>
         </Card>
@@ -2146,34 +2141,38 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
           const hasAPs  = (S.authPayers?.length ?? 0) > 0;
           const hasPot  = S.payPlan === 'pot';
           const qaItems = [
-            {
-              label:'Make Payment',
-              sub: hasPot ? 'Pay an installment or extra' : 'Pay your balance now',
-              icon:'💳', screen:'pay-now',
-            },
-            {
-              label:'Guest Payment Link',
-              sub:'One-time link — they pay up to your open balance, no account needed',
-              icon:'🔗', screen:'guest',
-            },
-            {
-              label:'Authorized Parties',
-              sub: hasAPs
-                ? `${S.authPayers.length} invited · tap to manage`
-                : 'Invite people to pay on your behalf',
-              icon:'👥', screen:'manage-ap',
-              badge: hasAPs ? String(S.authPayers.length) : null,
-            },
-            {
-              label:'Account History',
-              sub:'Payments, balance changes & activity',
-              icon:'📋', screen:'history',
-            },
+            // 1. My Pay Over Time Plan — only if on plan
             ...(hasPot ? [{
               label:'My Pay Over Time Plan',
               sub:`${fmt(S.potInstall || 517)}/installment · autopay on`,
               icon:'📆', screen:'manage-pot',
             }] : []),
+            // 2. Authorized Parties
+            {
+              label:'Authorized Parties',
+              sub:'Manage people who have access to your account to pay on your behalf',
+              icon:'👥', screen:'manage-ap',
+              badge: hasAPs ? String(S.authPayers.length) : null,
+            },
+            // 3. Guest Payment Link
+            {
+              label:'Guest Payment Link',
+              sub:'Send a one-time payment link, no account needed',
+              icon:'🔗', screen:'guest',
+            },
+            // 4. Make a Payment
+            {
+              label:'Make a Payment',
+              sub: hasPot ? 'Pay an installment or make an extra payment' : 'Pay your balance now',
+              icon:'💳', screen:'pay-now',
+            },
+            // 5. Account History
+            {
+              label:'Account History',
+              sub:'Payments, balance changes & activity',
+              icon:'📋', screen:'history',
+            },
+            // 6. AP Pay Over Time Plans — only if APs invited
             ...(hasAPs ? [{
               label:'AP Pay Over Time Plans',
               sub:'View plans your authorized parties set up',
