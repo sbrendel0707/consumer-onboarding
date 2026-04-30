@@ -238,7 +238,7 @@ const BackBtn = ({onClick, label='Back'}) => (
 const DecideLaterBtn = ({onClick}) => (
   <button onClick={onClick}
     className="w-full text-center text-hz-hint text-[12px] py-2 mt-1 hover:text-hz-muted transition-colors underline-offset-2 hover:underline">
-    I don't have this information right now
+    I need to decide on this later
   </button>
 );
 
@@ -736,45 +736,125 @@ const ContactScreen = ({nav, goBack, S, setS}) => {
 
 // ─── CommsScreen ─────────────────────────────────────────────────────────
 const CommsScreen = ({nav, goBack, S, setS}) => {
-  const [info, setInfo]       = React.useState(true);
-  const [suggest, setSuggest] = React.useState(false);
+  // Contact info — pre-filled from school
+  const [email,    setEmail]    = React.useState('alex.johnson@student.claude.edu');
+  const [phone,    setPhone]    = React.useState('(720) 555-0198');
+  const [editEmail, setEditEmail] = React.useState(false);
+  const [editPhone, setEditPhone] = React.useState(false);
+
+  // SMS opt-in (school says transactional-only)
+  const [smsMarketing, setSmsMarketing] = React.useState(false);
+  const [showMarketingPrompt, setShowMarketingPrompt] = React.useState(true); // nudge visible until dismissed
 
   const next = () => nav('complete');
 
   return (
     <ScreenWrap>
-      <Header title="Notifications" onBack={goBack}/>
+      <Header title="Communications" onBack={goBack}/>
       <StepBar current={6} nav={nav}/>
-      <div className="px-5 pb-8">
-        {S.hasPhone ? (
-          <>
-            <p className="text-hz-muted text-[13px] mb-6">Choose what text messages you'd like to receive.</p>
-            <Card className="mb-3">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-[14px] font-semibold text-hz-text mb-1">Informational</p>
-                  <p className="text-[12px] text-hz-muted">Payment due dates, balance changes, confirmations</p>
-                </div>
-                <Toggle on={info} onChange={setInfo} aria-label="Toggle informational text messages"/>
+      <div className="px-5 pt-4 pb-24 space-y-5 overflow-y-auto">
+
+        {/* Page title */}
+        <div>
+          <p className="text-[18px] font-bold text-hz-text">Communications</p>
+          <p className="text-hz-muted text-[13px] mt-1 leading-relaxed">
+            We got your contact information from Claude University. Please review it and make any corrections before continuing.
+          </p>
+        </div>
+
+        {/* Contact info from school */}
+        <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3 space-y-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint">Contact info from your school</p>
+
+          {/* Email */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label htmlFor="comms-email" className="text-[12px] font-semibold text-hz-text">Email address</label>
+              <button onClick={()=>setEditEmail(e=>!e)} className="text-hz-accent text-[11px] font-medium hover:opacity-75 transition-opacity">
+                {editEmail ? 'Done' : 'Edit'}
+              </button>
+            </div>
+            {editEmail ? (
+              <input id="comms-email" type="email" value={email} onChange={e=>setEmail(e.target.value)}
+                className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
+            ) : (
+              <p className="text-[13px] text-hz-text">{email}</p>
+            )}
+          </div>
+
+          <Divider/>
+
+          {/* Phone */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label htmlFor="comms-phone" className="text-[12px] font-semibold text-hz-text">Mobile number</label>
+              <button onClick={()=>setEditPhone(e=>!e)} className="text-hz-accent text-[11px] font-medium hover:opacity-75 transition-opacity">
+                {editPhone ? 'Done' : 'Edit'}
+              </button>
+            </div>
+            {editPhone ? (
+              <input id="comms-phone" type="tel" value={phone} onChange={e=>setPhone(e.target.value)}
+                className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
+            ) : (
+              <p className="text-[13px] text-hz-text">{phone || <span className="text-hz-hint italic">None on file</span>}</p>
+            )}
+          </div>
+        </div>
+
+        {/* SMS opt-in section */}
+        <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3 space-y-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint">Text message preferences</p>
+
+          {/* Transactional — always on, locked */}
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <p className="text-[13px] font-semibold text-hz-text">Transactional texts</p>
+              <p className="text-[11px] text-hz-muted mt-0.5">Payment confirmations, due date reminders, balance alerts</p>
+            </div>
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <span className="text-[10px] font-semibold text-hz-teal uppercase tracking-wide">On</span>
+              <div className="w-8 h-5 rounded-full bg-hz-teal flex items-center justify-end pr-0.5" aria-label="Transactional texts always enabled">
+                <div className="w-4 h-4 rounded-full bg-white shadow-sm"/>
               </div>
-            </Card>
-            <Card className="mb-6">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-[14px] font-semibold text-hz-text mb-1">Suggestions &amp; Tips</p>
-                  <p className="text-[12px] text-hz-muted">Payment reminders, financial aid tips, savings alerts</p>
-                </div>
-                <Toggle on={suggest} onChange={setSuggest} aria-label="Toggle suggestions and tips text messages"/>
-              </div>
-            </Card>
-          </>
-        ) : (
-          <Card className="mb-6 border-hz-amber bg-hz-amber-bg">
-            <p className="text-[14px] font-semibold text-hz-text mb-2">No phone number on file</p>
-            <p className="text-[12px] text-hz-muted">Add a mobile number in Contact Info to receive SMS alerts about payments and account activity.</p>
-          </Card>
+            </div>
+          </div>
+
+          <Divider/>
+
+          {/* Marketing — off by default, opt-in */}
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <p className="text-[13px] font-semibold text-hz-text">Information &amp; marketing texts</p>
+              <p className="text-[11px] text-hz-muted mt-0.5">Financial aid tips, payment plan offers, scholarship alerts, savings opportunities</p>
+            </div>
+            <Toggle on={smsMarketing} onChange={setSmsMarketing} aria-label="Opt in to information and marketing texts"/>
+          </div>
+        </div>
+
+        {/* School opt-in nudge — shown until dismissed or toggled on */}
+        {showMarketingPrompt && !smsMarketing && (
+          <div className="bg-hz-cloud border border-hz-accent/20 rounded-hz-sm px-4 py-3 space-y-2">
+            <p className="text-[12px] font-semibold text-hz-text">Heads up — your school has you set to transactional texts only</p>
+            <p className="text-[11px] text-hz-muted leading-relaxed">
+              You're currently only set to receive required account texts. You'd miss things like early payment plan reminders, financial aid deadlines, and scholarship opportunities. Want to opt in?
+            </p>
+            <div className="flex gap-2 pt-1">
+              <button onClick={()=>{ setSmsMarketing(true); setShowMarketingPrompt(false); }}
+                className="flex-1 py-2 rounded-hz-sm bg-hz-indigo text-white text-[12px] font-semibold hover:opacity-90 transition-opacity">
+                Yes, opt me in
+              </button>
+              <button onClick={()=>setShowMarketingPrompt(false)}
+                className="flex-1 py-2 rounded-hz-sm border border-[rgba(100,92,220,0.2)] text-hz-muted text-[12px] font-medium hover:bg-hz-card transition-colors">
+                No thanks
+              </button>
+            </div>
+          </div>
         )}
-        <Btn onClick={next}>Continue</Btn>
+
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 bg-hz-card border-t border-[rgba(100,92,220,0.1)] px-4 py-3">
+        <Btn onClick={next}>Save &amp; continue</Btn>
       </div>
     </ScreenWrap>
   );
