@@ -164,20 +164,88 @@ const RadioCard = ({selected, onClick, children, className='', 'aria-label':aria
   </button>
 );
 
-const ScreenWrap = ({children, className=''}) => (
-  <div className={'absolute inset-0 overflow-y-auto bg-hz-bg text-hz-text font-sans '+className}>{children}</div>
+// ─── Web-within-phone chrome ──────────────────────────────────────────────
+const BrowserBar = () => (
+  <div className="bg-[#F1F3F4] border-b border-gray-200 px-3 py-1.5 flex items-center gap-1.5 flex-shrink-0">
+    <svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#34A853" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+    <span className="text-[10px] text-gray-500 flex-1 text-center font-medium">pay.claude.edu</span>
+  </div>
+);
+
+const PortalHeader = ({onAccountClick, showAccount=false}) => (
+  <div className="bg-hz-indigo px-4 py-2 flex items-center justify-between flex-shrink-0">
+    <div className="flex items-center gap-2">
+      <div className="w-6 h-6 rounded-md bg-white/25 flex items-center justify-center">
+        <span className="text-white font-black text-[11px]">CU</span>
+      </div>
+      <span className="text-[13px] font-semibold text-white">Claude University</span>
+    </div>
+    {showAccount && (
+      <button onClick={onAccountClick} aria-label="Go to account settings"
+        className="flex flex-col items-center gap-0.5 group">
+        <div className="w-7 h-7 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-[11px] font-bold text-white group-hover:bg-white/30 transition-colors">AJ</div>
+        <span className="text-[8px] text-white/60 font-medium uppercase tracking-wide">Account</span>
+      </button>
+    )}
+  </div>
+);
+
+const ScreenWrap = ({children, portal=true, showAccount=false, onAccountClick}) => (
+  <div className="flex flex-col h-full overflow-hidden bg-hz-bg">
+    {portal && <BrowserBar/>}
+    {portal && <PortalHeader showAccount={showAccount} onAccountClick={onAccountClick}/>}
+    <div className="flex-1 overflow-y-auto">
+      {children}
+    </div>
+  </div>
 );
 
 const Header = ({title, onBack, right}) => (
-  <div className="flex items-center px-5 pt-12 pb-4 gap-3">
+  <div className="sticky top-0 bg-hz-card border-b border-[rgba(100,92,220,0.1)] px-4 py-3 flex items-center gap-3 z-10">
     {onBack && (
       <button onClick={onBack} aria-label="Go back"
-        className="w-9 h-9 flex items-center justify-center rounded-full bg-hz-cloud hover:bg-hz-cloud/80 transition-colors flex-shrink-0">
-        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-hz-indigo"><path d="m15 18-6-6 6-6"/></svg>
+        className="w-8 h-8 rounded-lg bg-hz-cloud flex items-center justify-center text-hz-indigo flex-shrink-0">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
     )}
-    <h1 className="flex-1 text-[17px] font-semibold text-hz-text">{title}</h1>
+    <p className="text-[15px] font-semibold text-hz-text flex-1">{title}</p>
     {right}
+  </div>
+);
+
+// ─── Step progress bar ───────────────────────────────────────────────────
+const STEP_LABELS = [
+  'Agreements',
+  'Security',
+  "Who's Paying",
+  'Insurance',
+  'Payment',
+  'Comms',
+];
+
+const StepBar = ({current, total=6}) => (
+  <div className="bg-hz-card border-b border-[rgba(100,92,220,0.08)] px-4 py-2.5">
+    <div className="flex items-center gap-1 mb-1.5">
+      {Array.from({length:total}).map((_,i)=>{
+        const done = i < current-1;
+        const active = i === current-1;
+        return (
+          <React.Fragment key={i}>
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0
+              ${done ? 'bg-hz-teal text-white' : active ? 'bg-hz-indigo text-white' : 'bg-hz-cloud text-hz-hint'}`}
+              aria-label={`Step ${i+1} ${done?'completed':active?'current':'upcoming'}: ${STEP_LABELS[i]}`}>
+              {done ? '✓' : i+1}
+            </div>
+            {i < total-1 && (
+              <div className={`flex-1 h-0.5 ${i < current-1 ? 'bg-hz-teal' : 'bg-hz-cloud'}`} aria-hidden="true"/>
+            )}
+          </React.Fragment>
+        );
+      })}
+    </div>
+    <p className="text-[11px] text-hz-hint">Step {current} of {total} — <span className="text-hz-indigo font-semibold">{STEP_LABELS[current-1]}</span></p>
   </div>
 );
 
@@ -190,7 +258,8 @@ const Toast = ({msg, show}) => (
 
 // ─── ProtoIntroScreen ────────────────────────────────────────────────────
 const ProtoIntroScreen = ({nav}) => (
-  <ScreenWrap className="flex flex-col px-6 py-12">
+  <ScreenWrap portal={false}>
+  <div className="flex flex-col px-6 py-12 h-full">
     <div className="flex-1 flex flex-col justify-center">
       <div className="mb-6">
         <span className="text-[11px] font-bold tracking-widest uppercase text-hz-accent">Prototype</span>
@@ -212,29 +281,230 @@ const ProtoIntroScreen = ({nav}) => (
       <p className="text-hz-hint text-[12px] mb-8">This prototype covers account setup through the post-enrollment home screen. Click through all 25 screens.</p>
     </div>
     <Btn onClick={()=>nav('welcome')} aria-label="Begin setup">I understand — begin setup →</Btn>
+  </div>
   </ScreenWrap>
 );
 
 
 // ─── WelcomeScreen ───────────────────────────────────────────────────────
 const WelcomeScreen = ({nav, goBack, S, setS}) => (
-  <ScreenWrap className="flex flex-col items-center justify-center px-8 text-center">
-    <div className="relative mb-8">
-      <div aria-hidden="true" className="absolute inset-0 rounded-full bg-hz-cloud blur-2xl scale-150"/>
-      <div className="relative w-20 h-20 rounded-full bg-hz-cloud border border-hz-accent/30 flex items-center justify-center text-4xl">
-        <span aria-hidden="true">🎓</span>
+  <ScreenWrap>
+    <div className="flex flex-col items-center justify-center px-8 text-center h-full">
+      <div className="relative mb-8">
+        <div aria-hidden="true" className="absolute inset-0 rounded-full bg-hz-cloud blur-2xl scale-150"/>
+        <div className="relative w-20 h-20 rounded-full bg-hz-cloud border border-hz-accent/30 flex items-center justify-center text-4xl">
+          <span aria-hidden="true">🎓</span>
+        </div>
       </div>
-    </div>
-    <p className="text-hz-muted text-sm font-medium tracking-wide uppercase mb-2">Welcome to</p>
-    <h1 className="text-2xl font-bold text-hz-text mb-2">Claude University</h1>
-    <p className="text-hz-muted text-[13px] mb-10">Student Account Portal</p>
-    <div className="w-full">
-      <Btn onClick={()=>nav('contact')} aria-label="Get started with account setup">Get started →</Btn>
-      <p className="text-hz-hint text-[11px] mt-4">Secure · Encrypted · FERPA Compliant</p>
+      <p className="text-hz-muted text-sm font-medium tracking-wide uppercase mb-2">Welcome to</p>
+      <h1 className="text-2xl font-bold text-hz-text mb-2">Claude University</h1>
+      <p className="text-hz-muted text-[13px] mb-10">Student Account Portal</p>
+      <div className="w-full">
+        <Btn onClick={()=>nav('agreements')} aria-label="Get started with account setup">Get started →</Btn>
+        <p className="text-hz-hint text-[11px] mt-4">Secure · Encrypted · FERPA Compliant</p>
+      </div>
     </div>
   </ScreenWrap>
 );
 
+
+// ─── AgreementsScreen ────────────────────────────────────────────────────
+const AgreementsScreen = ({nav, goBack, S, setS}) => {
+  const [sig, setSig] = React.useState('');
+  const [checked, setChecked] = React.useState(false);
+  const today = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const canSign = sig.trim().length > 2 && checked;
+
+  const agreements = [
+    {
+      id:'housing',
+      title:'Housing & Dorm Damages Acknowledgement',
+      body:`I understand that as a resident or potential resident of Claude University housing, I am financially responsible for any damages to university property attributed to my occupancy or my guests. Any damage assessments will be billed directly to my student account and are subject to the same payment terms and deadlines as all other university charges. I have the right to appeal a damage charge within 10 business days of receiving notice.`,
+    },
+    {
+      id:'financial',
+      title:'Student Financial Agreement',
+      body:`By enrolling at Claude University, I accept full financial responsibility for all tuition, fees, housing charges, and any other amounts assessed to my student account. I agree to pay all balances by the published due dates for each term. I understand that unpaid balances may result in account holds that restrict registration, transcript requests, and graduation. I acknowledge that financial aid awards, if any, are applied to my account as an estimate and may be adjusted; I remain responsible for any remaining balance regardless of financial aid status. Delinquent accounts may be referred to a collection agency and I may be responsible for collection costs.`,
+    },
+    {
+      id:'insurance',
+      title:'Health Insurance Acknowledgement',
+      body:`Claude University requires all enrolled students to maintain qualifying health insurance coverage. I understand that if I do not provide proof of comparable alternative coverage through the university's annual waiver process, the university's student health insurance plan will be automatically enrolled and billed to my student account each academic year. This charge is non-refundable after the published waiver deadline. I confirm that I have read and understand this policy.`,
+    },
+  ];
+
+  return (
+    <ScreenWrap>
+      <StepBar current={1}/>
+      <div className="px-4 pt-4 pb-24 space-y-3">
+        <div className="mb-1">
+          <p className="text-[18px] font-bold text-hz-text">School agreements</p>
+          <p className="text-[13px] text-hz-muted mt-1">Please read each agreement carefully. A single signature at the bottom covers all three.</p>
+        </div>
+
+        {agreements.map((a,i)=>(
+          <div key={a.id} className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz overflow-hidden">
+            <div className="bg-hz-cloud px-4 py-2.5 border-b border-[rgba(100,92,220,0.1)] flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-hz-indigo text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">{i+1}</span>
+              <p className="text-[13px] font-semibold text-hz-text">{a.title}</p>
+            </div>
+            <div className="px-4 py-3 max-h-36 overflow-y-auto">
+              <p className="text-[12px] text-hz-muted leading-relaxed">{a.body}</p>
+            </div>
+          </div>
+        ))}
+
+        <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-4 space-y-3">
+          <p className="text-[13px] font-semibold text-hz-text">Electronic Signature</p>
+          <p className="text-[12px] text-hz-muted leading-relaxed">
+            By typing your full legal name below, you confirm that you have read, understood, and agree to all three agreements listed above. This electronic signature is legally binding under the ESIGN Act and UETA.
+          </p>
+
+          <div>
+            <label htmlFor="sig-input" className="text-[12px] font-semibold text-hz-text block mb-1.5">
+              Full legal name <span aria-hidden="true" className="text-hz-danger">*</span>
+            </label>
+            <input
+              id="sig-input"
+              type="text"
+              value={sig}
+              onChange={e=>setSig(e.target.value)}
+              placeholder="e.g. Alex Johnson"
+              aria-required="true"
+              aria-label="Type your full legal name to sign"
+              className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[14px] font-medium text-hz-indigo placeholder-hz-hint focus:outline-none focus:border-hz-accent italic"
+              style={{fontFamily:"'Georgia', serif"}}
+            />
+          </div>
+
+          <div className="flex items-start gap-2.5">
+            <input
+              type="checkbox"
+              id="sig-confirm"
+              checked={checked}
+              onChange={e=>setChecked(e.target.checked)}
+              aria-required="true"
+              className="mt-0.5 w-4 h-4 accent-hz-indigo flex-shrink-0 cursor-pointer"
+            />
+            <label htmlFor="sig-confirm" className="text-[12px] text-hz-muted leading-relaxed cursor-pointer">
+              I have read all agreements above and I agree to be bound by their terms.
+            </label>
+          </div>
+
+          <div className="flex justify-between items-center pt-1">
+            <div>
+              <p className="text-[10px] text-hz-hint uppercase tracking-wide font-semibold">Date signed</p>
+              <p className="text-[12px] text-hz-text font-medium">{today}</p>
+            </div>
+            {sig.trim().length > 0 && (
+              <div className="text-right">
+                <p className="text-[10px] text-hz-hint uppercase tracking-wide font-semibold">Signature</p>
+                <p className="text-[15px] text-hz-indigo" style={{fontFamily:"'Georgia', serif",fontStyle:'italic'}}>{sig}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 bg-hz-card border-t border-[rgba(100,92,220,0.1)] px-4 py-3">
+        <button
+          onClick={()=>{ if(canSign) nav('security-questions'); }}
+          disabled={!canSign}
+          aria-disabled={!canSign}
+          aria-label="Agree to all school agreements and continue"
+          className={`w-full py-3 rounded-hz-pill text-[14px] font-semibold transition-all
+            ${canSign ? 'bg-hz-indigo text-white hover:opacity-90' : 'bg-hz-cloud text-hz-hint cursor-not-allowed'}`}>
+          I agree — continue to step 2
+        </button>
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── SecurityQuestionsScreen ──────────────────────────────────────────────
+const SECURITY_QUESTIONS = [
+  "What was the name of your first pet?",
+  "What city were you born in?",
+  "What is your mother's maiden name?",
+  "What was the name of your elementary school?",
+  "What was the make of your first car?",
+  "What is the name of the street you grew up on?",
+  "What was your childhood nickname?",
+  "What is the middle name of your oldest sibling?",
+];
+
+const SecurityQuestionsScreen = ({nav, goBack, S, setS}) => {
+  const [qs, setQs] = React.useState([
+    {q:'', a:''},
+    {q:'', a:''},
+    {q:'', a:''},
+  ]);
+  const [showA, setShowA] = React.useState([false,false,false]);
+
+  const setQ = (i,val) => setQs(prev=>prev.map((x,j)=>j===i?{...x,q:val}:x));
+  const setA = (i,val) => setQs(prev=>prev.map((x,j)=>j===i?{...x,a:val}:x));
+  const toggleShow = (i) => setShowA(prev=>prev.map((v,j)=>j===i?!v:v));
+
+  const usedQs = qs.map(x=>x.q).filter(Boolean);
+  const available = (idx) => SECURITY_QUESTIONS.filter(q=>!usedQs.includes(q)||q===qs[idx].q);
+  const canContinue = qs.every(x=>x.q && x.a.trim().length >= 3);
+
+  return (
+    <ScreenWrap>
+      <StepBar current={2}/>
+      <div className="px-4 pt-4 pb-24 space-y-4">
+        <div className="mb-1">
+          <p className="text-[18px] font-bold text-hz-text">Security questions</p>
+          <p className="text-[13px] text-hz-muted mt-1">Set up 3 security questions. These verify your identity if you ever need to access your account without your university login.</p>
+        </div>
+
+        {qs.map((item,i)=>(
+          <div key={i} className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3 space-y-2.5">
+            <p className="text-[12px] font-semibold text-hz-hint uppercase tracking-wide">Question {i+1}</p>
+            <div>
+              <label htmlFor={`q-select-${i}`} className="text-[12px] font-medium text-hz-text block mb-1">Choose a question</label>
+              <select id={`q-select-${i}`} value={item.q} onChange={e=>setQ(i,e.target.value)}
+                aria-required="true"
+                className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[13px] text-hz-text bg-white focus:outline-none focus:border-hz-accent">
+                <option value="">— Select a question —</option>
+                {available(i).map(q=><option key={q} value={q}>{q}</option>)}
+              </select>
+            </div>
+            {item.q && (
+              <div className="relative">
+                <label htmlFor={`q-answer-${i}`} className="text-[12px] font-medium text-hz-text block mb-1">Your answer</label>
+                <input id={`q-answer-${i}`} type={showA[i]?'text':'password'} value={item.a}
+                  onChange={e=>setA(i,e.target.value)}
+                  placeholder="Enter your answer"
+                  aria-required="true"
+                  className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 pr-10 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent"/>
+                <button onClick={()=>toggleShow(i)} aria-label={showA[i]?'Hide answer':'Show answer'}
+                  className="absolute right-3 top-[30px] text-hz-hint text-[11px]">
+                  {showA[i]?'Hide':'Show'}
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+
+        <div className="bg-hz-cloud border border-[rgba(100,92,220,0.15)] rounded-hz-sm px-3 py-2.5 flex gap-2">
+          <span aria-hidden="true" className="text-hz-accent text-sm flex-shrink-0">🔒</span>
+          <p className="text-[11px] text-hz-muted leading-relaxed">Your answers are encrypted and never shared. They're only used to verify your identity.</p>
+        </div>
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 bg-hz-card border-t border-[rgba(100,92,220,0.1)] px-4 py-3">
+        <button onClick={()=>{ if(canContinue) nav('payer'); }}
+          disabled={!canContinue} aria-disabled={!canContinue}
+          aria-label="Save security questions and continue"
+          className={`w-full py-3 rounded-hz-pill text-[14px] font-semibold transition-all
+            ${canContinue ? 'bg-hz-indigo text-white hover:opacity-90' : 'bg-hz-cloud text-hz-hint cursor-not-allowed'}`}>
+          Save &amp; continue
+        </button>
+      </div>
+    </ScreenWrap>
+  );
+};
 
 // ─── ContactScreen ───────────────────────────────────────────────────────
 const ContactScreen = ({nav, goBack, S, setS}) => {
@@ -292,11 +562,12 @@ const CommsScreen = ({nav, goBack, S, setS}) => {
   const [info, setInfo]       = React.useState(true);
   const [suggest, setSuggest] = React.useState(false);
 
-  const next = () => nav('payer');
+  const next = () => nav('complete');
 
   return (
     <ScreenWrap>
       <Header title="Notifications" onBack={goBack}/>
+      <StepBar current={6}/>
       <div className="px-5 pb-8">
         {S.hasPhone ? (
           <>
@@ -346,6 +617,7 @@ const PayerScreen = ({nav, goBack, S, setS}) => {
   return (
     <ScreenWrap>
       <Header title="Who's Paying?" onBack={goBack}/>
+      <StepBar current={3}/>
       <div className="px-5 pb-8">
         <p className="text-hz-muted text-[13px] mb-6">Let us know how payments will be made so we can set things up correctly.</p>
         <RadioCard selected={payer==='self'} onClick={()=>setPayer('self')} aria-label="I will pay myself">
@@ -387,11 +659,7 @@ const InviteScreen = ({nav, goBack, S, setS}) => {
   const finish = () => {
     const skipped = sent.length === 0;
     setS(p=>({...p, skippedInvite: skipped, authPayers: sent}));
-    if (S.payer === 'other') {
-      nav('complete');
-    } else {
-      nav('insurance');
-    }
+    nav('insurance');
   };
 
   return (
@@ -452,8 +720,10 @@ const InsuranceScreen = ({nav, goBack, S, setS}) => {
   const rate = inState === 'in' ? 0.019 : 0.022;
   const premium = Math.round(TOTAL_CHARGES * rate * 100) / 100;
 
+  const nextAfterInsurance = () => S.payer === 'other' ? nav('comms') : nav('howpay');
+
   const handleChoiceNext = () => {
-    if (choice === 'no') { nav('howpay'); return; }
+    if (choice === 'no') { nextAfterInsurance(); return; }
     setStep('C');
   };
   const handleAccept = () => {
@@ -465,12 +735,13 @@ const InsuranceScreen = ({nav, goBack, S, setS}) => {
   };
   const handleInsuranceDone = () => {
     setS(p=>({...p, apActive:true}));
-    nav('howpay');
+    nextAfterInsurance();
   };
 
   return (
     <ScreenWrap>
       <Header title="Tuition Protection" onBack={step==='A'?goBack:()=>setStep(step==='D'?'C':step==='C'?'A':'C')}/>
+      <StepBar current={4}/>
       <div className="px-5 pb-8">
         {step === 'A' && (
           <>
@@ -597,6 +868,7 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
   return (
     <ScreenWrap>
       <Header title="How Would You Like to Pay?" onBack={goBack}/>
+      <StepBar current={5}/>
       <div className="px-5 pb-8">
         <Card className="mb-5">
           <div className="flex justify-between items-center mb-1">
@@ -902,7 +1174,8 @@ const PayConfirmFullScreen = ({nav, goBack, S, setS}) => {
 
 // ─── PaySuccessScreen ─────────────────────────────────────────────────────
 const PaySuccessScreen = ({nav, goBack, S, setS}) => (
-  <ScreenWrap className="flex flex-col items-center justify-center px-8 text-center">
+  <ScreenWrap>
+    <div className="flex flex-col items-center justify-center px-8 text-center py-8">
     <div className="w-20 h-20 rounded-full bg-hz-teal-bg flex items-center justify-center text-4xl mb-5" aria-hidden="true">✅</div>
     <h2 className="text-2xl font-bold text-hz-text mb-2">
       {S.payPlan === 'pot' ? 'Enrolled in Pay Over Time!' : 'Payment Successful!'}
@@ -924,6 +1197,7 @@ const PaySuccessScreen = ({nav, goBack, S, setS}) => (
       )}
     </Card>
     <Btn onClick={()=>nav('adj-settings')} variant="success">Continue Account Setup</Btn>
+  </div>
   </ScreenWrap>
 );
 
@@ -944,11 +1218,13 @@ const PaySchedScreen = ({nav, goBack, S, setS}) => {
   };
 
   if (done) return (
-    <ScreenWrap className="flex flex-col items-center justify-center px-8 text-center">
+    <ScreenWrap>
+      <div className="flex flex-col items-center justify-center px-8 text-center py-8">
       <div className="w-20 h-20 rounded-full bg-hz-cloud flex items-center justify-center text-4xl mb-5" aria-hidden="true">📅</div>
       <h2 className="text-2xl font-bold text-hz-text mb-2">Payment Scheduled</h2>
       <p className="text-hz-muted text-[13px] mb-6">{fmt(BALANCE_DUE)} will be drafted on {date}.</p>
       <Btn onClick={()=>nav('adj-settings')}>Continue Account Setup</Btn>
+      </div>
     </ScreenWrap>
   );
 
@@ -1005,7 +1281,7 @@ const AdjSettingsScreen = ({nav, goBack, S, setS}) => {
   const [credits, setCredits] = React.useState('reduce');
 
   const next = () => {
-    nav('complete');
+    nav('comms');
   };
 
   return (
@@ -1070,21 +1346,23 @@ const CompleteScreen = ({nav, goBack, S, setS}) => {
     : "Your payment is scheduled. Everything's set!";
 
   return (
-    <ScreenWrap className="flex flex-col px-6 py-10">
-      <div className="flex-1 flex flex-col items-center text-center justify-center">
-        <div aria-hidden="true" className="w-20 h-20 rounded-full bg-hz-teal-bg border border-hz-teal/30 flex items-center justify-center text-4xl mb-5">🎉</div>
-        <h2 className="text-2xl font-bold text-hz-text mb-3">Setup Complete!</h2>
-        <p className="text-hz-muted text-[13px] leading-relaxed mb-8 max-w-[280px]">{msg}</p>
-        <Card className="w-full mb-8 text-left">
-          {lines.map((l,i)=>(
-            <div key={i} className="flex items-center gap-3 py-2">
-              <span aria-hidden="true" className="text-lg">{l.icon}</span>
-              <p className="text-[13px] text-hz-text">{l.text}</p>
-            </div>
-          ))}
-        </Card>
+    <ScreenWrap>
+      <div className="flex flex-col px-6 py-10 min-h-full">
+        <div className="flex-1 flex flex-col items-center text-center justify-center">
+          <div aria-hidden="true" className="w-20 h-20 rounded-full bg-hz-teal-bg border border-hz-teal/30 flex items-center justify-center text-4xl mb-5">🎉</div>
+          <h2 className="text-2xl font-bold text-hz-text mb-3">Setup Complete!</h2>
+          <p className="text-hz-muted text-[13px] leading-relaxed mb-8 max-w-[280px]">{msg}</p>
+          <Card className="w-full mb-8 text-left">
+            {lines.map((l,i)=>(
+              <div key={i} className="flex items-center gap-3 py-2">
+                <span aria-hidden="true" className="text-lg">{l.icon}</span>
+                <p className="text-[13px] text-hz-text">{l.text}</p>
+              </div>
+            ))}
+          </Card>
+        </div>
+        <Btn onClick={()=>nav('home')} variant="success" aria-label="Go to your home screen">Go to Home →</Btn>
       </div>
-      <Btn onClick={()=>nav('home')} variant="success" aria-label="Go to your home screen">Go to Home →</Btn>
     </ScreenWrap>
   );
 };
@@ -1104,21 +1382,11 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
   const duePct      = 100 - aidPct - paidPct;
 
   return (
-    <ScreenWrap>
-      {/* Header */}
-      <div className="bg-gradient-to-r from-hz-indigo to-hz-mid px-5 pt-12 pb-4 border-b border-white/10">
-        <div className="flex items-center justify-between mb-1">
-          <div>
-            <p className="text-[11px] text-white/70 uppercase tracking-wide">Claude University</p>
-            <p className="text-[16px] font-bold text-white">Alex Johnson</p>
-          </div>
-          <button onClick={()=>nav('account-details')} aria-label="Go to your account and profile settings"
-  className="flex flex-col items-center gap-0.5 group">
-  <div className="w-9 h-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-[13px] font-bold text-white group-hover:bg-white/30 transition-colors">AJ</div>
-  <span className="text-[9px] text-white/60 font-medium uppercase tracking-wide">Account</span>
-</button>
-        </div>
-        <p className="text-[11px] text-white/60">Student ID: 1234567</p>
+    <ScreenWrap portal={true} showAccount={true} onAccountClick={()=>nav('account-details')}>
+      {/* Greeting strip */}
+      <div className="bg-gradient-to-r from-hz-indigo to-hz-mid px-4 py-3">
+        <p className="text-[15px] font-bold text-white">Hi, Alex 👋</p>
+        <p className="text-[11px] text-white/65">Student ID: 1234567</p>
       </div>
 
       <div className="px-4 py-4 space-y-3">
@@ -1441,11 +1709,13 @@ const GuestScreen = ({nav, goBack, S, setS}) => {
   };
 
   if (sent) return (
-    <ScreenWrap className="flex flex-col items-center justify-center px-8 text-center">
+    <ScreenWrap>
+      <div className="flex flex-col items-center justify-center px-8 text-center py-8">
       <div aria-hidden="true" className="w-16 h-16 rounded-full bg-hz-cloud flex items-center justify-center text-3xl mb-4">✉️</div>
       <h2 className="text-xl font-bold text-hz-text mb-2">Link Sent!</h2>
       <p className="text-hz-muted text-[13px] mb-6">{email} will receive a secure guest payment link. No account required.</p>
       <Btn onClick={()=>nav('home')}>Return to Home</Btn>
+      </div>
     </ScreenWrap>
   );
 
@@ -1536,13 +1806,15 @@ const ChangeDatesScreen = ({nav, goBack, S, setS}) => {
   const handleSave = () => setDone(true);
 
   if (done) return (
-    <ScreenWrap className="flex flex-col items-center justify-center px-8 text-center">
+    <ScreenWrap>
+      <div className="flex flex-col items-center justify-center px-8 text-center py-8">
       <div aria-hidden="true" className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center text-3xl mb-4">✅</div>
       <h2 className="text-xl font-bold text-hz-text mb-2">Dates Updated</h2>
       <p className="text-hz-muted text-[13px] mb-6">
         {mode==='all' ? `All future payments moved to day ${newDay} of each ${S.potFreqLabel||'month'}.` : `Payment ${specificPmt} rescheduled to ${specificDate}.`}
       </p>
       <Btn onClick={()=>nav('manage-pot')}>Return to Plan</Btn>
+      </div>
     </ScreenWrap>
   );
 
@@ -1592,11 +1864,13 @@ const ChangeAutopayScreen = ({nav, goBack, S, setS}) => {
   };
 
   if (done) return (
-    <ScreenWrap className="flex flex-col items-center justify-center px-8 text-center">
+    <ScreenWrap>
+      <div className="flex flex-col items-center justify-center px-8 text-center py-8">
       <div aria-hidden="true" className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center text-3xl mb-4">✅</div>
       <h2 className="text-xl font-bold text-hz-text mb-2">Auto-Pay Updated</h2>
       <p className="text-hz-muted text-[13px] mb-6">Future installments will be drafted from your updated payment method.</p>
       <Btn onClick={()=>nav('manage-pot')}>Return to Plan</Btn>
+      </div>
     </ScreenWrap>
   );
 
@@ -1650,11 +1924,13 @@ const PayNextScreen = ({nav, goBack, S, setS}) => {
   };
 
   if (done) return (
-    <ScreenWrap className="flex flex-col items-center justify-center px-8 text-center">
+    <ScreenWrap>
+      <div className="flex flex-col items-center justify-center px-8 text-center py-8">
       <div aria-hidden="true" className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center text-3xl mb-4">✅</div>
       <h2 className="text-xl font-bold text-hz-text mb-2">Payment Submitted!</h2>
       <p className="text-hz-muted text-[13px] mb-6">{fmt(amount)} installment payment submitted successfully.</p>
       <Btn onClick={()=>nav('manage-pot')}>Return to Plan</Btn>
+      </div>
     </ScreenWrap>
   );
 
@@ -1873,6 +2149,8 @@ const App = () => {
   const screens = {
     'proto-intro':       <ProtoIntroScreen      nav={nav} goBack={goBack} S={S} setS={setS}/>,
     'welcome':           <WelcomeScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'agreements':        <AgreementsScreen      nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'security-questions':<SecurityQuestionsScreen nav={nav} goBack={goBack} S={S} setS={setS}/>,
     'contact':           <ContactScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
     'comms':             <CommsScreen           nav={nav} goBack={goBack} S={S} setS={setS}/>,
     'payer':             <PayerScreen           nav={nav} goBack={goBack} S={S} setS={setS}/>,
