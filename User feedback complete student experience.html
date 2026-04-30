@@ -263,6 +263,53 @@ const DecideLaterModal = ({stepName, onConfirm, onCancel}) => (
   </div>
 );
 
+// HORIZON — RangeSlider: styled range input with floating tooltip
+// Thumb accurately positioned at track edges; native input overlaid for interaction.
+const RangeSlider = ({value, min, max, step=25, onChange, topLabel, minHint, formatFn}) => {
+  const fmtFn = formatFn || fmt;
+  const pct = max > min ? (value - min) / (max - min) * 100 : 0;
+  // Thumb left edge (accounts for 20px thumb width so it stays on-track at extremes)
+  const thumbLeft = `calc(${pct}% - ${pct / 100 * 20}px)`;
+  // Tooltip center (thumb left edge + 10px = thumb center)
+  const tipLeft   = `calc(${pct}% + ${10 - pct / 100 * 20}px)`;
+  return (
+    <div>
+      {/* Floating tooltip above thumb */}
+      <div className="relative mb-3" style={{height:'44px'}} aria-hidden="true">
+        <div className="absolute bottom-0 pointer-events-none" style={{left:tipLeft, transform:'translateX(-50%)'}}>
+          <div className="bg-hz-text text-white rounded-[8px] px-3 py-1.5 text-center whitespace-nowrap shadow">
+            {topLabel && <p className="text-[9px] text-white/60 mb-0.5 leading-none">{topLabel}</p>}
+            <p className="text-[12px] font-bold leading-none">{fmtFn(value)}</p>
+          </div>
+          {/* Arrow */}
+          <div className="mx-auto w-0 h-0" style={{borderLeft:'5px solid transparent',borderRight:'5px solid transparent',borderTop:'5px solid #1A1060'}}/>
+        </div>
+      </div>
+      {/* Track — py-3 gives 24px touch target */}
+      <div className="relative py-3">
+        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-2 rounded-full bg-[rgba(100,92,220,0.12)]">
+          <div className="h-full rounded-full bg-hz-indigo pointer-events-none" style={{width:`${pct}%`}}/>
+        </div>
+        {/* Visual thumb */}
+        <div className="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-2 border-hz-indigo shadow-md pointer-events-none z-10"
+          style={{left:thumbLeft}}/>
+        {/* Invisible native input captures all interaction */}
+        <input type="range" min={min} max={max} step={step} value={value}
+          onChange={e=>onChange(Number(e.target.value))}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+          style={{margin:0}}
+          aria-label={topLabel||'Slider'} aria-valuemin={min} aria-valuemax={max}
+          aria-valuenow={value} aria-valuetext={fmtFn(value)}/>
+      </div>
+      {/* Min / max labels */}
+      <div className="flex justify-between mt-1">
+        <span className="text-[10px] text-hz-hint">{minHint||fmtFn(min)}</span>
+        <span className="text-[10px] text-hz-hint">{fmtFn(max)}</span>
+      </div>
+    </div>
+  );
+};
+
 const Header = ({title, onBack, right}) => (
   <div className="sticky top-0 bg-hz-card border-b border-[rgba(100,92,220,0.1)] px-2 py-2.5 flex items-center gap-1 z-10">
     {onBack && (
@@ -342,7 +389,7 @@ const ProtoIntroScreen = ({nav}) => (
       </div>
       <h1 className="text-2xl font-bold text-hz-text mb-4 leading-snug">Student Onboarding<br/>Complete Experience</h1>
       <p className="text-hz-muted text-[14px] leading-relaxed mb-6">
-        You are a first-year student at <strong className="text-hz-text">Claude University</strong> receiving your first bill for Fall semester.
+        You are a first-year student at <strong className="text-hz-text">Claude University</strong> receiving your first bill for Fall term.
         You'll review your balance and set up how you'd like to pay.
       </p>
       <Card className="mb-6">
@@ -1235,12 +1282,12 @@ const PayerHandoffScreen = ({nav, goBack, S, setS}) => (
 
 // ─── InsuranceScreen ─────────────────────────────────────────────────────
 const GRADGUARD_TERMS = [
-  ['Coverage Overview', 'This Tuition Protection Plan ("Plan") provides reimbursement for covered tuition charges in the event of a Covered Withdrawal from Claude University. Coverage is limited to the insured semester tuition charges, up to the maximum benefit shown on the Declarations Page.'],
+  ['Coverage Overview', 'This Tuition Protection Plan ("Plan") provides reimbursement for covered tuition charges in the event of a Covered Withdrawal from Claude University. Coverage is limited to the insured term tuition charges, up to the maximum benefit shown on the Declarations Page.'],
   ['Covered Withdrawals', 'A Covered Withdrawal is a complete, official withdrawal from the Institution due to: (a) a documented serious illness or injury; (b) a documented mental health condition requiring professional treatment; (c) death of the Insured Student; or (d) military deployment orders received after enrollment.'],
-  ['Exclusions', 'This Plan does not cover: voluntary withdrawals; withdrawals due to academic performance; loss of financial aid; pre-existing conditions diagnosed or treated within 90 days prior to the effective date; or withdrawals occurring after 60% of the semester has elapsed.'],
-  ['Premium & Effective Date', 'The premium is non-refundable once the semester begins. Coverage becomes effective on the first day of the insured semester or the date of enrollment, whichever is later. Premium is due at the time of enrollment.'],
+  ['Exclusions', 'This Plan does not cover: voluntary withdrawals; withdrawals due to academic performance; loss of financial aid; pre-existing conditions diagnosed or treated within 90 days prior to the effective date; or withdrawals occurring after 60% of the term has elapsed.'],
+  ['Premium & Effective Date', 'The premium is non-refundable once the term begins. Coverage becomes effective on the first day of the insured term or the date of enrollment, whichever is later. Premium is due at the time of enrollment.'],
   ['Claims Process', 'To file a claim, submit written notice to GradGuard within 30 days of withdrawal, with official withdrawal documentation and supporting medical records. Claims are adjudicated within 30 business days of receiving complete documentation.'],
-  ['Benefit Amount', 'Maximum benefit equals insured tuition charges for the covered semester, less any refunds already received from the Institution per its published refund schedule.'],
+  ['Benefit Amount', 'Maximum benefit equals insured tuition charges for the covered term, less any refunds already received from the Institution per its published refund schedule.'],
   ['Governing Law', 'This Plan is governed by the laws of the state in which it is issued. Disputes shall be subject to binding arbitration per the rules of the American Arbitration Association. Plan No. GG-2024-CU · Underwritten by Markel Insurance Company.'],
 ];
 
@@ -1330,7 +1377,7 @@ const InsuranceScreen = ({nav, goBack, S, setS}) => {
                 </div>
               </div>
               <div className="bg-hz-cloud rounded-hz-sm px-3 py-2.5 flex items-center justify-between">
-                <span className="text-[12px] font-semibold text-hz-text">Your premium this semester</span>
+                <span className="text-[12px] font-semibold text-hz-text">Your premium this term</span>
                 <span className="text-[18px] font-bold text-hz-indigo">{fmt(premium)}</span>
               </div>
               <ul className="text-[11px] text-hz-muted space-y-1">
@@ -1372,7 +1419,7 @@ const InsuranceScreen = ({nav, goBack, S, setS}) => {
               <div className="bg-hz-teal-bg border border-hz-teal/25 rounded-hz-sm px-3 py-3 flex gap-2.5">
                 <span aria-hidden="true" className="text-hz-teal text-sm flex-shrink-0 mt-0.5">✓</span>
                 <p className="text-[12px] text-hz-muted leading-relaxed">
-                  <span className="font-semibold text-hz-text">{fmt(premium)}</span> will be added to your initial payment in Step 5. It's due today — rolled into your down payment if you set up a plan, or included in your total if you pay in full.
+                  <span className="font-semibold text-hz-text">{fmt(premium)}</span> will be added to your sign-up costs when you complete Step 5 — included alongside your down payment or full payment today.
                 </p>
               </div>
             )}
@@ -1425,32 +1472,118 @@ const InsuranceScreen = ({nav, goBack, S, setS}) => {
 
 // ─── HowPayScreen ────────────────────────────────────────────────────────
 const HowPayScreen = ({nav, goBack, S, setS}) => {
-  const [expanded, setExpanded] = React.useState(false);
-  const [plan, setPlan] = React.useState('');
-  const [showDL, setShowDL] = React.useState(false);
+  const [expanded,    setExpanded]    = React.useState(false);
+  const [plan,        setPlan]        = React.useState('');
+  const [showDL,      setShowDL]      = React.useState(false);
   const [showAntInfo, setShowAntInfo] = React.useState(false);
 
+  // ── POT inline setup state ───────────────────────────────────────────────
+  const FREQ_OPTIONS = [
+    {val:'weekly',   label:'Weekly',         days:7},
+    {val:'biweekly', label:'Every 2 weeks',  days:14},
+    {val:'monthly',  label:'Monthly',        days:30},
+  ];
+  const INSTALL_OPTIONS = {weekly:[4,8,13,26], biweekly:[3,6,9,12], monthly:[3,6,9,12]};
+  const FREQ_LABEL = {weekly:'Weekly', biweekly:'Every 2 weeks', monthly:'Monthly'};
+  const FREQ_DAYS  = {weekly:7, biweekly:14, monthly:30};
+  const FREQ_S_LABEL = {weekly:'week', biweekly:'biweekly', monthly:'month'};
+
+  const minDown = Math.ceil(POT_BALANCE * 0.05 / 25) * 25; // school min: 5%
+
+  const [potFreq,    setPotFreq]    = React.useState('');
+  const [potDate,    setPotDate]    = React.useState('');
+  const [potInstalls,setPotInstalls]= React.useState(0);
+  const [potDown,    setPotDown]    = React.useState(minDown);
+
+  // Step confirmations — confirming a step locks it; editing resets downstream
+  const [freqOk,    setFreqOk]    = React.useState(false);
+  const [dateOk,    setDateOk]    = React.useState(false);
+  const [installOk, setInstallOk] = React.useState(false);
+  const [downOk,    setDownOk]    = React.useState(false);
+
+  const editFreq    = () => { setFreqOk(false); setDateOk(false); setInstallOk(false); setDownOk(false); };
+  const editDate    = () => {                   setDateOk(false); setInstallOk(false); setDownOk(false); };
+  const editInstall = () => {                                     setInstallOk(false); setDownOk(false); };
+  const editDown    = () => {                                                          setDownOk(false);  };
+
+  // Date constraints (prototype today = Apr 30 2026)
+  const TODAY_STR   = '2026-04-30';
+  const minDateStr  = '2026-05-01';
+  const maxDateStr  = '2026-05-30';
+  const maxDateFmt  = 'May 30, 2026';
+
+  // Last payment date
+  const lastPayDate = React.useMemo(() => {
+    if (!potDate || !potInstalls || !potFreq) return null;
+    const d = new Date(potDate + 'T12:00:00');
+    d.setDate(d.getDate() + (potInstalls - 1) * FREQ_DAYS[potFreq]);
+    return d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  }, [potDate, potInstalls, potFreq]);
+
+  // Per-installment amount
+  const installAmt = potInstalls > 0
+    ? Math.round((POT_BALANCE - potDown) / potInstalls * 100) / 100
+    : 0;
+
+  // Total due today: down + Nelnet fee + insurance (if accepted)
+  const totalToday = potDown + NELNET_FEE + (S.insAccepted ? (S.insPremium || 0) : 0);
+
+  const potComplete = freqOk && dateOk && installOk && downOk;
+
+  // ── Confirm step helper (shared outline pill style) ──────────────────────
+  const ConfirmBtn = ({onClick, disabled, label}) => (
+    <button onClick={onClick} disabled={disabled}
+      className={`w-full py-2.5 rounded-hz text-[13px] font-semibold transition-all
+        ${disabled ? 'bg-hz-cloud text-hz-hint cursor-not-allowed' : 'bg-hz-indigo text-white hover:opacity-90 active:scale-[0.98]'}`}>
+      {label || 'Confirm'}
+    </button>
+  );
+
+  // ── Summary row (collapsed step) ─────────────────────────────────────────
+  const SummaryStep = ({label, value, onEdit}) => (
+    <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3 flex items-center justify-between">
+      <div>
+        <p className="text-[10px] font-semibold text-hz-hint uppercase tracking-wide">{label}</p>
+        <p className="text-[13px] font-semibold text-hz-text mt-0.5">{value}</p>
+      </div>
+      <button onClick={onEdit} className="text-[12px] font-semibold text-hz-accent hover:opacity-75 transition-opacity ml-4 flex-shrink-0">Edit</button>
+    </div>
+  );
+
+  // ── Navigate ─────────────────────────────────────────────────────────────
   const next = () => {
-    if (!plan) return;
-    setS(p=>({...p, payPlan: plan}));
-    if (plan === 'pot')   nav('pot');
-    else if (plan === 'full') nav('pay-confirm-full');
-    else nav('pay-sched');
+    if (plan === 'pot') {
+      if (!potComplete) return;
+      setS(p=>({...p,
+        payPlan:'pot', potFreq, potInstall:installAmt, potCount:potInstalls,
+        potFreqLabel:FREQ_S_LABEL[potFreq], potDown, potTotalToday:totalToday,
+        potBwDate:potDate,
+      }));
+      nav('pot-confirm');
+    } else if (plan === 'full') {
+      setS(p=>({...p, payPlan:'full'}));
+      nav('pay-confirm-full');
+    } else if (plan === 'later') {
+      setS(p=>({...p, payPlan:'later'}));
+      nav('pay-sched');
+    }
   };
 
   return (
     <ScreenWrap>
-      <Header title="How Would You Like to Pay?" onBack={goBack}/>
+      <Header title="How would you like to pay?" onBack={goBack}/>
       <StepBar current={5} nav={nav}/>
-      <div className="px-5 pb-8">
-        <Card className="mb-5">
+      <div className="px-5 pb-10 space-y-3">
+
+        {/* ── Balance card — always visible ── */}
+        <Card className="mt-4">
           <div className="flex justify-between items-center mb-1">
             <p className="text-[13px] text-hz-muted">Balance Due</p>
             <Badge color="amber">Due May 1</Badge>
           </div>
           <p className="text-3xl font-bold text-hz-text mb-1">{fmt(BALANCE_DUE)}</p>
           <button onClick={()=>setExpanded(p=>!p)} aria-expanded={expanded} aria-controls="balance-breakdown"
-            className="text-hz-indigo text-[12px] font-medium">
+            className="text-hz-accent text-[12px] font-medium">
             {expanded ? '▲ Hide breakdown' : '▼ See breakdown'}
           </button>
           {expanded && (
@@ -1460,12 +1593,11 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
               <Row label="Fees" value="$1,300"/>
               <Row label="Merit scholarship" value="−$1,200"/>
               <Row label="Pell Grant" value="−$1,100"/>
-              {/* Anticipated aid row — "Anticipated" is a tappable info link */}
-              <div className="flex justify-between items-baseline py-1.5 border-b border-[rgba(100,92,220,0.06)] last:border-0">
+              <div className="flex justify-between items-baseline py-1.5 border-b border-[rgba(100,92,220,0.06)]">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[13px] text-hz-muted">Fed. subsidized loan</span>
                   <button onClick={()=>setShowAntInfo(true)}
-                    className="text-[10px] font-semibold text-hz-accent bg-hz-cloud px-1.5 py-0.5 rounded-full hover:bg-hz-cloud/80 transition-colors" aria-label="What does anticipated mean?">
+                    className="text-[10px] font-semibold text-hz-accent bg-hz-cloud px-1.5 py-0.5 rounded-full hover:bg-hz-cloud/80 transition-colors">
                     Anticipated
                   </button>
                 </div>
@@ -1477,24 +1609,165 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
           )}
         </Card>
 
-        <RadioCard selected={plan==='pot'} onClick={()=>setPlan('pot')} aria-label="Pay over time — split your balance into multiple payments over a longer period of time">
+        {/* ── Pay over time ── */}
+        <RadioCard selected={plan==='pot'} onClick={()=>setPlan('pot')}
+          aria-label="Pay over time — split your balance into multiple payments">
           <p className="text-[14px] font-semibold text-hz-text">Pay over time</p>
           <p className="text-[12px] text-hz-muted mt-0.5">Split your balance into multiple payments over a longer period of time</p>
         </RadioCard>
 
-        <RadioCard selected={plan==='full'} onClick={()=>setPlan('full')} aria-label={`Pay in Full — pay ${fmt(BALANCE_DUE)} now`}>
-          <p className="text-[14px] font-semibold text-hz-text">Pay in Full</p>
+        {/* ── Inline POT setup — reveals when pay over time is selected ── */}
+        {plan === 'pot' && (
+          <div className="space-y-2 pl-1">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint px-1 pt-1">Pay over time setup</p>
+
+            {/* Step 1: Frequency */}
+            {freqOk
+              ? <SummaryStep label="How often" value={FREQ_LABEL[potFreq]} onEdit={editFreq}/>
+              : (
+                <div className="bg-hz-card border border-hz-accent/25 rounded-hz px-4 py-4 space-y-3">
+                  <p className="text-[13px] font-semibold text-hz-text">How often would you like to make payments?</p>
+                  <div className="space-y-2">
+                    {FREQ_OPTIONS.map(o=>(
+                      <button key={o.val} onClick={()=>setPotFreq(o.val)} aria-pressed={potFreq===o.val}
+                        className={`w-full py-2.5 px-4 rounded-hz-sm border text-left text-[13px] font-medium transition-colors
+                          ${potFreq===o.val ? 'bg-hz-indigo text-white border-hz-indigo' : 'text-hz-muted border-[rgba(100,92,220,0.2)] hover:border-hz-accent/40'}`}>
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                  <ConfirmBtn onClick={()=>setFreqOk(true)} disabled={!potFreq} label="Confirm frequency"/>
+                </div>
+              )
+            }
+
+            {/* Step 2: First payment date */}
+            {freqOk && (dateOk
+              ? <SummaryStep
+                  label="First payment"
+                  value={new Date(potDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
+                  onEdit={editDate}/>
+              : (
+                <div className="bg-hz-card border border-hz-accent/25 rounded-hz px-4 py-4 space-y-3">
+                  <div className="bg-hz-cloud rounded-hz-sm px-3 py-2.5 flex gap-2 items-start">
+                    <span aria-hidden="true" className="text-hz-indigo flex-shrink-0">📅</span>
+                    <p className="text-[11px] text-hz-muted leading-relaxed">
+                      Your school requires your first payment to be <strong className="text-hz-text">within 30 days of today</strong> — by <strong className="text-hz-text">{maxDateFmt}</strong>.
+                    </p>
+                  </div>
+                  <label htmlFor="pot-date" className="block text-[13px] font-semibold text-hz-text">When is your first payment?</label>
+                  <input id="pot-date" type="date" value={potDate} min={minDateStr} max={maxDateStr}
+                    onChange={e=>setPotDate(e.target.value)}
+                    className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20"/>
+                  <ConfirmBtn onClick={()=>setDateOk(true)} disabled={!potDate} label="Confirm date"/>
+                </div>
+              )
+            )}
+
+            {/* Step 3: Number of installments */}
+            {freqOk && dateOk && (installOk
+              ? <SummaryStep
+                  label="Installments"
+                  value={`${potInstalls} payments · ${FREQ_LABEL[potFreq].toLowerCase()} · ends ${lastPayDate}`}
+                  onEdit={editInstall}/>
+              : (
+                <div className="bg-hz-card border border-hz-accent/25 rounded-hz px-4 py-4 space-y-3">
+                  <p className="text-[13px] font-semibold text-hz-text">How many installments?</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(INSTALL_OPTIONS[potFreq]||[]).map(n=>{
+                      const d = new Date(potDate+'T12:00:00');
+                      d.setDate(d.getDate() + (n-1) * FREQ_DAYS[potFreq]);
+                      const endStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+                      const sel = potInstalls===n;
+                      return (
+                        <button key={n} onClick={()=>setPotInstalls(n)}
+                          className={`py-2.5 px-3 rounded-hz-sm border text-left transition-colors
+                            ${sel ? 'bg-hz-indigo border-hz-indigo' : 'bg-hz-card border-[rgba(100,92,220,0.2)] hover:border-hz-accent/40'}`}>
+                          <p className={`text-[13px] font-semibold ${sel?'text-white':'text-hz-text'}`}>{n} payments</p>
+                          <p className={`text-[10px] mt-0.5 ${sel?'text-white/70':'text-hz-hint'}`}>Ends {endStr}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <ConfirmBtn onClick={()=>setInstallOk(true)} disabled={!potInstalls} label="Confirm installments"/>
+                </div>
+              )
+            )}
+
+            {/* Step 4: Down payment slider */}
+            {freqOk && dateOk && installOk && (downOk
+              ? <SummaryStep
+                  label="Down payment today"
+                  value={`${fmt(potDown)} down · ${fmt(installAmt)} × ${potInstalls} payments after`}
+                  onEdit={editDown}/>
+              : (
+                <div className="bg-hz-card border border-hz-accent/25 rounded-hz px-4 py-4 space-y-4">
+                  <p className="text-[13px] font-semibold text-hz-text">How much would you like to put down today?</p>
+
+                  <RangeSlider
+                    value={potDown} min={minDown} max={POT_BALANCE} step={25}
+                    onChange={v=>{ setPotDown(v); }}
+                    topLabel="Down payment"
+                    minHint={`${fmt(minDown)} · school min (5%)`}/>
+
+                  {/* Live impact — installment amount */}
+                  <div className="bg-hz-cloud rounded-hz-sm px-3 py-2.5 flex items-center justify-between">
+                    <span className="text-[12px] text-hz-muted">Each of {potInstalls} payments</span>
+                    <span className="text-[15px] font-bold text-hz-text">{fmt(installAmt)}</span>
+                  </div>
+
+                  {/* Total due today breakdown */}
+                  <div className="rounded-hz border border-[rgba(100,92,220,0.14)] overflow-hidden">
+                    <p className="bg-hz-cloud px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-hz-hint">Paid today</p>
+                    <div className="divide-y divide-[rgba(100,92,220,0.07)]">
+                      <div className="flex justify-between px-4 py-2.5 text-[12px]">
+                        <span className="text-hz-muted">Down payment</span>
+                        <span className="text-hz-text font-medium">{fmt(potDown)}</span>
+                      </div>
+                      <div className="flex justify-between px-4 py-2.5 text-[12px]">
+                        <span className="text-hz-muted">Nelnet enrollment fee</span>
+                        <span className="text-hz-text font-medium">{fmt(NELNET_FEE)}</span>
+                      </div>
+                      {S.insAccepted && S.insPremium > 0 && (
+                        <div className="flex justify-between px-4 py-2.5 text-[12px]">
+                          <span className="text-hz-muted">GradGuard insurance premium</span>
+                          <span className="text-hz-text font-medium">{fmt(S.insPremium)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between px-4 py-3 text-[13px] font-bold bg-hz-cloud/50">
+                        <span className="text-hz-text">Total due today</span>
+                        <span className="text-hz-indigo">{fmt(totalToday)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <ConfirmBtn onClick={()=>setDownOk(true)} label="Confirm down payment"/>
+                </div>
+              )
+            )}
+          </div>
+        )}
+
+        {/* ── Pay in full ── */}
+        <RadioCard selected={plan==='full'} onClick={()=>setPlan('full')}
+          aria-label={`Pay in full — pay ${fmt(BALANCE_DUE)} now`}>
+          <p className="text-[14px] font-semibold text-hz-text">Pay in full</p>
           <p className="text-[12px] text-hz-muted mt-0.5">Pay {fmt(BALANCE_DUE)} now and you're done</p>
         </RadioCard>
 
-        <RadioCard selected={plan==='later'} onClick={()=>setPlan('later')} aria-label="Schedule a payment — choose a date before May 1">
-          <p className="text-[14px] font-semibold text-hz-text">Schedule a Payment</p>
+        {/* ── Schedule a payment ── */}
+        <RadioCard selected={plan==='later'} onClick={()=>setPlan('later')}
+          aria-label="Schedule a payment — choose a date before May 1">
+          <p className="text-[14px] font-semibold text-hz-text">Schedule a payment</p>
           <p className="text-[12px] text-hz-muted mt-0.5">Choose a date before May 1 to pay in full</p>
         </RadioCard>
 
-        <Btn onClick={next} disabled={!plan}>Continue</Btn>
+        <Btn onClick={next} disabled={!plan || (plan==='pot' && !potComplete)}>
+          {plan === 'pot' && !potComplete ? 'Complete setup above to continue' : 'Continue'}
+        </Btn>
         <DecideLaterBtn onClick={()=>setShowDL(true)}/>
       </div>
+
       {showDL && (
         <DecideLaterModal
           stepName="Payment Setup"
@@ -1502,7 +1775,6 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
           onCancel={()=>setShowDL(false)}/>
       )}
 
-      {/* Anticipated aid explanation modal */}
       {showAntInfo && (
         <div className="absolute inset-0 bg-black/50 z-50 flex items-end" role="dialog" aria-modal="true" aria-labelledby="ant-title">
           <div className="bg-hz-card w-full rounded-t-[20px] px-5 pt-5 pb-8 space-y-3">
@@ -1514,7 +1786,7 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
             <div className="bg-hz-amber-bg border border-hz-amber/40 rounded-hz-sm px-3 py-2.5 flex gap-2 items-start">
               <span aria-hidden="true" className="flex-shrink-0 text-hz-amber">⚠️</span>
               <p className="text-[12px] text-hz-muted leading-relaxed">
-                If this aid doesn't finalize — for example, if your enrollment status changes — you could still owe this amount. Keep an eye on your aid status in your school portal.
+                If this aid doesn't finalize — for example, if your enrollment status changes — you could still owe this amount.
               </p>
             </div>
             <button onClick={()=>setShowAntInfo(false)}
@@ -1654,20 +1926,30 @@ const PotConfirmScreen = ({nav, goBack, S, setS}) => {
     <ScreenWrap>
       <Header title="Confirm Your Plan" onBack={goBack}/>
       <div className="px-5 pb-8">
-        <Card className="mb-4">
-          <p className="text-[13px] font-semibold text-hz-muted mb-3">Pay Over Time Plan</p>
-          <Row label="Down payment (10%)" value={fmt(POT_DOWN)}/>
-          <Row label="Setup fee" value={fmt(NELNET_FEE)}/>
-          <Row label="Due today" value={fmt(POT_DOWN_TOTAL)} bold/>
-          <Divider/>
-          <Row label="Remaining balance" value={fmt(POT_BALANCE)}/>
-          <Row label="Installments" value={`${S.potCount} × ${fmt(S.potInstall)}`}/>
-          <Row label="Frequency" value={S.potFreqLabel==='month'?'Monthly':S.potFreqLabel==='half-month'?'Twice Monthly':'Every 2 Weeks'}/>
-          {S.potDays && S.potDays.length > 0 && <Row label="Payment days" value={S.potDays.map(d=>'Day '+d).join(' & ')}/>}
-          {S.potBwDate && <Row label="First payment" value={S.potBwDate}/>}
-        </Card>
+        {(() => {
+          const todayDown   = S.potDown        || POT_DOWN;
+          const todayTotal  = S.potTotalToday  || POT_DOWN_TOTAL;
+          const remaining   = BALANCE_DUE - todayDown;
+          const freqLabel   = S.potFreqLabel === 'month' ? 'Monthly'
+                            : S.potFreqLabel === 'week'  ? 'Weekly'
+                            : 'Every 2 weeks';
+          return (
+            <Card className="mb-4">
+              <p className="text-[13px] font-semibold text-hz-muted mb-3">Pay Over Time Plan</p>
+              <Row label="Down payment" value={fmt(todayDown)}/>
+              <Row label="Nelnet enrollment fee" value={fmt(NELNET_FEE)}/>
+              {S.insAccepted && S.insPremium > 0 && <Row label="Tuition insurance premium" value={fmt(S.insPremium)}/>}
+              <Row label="Due today" value={fmt(todayTotal)} bold/>
+              <Divider/>
+              <Row label="Remaining balance" value={fmt(remaining)}/>
+              <Row label="Installments" value={`${S.potCount} × ${fmt(S.potInstall)}`}/>
+              <Row label="Frequency" value={freqLabel}/>
+              {S.potBwDate && <Row label="First payment" value={new Date(S.potBwDate + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}/>}
+            </Card>
+          );
+        })()}
 
-        <p className="text-[13px] font-semibold text-hz-text mb-3">Payment Method for Today's {fmt(POT_DOWN_TOTAL)}</p>
+        <p className="text-[13px] font-semibold text-hz-text mb-3">Payment Method for Today's {fmt(S.potTotalToday || POT_DOWN_TOTAL)}</p>
 
         {S.methodSaved ? (
           <Card className="mb-4 border-hz-teal/30 bg-hz-teal-bg/40">
@@ -1709,7 +1991,7 @@ const PotConfirmScreen = ({nav, goBack, S, setS}) => {
           <p className="text-[12px] text-hz-muted leading-relaxed">I agree to the Pay Over Time plan terms. Installment payments will be automatically drafted according to the schedule above. A $25 non-refundable fee applies.</p>
         </button>
 
-        <Btn onClick={submit} disabled={!canSubmit} aria-label={`Pay ${fmt(POT_DOWN_TOTAL)} and enroll in Pay Over Time`}>Pay {fmt(POT_DOWN_TOTAL)} &amp; Enroll</Btn>
+        <Btn onClick={submit} disabled={!canSubmit} aria-label={`Pay ${fmt(S.potTotalToday || POT_DOWN_TOTAL)} and enroll in Pay Over Time`}>Pay {fmt(S.potTotalToday || POT_DOWN_TOTAL)} &amp; Enroll</Btn>
       </div>
     </ScreenWrap>
   );
@@ -1791,14 +2073,14 @@ const PaySuccessScreen = ({nav, goBack, S, setS}) => (
     </h2>
     <p className="text-hz-muted text-[13px] mb-6">
       {S.payPlan === 'pot'
-        ? `${fmt(POT_DOWN_TOTAL)} paid today. Your first installment will be drafted on schedule.`
+        ? `${fmt(S.potTotalToday || POT_DOWN_TOTAL)} paid today. Your first installment will be drafted on schedule.`
         : `${fmt(BALANCE_DUE)} has been submitted. You'll receive a confirmation email shortly.`}
     </p>
     <Card className="w-full mb-8">
       {S.payPlan === 'pot' ? (
         <>
-          <Row label="Paid today" value={fmt(POT_DOWN_TOTAL)}/>
-          <Row label="Remaining" value={fmt(POT_BALANCE)}/>
+          <Row label="Paid today" value={fmt(S.potTotalToday || POT_DOWN_TOTAL)}/>
+          <Row label="Remaining" value={fmt(BALANCE_DUE - (S.potDown || POT_DOWN))}/>
           <Row label="Installments" value={`${S.potCount} × ${fmt(S.potInstall)}`}/>
         </>
       ) : (
@@ -3311,6 +3593,7 @@ const App = () => {
     smsMarketing: false,
     commsEmail: 'alex.johnson@student.claude.edu',
     commsPhone: '(720) 555-0198',
+    potTotalToday: 0, potDown: 0,
   });
   const navStack = React.useRef([]);
   const nav    = (s) => { navStack.current.push(screen); setScreen(s); };
