@@ -209,15 +209,41 @@ const ScreenWrap = ({children, portal=true, showAccount=false, onAccountClick}) 
   </div>
 );
 
+// ─────────────────────────────────────────────────────────────────────────────
+// HORIZON DESIGN SYSTEM — INTERACTION PATTERNS
+// Progressive reveal: when decisions are sequential and tightly coupled,
+// reveal the next input inline on the same page rather than routing to a new
+// screen. Keeps context visible, reduces navigation overhead, and makes the
+// relationship between choices obvious. Examples: count → invite form,
+// insurance yes/no → plan details, pay-over-time → frequency → dates.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Shared back chevron SVG
+const ChevronLeft = () => (
+  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+// Back button — used inline within scrolling content (e.g. onboarding steps)
+const BackBtn = ({onClick, label='Back'}) => (
+  <button onClick={onClick} aria-label={`Go back${label!=='Back'?' to '+label:''}`}
+    className="inline-flex items-center gap-1 text-hz-muted text-[12px] font-medium mb-4 -ml-0.5 px-2 py-1 rounded-hz-sm hover:text-hz-indigo hover:bg-hz-cloud active:bg-hz-cloud transition-colors">
+    <ChevronLeft/>
+    {label}
+  </button>
+);
+
 const Header = ({title, onBack, right}) => (
-  <div className="sticky top-0 bg-hz-card border-b border-[rgba(100,92,220,0.1)] px-4 py-3 flex items-center gap-3 z-10">
+  <div className="sticky top-0 bg-hz-card border-b border-[rgba(100,92,220,0.1)] px-2 py-2.5 flex items-center gap-1 z-10">
     {onBack && (
       <button onClick={onBack} aria-label="Go back"
-        className="w-8 h-8 rounded-lg bg-hz-cloud flex items-center justify-center text-hz-indigo flex-shrink-0">
-        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+        className="flex items-center gap-0.5 text-hz-muted text-[12px] font-medium px-2 py-1.5 rounded-hz-sm hover:text-hz-indigo hover:bg-hz-cloud transition-colors flex-shrink-0">
+        <ChevronLeft/>
+        <span className="sr-only">Back</span>
       </button>
     )}
-    <p className="text-[15px] font-semibold text-hz-text flex-1">{title}</p>
+    <p className="text-[15px] font-semibold text-hz-text flex-1 px-1">{title}</p>
     {right}
   </div>
 );
@@ -229,30 +255,44 @@ const STEP_LABELS = [
   "Who's Paying",
   'Insurance',
   'Payment',
-  'Comms',
+  'Communications',
 ];
 
-const StepBar = ({current, total=6}) => (
+// First screen of each step — used by StepBar to jump back
+const STEP_ENTRY = ['agreements','security-questions','payer','insurance','howpay','comms'];
+
+const StepBar = ({current, total=6, nav}) => (
   <div className="bg-hz-card border-b border-[rgba(100,92,220,0.08)] px-4 py-2.5">
     <div className="flex items-center gap-1 mb-1.5">
       {Array.from({length:total}).map((_,i)=>{
-        const done = i < current-1;
+        const done   = i < current-1;
         const active = i === current-1;
+        const El     = done && nav ? 'button' : 'div';
         return (
           <React.Fragment key={i}>
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0
-              ${done ? 'bg-hz-teal text-white' : active ? 'bg-hz-indigo text-white' : 'bg-hz-cloud text-hz-hint'}`}
-              aria-label={`Step ${i+1} ${done?'completed':active?'current':'upcoming'}: ${STEP_LABELS[i]}`}>
+            <El
+              onClick={done && nav ? ()=>nav(STEP_ENTRY[i]) : undefined}
+              title={done && nav ? `Go back to Step ${i+1}: ${STEP_LABELS[i]}` : undefined}
+              aria-label={done && nav ? `Go back to step ${i+1}: ${STEP_LABELS[i]}` : `Step ${i+1} ${done?'completed':active?'current':'upcoming'}: ${STEP_LABELS[i]}`}
+              className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 transition-all
+                ${done
+                  ? 'bg-hz-teal text-white ' + (nav ? 'cursor-pointer hover:scale-110 hover:shadow-sm active:scale-95' : '')
+                  : active
+                    ? 'bg-hz-indigo text-white ring-2 ring-hz-indigo/20'
+                    : 'bg-hz-cloud text-hz-hint'}`}>
               {done ? '✓' : i+1}
-            </div>
+            </El>
             {i < total-1 && (
-              <div className={`flex-1 h-0.5 ${i < current-1 ? 'bg-hz-teal' : 'bg-hz-cloud'}`} aria-hidden="true"/>
+              <div className={`flex-1 h-0.5 transition-colors ${i < current-1 ? 'bg-hz-teal' : 'bg-hz-cloud'}`} aria-hidden="true"/>
             )}
           </React.Fragment>
         );
       })}
     </div>
-    <p className="text-[11px] text-hz-hint">Step {current} of {total} — <span className="text-hz-indigo font-semibold">{STEP_LABELS[current-1]}</span></p>
+    <p className="text-[11px] text-hz-hint">
+      Step {current} of {total} — <span className="text-hz-indigo font-semibold">{STEP_LABELS[current-1]}</span>
+      {nav && current > 1 && <span className="text-hz-hint/70"> · tap a completed step to go back</span>}
+    </p>
   </div>
 );
 
@@ -387,7 +427,7 @@ const AgreementsScreen = ({nav, goBack, S, setS}) => {
 
   return (
     <ScreenWrap>
-      <StepBar current={1}/>
+      <StepBar current={1} nav={nav}/>
       <div className="px-4 pt-4 pb-24 space-y-3">
         <div className="mb-1">
           <p className="text-[18px] font-bold text-hz-text">School agreements</p>
@@ -544,7 +584,7 @@ const SecurityQuestionsScreen = ({nav, goBack, S, setS}) => {
 
   return (
     <ScreenWrap>
-      <StepBar current={2}/>
+      <StepBar current={2} nav={nav}/>
       <div className="px-4 pt-4 pb-24 space-y-4">
         <div className="mb-1">
           <p className="text-[18px] font-bold text-hz-text">Security questions</p>
@@ -667,7 +707,7 @@ const CommsScreen = ({nav, goBack, S, setS}) => {
   return (
     <ScreenWrap>
       <Header title="Notifications" onBack={goBack}/>
-      <StepBar current={6}/>
+      <StepBar current={6} nav={nav}/>
       <div className="px-5 pb-8">
         {S.hasPhone ? (
           <>
@@ -716,7 +756,7 @@ const PayerScreen = ({nav, goBack, S, setS}) => {
 
   return (
     <ScreenWrap>
-      <StepBar current={3}/>
+      <StepBar current={3} nav={nav}/>
       <div className="px-5 pt-5 pb-8">
         <p className="text-[18px] font-bold text-hz-text mb-2">Who's paying?</p>
         <p className="text-hz-muted text-[13px] mb-6 leading-relaxed">We want to know who will be logging in to this payment portal to submit payments, so we know what tasks are most relevant to you.</p>
@@ -783,15 +823,9 @@ const InviteScreen = ({nav, goBack, S, setS}) => {
 
   return (
     <ScreenWrap>
-      <StepBar current={3}/>
+      <StepBar current={3} nav={nav}/>
       <div className="px-5 pt-5 pb-24 overflow-y-auto">
-        <button onClick={goBack} aria-label="Go back"
-          className="flex items-center gap-1.5 text-hz-accent text-[12px] font-medium mb-4 hover:opacity-75 transition-opacity">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          Back
-        </button>
+        <BackBtn onClick={goBack}/>
 
         <p className="text-[18px] font-bold text-hz-text mb-2">Invite your payers</p>
         <p className="text-hz-muted text-[13px] mb-5 leading-relaxed">How many other people will be paying on your account?</p>
@@ -992,7 +1026,7 @@ const InsuranceScreen = ({nav, goBack, S, setS}) => {
   return (
     <ScreenWrap>
       <Header title="Tuition Protection" onBack={step==='A'?goBack:()=>setStep(step==='D'?'C':step==='C'?'A':'C')}/>
-      <StepBar current={4}/>
+      <StepBar current={4} nav={nav}/>
       <div className="px-5 pb-8">
         {step === 'A' && (
           <>
@@ -1119,7 +1153,7 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
   return (
     <ScreenWrap>
       <Header title="How Would You Like to Pay?" onBack={goBack}/>
-      <StepBar current={5}/>
+      <StepBar current={5} nav={nav}/>
       <div className="px-5 pb-8">
         <Card className="mb-5">
           <div className="flex justify-between items-center mb-1">
