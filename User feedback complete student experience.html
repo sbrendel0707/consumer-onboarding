@@ -1151,151 +1151,173 @@ const PayerHandoffScreen = ({nav, goBack, S, setS}) => (
 );
 
 // ─── InsuranceScreen ─────────────────────────────────────────────────────
-const InsuranceScreen = ({nav, goBack, S, setS}) => {
-  const [step, setStep] = React.useState('A');
-  const [choice, setChoice] = React.useState('');
-  const [inState, setInState] = React.useState('');
-  const [method, setMethod] = React.useState('ach');
-  const [acct, setAcct] = React.useState('');
-  const [routing, setRouting] = React.useState('');
-  const [showDLIns, setShowDLIns] = React.useState(false);
+const GRADGUARD_TERMS = [
+  ['Coverage Overview', 'This Tuition Protection Plan ("Plan") provides reimbursement for covered tuition charges in the event of a Covered Withdrawal from Claude University. Coverage is limited to the insured semester tuition charges, up to the maximum benefit shown on the Declarations Page.'],
+  ['Covered Withdrawals', 'A Covered Withdrawal is a complete, official withdrawal from the Institution due to: (a) a documented serious illness or injury; (b) a documented mental health condition requiring professional treatment; (c) death of the Insured Student; or (d) military deployment orders received after enrollment.'],
+  ['Exclusions', 'This Plan does not cover: voluntary withdrawals; withdrawals due to academic performance; loss of financial aid; pre-existing conditions diagnosed or treated within 90 days prior to the effective date; or withdrawals occurring after 60% of the semester has elapsed.'],
+  ['Premium & Effective Date', 'The premium is non-refundable once the semester begins. Coverage becomes effective on the first day of the insured semester or the date of enrollment, whichever is later. Premium is due at the time of enrollment.'],
+  ['Claims Process', 'To file a claim, submit written notice to GradGuard within 30 days of withdrawal, with official withdrawal documentation and supporting medical records. Claims are adjudicated within 30 business days of receiving complete documentation.'],
+  ['Benefit Amount', 'Maximum benefit equals insured tuition charges for the covered semester, less any refunds already received from the Institution per its published refund schedule.'],
+  ['Governing Law', 'This Plan is governed by the laws of the state in which it is issued. Disputes shall be subject to binding arbitration per the rules of the American Arbitration Association. Plan No. GG-2024-CU · Underwritten by Markel Insurance Company.'],
+];
 
-  const rate = inState === 'in' ? 0.019 : 0.022;
+const InsuranceScreen = ({nav, goBack, S, setS}) => {
+  const [inState,     setInState]     = React.useState(''); // 'yes' | 'no'
+  const [choice,      setChoice]      = React.useState(''); // 'yes' | 'no'
+  const [showTerms,   setShowTerms]   = React.useState(false);
+  const [showDLIns,   setShowDLIns]   = React.useState(false);
+
+  const rate    = inState === 'yes' ? 0.019 : 0.022;
   const premium = Math.round(TOTAL_CHARGES * rate * 100) / 100;
 
   const nextAfterInsurance = () => S.payer === 'other' ? nav('comms') : nav('howpay');
 
-  const handleChoiceNext = () => {
-    if (choice === 'no') { nextAfterInsurance(); return; }
-    setStep('C');
-  };
-  const handleAccept = () => {
-    setS(p=>({...p, insAccepted:true, insPremium:premium, insState:inState}));
-    setStep('D');
-  };
-  const handlePayInsurance = () => {
-    setStep('E');
-  };
-  const handleInsuranceDone = () => {
-    setS(p=>({...p, apActive:true}));
+  const handleContinue = () => {
+    if (choice === 'yes') setS(p=>({...p, insAccepted:true, insPremium:premium, insState:inState}));
     nextAfterInsurance();
   };
 
   return (
     <ScreenWrap>
-      <Header title="Tuition Protection" onBack={step==='A'?goBack:()=>setStep(step==='D'?'C':step==='C'?'A':'C')}/>
+      <Header title="Tuition Protection" onBack={goBack}/>
       <StepBar current={4} nav={nav}/>
-      <div className="px-5 pb-8">
-        {step === 'A' && (
+      <div className="px-5 pt-4 pb-28 space-y-4 overflow-y-auto">
+
+        {/* Page title */}
+        <div>
+          <p className="text-[18px] font-bold text-hz-text">Tuition protection</p>
+          <p className="text-hz-muted text-[13px] mt-1 leading-relaxed">Claude University offers optional tuition protection through GradGuard. Let's find your rate first.</p>
+        </div>
+
+        {/* Step 1: state question */}
+        <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3 space-y-3">
+          <p className="text-[13px] font-semibold text-hz-text">Do you live in <span className="text-hz-indigo">Claudious</span> during the school year?</p>
+          <div className="flex gap-2">
+            {[{val:'yes',label:'Yes'},{val:'no',label:'No, I live out of state'}].map(opt=>(
+              <button key={opt.val} onClick={()=>{ setInState(opt.val); setChoice(''); }}
+                aria-pressed={inState===opt.val}
+                className={`flex-1 py-2 rounded-hz-sm border text-[12px] font-semibold transition-colors
+                  ${inState===opt.val
+                    ? 'bg-hz-indigo text-white border-hz-indigo'
+                    : 'bg-hz-card text-hz-muted border-[rgba(100,92,220,0.2)] hover:border-hz-accent/40'}`}>
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Step 2: offer card — reveals after state answered */}
+        {inState && (
           <>
-            <p className="text-hz-muted text-[13px] mb-6">Would you like to add tuition protection insurance to your account?</p>
-            <Card className="mb-5">
-              <p className="text-[13px] font-semibold text-hz-text mb-2">GradGuard Tuition Protection</p>
-              <ul className="text-[12px] text-hz-muted space-y-1.5">
-                <li>• Covers withdrawal due to illness, injury, or mental health</li>
-                <li>• Reimburses up to 100% of insured tuition</li>
-                <li>• Rated A+ by AM Best</li>
-              </ul>
-            </Card>
-            <RadioCard selected={choice==='yes'} onClick={()=>setChoice('yes')} aria-label="Yes, add tuition protection">
-              <p className="text-[14px] font-semibold text-hz-text">Yes, add protection</p>
-              <p className="text-[12px] text-hz-muted mt-0.5">Rates vary by state</p>
-            </RadioCard>
-            {choice === 'yes' && (
-              <div className="mb-3">
-                <p className="text-xs font-medium text-hz-muted mb-2">Your state:</p>
-                <RadioCard selected={inState==='in'} onClick={()=>setInState('in')} aria-label="In-state Colorado">
-                  <p className="text-[13px] text-hz-text">In-state (e.g. Colorado)</p>
-                  <p className="text-[12px] text-hz-muted">1.9% of charges = {fmt(TOTAL_CHARGES * 0.019)}</p>
-                </RadioCard>
-                <RadioCard selected={inState==='out'} onClick={()=>setInState('out')} aria-label="Out-of-state">
-                  <p className="text-[13px] text-hz-text">Out-of-state</p>
-                  <p className="text-[12px] text-hz-muted">2.2% of charges = {fmt(TOTAL_CHARGES * 0.022)}</p>
-                </RadioCard>
-              </div>
-            )}
-            <RadioCard selected={choice==='no'} onClick={()=>setChoice('no')} aria-label="No thanks, skip insurance">
-              <p className="text-[14px] font-semibold text-hz-text">No thanks</p>
-              <p className="text-[12px] text-hz-muted mt-0.5">I'll skip insurance for now</p>
-            </RadioCard>
-            <Btn onClick={handleChoiceNext} disabled={!choice || (choice==='yes' && !inState)}>Continue</Btn>
-            <DecideLaterBtn onClick={()=>setShowDLIns(true)}/>
-          </>
-        )}
-        {showDLIns && (
-          <DecideLaterModal
-            stepName="Insurance"
-            onConfirm={()=>{ setS(p=>({...p, insDeferred:true})); nextAfterInsurance(); }}
-            onCancel={()=>setShowDLIns(false)}/>
-        )}
-        {step === 'C' && (
-          <>
-            <p className="text-hz-muted text-[13px] mb-5">Here's your personalized coverage offer.</p>
-            <Card className="mb-5 border-hz-accent/30">
-              <div className="flex justify-between items-start mb-3">
+            <div className="bg-hz-card border border-hz-accent/30 rounded-hz px-4 py-4 space-y-3">
+              <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-[15px] font-bold text-hz-text">GradGuard</p>
-                  <p className="text-[12px] text-hz-muted">Tuition Protection Plan</p>
+                  <p className="text-[14px] font-bold text-hz-text">GradGuard Tuition Protection</p>
+                  <p className="text-[11px] text-hz-muted mt-0.5">
+                    {inState === 'yes' ? 'Claudious resident rate · 1.9%' : 'Out-of-state rate · 2.2%'}
+                  </p>
                 </div>
                 <Badge color="blue">A+ Rated</Badge>
               </div>
               <Divider/>
-              <Row label="Coverage amount" value={fmt(TOTAL_CHARGES)}/>
-              <Row label="Your rate" value={(rate*100).toFixed(1)+'%'}/>
-              <Row label="Annual premium" value={fmt(premium)} bold/>
-              <Divider/>
-              <p className="text-[11px] text-hz-hint mt-1">Premium billed separately. Coverage starts immediately upon enrollment.</p>
-            </Card>
-            <Btn onClick={handleAccept} className="mb-3">Accept &amp; Continue</Btn>
-            <button onClick={()=>{ setChoice('no'); setStep('A'); }} aria-label="Decline coverage and go back"
-              className="w-full text-center text-hz-hint text-[13px] py-2">Decline coverage</button>
-          </>
-        )}
-        {step === 'D' && (
-          <>
-            <p className="text-hz-muted text-[13px] mb-5">Add a payment method for your insurance premium.</p>
-            <Card className="mb-4">
-              <Row label="Insurance premium" value={fmt(premium)} bold/>
-            </Card>
-            <div className="flex gap-2 mb-4" role="group" aria-label="Payment method selection">
-              {['ach','card'].map(m=>(
-                <button key={m} onClick={()=>setMethod(m)} aria-pressed={method===m}
-                  className={'flex-1 py-2 rounded-hz-sm border text-[13px] font-medium transition-all '+(method===m?'border-hz-accent bg-hz-cloud text-hz-indigo':'border-[rgba(100,92,220,0.14)] text-hz-muted hover:border-hz-accent/40')}>
-                  {m === 'ach' ? 'Bank (ACH)' : 'Card'}
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-[12px]">
+                  <span className="text-hz-muted">Covers up to</span>
+                  <span className="font-semibold text-hz-text">{fmt(TOTAL_CHARGES)} of school costs</span>
+                </div>
+                <div className="flex justify-between text-[12px]">
+                  <span className="text-hz-muted">Rate</span>
+                  <span className="font-semibold text-hz-text">{(rate*100).toFixed(1)}% of charges</span>
+                </div>
+              </div>
+              <div className="bg-hz-cloud rounded-hz-sm px-3 py-2.5 flex items-center justify-between">
+                <span className="text-[12px] font-semibold text-hz-text">Your premium this semester</span>
+                <span className="text-[18px] font-bold text-hz-indigo">{fmt(premium)}</span>
+              </div>
+              <ul className="text-[11px] text-hz-muted space-y-1">
+                <li>• Covers withdrawal due to illness, injury, or mental health</li>
+                <li>• Reimburses up to 100% of covered tuition</li>
+                <li>• Coverage starts the day you enroll</li>
+              </ul>
+              <button onClick={()=>setShowTerms(true)} aria-label="View GradGuard full terms and conditions"
+                className="text-hz-accent text-[11px] font-medium underline underline-offset-2 hover:opacity-75 transition-opacity">
+                See full terms &amp; conditions
+              </button>
+            </div>
+
+            {/* Step 3: yes / no choice */}
+            <div className="space-y-2">
+              {[
+                {val:'yes', label:'Yes, add protection', sub:`Add ${fmt(premium)} to my costs`},
+                {val:'no',  label:'No thanks',           sub:'I\'ll skip tuition protection'},
+              ].map(opt=>(
+                <button key={opt.val} onClick={()=>setChoice(opt.val)} aria-pressed={choice===opt.val}
+                  className={`w-full text-left px-4 py-3 rounded-hz border transition-all ${
+                    choice===opt.val ? 'border-hz-indigo bg-hz-cloud' : 'border-[rgba(100,92,220,0.2)] bg-hz-card hover:border-hz-accent/40'
+                  }`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${choice===opt.val?'border-hz-indigo':'border-hz-hint'}`}>
+                      {choice===opt.val && <div className="w-2 h-2 rounded-full bg-hz-indigo"/>}
+                    </div>
+                    <div>
+                      <p className={`text-[13px] font-semibold ${choice===opt.val?'text-hz-indigo':'text-hz-text'}`}>{opt.label}</p>
+                      <p className="text-[11px] text-hz-muted mt-0.5">{opt.sub}</p>
+                    </div>
+                  </div>
                 </button>
               ))}
             </div>
-            {method === 'ach' ? (
-              <>
-                <Input label="Routing number" id="ins-routing" value={routing} onChange={setRouting} placeholder="9 digits"/>
-                <Input label="Account number" id="ins-acct" value={acct} onChange={setAcct} placeholder="Account number"/>
-              </>
-            ) : (
-              <>
-                <Input label="Card number" id="ins-card" value={acct} onChange={setAcct} placeholder="1234 5678 9012 3456"/>
-                <div className="flex gap-3">
-                  <Input label="Expiry" id="ins-expiry" value={routing} onChange={setRouting} placeholder="MM/YY" className="flex-1 mb-0"/>
-                  <Input label="CVV" id="ins-cvv" value="" onChange={()=>{}} placeholder="123" className="w-24 mb-0"/>
-                </div>
-                <div className="mb-4"/>
-              </>
+
+            {/* Step 4: acceptance note — reveals after "yes" */}
+            {choice === 'yes' && (
+              <div className="bg-hz-teal-bg border border-hz-teal/25 rounded-hz-sm px-3 py-3 flex gap-2.5">
+                <span aria-hidden="true" className="text-hz-teal text-sm flex-shrink-0 mt-0.5">✓</span>
+                <p className="text-[12px] text-hz-muted leading-relaxed">
+                  <span className="font-semibold text-hz-text">{fmt(premium)}</span> will be added to your initial payment in Step 5. It's due today — rolled into your down payment if you set up a plan, or included in your total if you pay in full.
+                </p>
+              </div>
             )}
-            <Btn onClick={handlePayInsurance} disabled={!acct}>Pay {fmt(premium)}</Btn>
           </>
         )}
-        {step === 'E' && (
-          <div className="flex flex-col items-center text-center pt-8">
-            <div className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center text-3xl mb-4" aria-hidden="true">✅</div>
-            <h2 className="text-xl font-bold text-hz-text mb-2">You're protected!</h2>
-            <p className="text-hz-muted text-[13px] mb-6">Your GradGuard coverage is active. We'll email your policy details.</p>
-            <Card className="w-full mb-8">
-              <Row label="Premium paid" value={fmt(premium)}/>
-              <Row label="Coverage" value={fmt(TOTAL_CHARGES)}/>
-              <Row label="Policy start" value="Today"/>
-            </Card>
-            <Btn onClick={handleInsuranceDone} variant="success">Continue to Payment Setup</Btn>
+      </div>
+
+      {/* Terms & conditions modal */}
+      {showTerms && (
+        <div className="absolute inset-0 bg-black/50 z-50 flex items-end" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+          <div className="bg-hz-card w-full rounded-t-[20px] px-5 pt-5 pb-8 flex flex-col" style={{maxHeight:'80%'}}>
+            <div className="w-10 h-1 bg-[rgba(100,92,220,0.2)] rounded-full mx-auto mb-4 flex-shrink-0"/>
+            <p id="terms-title" className="text-[16px] font-bold text-hz-text mb-0.5 flex-shrink-0">Terms &amp; Conditions</p>
+            <p className="text-[11px] text-hz-hint mb-3 flex-shrink-0">GradGuard Tuition Protection · Plan No. GG-2024-CU · Underwritten by Markel Insurance</p>
+            <div className="overflow-y-auto flex-1 space-y-3 pr-1">
+              {GRADGUARD_TERMS.map(([title, body])=>(
+                <div key={title}>
+                  <p className="text-[12px] font-semibold text-hz-text mb-0.5">{title}</p>
+                  <p className="text-[11px] text-hz-muted leading-relaxed">{body}</p>
+                </div>
+              ))}
+            </div>
+            <button onClick={()=>setShowTerms(false)}
+              className="mt-4 w-full py-2.5 rounded-hz-pill bg-hz-cloud text-hz-indigo text-[13px] font-semibold hover:opacity-90 flex-shrink-0">
+              Close
+            </button>
           </div>
-        )}
+        </div>
+      )}
+
+      {showDLIns && (
+        <DecideLaterModal
+          stepName="Insurance"
+          onConfirm={()=>{ setS(p=>({...p, insDeferred:true})); nextAfterInsurance(); }}
+          onCancel={()=>setShowDLIns(false)}/>
+      )}
+
+      <div className="absolute bottom-0 left-0 right-0 bg-hz-card border-t border-[rgba(100,92,220,0.1)] px-4 py-3">
+        <button onClick={handleContinue} disabled={!choice} aria-disabled={!choice}
+          className={`w-full py-3 rounded-hz-pill text-[14px] font-semibold transition-all
+            ${choice ? 'bg-hz-indigo text-white hover:opacity-90' : 'bg-hz-cloud text-hz-hint cursor-not-allowed'}`}>
+          Continue
+        </button>
+        <DecideLaterBtn onClick={()=>setShowDLIns(true)}/>
       </div>
     </ScreenWrap>
   );
