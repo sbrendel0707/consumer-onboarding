@@ -287,7 +287,7 @@ const ProtoIntroScreen = ({nav}) => (
       </Card>
       <p className="text-hz-hint text-[12px] mb-8">This prototype covers account setup through the post-enrollment home screen. Click through all 25 screens.</p>
     </div>
-    <Btn onClick={()=>nav('welcome')} aria-label="Begin setup">I understand — begin setup →</Btn>
+    <Btn onClick={()=>nav('welcome')} aria-label="Begin setup">I understand — begin setup</Btn>
   </div>
   </ScreenWrap>
 );
@@ -345,7 +345,7 @@ const WelcomeScreen = ({nav, goBack, S, setS}) => (
 
       {/* CTA */}
       <div className="mt-auto">
-        <Btn onClick={()=>nav('agreements')} aria-label="Get started with account setup">Get started →</Btn>
+        <Btn onClick={()=>nav('agreements')} aria-label="Get started with account setup">Get started</Btn>
       </div>
     </div>
   </ScreenWrap>
@@ -740,208 +740,221 @@ const PayerScreen = ({nav, goBack, S, setS}) => {
 
 
 // ─── InviteScreen ────────────────────────────────────────────────────────
+// Single-page progressive reveal: select count → form expands inline → add more collapses prior cards
 const InviteScreen = ({nav, goBack, S, setS}) => {
-  // phase: 'count' | 'form' | 'review'
-  const [phase, setPhase]   = React.useState('count');
-  const [count, setCount]   = React.useState('');      // 'one' | 'multi'
+  const [count,   setCount]   = React.useState('');   // 'one' | 'multi'
+  const [sent,    setSent]    = React.useState([]);   // committed payers
 
-  // form fields
-  const [first, setFirst]   = React.useState('');
-  const [last,  setLast]    = React.useState('');
-  const [email, setEmail]   = React.useState('');
-  const [rel,   setRel]     = React.useState('');
-  const [pct,   setPct]     = React.useState('');      // % responsibility (multi only)
-  const [pctMode, setPctMode] = React.useState('set'); // 'set' | 'ask'
+  // active form fields
+  const [first,   setFirst]   = React.useState('');
+  const [last,    setLast]    = React.useState('');
+  const [email,   setEmail]   = React.useState('');
+  const [rel,     setRel]     = React.useState('');
+  const [pct,     setPct]     = React.useState('');
+  const [pctMode, setPctMode] = React.useState('set');
+  const [showForm, setShowForm] = React.useState(false); // revealed after count chosen
 
-  const [sent, setSent]     = React.useState([]);
+  const isMulti = count === 'multi';
+  const totalPctAssigned = sent.filter(p=>p.pctMode==='set').reduce((s,p)=>s+Number(p.pct||0), 0);
+  const canSend = first.trim() && email.includes('@') &&
+    (!isMulti || pctMode === 'ask' || (pct !== '' && Number(pct) > 0 && Number(pct) <= 100));
 
-  const isMulti   = count === 'multi';
-  const canSend   = first.trim() && email.includes('@') && (!isMulti || pctMode === 'ask' || (pct !== '' && Number(pct) > 0 && Number(pct) <= 100));
-  const totalPctAssigned = sent.filter(p=>p.pctMode==='set').reduce((s,p)=>s+Number(p.pct||0),0);
+  const handleCountSelect = (val) => {
+    setCount(val);
+    setShowForm(true);
+  };
 
-  const send = () => {
-    setSent(p=>[...p, {first, last, email, rel, pct: pctMode==='ask'?null:pct, pctMode}]);
+  const addPayer = () => {
+    setSent(p=>[...p, {first, last, email, rel, pct: pctMode==='ask' ? null : pct, pctMode}]);
     setFirst(''); setLast(''); setEmail(''); setRel(''); setPct(''); setPctMode('set');
-    // After adding one payer: if single, go to review; if multi, stay on form to add more
-    if (!isMulti) setPhase('review');
   };
 
   const finish = () => {
-    setS(p=>({...p, authPayers: sent}));
+    // If there's an unsent form with enough info, commit it first
+    const finalSent = (first.trim() && email.includes('@'))
+      ? [...sent, {first, last, email, rel, pct: pctMode==='ask' ? null : pct, pctMode}]
+      : sent;
+    setS(p=>({...p, authPayers: finalSent}));
     nav('insurance');
   };
 
-  // ── Phase 1: how many? ──────────────────────────────────────────────────
-  if (phase === 'count') return (
-    <ScreenWrap>
-      <StepBar current={3}/>
-      <div className="px-5 pt-5 pb-8">
-        <button onClick={goBack} aria-label="Go back" className="flex items-center gap-1.5 text-hz-accent text-[12px] font-medium mb-4 hover:opacity-75 transition-opacity">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          Back
-        </button>
-        <p className="text-[18px] font-bold text-hz-text mb-2">Invite your payers</p>
-        <p className="text-hz-muted text-[13px] mb-6 leading-relaxed">How many other people will be paying on your account?</p>
-        <RadioCard selected={count==='one'} onClick={()=>setCount('one')} aria-label="One other person will pay">
-          <p className="text-[14px] font-semibold text-hz-text">Just one person</p>
-          <p className="text-[12px] text-hz-muted mt-0.5">One other person will handle all payments.</p>
-        </RadioCard>
-        <RadioCard selected={count==='multi'} onClick={()=>setCount('multi')} aria-label="Two or more people will pay">
-          <p className="text-[14px] font-semibold text-hz-text">Two or more people</p>
-          <p className="text-[12px] text-hz-muted mt-0.5">Multiple payers, each responsible for a portion.</p>
-        </RadioCard>
-        <Btn onClick={()=>{ if(count) setPhase('form'); }} disabled={!count}>Continue</Btn>
-      </div>
-    </ScreenWrap>
-  );
+  const canFinish = sent.length > 0 || (first.trim() && email.includes('@') &&
+    (!isMulti || pctMode === 'ask' || (pct !== '' && Number(pct) > 0)));
 
-  // ── Phase 2: invite form ────────────────────────────────────────────────
-  if (phase === 'form') return (
-    <ScreenWrap>
-      <StepBar current={3}/>
-      <div className="px-5 pt-5 pb-8 overflow-y-auto">
-        <button onClick={()=>setPhase(sent.length > 0 ? 'review' : 'count')} aria-label="Go back"
-          className="flex items-center gap-1.5 text-hz-accent text-[12px] font-medium mb-4 hover:opacity-75 transition-opacity">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          Back
-        </button>
-
-        <p className="text-[18px] font-bold text-hz-text mb-1">
-          {sent.length === 0 ? 'Invite payer' : `Invite payer ${sent.length + 1}`}
-        </p>
-        <p className="text-hz-muted text-[13px] mb-5 leading-relaxed">
-          They'll receive an email with a secure link to create their account and set up payments.
-        </p>
-
-        {/* Previously invited — compact chips */}
-        {sent.length > 0 && (
-          <div className="mb-4 space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint mb-2">Invited so far</p>
-            {sent.map((p,i)=>(
-              <div key={i} className="flex items-center gap-2.5 bg-hz-teal-bg border border-hz-teal/25 rounded-hz-sm px-3 py-2">
-                <span aria-hidden="true" className="text-hz-teal text-sm">✓</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-semibold text-hz-text truncate">{p.first} {p.last}</p>
-                  <p className="text-[11px] text-hz-muted truncate">{p.email}</p>
-                </div>
-                {isMulti && (
-                  <span className="text-[11px] font-semibold text-hz-teal flex-shrink-0">
-                    {p.pctMode==='ask' ? 'Ask AP' : p.pct+'%'}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div className="flex gap-3">
-          <Input label="First name" id="inv-first" value={first} onChange={setFirst} placeholder="Jane" className="flex-1 mb-0"/>
-          <Input label="Last name"  id="inv-last"  value={last}  onChange={setLast}  placeholder="Doe"  className="flex-1 mb-0"/>
-        </div>
-        <div className="mb-4"/>
-        <Input label="Email address" id="inv-email" value={email} onChange={setEmail} type="email" placeholder="jane@example.com"/>
-        <Input label="Relationship (optional)" id="inv-rel" value={rel} onChange={setRel} placeholder="e.g. Parent, Guardian"/>
-
-        {/* Percentage assignment — only for multi-payer */}
-        {isMulti && (
-          <div className="mb-4 bg-hz-cloud border border-hz-accent/20 rounded-hz-sm px-4 py-3 space-y-3">
-            <p className="text-[12px] font-semibold text-hz-text">Payment responsibility</p>
-            <p className="text-[11px] text-hz-muted leading-relaxed">What portion of the total balance will this person be responsible for?</p>
-            <div className="flex gap-2">
-              <button onClick={()=>setPctMode('set')} aria-pressed={pctMode==='set'}
-                className={`flex-1 py-2 rounded-hz-sm text-[12px] font-semibold border transition-colors ${pctMode==='set' ? 'bg-hz-indigo text-white border-hz-indigo' : 'bg-hz-card text-hz-muted border-[rgba(100,92,220,0.2)]'}`}>
-                Set a %
-              </button>
-              <button onClick={()=>setPctMode('ask')} aria-pressed={pctMode==='ask'}
-                className={`flex-1 py-2 rounded-hz-sm text-[12px] font-semibold border transition-colors ${pctMode==='ask' ? 'bg-hz-indigo text-white border-hz-indigo' : 'bg-hz-card text-hz-muted border-[rgba(100,92,220,0.2)]'}`}>
-                Ask them when they sign in
-              </button>
-            </div>
-            {pctMode === 'set' && (
-              <div>
-                <div className="relative">
-                  <input
-                    type="number" min="1" max="100" value={pct}
-                    onChange={e=>setPct(e.target.value)}
-                    placeholder="e.g. 50"
-                    aria-label="Percentage of balance this person is responsible for"
-                    className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 pr-8 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-hz-hint text-[13px] font-semibold">%</span>
-                </div>
-                {sent.length > 0 && (
-                  <p className="text-[11px] text-hz-muted mt-1.5">
-                    Already assigned: <span className="font-semibold text-hz-text">{totalPctAssigned}%</span>
-                    {pct && Number(pct) > 0 ? <> — this invite: <span className="font-semibold text-hz-text">{pct}%</span> — total: <span className={`font-semibold ${totalPctAssigned+Number(pct)>100?'text-hz-danger':'text-hz-text'}`}>{totalPctAssigned+Number(pct)}%</span></> : null}
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        <Btn onClick={send} disabled={!canSend}>Send Invite</Btn>
-      </div>
-    </ScreenWrap>
-  );
-
-  // ── Phase 3: review + disclaimer ────────────────────────────────────────
   return (
     <ScreenWrap>
       <StepBar current={3}/>
-      <div className="px-5 pt-5 pb-24">
-        <button onClick={()=>setPhase('form')} aria-label="Add another payer"
+      <div className="px-5 pt-5 pb-24 overflow-y-auto">
+        <button onClick={goBack} aria-label="Go back"
           className="flex items-center gap-1.5 text-hz-accent text-[12px] font-medium mb-4 hover:opacity-75 transition-opacity">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
           Back
         </button>
 
-        <p className="text-[18px] font-bold text-hz-text mb-1">
-          {sent.length === 1 ? '1 payer invited' : `${sent.length} payers invited`}
-        </p>
-        <p className="text-hz-muted text-[13px] mb-5">Each person will receive an email invite to set up their account.</p>
+        <p className="text-[18px] font-bold text-hz-text mb-2">Invite your payers</p>
+        <p className="text-hz-muted text-[13px] mb-5 leading-relaxed">How many other people will be paying on your account?</p>
 
+        {/* Count selector — tapping immediately reveals form, no Continue button */}
         <div className="space-y-2 mb-5">
-          {sent.map((p,i)=>(
-            <div key={i} className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-hz-cloud flex items-center justify-center text-[12px] font-bold text-hz-indigo flex-shrink-0">
-                {(p.first[0]||'?').toUpperCase()}{(p.last[0]||'').toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-semibold text-hz-text">{p.first} {p.last}</p>
-                <p className="text-[11px] text-hz-muted truncate">{p.email}{p.rel ? ' · '+p.rel : ''}</p>
-              </div>
-              {isMulti && (
-                <div className="text-right flex-shrink-0">
-                  <p className="text-[12px] font-bold text-hz-indigo">{p.pctMode==='ask' ? '—' : p.pct+'%'}</p>
-                  <p className="text-[9px] text-hz-hint uppercase tracking-wide">{p.pctMode==='ask' ? 'AP sets' : 'of balance'}</p>
+          {[
+            {val:'one',   label:'Just one person',    sub:'One person will handle all payments.'},
+            {val:'multi', label:'Two or more people', sub:'Multiple payers, each responsible for a portion.'},
+          ].map(opt=>(
+            <button key={opt.val} onClick={()=>handleCountSelect(opt.val)}
+              aria-pressed={count===opt.val}
+              className={`w-full text-left px-4 py-3 rounded-hz border transition-all ${
+                count===opt.val
+                  ? 'border-hz-indigo bg-hz-cloud'
+                  : 'border-[rgba(100,92,220,0.2)] bg-hz-card hover:border-hz-accent/40'
+              }`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                  count===opt.val ? 'border-hz-indigo' : 'border-hz-hint'
+                }`}>
+                  {count===opt.val && <div className="w-2 h-2 rounded-full bg-hz-indigo"/>}
                 </div>
-              )}
-            </div>
+                <div>
+                  <p className={`text-[13px] font-semibold ${count===opt.val ? 'text-hz-indigo' : 'text-hz-text'}`}>{opt.label}</p>
+                  <p className="text-[11px] text-hz-muted mt-0.5">{opt.sub}</p>
+                </div>
+              </div>
+            </button>
           ))}
         </div>
 
-        {isMulti && (
-          <div className="mb-4">
-            <button onClick={()=>setPhase('form')} aria-label="Invite another payer"
-              className="w-full py-2.5 rounded-hz-pill border border-hz-accent/30 text-hz-indigo text-[13px] font-semibold hover:bg-hz-cloud transition-colors">
-              + Invite another payer
-            </button>
-          </div>
+        {/* Form — slides in after count is chosen */}
+        {showForm && (
+          <>
+            {/* Collapsed cards for already-added payers */}
+            {sent.length > 0 && (
+              <div className="mb-4 space-y-2">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint">Invited</p>
+                {sent.map((p,i)=>(
+                  <div key={i} className="flex items-center gap-2.5 bg-hz-teal-bg border border-hz-teal/25 rounded-hz-sm px-3 py-2">
+                    <div className="w-7 h-7 rounded-full bg-hz-teal/20 flex items-center justify-center text-[11px] font-bold text-hz-teal flex-shrink-0">
+                      {(p.first[0]||'?').toUpperCase()}{(p.last[0]||'').toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] font-semibold text-hz-text truncate">{p.first} {p.last}</p>
+                      <p className="text-[11px] text-hz-muted truncate">{p.email}</p>
+                    </div>
+                    {isMulti && (
+                      <span className="text-[11px] font-semibold text-hz-teal flex-shrink-0">
+                        {p.pctMode==='ask' ? 'AP sets %' : p.pct+'%'}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* New payer form */}
+            <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-4 space-y-3 mb-4">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint">
+                {sent.length === 0 ? 'Payer details' : `Payer ${sent.length + 1} details`}
+              </p>
+
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label htmlFor="inv-first" className="block text-xs font-semibold text-hz-muted mb-1">First name</label>
+                  <input id="inv-first" type="text" value={first} onChange={e=>setFirst(e.target.value)} placeholder="Jane"
+                    className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="inv-last" className="block text-xs font-semibold text-hz-muted mb-1">Last name</label>
+                  <input id="inv-last" type="text" value={last} onChange={e=>setLast(e.target.value)} placeholder="Doe"
+                    className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="inv-email" className="block text-xs font-semibold text-hz-muted mb-1">Email address</label>
+                <input id="inv-email" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="jane@example.com"
+                  className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
+              </div>
+              <div>
+                <label htmlFor="inv-rel" className="block text-xs font-semibold text-hz-muted mb-1">Relationship <span className="font-normal text-hz-hint">(optional)</span></label>
+                <input id="inv-rel" type="text" value={rel} onChange={e=>setRel(e.target.value)} placeholder="e.g. Parent, Guardian"
+                  className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
+              </div>
+
+              {/* Single payer: static 100% note */}
+              {!isMulti && (
+                <div className="bg-hz-cloud rounded-hz-sm px-3 py-2 flex gap-2 items-start">
+                  <span aria-hidden="true" className="text-hz-accent text-sm flex-shrink-0">ℹ️</span>
+                  <p className="text-[11px] text-hz-muted leading-relaxed">This person will be responsible for <span className="font-semibold text-hz-text">100%</span> of your school costs.</p>
+                </div>
+              )}
+
+              {/* Multi-payer: % assignment */}
+              {isMulti && (
+                <div className="space-y-2">
+                  <p className="text-[12px] font-semibold text-hz-text">Payment responsibility</p>
+                  <div className="flex gap-2">
+                    <button onClick={()=>setPctMode('set')} aria-pressed={pctMode==='set'}
+                      className={`flex-1 py-2 rounded-hz-sm text-[11px] font-semibold border transition-colors ${pctMode==='set' ? 'bg-hz-indigo text-white border-hz-indigo' : 'bg-hz-card text-hz-muted border-[rgba(100,92,220,0.2)]'}`}>
+                      Set a %
+                    </button>
+                    <button onClick={()=>setPctMode('ask')} aria-pressed={pctMode==='ask'}
+                      className={`flex-1 py-2 rounded-hz-sm text-[11px] font-semibold border transition-colors ${pctMode==='ask' ? 'bg-hz-indigo text-white border-hz-indigo' : 'bg-hz-card text-hz-muted border-[rgba(100,92,220,0.2)]'}`}>
+                      Ask when they sign in
+                    </button>
+                  </div>
+                  {pctMode === 'set' && (
+                    <div className="relative">
+                      <input type="number" min="1" max="100" value={pct}
+                        onChange={e=>setPct(e.target.value)}
+                        placeholder="e.g. 50"
+                        aria-label="Percentage of balance this person is responsible for"
+                        className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 pr-8 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-hz-hint text-[13px] font-semibold">%</span>
+                      {sent.length > 0 && (
+                        <p className="text-[11px] text-hz-muted mt-1.5">
+                          Already assigned: <span className="font-semibold text-hz-text">{totalPctAssigned}%</span>
+                          {pct && Number(pct) > 0 && <>
+                            {' '}+ this payer: <span className="font-semibold text-hz-text">{pct}%</span>
+                            {' '}= <span className={`font-semibold ${totalPctAssigned+Number(pct)>100?'text-hz-danger':'text-hz-text'}`}>{totalPctAssigned+Number(pct)}%</span>
+                          </>}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Student responsibility disclaimer */}
+            <div className="bg-hz-amber-bg border border-hz-amber/40 rounded-hz-sm px-3 py-2.5 mb-4 flex gap-2.5">
+              <span aria-hidden="true" className="text-hz-amber text-sm flex-shrink-0 mt-0.5">⚠️</span>
+              <p className="text-[11px] text-hz-muted leading-relaxed">
+                <span className="font-semibold text-hz-text">Remember: </span>
+                Even if a payer doesn't complete their portion, the full balance remains your responsibility as the student.
+              </p>
+            </div>
+
+            {/* Multi-payer: add another */}
+            {isMulti && (
+              <button onClick={addPayer} disabled={!canSend}
+                aria-label="Save this payer and add another"
+                className={`w-full py-2.5 rounded-hz-pill border text-[13px] font-semibold mb-3 transition-colors ${
+                  canSend ? 'border-hz-accent/40 text-hz-indigo hover:bg-hz-cloud' : 'border-hz-border text-hz-hint cursor-not-allowed'
+                }`}>
+                + Add another payer
+              </button>
+            )}
+          </>
         )}
+      </div>
 
-        {/* Student responsibility disclaimer */}
-        <div className="bg-hz-amber-bg border border-hz-amber/40 rounded-hz-sm px-4 py-3 mb-5 flex gap-2.5">
-          <span aria-hidden="true" className="text-hz-amber text-base flex-shrink-0 mt-0.5">⚠️</span>
-          <p className="text-[12px] text-hz-muted leading-relaxed">
-            <span className="font-semibold text-hz-text">Heads up: </span>
-            Even if an authorized payer doesn't make their payment, the full balance ultimately remains your responsibility as the student. Unpaid amounts may result in account holds.
-          </p>
+      {/* Sticky footer CTA */}
+      {showForm && (
+        <div className="absolute bottom-0 left-0 right-0 bg-hz-card border-t border-[rgba(100,92,220,0.1)] px-4 py-3">
+          <Btn onClick={finish} disabled={!canFinish}>
+            {isMulti && sent.length === 0 ? 'Send invite & continue' : isMulti ? 'Send invites & continue' : 'Send invite & continue'}
+          </Btn>
         </div>
-      </div>
-
-      <div className="absolute bottom-0 left-0 right-0 bg-hz-card border-t border-[rgba(100,92,220,0.1)] px-4 py-3">
-        <Btn onClick={finish}>Continue</Btn>
-      </div>
+      )}
     </ScreenWrap>
   );
 };
@@ -1599,7 +1612,7 @@ const CompleteScreen = ({nav, goBack, S, setS}) => {
             ))}
           </Card>
         </div>
-        <Btn onClick={()=>nav('home')} variant="success" aria-label="Go to your home screen">Go to Home →</Btn>
+        <Btn onClick={()=>nav('home')} variant="success" aria-label="Go to your home screen">Go to Home</Btn>
       </div>
     </ScreenWrap>
   );
