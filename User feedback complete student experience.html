@@ -2429,9 +2429,53 @@ const App = () => {
         <select id="screen-jump"
           value={screen}
           onChange={e => { navStack.current = []; setScreen(e.target.value); }}
-          className="bg-hz-card border border-[rgba(100,92,220,0.2)] text-hz-text text-[11px] rounded-hz-sm px-2 py-1.5 shadow-sm outline-none focus:border-hz-accent max-w-[160px]"
+          className="bg-hz-card border border-[rgba(100,92,220,0.2)] text-hz-text text-[11px] rounded-hz-sm px-2 py-1.5 shadow-sm outline-none focus:border-hz-accent max-w-[190px]"
           title="Jump to screen">
-          {Object.keys(screens).map(s => <option key={s} value={s}>{s}</option>)}
+          <optgroup label="── Intro">
+            <option value="proto-intro">Landing / Intro</option>
+            <option value="welcome">Welcome</option>
+          </optgroup>
+          <optgroup label="── Step 1: Agreements">
+            <option value="agreements">Review &amp; sign agreements</option>
+          </optgroup>
+          <optgroup label="── Step 2: Security">
+            <option value="security-questions">Set security questions</option>
+          </optgroup>
+          <optgroup label="── Step 3: Who's Paying">
+            <option value="payer">Choose payer type</option>
+            <option value="invite">Invite payers</option>
+          </optgroup>
+          <optgroup label="── Step 4: Insurance">
+            <option value="insurance">Tuition protection</option>
+          </optgroup>
+          <optgroup label="── Step 5: Payment">
+            <option value="howpay">Choose how to pay</option>
+            <option value="pot">Plan — setup</option>
+            <option value="pot-confirm">Plan — confirm</option>
+            <option value="pay-sched">Plan — schedule overview</option>
+            <option value="adj-settings">Plan — adjust settings</option>
+            <option value="pay-confirm-full">Pay in full — confirm</option>
+            <option value="pay-success">Pay in full — success</option>
+          </optgroup>
+          <optgroup label="── Step 6: Communications">
+            <option value="comms">Communication preferences</option>
+          </optgroup>
+          <optgroup label="── Complete">
+            <option value="complete">Onboarding complete</option>
+          </optgroup>
+          <optgroup label="── Home">
+            <option value="home">Home</option>
+            <option value="costs">View bill</option>
+            <option value="print">Print statement</option>
+            <option value="pay-now">Make a payment</option>
+            <option value="guest">Guest payer</option>
+            <option value="manage-pot">Manage plan</option>
+            <option value="change-dates-ob">Change payment dates</option>
+            <option value="change-autopay-ob">Change autopay</option>
+            <option value="pay-next-ob">Pay next installment</option>
+            <option value="history">Payment history</option>
+            <option value="account-details">Account details</option>
+          </optgroup>
         </select>
       </div>
 
