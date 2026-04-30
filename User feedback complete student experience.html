@@ -1929,163 +1929,271 @@ const CompleteScreen = ({nav, goBack, S, setS}) => {
 
 // ─── HomeScreen ───────────────────────────────────────────────────────────
 const HomeScreen = ({nav, goBack, S, setS}) => {
-  const [expanded, setExpanded] = React.useState({due:false, sched:false, aid:false, paid:false});
-  const toggle = (k) => setExpanded(p=>({...p,[k]:!p[k]}));
 
-  const amountDue   = S.payPlan==='pot' ? POT_BALANCE : S.payPlan==='full' ? 0 : BALANCE_DUE;
-  const paidToday   = S.payPlan==='pot' ? POT_DOWN_TOTAL : S.payPlan==='full' ? BALANCE_DUE : 0;
-  const totalAid    = APPLIED_AID + ANTICIPATED_AID;
-  const barTotal    = TOTAL_CHARGES;
+  // Balance math
+  const netBalance = BALANCE_DUE;
+  const onPlan     = S.payPlan === 'pot' ? POT_BALANCE : 0;
+  const paidFull   = S.payPlan === 'full';
+  const openBal    = paidFull ? 0 : netBalance - onPlan;
 
-  const aidPct      = Math.round(totalAid/barTotal*100);
-  const paidPct     = Math.round(paidToday/barTotal*100);
-  const duePct      = 100 - aidPct - paidPct;
+  // Coverage bar segments (as % of total charges)
+  const aidPct  = Math.round(APPLIED_AID / TOTAL_CHARGES * 100);
+  const antPct  = Math.round(ANTICIPATED_AID / TOTAL_CHARGES * 100);
+  const planPct = Math.round(onPlan / TOTAL_CHARGES * 100);
+  const paidPct = paidFull ? Math.round(netBalance / TOTAL_CHARGES * 100) : 0;
+  const openPct = Math.max(0, 100 - aidPct - antPct - planPct - paidPct);
+
+  // To-do actions (derived from S state)
+  const actions = [];
+  if (openBal > 0 && !paidFull && S.payPlan !== 'later')
+    actions.push({id:'open-bal', icon:'⚡', color:'amber',
+      title:'Open balance needs attention',
+      sub:`${fmt(openBal)} hasn't been scheduled or added to a plan yet`,
+      screen:'howpay', cta:'Address now'});
+  if (S.payPlan === 'later')
+    actions.push({id:'scheduled', icon:'📅', color:'blue',
+      title:'Payment scheduled',
+      sub:`${fmt(BALANCE_DUE)} scheduled before May 1`,
+      screen:'pay-now', cta:'View details'});
+  if (S.secQsDeferred)
+    actions.push({id:'sec-q', icon:'🔒', color:'blue',
+      title:'Set up security questions',
+      sub:'Required if you ever need to verify yourself by phone with support',
+      screen:'security-questions', cta:'Complete now'});
+  if (S.insDeferred)
+    actions.push({id:'ins', icon:'🛡️', color:'blue',
+      title:'Review tuition protection',
+      sub:'You deferred your insurance decision — a deadline may apply',
+      screen:'insurance', cta:'Review now'});
+  if (S.payDeferred)
+    actions.push({id:'pay', icon:'💳', color:'blue',
+      title:'Complete payment setup',
+      sub:"You haven't decided how you'll pay your balance yet",
+      screen:'howpay', cta:'Set up now'});
+
+  // Upcoming payments (next 30 days)
+  const upcoming = [];
+  if (S.payPlan === 'pot' && S.potInstall)
+    upcoming.push({date:'May 10, 2025', amount:S.potInstall, label:'Payment plan installment', note:'Auto-pay'});
+  if (S.payPlan === 'later')
+    upcoming.push({date:'Apr 30, 2025', amount:BALANCE_DUE, label:'Scheduled payment'});
+  if (S.insAccepted && S.insPremium && S.payPlan !== 'full')
+    upcoming.push({date:'Today', amount:S.insPremium, label:'GradGuard insurance premium', note:'Added to initial payment'});
+
+  // Info hub items
+  const infoBalance = [];
+  const infoAccount = [];
+  const infoPayers  = [];
+  infoBalance.push({date:'Apr 15', text:'Pell Grant ($1,100) applied to your account'});
+  infoBalance.push({date:'Apr 15', text:'Anticipated federal loan ($1,000) reflected in balance'});
+  if (S.insAccepted) infoBalance.push({date:'Today', text:`GradGuard premium (${fmt(S.insPremium)}) added to initial payment`});
+  infoAccount.push({date:'Today', text:'Account setup complete — all steps finished'});
+  if (S.secQsDeferred) infoAccount.push({date:'Today', text:'Security questions deferred — task added to your to-do list'});
+  if (S.authPayers?.length > 0)
+    S.authPayers.forEach(p=>infoPayers.push({date:'Today', text:`Invite sent to ${p.first} ${p.last} (${p.email})`}));
+  const showInfoHub = infoBalance.length || infoAccount.length || infoPayers.length;
+
+  const actionColors = {amber:'bg-hz-amber-bg border-hz-amber/40', blue:'bg-hz-cloud border-hz-accent/30', danger:'bg-hz-danger-bg border-hz-danger/40'};
+  const actionText   = {amber:'text-hz-amber', blue:'text-hz-indigo', danger:'text-hz-danger'};
 
   return (
     <ScreenWrap portal={true} showAccount={true} onAccountClick={()=>nav('account-details')}>
-      {/* Greeting strip */}
-      <div className="bg-gradient-to-r from-hz-indigo to-hz-mid px-4 py-3">
-        <p className="text-[15px] font-bold text-white">Hi, Alex 👋</p>
-        <p className="text-[11px] text-white/65">Student ID: 1234567</p>
+
+      {/* Greeting — inline, not a second banner */}
+      <div className="px-4 pt-4 pb-2 flex items-center gap-3">
+        <div className="w-9 h-9 rounded-full bg-hz-cloud border border-hz-accent/20 flex items-center justify-center text-[13px] font-bold text-hz-indigo flex-shrink-0">AJ</div>
+        <div>
+          <p className="text-[16px] font-bold text-hz-text leading-tight">Hi, Alex 👋</p>
+          <p className="text-[11px] text-hz-hint">Student ID 1234567 · Fall 2025</p>
+        </div>
       </div>
 
-      <div className="px-4 py-4 space-y-3">
-        {/* ── Actions & Info Hub ── */}
-        {(() => {
-          const items = [];
-          if (S.payPlan === 'pot') items.push({
-            type:'info', icon:'🔄', color:'amber',
-            title:'Auto-pay active',
-            sub:`Next ${fmt(S.potInstall)} · ${S.potFreqLabel==='month'?'Monthly':S.potFreqLabel==='half-month'?'Twice Monthly':'Biweekly'}`
-          });
-          if (S.payPlan === 'later') items.push({
-            type:'action', icon:'⚠️', color:'danger',
-            title:'Action needed',
-            sub:'Unscheduled balance — confirm payment before May 1'
-          });
-          if (S.insAccepted) items.push({
-            type:'info', icon:'🛡️', color:'teal',
-            title:'Tuition insurance active',
-            sub:'GradGuard coverage enrolled for this term'
-          });
-
-          const colorMap = {
-            amber:  'bg-hz-amber-bg border-hz-amber',
-            danger: 'bg-hz-danger-bg border-hz-danger',
-            teal:   'bg-hz-teal-bg border-hz-teal',
-            blue:   'bg-hz-cloud border-hz-accent',
-          };
-          const textMap  = {amber:'text-hz-text', danger:'text-hz-danger', teal:'text-hz-text', blue:'text-hz-text'};
-
-          if (items.length === 0) return (
-            <div className="bg-hz-teal-bg border border-hz-teal rounded-hz px-4 py-3 flex items-center gap-3" role="status" aria-label="Account status">
-              <span aria-hidden="true" className="text-hz-teal text-lg">✓</span>
-              <div>
-                <p className="text-[13px] font-semibold text-hz-teal">You're all set</p>
-                <p className="text-[11px] text-hz-muted">No action needed right now — we'll notify you if anything changes.</p>
-              </div>
-            </div>
-          );
-
-          return <>{items.map((item,i)=>(
-            <div key={i} className={`${colorMap[item.color]} border rounded-hz px-4 py-3 flex items-center gap-3`}
-              role={item.type==='action'?'alert':'status'}>
-              <span aria-hidden="true" className="text-lg">{item.icon}</span>
-              <div>
-                <p className={`text-[13px] font-semibold ${textMap[item.color]}`}>{item.title}</p>
-                <p className="text-[11px] text-hz-muted">{item.sub}</p>
-              </div>
-            </div>
-          ))}</>;
-        })()}
+      <div className="px-4 pb-6 space-y-4 pt-1">
 
         {/* ── Balance Card ── */}
         <Card className="p-0 overflow-hidden">
-          <div className="px-4 pt-4 pb-3 space-y-2.5">
-            {/* Total */}
-            <div className="flex justify-between items-baseline">
-              <span className="text-[13px] text-hz-muted">Total balance</span>
-              <span className="text-[15px] font-semibold text-hz-text">{fmt(TOTAL_CHARGES - APPLIED_AID - ANTICIPATED_AID)}</span>
+          {paidFull ? (
+            <div className="px-4 py-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-hz-teal-bg flex items-center justify-center text-xl flex-shrink-0" aria-hidden="true">✅</div>
+              <div>
+                <p className="text-[16px] font-bold text-hz-teal">Paid in full</p>
+                <p className="text-[12px] text-hz-muted">You have no outstanding balance. Nice work!</p>
+              </div>
             </div>
-
-            {/* On plan row */}
-            {S.payPlan === 'pot' && (
-              <div className="flex justify-between items-center">
-                <span className="flex items-center gap-2 text-[13px] text-hz-muted">
-                  <span aria-hidden="true" className="w-2 h-2 rounded-full bg-hz-teal flex-shrink-0"/>
-                  On Pay Over Time plan
-                  <span className="bg-hz-teal-bg text-[#0F6E56] text-[10px] font-semibold px-2 py-0.5 rounded-full">autopay on</span>
-                </span>
-                <span className="text-[13px] font-medium text-hz-text">{fmt(POT_BALANCE)}</span>
+          ) : (
+            <div className="px-4 pt-4 pb-3 space-y-3">
+              {/* Open balance — primary number */}
+              <div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-hz-amber">Open balance</span>
+                  <span className="text-[24px] font-bold text-hz-text leading-none">{fmt(openBal)}</span>
+                </div>
+                <p className="text-[11px] text-hz-hint mt-0.5">Hasn't been scheduled or added to a plan yet</p>
               </div>
-            )}
-            {S.payPlan === 'full' && (
-              <div className="flex justify-between items-center">
-                <span className="flex items-center gap-2 text-[13px] text-hz-muted">
-                  <span aria-hidden="true" className="w-2 h-2 rounded-full bg-hz-teal flex-shrink-0"/>
-                  Paid in full
-                </span>
-                <span className="text-[13px] font-medium text-hz-teal">{fmt(TOTAL_CHARGES - APPLIED_AID - ANTICIPATED_AID)}</span>
-              </div>
-            )}
 
-            {/* Action row */}
-            <div className="flex justify-between items-center">
-              {amountDue > 0 ? (
+              {/* On plan */}
+              {S.payPlan === 'pot' && (
                 <>
-                  <span className="flex items-center gap-2 text-[13px] font-semibold text-hz-text">
-                    <span aria-hidden="true" className="w-2 h-2 rounded-full bg-hz-amber flex-shrink-0"/>
-                    Balance requiring action
-                  </span>
-                  <span className="text-[15px] font-bold text-hz-text">{fmt(amountDue)}</span>
+                  <Divider/>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[12px] text-hz-muted">On payment plan</p>
+                      <p className="text-[11px] text-hz-hint">Autopay on · next {fmt(S.potInstall)}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[14px] font-semibold text-hz-text">{fmt(POT_BALANCE)}</p>
+                      <span className="text-[10px] font-semibold text-hz-teal bg-hz-teal-bg px-2 py-0.5 rounded-full">Active</span>
+                    </div>
+                  </div>
                 </>
-              ) : (
-                <span className="flex items-center gap-2 text-[13px] text-hz-teal font-medium">
-                  <span aria-hidden="true" className="w-2 h-2 rounded-full bg-hz-teal flex-shrink-0"/>
-                  No outstanding balance
-                </span>
               )}
-            </div>
-          </div>
 
-          {/* Statement link */}
+              {/* Total */}
+              <Divider/>
+              <div className="flex items-baseline justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-hz-hint">Total balance</span>
+                <span className="text-[13px] font-bold text-hz-text">{fmt(netBalance)}</span>
+              </div>
+
+              {/* Coverage bar */}
+              <div>
+                <div className="w-full h-2 rounded-full overflow-hidden flex gap-px bg-[rgba(100,92,220,0.07)]">
+                  <div style={{width:aidPct+'%'}}  className="bg-hz-teal h-full rounded-l-full"/>
+                  <div style={{width:antPct+'%'}}  className="bg-hz-teal/35 h-full"/>
+                  {planPct > 0 && <div style={{width:planPct+'%'}} className="bg-hz-indigo h-full"/>}
+                  {openPct > 0 && <div style={{width:openPct+'%'}} className="bg-hz-amber/70 h-full rounded-r-full"/>}
+                </div>
+                <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5">
+                  <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-sm bg-hz-teal inline-block"/>Aid applied</span>
+                  <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-sm bg-hz-teal/35 inline-block"/>Anticipated aid</span>
+                  {planPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-sm bg-hz-indigo inline-block"/>On plan</span>}
+                  {openPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-sm bg-hz-amber/70 inline-block"/>Open</span>}
+                </div>
+              </div>
+            </div>
+          )}
           <div className="border-t border-[rgba(100,92,220,0.1)] px-4 py-2.5">
-            <button onClick={()=>nav('costs')} className="text-[12px] text-hz-accent font-medium hover:underline"
-              aria-label="View your full statement for complete transaction details">
-              View your statement for complete transaction details →
+            <button onClick={()=>nav('costs')} className="text-[12px] text-hz-accent font-medium hover:underline">
+              View full statement
             </button>
           </div>
         </Card>
 
-        {/* PoT card */}
-        {S.payPlan === 'pot' && (
-          <Card>
-            <div className="flex justify-between items-center mb-3">
-              <p className="text-[14px] font-semibold text-hz-text">Pay Over Time</p>
-              <Badge color="blue">Active</Badge>
+        {/* ── Actions ── */}
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint mb-2">To do</p>
+          {actions.length === 0 ? (
+            <div className="bg-hz-teal-bg border border-hz-teal/30 rounded-hz px-4 py-3 flex items-center gap-3" role="status">
+              <span aria-hidden="true" className="text-hz-teal text-base">✓</span>
+              <div>
+                <p className="text-[13px] font-semibold text-hz-teal">You're all set</p>
+                <p className="text-[11px] text-hz-muted">No action needed right now.</p>
+              </div>
             </div>
-            <Row label="Remaining balance" value={fmt(POT_BALANCE)}/>
-            <Row label="Next payment" value={fmt(S.potInstall)}/>
-            <Divider/>
-            <Btn onClick={()=>nav('manage-pot')} variant="ghost" className="py-2.5 text-[13px]" aria-label="Manage your Pay Over Time plan">Manage Plan</Btn>
-          </Card>
+          ) : (
+            <div className="space-y-2">
+              {actions.map(a=>(
+                <div key={a.id} className={`${actionColors[a.color]} border rounded-hz px-4 py-3`} role="alert">
+                  <div className="flex items-start gap-2.5">
+                    <span aria-hidden="true" className="text-base mt-0.5 flex-shrink-0">{a.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-semibold text-hz-text">{a.title}</p>
+                      <p className="text-[11px] text-hz-muted mt-0.5 leading-snug">{a.sub}</p>
+                      <button onClick={()=>nav(a.screen)}
+                        className={`mt-1.5 text-[12px] font-semibold ${actionText[a.color]} underline underline-offset-2 hover:opacity-75`}>
+                        {a.cta}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── Upcoming Payments ── */}
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint mb-2">Upcoming payments · next 30 days</p>
+          {upcoming.length === 0 ? (
+            <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3">
+              <p className="text-[12px] text-hz-muted leading-relaxed">Nothing is currently scheduled to be paid by you in the next 30 days.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {upcoming.map((p,i)=>(
+                <div key={i} className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-semibold text-hz-text truncate">{p.label}</p>
+                    <p className="text-[11px] text-hz-hint">{p.date}{p.note && <span className="text-hz-teal"> · {p.note}</span>}</p>
+                  </div>
+                  <span className="text-[14px] font-bold text-hz-indigo flex-shrink-0">{fmt(p.amount)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── Info Hub ── */}
+        {showInfoHub && (
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint mb-2">What's happened · last 30 days</p>
+            <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz overflow-hidden divide-y divide-[rgba(100,92,220,0.07)]">
+              {infoBalance.length > 0 && (
+                <div className="px-4 py-3 space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-hz-hint">Changes to amount you owe</p>
+                  {infoBalance.map((item,i)=>(
+                    <div key={i} className="flex items-start gap-2">
+                      <span className="text-[10px] text-hz-hint mt-0.5 flex-shrink-0 w-[42px]">{item.date}</span>
+                      <p className="text-[12px] text-hz-muted leading-snug">{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {infoAccount.length > 0 && (
+                <div className="px-4 py-3 space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-hz-hint">Changes to your account</p>
+                  {infoAccount.map((item,i)=>(
+                    <div key={i} className="flex items-start gap-2">
+                      <span className="text-[10px] text-hz-hint mt-0.5 flex-shrink-0 w-[42px]">{item.date}</span>
+                      <p className="text-[12px] text-hz-muted leading-snug">{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {infoPayers.length > 0 && (
+                <div className="px-4 py-3 space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-hz-hint">Authorized payer activity</p>
+                  {infoPayers.map((item,i)=>(
+                    <div key={i} className="flex items-start gap-2">
+                      <span className="text-[10px] text-hz-hint mt-0.5 flex-shrink-0 w-[42px]">{item.date}</span>
+                      <p className="text-[12px] text-hz-muted leading-snug">{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         )}
 
-        {/* Quick actions */}
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            {label:'View Bill', icon:'📄', screen:'costs'},
-            {label:'Make Payment', icon:'💳', screen:'pay-now'},
-            {label:'Guest Payer', icon:'👥', screen:'guest'},
-            {label:'History', icon:'📋', screen:'history'},
-          ].map(a=>(
-            <button key={a.screen} onClick={()=>nav(a.screen)} aria-label={a.label}
-              className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz p-4 flex flex-col items-center gap-2 hover:bg-hz-cloud/40 transition-colors">
-              <span aria-hidden="true" className="text-2xl">{a.icon}</span>
-              <span className="text-[12px] font-medium text-hz-text">{a.label}</span>
-            </button>
-          ))}
+        {/* ── Quick Actions ── */}
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint mb-2">Quick actions</p>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              {label:'View Bill', icon:'📄', screen:'costs'},
+              {label:'Make Payment', icon:'💳', screen:'pay-now'},
+              {label:'Guest Payer', icon:'👥', screen:'guest'},
+              {label:'History', icon:'📋', screen:'history'},
+            ].map(a=>(
+              <button key={a.screen} onClick={()=>nav(a.screen)} aria-label={a.label}
+                className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz p-3 flex flex-col items-center gap-1.5 hover:bg-hz-cloud/40 transition-colors">
+                <span aria-hidden="true" className="text-2xl">{a.icon}</span>
+                <span className="text-[11px] font-medium text-hz-text">{a.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
+
       </div>
     </ScreenWrap>
   );
