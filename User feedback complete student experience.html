@@ -197,7 +197,7 @@ const ProtoIntroScreen = ({nav}) => (
       </div>
       <h1 className="text-2xl font-bold text-hz-text mb-4 leading-snug">Student Onboarding<br/>Complete Experience</h1>
       <p className="text-hz-muted text-[14px] leading-relaxed mb-6">
-        You are a first-year student at <strong className="text-hz-text">Lakewood University</strong> receiving your first bill for Fall semester.
+        You are a first-year student at <strong className="text-hz-text">Claude University</strong> receiving your first bill for Fall semester.
         You'll review your balance and set up how you'd like to pay.
       </p>
       <Card className="mb-6">
@@ -226,9 +226,8 @@ const WelcomeScreen = ({nav, goBack, S, setS}) => (
       </div>
     </div>
     <p className="text-hz-muted text-sm font-medium tracking-wide uppercase mb-2">Welcome to</p>
-    <h1 className="text-2xl font-bold text-hz-text mb-2">Lakewood University</h1>
-    <p className="text-hz-muted text-[13px] mb-2">Student Account Portal</p>
-    <p className="text-hz-hint text-[12px] mb-10">Powered by Nelnet Campus Commerce</p>
+    <h1 className="text-2xl font-bold text-hz-text mb-2">Claude University</h1>
+    <p className="text-hz-muted text-[13px] mb-10">Student Account Portal</p>
     <div className="w-full">
       <Btn onClick={()=>nav('contact')} aria-label="Get started with account setup">Get started →</Btn>
       <p className="text-hz-hint text-[11px] mt-4">Secure · Encrypted · FERPA Compliant</p>
@@ -239,7 +238,7 @@ const WelcomeScreen = ({nav, goBack, S, setS}) => (
 
 // ─── ContactScreen ───────────────────────────────────────────────────────
 const ContactScreen = ({nav, goBack, S, setS}) => {
-  const [email, setEmail] = React.useState('alex.johnson@student.lakewood.edu');
+  const [email, setEmail] = React.useState('alex.johnson@student.claude.edu');
   const [phone, setPhone] = React.useState('');
   const [extras, setExtras] = React.useState([]);
   const [extraInput, setExtraInput] = React.useState('');
@@ -1110,85 +1109,124 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
       <div className="bg-gradient-to-r from-hz-indigo to-hz-mid px-5 pt-12 pb-4 border-b border-white/10">
         <div className="flex items-center justify-between mb-1">
           <div>
-            <p className="text-[11px] text-white/70 uppercase tracking-wide">Lakewood University</p>
+            <p className="text-[11px] text-white/70 uppercase tracking-wide">Claude University</p>
             <p className="text-[16px] font-bold text-white">Alex Johnson</p>
           </div>
-          <div aria-hidden="true" className="w-9 h-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-[16px]">👤</div>
+          <button onClick={()=>nav('account-details')} aria-label="Go to your account and profile settings"
+  className="flex flex-col items-center gap-0.5 group">
+  <div className="w-9 h-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-[13px] font-bold text-white group-hover:bg-white/30 transition-colors">AJ</div>
+  <span className="text-[9px] text-white/60 font-medium uppercase tracking-wide">Account</span>
+</button>
         </div>
-        <p className="text-[11px] text-white/60">Fall 2025 · Student ID: 1234567</p>
+        <p className="text-[11px] text-white/60">Student ID: 1234567</p>
       </div>
 
       <div className="px-4 py-4 space-y-3">
-        {/* Banners */}
-        {S.payPlan === 'pot' && (
-          <div className="bg-hz-amber-bg border border-hz-amber rounded-hz px-4 py-3 flex items-center gap-3" role="status">
-            <span aria-hidden="true" className="text-hz-amber text-lg">🔄</span>
-            <div>
-              <p className="text-[13px] font-semibold text-hz-text">Auto-pay active</p>
-              <p className="text-[11px] text-hz-muted">Next: {fmt(S.potInstall)} · {S.potFreqLabel==='month'?'Monthly':S.potFreqLabel==='half-month'?'Twice Monthly':'Biweekly'}</p>
-            </div>
-          </div>
-        )}
-        {S.payPlan === 'later' && (
-          <div className="bg-hz-danger-bg border border-hz-danger rounded-hz px-4 py-3 flex items-center gap-3" role="alert">
-            <span aria-hidden="true" className="text-hz-danger text-lg">⚠️</span>
-            <div>
-              <p className="text-[13px] font-semibold text-hz-danger">Action needed</p>
-              <p className="text-[11px] text-hz-muted">Payment scheduled — confirm before May 1</p>
-            </div>
-          </div>
-        )}
+        {/* ── Actions & Info Hub ── */}
+        {(() => {
+          const items = [];
+          if (S.payPlan === 'pot') items.push({
+            type:'info', icon:'🔄', color:'amber',
+            title:'Auto-pay active',
+            sub:`Next ${fmt(S.potInstall)} · ${S.potFreqLabel==='month'?'Monthly':S.potFreqLabel==='half-month'?'Twice Monthly':'Biweekly'}`
+          });
+          if (S.payPlan === 'later') items.push({
+            type:'action', icon:'⚠️', color:'danger',
+            title:'Action needed',
+            sub:'Unscheduled balance — confirm payment before May 1'
+          });
+          if (S.insAccepted) items.push({
+            type:'info', icon:'🛡️', color:'teal',
+            title:'Tuition insurance active',
+            sub:'GradGuard coverage enrolled for this term'
+          });
 
-        {/* Balance Summary Card */}
-        <Card className="p-0 overflow-hidden">
-          <div className="px-4 pt-4 pb-3">
-            <div className="flex justify-between items-start mb-3">
+          const colorMap = {
+            amber:  'bg-hz-amber-bg border-hz-amber',
+            danger: 'bg-hz-danger-bg border-hz-danger',
+            teal:   'bg-hz-teal-bg border-hz-teal',
+            blue:   'bg-hz-cloud border-hz-accent',
+          };
+          const textMap  = {amber:'text-hz-text', danger:'text-hz-danger', teal:'text-hz-text', blue:'text-hz-text'};
+
+          if (items.length === 0) return (
+            <div className="bg-hz-teal-bg border border-hz-teal rounded-hz px-4 py-3 flex items-center gap-3" role="status" aria-label="Account status">
+              <span aria-hidden="true" className="text-hz-teal text-lg">✓</span>
               <div>
-                <p className="text-[12px] text-hz-muted mb-0.5">Amount Due</p>
-                <p className="text-3xl font-bold text-hz-text">{fmt(amountDue)}</p>
-                <p className="text-[11px] text-hz-hint">Due May 1, 2025</p>
+                <p className="text-[13px] font-semibold text-hz-teal">You're all set</p>
+                <p className="text-[11px] text-hz-muted">No action needed right now — we'll notify you if anything changes.</p>
               </div>
-              {S.payPlan==='full' && <Badge color="green">Paid</Badge>}
-              {S.payPlan==='pot' && <Badge color="blue">On Plan</Badge>}
             </div>
-            {/* Progress bar */}
-            <div role="progressbar" aria-valuenow={aidPct+paidPct} aria-valuemin={0} aria-valuemax={100}
-              aria-label="Payment plan progress"
-              className="h-2.5 rounded-full bg-hz-cloud overflow-hidden flex">
-              <div aria-hidden="true" className="bg-hz-teal h-full transition-all" style={{width:aidPct+'%'}}/>
-              <div aria-hidden="true" className="bg-hz-indigo h-full transition-all" style={{width:paidPct+'%'}}/>
-              <div aria-hidden="true" className="bg-[rgba(100,92,220,0.15)] h-full transition-all" style={{width:Math.max(0,duePct)+'%'}}/>
+          );
+
+          return <>{items.map((item,i)=>(
+            <div key={i} className={`${colorMap[item.color]} border rounded-hz px-4 py-3 flex items-center gap-3`}
+              role={item.type==='action'?'alert':'status'}>
+              <span aria-hidden="true" className="text-lg">{item.icon}</span>
+              <div>
+                <p className={`text-[13px] font-semibold ${textMap[item.color]}`}>{item.title}</p>
+                <p className="text-[11px] text-hz-muted">{item.sub}</p>
+              </div>
             </div>
-            <div className="flex gap-3 mt-2">
-              <span className="text-[10px] text-hz-hint flex items-center gap-1"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-hz-teal inline-block"/>Aid</span>
-              <span className="text-[10px] text-hz-hint flex items-center gap-1"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-hz-indigo inline-block"/>Paid</span>
-              <span className="text-[10px] text-hz-hint flex items-center gap-1"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-[rgba(100,92,220,0.3)] inline-block"/>Remaining</span>
+          ))}</>;
+        })()}
+
+        {/* ── Balance Card ── */}
+        <Card className="p-0 overflow-hidden">
+          <div className="px-4 pt-4 pb-3 space-y-2.5">
+            {/* Total */}
+            <div className="flex justify-between items-baseline">
+              <span className="text-[13px] text-hz-muted">Total balance</span>
+              <span className="text-[15px] font-semibold text-hz-text">{fmt(TOTAL_CHARGES - APPLIED_AID - ANTICIPATED_AID)}</span>
+            </div>
+
+            {/* On plan row */}
+            {S.payPlan === 'pot' && (
+              <div className="flex justify-between items-center">
+                <span className="flex items-center gap-2 text-[13px] text-hz-muted">
+                  <span aria-hidden="true" className="w-2 h-2 rounded-full bg-hz-teal flex-shrink-0"/>
+                  On Pay Over Time plan
+                  <span className="bg-hz-teal-bg text-[#0F6E56] text-[10px] font-semibold px-2 py-0.5 rounded-full">autopay on</span>
+                </span>
+                <span className="text-[13px] font-medium text-hz-text">{fmt(POT_BALANCE)}</span>
+              </div>
+            )}
+            {S.payPlan === 'full' && (
+              <div className="flex justify-between items-center">
+                <span className="flex items-center gap-2 text-[13px] text-hz-muted">
+                  <span aria-hidden="true" className="w-2 h-2 rounded-full bg-hz-teal flex-shrink-0"/>
+                  Paid in full
+                </span>
+                <span className="text-[13px] font-medium text-hz-teal">{fmt(TOTAL_CHARGES - APPLIED_AID - ANTICIPATED_AID)}</span>
+              </div>
+            )}
+
+            {/* Action row */}
+            <div className="flex justify-between items-center">
+              {amountDue > 0 ? (
+                <>
+                  <span className="flex items-center gap-2 text-[13px] font-semibold text-hz-text">
+                    <span aria-hidden="true" className="w-2 h-2 rounded-full bg-hz-amber flex-shrink-0"/>
+                    Balance requiring action
+                  </span>
+                  <span className="text-[15px] font-bold text-hz-text">{fmt(amountDue)}</span>
+                </>
+              ) : (
+                <span className="flex items-center gap-2 text-[13px] text-hz-teal font-medium">
+                  <span aria-hidden="true" className="w-2 h-2 rounded-full bg-hz-teal flex-shrink-0"/>
+                  No outstanding balance
+                </span>
+              )}
             </div>
           </div>
-          {/* Expandable rows */}
-          {[
-            {k:'due', label:'Amount due', val:fmt(amountDue), sub:'May 1, 2025', children:
-              <><Row label="Tuition" value="$7,200"/><Row label="Fees" value="$1,300"/></>},
-            {k:'aid', label:'Financial aid', val:fmt(totalAid), sub:'Applied + anticipated', children:
-              <><Row label="Merit scholarship" value="−$1,200"/><Row label="Pell Grant" value="−$1,100"/><Row label="Fed. subsidized loan" value="−$1,000" sub="Anticipated"/></>},
-            {k:'paid', label:'Payments made', val:fmt(paidToday), sub:paidToday>0?'Processed today':'None yet', children:
-              <>{paidToday>0?<Row label="Today's payment" value={fmt(paidToday)}/>:<p className="text-hz-hint text-[12px] py-1">No payments yet</p>}</>},
-          ].map(row=>(
-            <div key={row.k} className="border-t border-[rgba(100,92,220,0.1)]">
-              <button onClick={()=>toggle(row.k)} aria-expanded={expanded[row.k]} aria-controls={`expand-${row.k}`}
-                className="w-full flex justify-between items-center px-4 py-3 hover:bg-hz-cloud/40 transition-colors">
-                <div className="text-left">
-                  <p className="text-[13px] font-medium text-hz-text">{row.label}</p>
-                  <p className="text-[11px] text-hz-hint">{row.sub}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[14px] font-semibold text-hz-text">{row.val}</span>
-                  <span aria-hidden="true" className="text-hz-hint text-xs">{expanded[row.k]?'▲':'▼'}</span>
-                </div>
-              </button>
-              {expanded[row.k] && <div id={`expand-${row.k}`} className="px-4 pb-3">{row.children}</div>}
-            </div>
-          ))}
+
+          {/* Statement link */}
+          <div className="border-t border-[rgba(100,92,220,0.1)] px-4 py-2.5">
+            <button onClick={()=>nav('costs')} className="text-[12px] text-hz-accent font-medium hover:underline"
+              aria-label="View your full statement for complete transaction details">
+              View your statement for complete transaction details →
+            </button>
+          </div>
         </Card>
 
         {/* PoT card */}
@@ -1210,7 +1248,7 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
           {[
             {label:'View Bill', icon:'📄', screen:'costs'},
             {label:'Make Payment', icon:'💳', screen:'pay-now'},
-            {label:'Invite Payer', icon:'👤', screen:'guest'},
+            {label:'Guest Payer', icon:'👥', screen:'guest'},
             {label:'History', icon:'📋', screen:'history'},
           ].map(a=>(
             <button key={a.screen} onClick={()=>nav(a.screen)} aria-label={a.label}
@@ -1275,7 +1313,7 @@ const PrintScreen = ({nav, goBack, S, setS}) => (
     <div className="px-4 pb-8">
       <div className="bg-white rounded-hz p-5 text-gray-900 border border-[rgba(100,92,220,0.14)]">
         <div className="border-b border-gray-200 pb-4 mb-4">
-          <p className="text-lg font-bold text-gray-900">Lakewood University</p>
+          <p className="text-lg font-bold text-gray-900">Claude University</p>
           <p className="text-sm text-gray-500">Student Account Statement</p>
           <p className="text-sm text-gray-500 mt-1">Fall 2025 · Alex Johnson · ID: 1234567</p>
         </div>
@@ -1659,6 +1697,103 @@ const PayNextScreen = ({nav, goBack, S, setS}) => {
 };
 
 
+// ─── AccountDetailsScreen ─────────────────────────────────────────────────
+const AccountDetailsScreen = ({nav, goBack, S, setS}) => {
+  const [commEmail, setCommEmail] = React.useState({payments:true, reminders:true, statements:true, alerts:true});
+  const [commSms,   setCommSms]   = React.useState({payments:true, reminders:false, alerts:true});
+  const [saved, setSaved] = React.useState(false);
+
+  const save = () => { setSaved(true); setTimeout(()=>setSaved(false), 2200); };
+
+  return (
+    <ScreenWrap>
+      <Header title="My Account" onBack={goBack}/>
+      <div className="px-5 pb-8 space-y-4">
+
+        {/* Profile */}
+        <Card>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-3">Profile</p>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <div><p className="text-[13px] font-medium text-hz-text">Alex Johnson</p><p className="text-[11px] text-hz-hint">Full name</p></div>
+            </div>
+            <Divider/>
+            <div className="flex justify-between items-center">
+              <div><p className="text-[13px] font-medium text-hz-text">ajohnson@student.claude.edu</p><p className="text-[11px] text-hz-hint">Email address</p></div>
+            </div>
+            <Divider/>
+            <div className="flex justify-between items-center">
+              <div><p className="text-[13px] font-medium text-hz-text">{S.hasPhone ? '(555) 867-5309' : 'Not set'}</p><p className="text-[11px] text-hz-hint">Mobile number</p></div>
+              <button className="text-[12px] text-hz-accent font-medium" aria-label="Edit mobile number">Edit</button>
+            </div>
+            <Divider/>
+            <div className="flex justify-between items-center">
+              <div><p className="text-[13px] font-medium text-hz-text">1234567</p><p className="text-[11px] text-hz-hint">Student ID</p></div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Email notifications */}
+        <Card>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-1">Email Notifications</p>
+          <p className="text-[12px] text-hz-muted mb-3">Choose what Claude University emails you about.</p>
+          {[
+            {k:'payments',   label:'Payment confirmations',    desc:'Receipts for every payment'},
+            {k:'reminders',  label:'Payment reminders',        desc:'Upcoming due dates'},
+            {k:'statements', label:'New billing statements',   desc:'When a new bill posts'},
+            {k:'alerts',     label:'Account alerts',           desc:'Balance changes, holds'},
+          ].map(item=>(
+            <div key={item.k} className="flex justify-between items-center py-2.5 border-b border-[rgba(100,92,220,0.08)] last:border-0">
+              <div>
+                <p className="text-[13px] font-medium text-hz-text">{item.label}</p>
+                <p className="text-[11px] text-hz-hint">{item.desc}</p>
+              </div>
+              <button role="switch" aria-checked={commEmail[item.k]}
+                onClick={()=>setCommEmail(p=>({...p,[item.k]:!p[item.k]}))}
+                aria-label={`Toggle email for ${item.label}`}
+                className={`relative w-11 h-6 rounded-full transition-colors ${commEmail[item.k]?'bg-hz-teal':'bg-hz-cloud'}`}>
+                <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${commEmail[item.k]?'left-[22px]':'left-0.5'}`}/>
+              </button>
+            </div>
+          ))}
+        </Card>
+
+        {/* SMS notifications */}
+        {S.hasPhone && (
+          <Card>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-1">Text (SMS) Notifications</p>
+            <p className="text-[12px] text-hz-muted mb-3">We'll only text for what you turn on.</p>
+            {[
+              {k:'payments', label:'Payment confirmations', desc:'Quick confirmation texts'},
+              {k:'reminders',label:'Payment reminders',     desc:'Day-before reminders'},
+              {k:'alerts',   label:'Urgent alerts',         desc:'Time-sensitive account issues'},
+            ].map(item=>(
+              <div key={item.k} className="flex justify-between items-center py-2.5 border-b border-[rgba(100,92,220,0.08)] last:border-0">
+                <div>
+                  <p className="text-[13px] font-medium text-hz-text">{item.label}</p>
+                  <p className="text-[11px] text-hz-hint">{item.desc}</p>
+                </div>
+                <button role="switch" aria-checked={commSms[item.k]}
+                  onClick={()=>setCommSms(p=>({...p,[item.k]:!p[item.k]}))}
+                  aria-label={`Toggle SMS for ${item.label}`}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${commSms[item.k]?'bg-hz-teal':'bg-hz-cloud'}`}>
+                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${commSms[item.k]?'left-[22px]':'left-0.5'}`}/>
+                </button>
+              </div>
+            ))}
+          </Card>
+        )}
+
+        <Btn onClick={save} variant="primary" aria-label="Save account changes">
+          {saved ? '✓ Saved' : 'Save changes'}
+        </Btn>
+
+      </div>
+    </ScreenWrap>
+  );
+};
+
+
 // ─── HistoryScreen ────────────────────────────────────────────────────────
 const HistoryScreen = ({nav, goBack, S, setS}) => {
   const [tab, setTab] = React.useState('all');
@@ -1761,6 +1896,7 @@ const App = () => {
     'change-autopay-ob': <ChangeAutopayScreen   nav={nav} goBack={goBack} S={S} setS={setS}/>,
     'pay-next-ob':       <PayNextScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
     'history':           <HistoryScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'account-details':   <AccountDetailsScreen  nav={nav} goBack={goBack} S={S} setS={setS}/>,
   };
 
   return (
@@ -1793,10 +1929,6 @@ const App = () => {
         </div>
       </div>
 
-      {/* Watermark */}
-      <div aria-hidden="true" className="fixed bottom-4 left-1/2 -translate-x-1/2 text-hz-hint text-[11px] font-medium tracking-wide pointer-events-none">
-        Nelnet Campus Commerce · Student Onboarding Prototype
-      </div>
     </div>
   );
 };
