@@ -512,6 +512,7 @@ body {
      VISITOR BAR
 ════════════════════════════════════════ -->
 <div id="visitor-bar" class="visitor-bar" role="status">
+  <a id="home-link" href="/index.html" style="display:none;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--hz-indigo);text-decoration:none;background:var(--hz-cloud);border:1px solid rgba(100,92,220,.2);border-radius:7px;padding:3px 10px;" aria-label="Back to prototypes">← Prototypes</a>
   <span>Viewing as <span id="visitor-name" class="visitor-name"></span></span>
   <span id="visitor-change-pill" class="visitor-change-pill"></span>
   <button class="visitor-switch" onclick="switchViewer()">Not you?</button>
@@ -1234,6 +1235,11 @@ function openAsViewer(name) {
   var bar = document.getElementById('visitor-bar');
   bar.style.display = 'flex';
 
+  // Show prototype home link only for Sophie
+  if (name.toLowerCase() === 'sophie') {
+    document.getElementById('home-link').style.display = 'flex';
+  }
+
   // Show change pill + banner if there are updates
   if (count > 0) {
     var pill = document.getElementById('visitor-change-pill');
@@ -1256,6 +1262,7 @@ function switchViewer() {
   document.getElementById('visitor-bar').style.display  = 'none';
   document.getElementById('change-banner').style.display = 'none';
   document.getElementById('visitor-change-pill').style.display = 'none';
+  document.getElementById('home-link').style.display = 'none';
   document.getElementById('name-input').value = '';
   document.getElementById('name-overlay').style.display = 'flex';
 }
