@@ -746,7 +746,10 @@ const CommsScreen = ({nav, goBack, S, setS}) => {
   const [smsMarketing, setSmsMarketing] = React.useState(false);
   const [showMarketingPrompt, setShowMarketingPrompt] = React.useState(true); // nudge visible until dismissed
 
-  const next = () => nav('complete');
+  const next = () => {
+    setS(p=>({...p, smsMarketing, commsEmail: email, commsPhone: phone}));
+    nav('complete');
+  };
 
   return (
     <ScreenWrap>
@@ -1936,12 +1939,9 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
   const paidFull   = S.payPlan === 'full';
   const openBal    = paidFull ? 0 : netBalance - onPlan;
 
-  // Coverage bar segments (as % of total charges)
-  const aidPct  = Math.round(APPLIED_AID / TOTAL_CHARGES * 100);
-  const antPct  = Math.round(ANTICIPATED_AID / TOTAL_CHARGES * 100);
-  const planPct = Math.round(onPlan / TOTAL_CHARGES * 100);
-  const paidPct = paidFull ? Math.round(netBalance / TOTAL_CHARGES * 100) : 0;
-  const openPct = Math.max(0, 100 - aidPct - antPct - planPct - paidPct);
+  // Coverage bar — two segments only: on-plan (green) + open (amber), as % of total balance
+  const planPct = netBalance > 0 ? Math.round(onPlan / netBalance * 100) : 0;
+  const openPct = netBalance > 0 ? Math.max(0, 100 - planPct) : 0;
 
   // To-do actions (derived from S state)
   const actions = [];
@@ -2055,19 +2055,15 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
                 <span className="text-[13px] font-bold text-hz-text">{fmt(netBalance)}</span>
               </div>
 
-              {/* Coverage bar */}
+              {/* Coverage bar — on-plan (green) + open balance (amber) as % of total balance */}
               <div>
-                <div className="w-full h-2 rounded-full overflow-hidden flex gap-px bg-[rgba(100,92,220,0.07)]">
-                  <div style={{width:aidPct+'%'}}  className="bg-hz-teal h-full rounded-l-full"/>
-                  <div style={{width:antPct+'%'}}  className="bg-hz-teal/35 h-full"/>
-                  {planPct > 0 && <div style={{width:planPct+'%'}} className="bg-hz-indigo h-full"/>}
-                  {openPct > 0 && <div style={{width:openPct+'%'}} className="bg-hz-amber/70 h-full rounded-r-full"/>}
+                <div className="w-full h-2 rounded-full overflow-hidden flex bg-[rgba(100,92,220,0.07)]">
+                  {planPct > 0 && <div style={{width:planPct+'%'}} className="bg-hz-teal h-full rounded-l-full transition-all"/>}
+                  {openPct > 0 && <div style={{width:openPct+'%'}} className={`bg-hz-amber/70 h-full transition-all ${planPct===0?'rounded-full':'rounded-r-full'}`}/>}
                 </div>
                 <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5">
-                  <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-sm bg-hz-teal inline-block"/>Aid applied</span>
-                  <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-sm bg-hz-teal/35 inline-block"/>Anticipated aid</span>
-                  {planPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-sm bg-hz-indigo inline-block"/>On plan</span>}
-                  {openPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-sm bg-hz-amber/70 inline-block"/>Open</span>}
+                  {planPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-sm bg-hz-teal inline-block"/>On payment plan</span>}
+                  {openPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-sm bg-hz-amber/70 inline-block"/>Open balance</span>}
                 </div>
               </div>
             </div>
@@ -2180,10 +2176,10 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
           <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint mb-2">Quick actions</p>
           <div className="grid grid-cols-2 gap-2">
             {[
-              {label:'View Bill', icon:'📄', screen:'costs'},
               {label:'Make Payment', icon:'💳', screen:'pay-now'},
               {label:'Guest Payer', icon:'👥', screen:'guest'},
               {label:'History', icon:'📋', screen:'history'},
+              {label:'Manage Plan', icon:'📆', screen:'manage-pot'},
             ].map(a=>(
               <button key={a.screen} onClick={()=>nav(a.screen)} aria-label={a.label}
                 className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz p-3 flex flex-col items-center gap-1.5 hover:bg-hz-cloud/40 transition-colors">
@@ -2643,92 +2639,242 @@ const PayNextScreen = ({nav, goBack, S, setS}) => {
 
 // ─── AccountDetailsScreen ─────────────────────────────────────────────────
 const AccountDetailsScreen = ({nav, goBack, S, setS}) => {
-  const [commEmail, setCommEmail] = React.useState({payments:true, reminders:true, statements:true, alerts:true});
-  const [commSms,   setCommSms]   = React.useState({payments:true, reminders:false, alerts:true});
-  const [saved, setSaved] = React.useState(false);
 
-  const save = () => { setSaved(true); setTimeout(()=>setSaved(false), 2200); };
+  // ── Demographics ──────────────────────────────────────────────────────────
+  const [firstName,  setFirstName]  = React.useState('Alex');
+  const [lastName,   setLastName]   = React.useState('Johnson');
+  const [prefName,   setPrefName]   = React.useState('');
+  const [editDemo,   setEditDemo]   = React.useState(false);
+
+  // ── Contact info ──────────────────────────────────────────────────────────
+  const [emails, setEmails] = React.useState([S.commsEmail || 'alex.johnson@student.claude.edu']);
+  const [phones, setPhones] = React.useState([S.commsPhone || '(720) 555-0198']);
+  const [editContactIdx, setEditContactIdx] = React.useState({emails:{}, phones:{}});
+
+  const addEmail = () => setEmails(p=>[...p,'']);
+  const addPhone = () => setPhones(p=>[...p,'']);
+  const updateEmail = (i,v) => setEmails(p=>p.map((e,idx)=>idx===i?v:e));
+  const updatePhone = (i,v) => setPhones(p=>p.map((e,idx)=>idx===i?v:e));
+  const removeEmail = (i) => setEmails(p=>p.filter((_,idx)=>idx!==i));
+  const removePhone = (i) => setPhones(p=>p.filter((_,idx)=>idx!==i));
+  const toggleEditEmail = (i) => setEditContactIdx(p=>({...p, emails:{...p.emails, [i]:!p.emails[i]}}));
+  const toggleEditPhone = (i) => setEditContactIdx(p=>({...p, phones:{...p.phones, [i]:!p.phones[i]}}));
+
+  // ── SMS opt-ins ────────────────────────────────────────────────────────────
+  // Transactional: always on — locked. Marketing: seeded from S.smsMarketing (set in step 6).
+  const [smsMarketing, setSmsMarketing] = React.useState(S.smsMarketing ?? false);
+
+  // ── Security questions ────────────────────────────────────────────────────
+  const [editSec, setEditSec] = React.useState(false);
+
+  // ── Save ──────────────────────────────────────────────────────────────────
+  const [saved, setSaved] = React.useState(false);
+  const save = () => {
+    setS(p=>({...p, smsMarketing, commsEmail: emails[0], commsPhone: phones[0]}));
+    setEditDemo(false);
+    setSaved(true);
+    setTimeout(()=>setSaved(false), 2200);
+  };
 
   return (
     <ScreenWrap>
       <Header title="My Account" onBack={goBack}/>
-      <div className="px-5 pb-8 space-y-4">
+      <div className="px-5 pb-10 space-y-5 pt-3">
 
-        {/* Profile */}
+        {/* ── Demographics ── */}
         <Card>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-3">Profile</p>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <div><p className="text-[13px] font-medium text-hz-text">Alex Johnson</p><p className="text-[11px] text-hz-hint">Full name</p></div>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint">Demographics</p>
+            <button onClick={()=>setEditDemo(e=>!e)}
+              className="text-hz-accent text-[12px] font-medium hover:opacity-75 transition-opacity" aria-label={editDemo?'Done editing demographics':'Edit demographics'}>
+              {editDemo ? 'Done' : 'Edit'}
+            </button>
+          </div>
+          <div className="space-y-0 divide-y divide-[rgba(100,92,220,0.07)]">
+
+            {/* First name */}
+            <div className="flex items-center justify-between py-2.5">
+              <p className="text-[11px] text-hz-hint w-28 flex-shrink-0">First name</p>
+              {editDemo
+                ? <input value={firstName} onChange={e=>setFirstName(e.target.value)} aria-label="First name"
+                    className="flex-1 text-[13px] text-hz-text border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-2 py-1 focus:outline-none focus:border-hz-accent focus:ring-1 focus:ring-hz-accent/20"/>
+                : <p className="flex-1 text-[13px] font-medium text-hz-text text-right">{firstName}</p>
+              }
             </div>
-            <Divider/>
-            <div className="flex justify-between items-center">
-              <div><p className="text-[13px] font-medium text-hz-text">ajohnson@student.claude.edu</p><p className="text-[11px] text-hz-hint">Email address</p></div>
+
+            {/* Last name */}
+            <div className="flex items-center justify-between py-2.5">
+              <p className="text-[11px] text-hz-hint w-28 flex-shrink-0">Last name</p>
+              {editDemo
+                ? <input value={lastName} onChange={e=>setLastName(e.target.value)} aria-label="Last name"
+                    className="flex-1 text-[13px] text-hz-text border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-2 py-1 focus:outline-none focus:border-hz-accent focus:ring-1 focus:ring-hz-accent/20"/>
+                : <p className="flex-1 text-[13px] font-medium text-hz-text text-right">{lastName}</p>
+              }
             </div>
-            <Divider/>
-            <div className="flex justify-between items-center">
-              <div><p className="text-[13px] font-medium text-hz-text">{S.hasPhone ? '(555) 867-5309' : 'Not set'}</p><p className="text-[11px] text-hz-hint">Mobile number</p></div>
-              <button className="text-[12px] text-hz-accent font-medium" aria-label="Edit mobile number">Edit</button>
+
+            {/* Preferred name */}
+            <div className="flex items-center justify-between py-2.5">
+              <p className="text-[11px] text-hz-hint w-28 flex-shrink-0">Preferred name</p>
+              {editDemo
+                ? <input value={prefName} onChange={e=>setPrefName(e.target.value)} placeholder="Optional" aria-label="Preferred name"
+                    className="flex-1 text-[13px] text-hz-text border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-2 py-1 focus:outline-none focus:border-hz-accent focus:ring-1 focus:ring-hz-accent/20 placeholder:text-hz-hint/60"/>
+                : <p className="flex-1 text-[13px] font-medium text-hz-text text-right">{prefName || <span className="text-hz-hint italic font-normal">Not set</span>}</p>
+              }
             </div>
-            <Divider/>
-            <div className="flex justify-between items-center">
-              <div><p className="text-[13px] font-medium text-hz-text">1234567</p><p className="text-[11px] text-hz-hint">Student ID</p></div>
+
+            {/* Student ID — read-only, always */}
+            <div className="flex items-center justify-between py-2.5">
+              <p className="text-[11px] text-hz-hint w-28 flex-shrink-0">Student ID</p>
+              <p className="flex-1 text-[13px] font-medium text-hz-text text-right">1234567</p>
             </div>
+
+          </div>
+          {editDemo && (
+            <p className="text-[10px] text-hz-hint mt-2">Student ID is managed by your school and cannot be changed here.</p>
+          )}
+        </Card>
+
+        {/* ── Contact Information ── */}
+        <Card>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-3">Contact Information</p>
+
+          {/* Email addresses */}
+          <div className="mb-4">
+            <p className="text-[12px] font-semibold text-hz-text mb-2">Email addresses</p>
+            <div className="space-y-2">
+              {emails.map((e,i)=>(
+                <div key={i} className="flex items-center gap-2">
+                  {editContactIdx.emails[i]
+                    ? <input type="email" value={e} onChange={ev=>updateEmail(i,ev.target.value)} aria-label={`Email address ${i+1}`}
+                        className="flex-1 text-[13px] text-hz-text border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-2 py-1.5 focus:outline-none focus:border-hz-accent focus:ring-1 focus:ring-hz-accent/20"/>
+                    : <p className="flex-1 text-[13px] text-hz-text">{e || <span className="text-hz-hint italic">Enter email</span>}</p>
+                  }
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <button onClick={()=>toggleEditEmail(i)}
+                      className="text-[11px] text-hz-accent font-medium hover:opacity-75 transition-opacity" aria-label={editContactIdx.emails[i]?`Done editing email ${i+1}`:`Edit email ${i+1}`}>
+                      {editContactIdx.emails[i] ? 'Done' : 'Edit'}
+                    </button>
+                    {i > 0 && (
+                      <button onClick={()=>removeEmail(i)} aria-label={`Remove email ${i+1}`}
+                        className="text-hz-hint text-[11px] hover:text-hz-danger transition-colors ml-1">Remove</button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button onClick={addEmail}
+              className="mt-2 text-[12px] text-hz-accent font-medium flex items-center gap-1 hover:opacity-75 transition-opacity" aria-label="Add another email address">
+              <span aria-hidden="true" className="text-base leading-none">+</span> Add another email
+            </button>
+          </div>
+
+          <Divider/>
+
+          {/* Phone numbers */}
+          <div className="mt-3">
+            <p className="text-[12px] font-semibold text-hz-text mb-2">Phone numbers</p>
+            <div className="space-y-2">
+              {phones.map((p,i)=>(
+                <div key={i} className="flex items-center gap-2">
+                  {editContactIdx.phones[i]
+                    ? <input type="tel" value={p} onChange={ev=>updatePhone(i,ev.target.value)} aria-label={`Phone number ${i+1}`}
+                        className="flex-1 text-[13px] text-hz-text border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-2 py-1.5 focus:outline-none focus:border-hz-accent focus:ring-1 focus:ring-hz-accent/20"/>
+                    : <p className="flex-1 text-[13px] text-hz-text">{p || <span className="text-hz-hint italic">Enter phone</span>}</p>
+                  }
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <button onClick={()=>toggleEditPhone(i)}
+                      className="text-[11px] text-hz-accent font-medium hover:opacity-75 transition-opacity" aria-label={editContactIdx.phones[i]?`Done editing phone ${i+1}`:`Edit phone ${i+1}`}>
+                      {editContactIdx.phones[i] ? 'Done' : 'Edit'}
+                    </button>
+                    {i > 0 && (
+                      <button onClick={()=>removePhone(i)} aria-label={`Remove phone ${i+1}`}
+                        className="text-hz-hint text-[11px] hover:text-hz-danger transition-colors ml-1">Remove</button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button onClick={addPhone}
+              className="mt-2 text-[12px] text-hz-accent font-medium flex items-center gap-1 hover:opacity-75 transition-opacity" aria-label="Add another phone number">
+              <span aria-hidden="true" className="text-base leading-none">+</span> Add another phone
+            </button>
           </div>
         </Card>
 
-        {/* Email notifications */}
+        {/* ── Text Message Opt-Ins (Legal) ── */}
         <Card>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-1">Email Notifications</p>
-          <p className="text-[12px] text-hz-muted mb-3">Choose what Claude University emails you about.</p>
-          {[
-            {k:'payments',   label:'Payment confirmations',    desc:'Receipts for every payment'},
-            {k:'reminders',  label:'Payment reminders',        desc:'Upcoming due dates'},
-            {k:'statements', label:'New billing statements',   desc:'When a new bill posts'},
-            {k:'alerts',     label:'Account alerts',           desc:'Balance changes, holds'},
-          ].map(item=>(
-            <div key={item.k} className="flex justify-between items-center py-2.5 border-b border-[rgba(100,92,220,0.08)] last:border-0">
-              <div>
-                <p className="text-[13px] font-medium text-hz-text">{item.label}</p>
-                <p className="text-[11px] text-hz-hint">{item.desc}</p>
-              </div>
-              <button role="switch" aria-checked={commEmail[item.k]}
-                onClick={()=>setCommEmail(p=>({...p,[item.k]:!p[item.k]}))}
-                aria-label={`Toggle email for ${item.label}`}
-                className={`relative w-11 h-6 rounded-full transition-colors ${commEmail[item.k]?'bg-hz-teal':'bg-hz-cloud'}`}>
-                <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${commEmail[item.k]?'left-[22px]':'left-0.5'}`}/>
-              </button>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-1">Text Message Opt-Ins</p>
+          <p className="text-[12px] text-hz-muted mb-4 leading-relaxed">
+            These preferences were set during your account setup. You can update your marketing opt-in at any time.
+          </p>
+
+          {/* Transactional — always on, locked */}
+          <div className="flex items-start justify-between gap-4 py-3 border-b border-[rgba(100,92,220,0.08)]">
+            <div className="flex-1">
+              <p className="text-[13px] font-semibold text-hz-text">Transactional texts</p>
+              <p className="text-[11px] text-hz-muted mt-0.5 leading-snug">Payment confirmations, due date reminders, balance alerts. Required for account activity.</p>
             </div>
-          ))}
+            <div className="flex flex-col items-center gap-0.5 flex-shrink-0 pt-0.5">
+              <div className="w-11 h-6 rounded-full bg-hz-teal flex items-center justify-end pr-0.5" aria-label="Transactional texts — always on">
+                <div className="w-5 h-5 rounded-full bg-white shadow-sm"/>
+              </div>
+              <span className="text-[9px] font-bold text-hz-teal uppercase tracking-wide">Required</span>
+            </div>
+          </div>
+
+          {/* Information & marketing — opt-in, seeded from step 6 */}
+          <div className="flex items-start justify-between gap-4 py-3">
+            <div className="flex-1">
+              <p className="text-[13px] font-semibold text-hz-text">Information &amp; marketing texts</p>
+              <p className="text-[11px] text-hz-muted mt-0.5 leading-snug">Financial aid tips, payment plan offers, scholarship alerts, savings opportunities.</p>
+            </div>
+            <Toggle on={smsMarketing} onChange={setSmsMarketing} aria-label="Toggle information and marketing texts"/>
+          </div>
+
+          {!smsMarketing && (
+            <p className="text-[10px] text-hz-hint mt-1 leading-relaxed">
+              You're opted out of marketing texts. You may miss financial aid reminders and savings opportunities.
+            </p>
+          )}
         </Card>
 
-        {/* SMS notifications */}
-        {S.hasPhone && (
-          <Card>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-1">Text (SMS) Notifications</p>
-            <p className="text-[12px] text-hz-muted mb-3">We'll only text for what you turn on.</p>
-            {[
-              {k:'payments', label:'Payment confirmations', desc:'Quick confirmation texts'},
-              {k:'reminders',label:'Payment reminders',     desc:'Day-before reminders'},
-              {k:'alerts',   label:'Urgent alerts',         desc:'Time-sensitive account issues'},
-            ].map(item=>(
-              <div key={item.k} className="flex justify-between items-center py-2.5 border-b border-[rgba(100,92,220,0.08)] last:border-0">
-                <div>
-                  <p className="text-[13px] font-medium text-hz-text">{item.label}</p>
-                  <p className="text-[11px] text-hz-hint">{item.desc}</p>
-                </div>
-                <button role="switch" aria-checked={commSms[item.k]}
-                  onClick={()=>setCommSms(p=>({...p,[item.k]:!p[item.k]}))}
-                  aria-label={`Toggle SMS for ${item.label}`}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${commSms[item.k]?'bg-hz-teal':'bg-hz-cloud'}`}>
-                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${commSms[item.k]?'left-[22px]':'left-0.5'}`}/>
-                </button>
+        {/* ── Security Questions ── */}
+        <Card>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint">Security Questions</p>
+            <button onClick={()=>nav('security-questions')}
+              className="text-hz-accent text-[12px] font-medium hover:opacity-75 transition-opacity" aria-label="Change security questions">
+              Change
+            </button>
+          </div>
+          <p className="text-[12px] text-hz-muted mb-3 leading-relaxed">
+            Used to verify you as a caller when you contact support by phone.
+          </p>
+          {S.secQsDeferred ? (
+            <div className="bg-hz-amber-bg border border-hz-amber/40 rounded-hz-sm px-3 py-2.5 flex items-start gap-2">
+              <span aria-hidden="true" className="text-hz-amber flex-shrink-0">⏰</span>
+              <div>
+                <p className="text-[12px] font-semibold text-hz-text">Security questions not set up yet</p>
+                <p className="text-[11px] text-hz-muted mt-0.5">You deferred this during setup. Tap "Change" to complete it now.</p>
               </div>
-            ))}
-          </Card>
-        )}
+            </div>
+          ) : (
+            <div className="space-y-0 divide-y divide-[rgba(100,92,220,0.07)]">
+              <div className="py-2.5">
+                <p className="text-[11px] text-hz-hint mb-0.5">Question 1</p>
+                <p className="text-[12px] font-medium text-hz-text">What was the name of your first pet?</p>
+                <p className="text-[12px] text-hz-hint mt-0.5 font-mono tracking-widest">••••••••</p>
+              </div>
+              <div className="py-2.5">
+                <p className="text-[11px] text-hz-hint mb-0.5">Question 2</p>
+                <p className="text-[12px] font-medium text-hz-text">What street did you grow up on?</p>
+                <p className="text-[12px] text-hz-hint mt-0.5 font-mono tracking-widest">••••••••</p>
+              </div>
+            </div>
+          )}
+        </Card>
 
-        <Btn onClick={save} variant="primary" aria-label="Save account changes">
+        <Btn onClick={save} aria-label="Save account changes">
           {saved ? '✓ Saved' : 'Save changes'}
         </Btn>
 
@@ -2809,6 +2955,9 @@ const App = () => {
     potInstall: 0, potCount: 0, potFreqLabel: 'month', potMinInstall: 0,
     skippedInvite: false, skippedMethod: false, hasPhone: false,
     insAccepted: false, insPremium: 162, insState: '', apActive: false,
+    smsMarketing: false,
+    commsEmail: 'alex.johnson@student.claude.edu',
+    commsPhone: '(720) 555-0198',
   });
   const navStack = React.useRef([]);
   const nav    = (s) => { navStack.current.push(screen); setScreen(s); };
