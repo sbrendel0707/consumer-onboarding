@@ -110,10 +110,17 @@ const Select = ({label, id, value, onChange, options, className=''}) => {
   return (
     <div className={'mb-4 '+className}>
       {label && <label htmlFor={selectId} className="block text-xs font-semibold text-hz-muted mb-1">{label}</label>}
-      <select id={selectId} value={value} onChange={e=>onChange(e.target.value)}
-        className="w-full bg-white border border-[rgba(100,92,220,0.14)] rounded-hz-sm px-4 py-3 text-hz-text text-[15px] outline-none focus:border-hz-accent appearance-none">
-        {options.map(o => <option key={o.value||o} value={o.value||o}>{o.label||o}</option>)}
-      </select>
+      <div className="relative">
+        <select id={selectId} value={value} onChange={e=>onChange(e.target.value)}
+          className="w-full bg-hz-card border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-4 py-3 pr-10 text-hz-text text-[14px] font-medium outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 appearance-none cursor-pointer transition-colors">
+          {options.map(o => <option key={o.value||o} value={o.value||o}>{o.label||o}</option>)}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M3 5l4 4 4-4" stroke="#645CDC" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </div>
     </div>
   );
 };
@@ -347,15 +354,23 @@ const WelcomeScreen = ({nav, goBack, S, setS}) => (
 
 // ─── AgreementsScreen ────────────────────────────────────────────────────
 const AgreementsScreen = ({nav, goBack, S, setS}) => {
+  const [acknowledged, setAcknowledged] = React.useState([false, false, false]);
   const [sig, setSig] = React.useState('');
-  const [checked, setChecked] = React.useState(false);
+  const [sigChecked, setSigChecked] = React.useState(false);
   const today = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-  const canSign = sig.trim().length > 2 && checked;
+
+  const allAcknowledged = acknowledged.every(Boolean);
+  const canSign = allAcknowledged && sig.trim().length > 2 && sigChecked;
+
+  // Which step is currently active (first unchecked, or sign step if all checked)
+  const activeStep = allAcknowledged ? 3 : acknowledged.findIndex(v => !v);
+
+  const acknowledge = (i) => setAcknowledged(prev => prev.map((v,j) => j===i ? true : v));
 
   const agreements = [
     {
       id:'housing',
-      title:'Housing & Dorm Damages Acknowledgement',
+      title:'Housing & Dorm Damages',
       body:`I understand that as a resident or potential resident of Claude University housing, I am financially responsible for any damages to university property attributed to my occupancy or my guests. Any damage assessments will be billed directly to my student account and are subject to the same payment terms and deadlines as all other university charges. I have the right to appeal a damage charge within 10 business days of receiving notice.`,
     },
     {
@@ -365,7 +380,7 @@ const AgreementsScreen = ({nav, goBack, S, setS}) => {
     },
     {
       id:'insurance',
-      title:'Health Insurance Acknowledgement',
+      title:'Health Insurance',
       body:`Claude University requires all enrolled students to maintain qualifying health insurance coverage. I understand that if I do not provide proof of comparable alternative coverage through the university's annual waiver process, the university's student health insurance plan will be automatically enrolled and billed to my student account each academic year. This charge is non-refundable after the published waiver deadline. I confirm that I have read and understand this policy.`,
     },
   ];
@@ -376,71 +391,113 @@ const AgreementsScreen = ({nav, goBack, S, setS}) => {
       <div className="px-4 pt-4 pb-24 space-y-3">
         <div className="mb-1">
           <p className="text-[18px] font-bold text-hz-text">School agreements</p>
-          <p className="text-[13px] text-hz-muted mt-1">Please read each agreement carefully. A single signature at the bottom covers all three.</p>
+          <p className="text-[13px] text-hz-muted mt-1">Read and acknowledge each agreement to continue. A single signature covers all three.</p>
         </div>
 
-        {agreements.map((a,i)=>(
-          <div key={a.id} className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz overflow-hidden">
-            <div className="bg-hz-cloud px-4 py-2.5 border-b border-[rgba(100,92,220,0.1)] flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-hz-indigo text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">{i+1}</span>
-              <p className="text-[13px] font-semibold text-hz-text">{a.title}</p>
-            </div>
-            <div className="px-4 py-3 max-h-36 overflow-y-auto">
-              <p className="text-[12px] text-hz-muted leading-relaxed">{a.body}</p>
-            </div>
-          </div>
-        ))}
-
-        <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-4 space-y-3">
-          <p className="text-[13px] font-semibold text-hz-text">Electronic Signature</p>
-          <p className="text-[12px] text-hz-muted leading-relaxed">
-            By typing your full legal name below, you confirm that you have read, understood, and agree to all three agreements listed above. This electronic signature is legally binding under the ESIGN Act and UETA.
-          </p>
-
-          <div>
-            <label htmlFor="sig-input" className="text-[12px] font-semibold text-hz-text block mb-1.5">
-              Full legal name <span aria-hidden="true" className="text-hz-danger">*</span>
-            </label>
-            <input
-              id="sig-input"
-              type="text"
-              value={sig}
-              onChange={e=>setSig(e.target.value)}
-              placeholder="e.g. Alex Johnson"
-              aria-required="true"
-              aria-label="Type your full legal name to sign"
-              className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[14px] font-medium text-hz-indigo placeholder-hz-hint focus:outline-none focus:border-hz-accent italic"
-              style={{fontFamily:"'Georgia', serif"}}
-            />
-          </div>
-
-          <div className="flex items-start gap-2.5">
-            <input
-              type="checkbox"
-              id="sig-confirm"
-              checked={checked}
-              onChange={e=>setChecked(e.target.checked)}
-              aria-required="true"
-              className="mt-0.5 w-4 h-4 accent-hz-indigo flex-shrink-0 cursor-pointer"
-            />
-            <label htmlFor="sig-confirm" className="text-[12px] text-hz-muted leading-relaxed cursor-pointer">
-              I have read all agreements above and I agree to be bound by their terms.
-            </label>
-          </div>
-
-          <div className="flex justify-between items-center pt-1">
-            <div>
-              <p className="text-[10px] text-hz-hint uppercase tracking-wide font-semibold">Date signed</p>
-              <p className="text-[12px] text-hz-text font-medium">{today}</p>
-            </div>
-            {sig.trim().length > 0 && (
-              <div className="text-right">
-                <p className="text-[10px] text-hz-hint uppercase tracking-wide font-semibold">Signature</p>
-                <p className="text-[15px] text-hz-indigo" style={{fontFamily:"'Georgia', serif",fontStyle:'italic'}}>{sig}</p>
+        {agreements.map((a, i) => {
+          const done = acknowledged[i];
+          const open = activeStep === i;
+          const locked = !done && !open;
+          return (
+            <div key={a.id} className={`rounded-hz border overflow-hidden transition-all ${
+              done    ? 'border-hz-teal/40 bg-hz-card'
+              : open  ? 'border-hz-accent/40 bg-hz-card'
+                      : 'border-[rgba(100,92,220,0.1)] bg-hz-card opacity-50'
+            }`}>
+              {/* Header row */}
+              <div className={`px-4 py-3 flex items-center gap-3 ${
+                done ? 'bg-[#E1F5EE]' : open ? 'bg-hz-cloud' : 'bg-hz-bg'
+              }`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[11px] font-bold ${
+                  done ? 'bg-hz-teal text-white' : open ? 'bg-hz-indigo text-white' : 'bg-[rgba(100,92,220,0.15)] text-hz-hint'
+                }`}>
+                  {done ? '✓' : i+1}
+                </div>
+                <p className={`text-[13px] font-semibold flex-1 ${done ? 'text-hz-teal' : open ? 'text-hz-text' : 'text-hz-hint'}`}>
+                  {a.title}
+                </p>
+                {done && <span className="text-[10px] font-bold uppercase tracking-wide text-hz-teal">Done</span>}
+                {locked && <span className="text-[10px] font-bold uppercase tracking-wide text-hz-hint">Upcoming</span>}
               </div>
-            )}
+
+              {/* Body — only shown when open */}
+              {open && (
+                <div className="px-4 pt-3 pb-4 space-y-3">
+                  <div className="max-h-32 overflow-y-auto pr-1">
+                    <p className="text-[12px] text-hz-muted leading-relaxed">{a.body}</p>
+                  </div>
+                  <div className="flex items-start gap-2.5 pt-1">
+                    <input
+                      type="checkbox"
+                      id={`ack-${a.id}`}
+                      checked={false}
+                      onChange={()=>acknowledge(i)}
+                      aria-label={`I have read and acknowledge the ${a.title}`}
+                      className="mt-0.5 w-4 h-4 accent-hz-indigo flex-shrink-0 cursor-pointer"
+                    />
+                    <label htmlFor={`ack-${a.id}`} className="text-[12px] text-hz-muted leading-relaxed cursor-pointer">
+                      I have read and acknowledge this agreement.
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {/* E-signature — only appears after all three are acknowledged */}
+        {allAcknowledged && (
+          <div className="bg-hz-card border border-[rgba(100,92,220,0.2)] rounded-hz px-4 py-4 space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <span aria-hidden="true" className="text-base">✍️</span>
+              <p className="text-[13px] font-semibold text-hz-text">Electronic Signature</p>
+            </div>
+            <p className="text-[12px] text-hz-muted leading-relaxed">
+              By typing your full legal name below, you confirm you have read and agree to all three agreements above. Legally binding under the ESIGN Act and UETA.
+            </p>
+            <div>
+              <label htmlFor="sig-input" className="text-[12px] font-semibold text-hz-text block mb-1.5">
+                Full legal name <span aria-hidden="true" className="text-hz-danger">*</span>
+              </label>
+              <input
+                id="sig-input"
+                type="text"
+                value={sig}
+                onChange={e=>setSig(e.target.value)}
+                placeholder="e.g. Alex Johnson"
+                aria-required="true"
+                aria-label="Type your full legal name to sign"
+                className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[14px] font-medium text-hz-indigo placeholder-hz-hint focus:outline-none focus:border-hz-accent italic"
+                style={{fontFamily:"'Georgia', serif"}}
+              />
+            </div>
+            <div className="flex items-start gap-2.5">
+              <input
+                type="checkbox"
+                id="sig-confirm"
+                checked={sigChecked}
+                onChange={e=>setSigChecked(e.target.checked)}
+                aria-required="true"
+                className="mt-0.5 w-4 h-4 accent-hz-indigo flex-shrink-0 cursor-pointer"
+              />
+              <label htmlFor="sig-confirm" className="text-[12px] text-hz-muted leading-relaxed cursor-pointer">
+                I agree to be bound by the terms of all agreements I acknowledged above.
+              </label>
+            </div>
+            <div className="flex justify-between items-center pt-1">
+              <div>
+                <p className="text-[10px] text-hz-hint uppercase tracking-wide font-semibold">Date signed</p>
+                <p className="text-[12px] text-hz-text font-medium">{today}</p>
+              </div>
+              {sig.trim().length > 0 && (
+                <div className="text-right">
+                  <p className="text-[10px] text-hz-hint uppercase tracking-wide font-semibold">Signature</p>
+                  <p className="text-[15px] text-hz-indigo" style={{fontFamily:"'Georgia', serif",fontStyle:'italic'}}>{sig}</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 bg-hz-card border-t border-[rgba(100,92,220,0.1)] px-4 py-3">
@@ -474,9 +531,8 @@ const SecurityQuestionsScreen = ({nav, goBack, S, setS}) => {
   const [qs, setQs] = React.useState([
     {q:'', a:''},
     {q:'', a:''},
-    {q:'', a:''},
   ]);
-  const [showA, setShowA] = React.useState([false,false,false]);
+  const [showA, setShowA] = React.useState([false, false]);
 
   const setQ = (i,val) => setQs(prev=>prev.map((x,j)=>j===i?{...x,q:val}:x));
   const setA = (i,val) => setQs(prev=>prev.map((x,j)=>j===i?{...x,a:val}:x));
@@ -492,31 +548,41 @@ const SecurityQuestionsScreen = ({nav, goBack, S, setS}) => {
       <div className="px-4 pt-4 pb-24 space-y-4">
         <div className="mb-1">
           <p className="text-[18px] font-bold text-hz-text">Security questions</p>
-          <p className="text-[13px] text-hz-muted mt-1">Set up 3 security questions. These verify your identity if you ever need to access your account without your university login.</p>
+          <p className="text-[13px] text-hz-muted mt-1">Choose 2 security questions. We'll use these to verify your identity if you ever need to access your account without your university login.</p>
         </div>
 
         {qs.map((item,i)=>(
           <div key={i} className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3 space-y-2.5">
-            <p className="text-[12px] font-semibold text-hz-hint uppercase tracking-wide">Question {i+1}</p>
+            <p className="text-[11px] font-bold text-hz-hint uppercase tracking-widest">Question {i+1} of 2</p>
             <div>
-              <label htmlFor={`q-select-${i}`} className="text-[12px] font-medium text-hz-text block mb-1">Choose a question</label>
-              <select id={`q-select-${i}`} value={item.q} onChange={e=>setQ(i,e.target.value)}
-                aria-required="true"
-                className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[13px] text-hz-text bg-white focus:outline-none focus:border-hz-accent">
-                <option value="">— Select a question —</option>
-                {available(i).map(q=><option key={q} value={q}>{q}</option>)}
-              </select>
+              <label htmlFor={`q-select-${i}`} className="text-[12px] font-semibold text-hz-text block mb-1.5">Choose a question</label>
+              <div className="relative">
+                <select
+                  id={`q-select-${i}`}
+                  value={item.q}
+                  onChange={e=>setQ(i,e.target.value)}
+                  aria-required="true"
+                  className="w-full bg-hz-card border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 pr-10 text-[13px] font-medium text-hz-text appearance-none cursor-pointer focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors">
+                  <option value="">Select a question…</option>
+                  {available(i).map(q=><option key={q} value={q}>{q}</option>)}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M3 5l4 4 4-4" stroke="#645CDC" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
             </div>
             {item.q && (
               <div className="relative">
-                <label htmlFor={`q-answer-${i}`} className="text-[12px] font-medium text-hz-text block mb-1">Your answer</label>
+                <label htmlFor={`q-answer-${i}`} className="text-[12px] font-semibold text-hz-text block mb-1.5">Your answer</label>
                 <input id={`q-answer-${i}`} type={showA[i]?'text':'password'} value={item.a}
                   onChange={e=>setA(i,e.target.value)}
                   placeholder="Enter your answer"
                   aria-required="true"
-                  className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 pr-10 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent"/>
+                  className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 pr-16 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
                 <button onClick={()=>toggleShow(i)} aria-label={showA[i]?'Hide answer':'Show answer'}
-                  className="absolute right-3 top-[30px] text-hz-hint text-[11px]">
+                  className="absolute right-3 top-1/2 -translate-y-1/2 mt-[11px] text-hz-accent text-[11px] font-semibold hover:opacity-75 transition-opacity">
                   {showA[i]?'Hide':'Show'}
                 </button>
               </div>
