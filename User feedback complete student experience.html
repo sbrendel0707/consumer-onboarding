@@ -741,68 +741,206 @@ const PayerScreen = ({nav, goBack, S, setS}) => {
 
 // ─── InviteScreen ────────────────────────────────────────────────────────
 const InviteScreen = ({nav, goBack, S, setS}) => {
-  const [first, setFirst] = React.useState('');
-  const [last,  setLast]  = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [rel,   setRel]   = React.useState('');
-  const [sent,  setSent]  = React.useState([]);
-  const [justSent, setJustSent] = React.useState(false);
+  // phase: 'count' | 'form' | 'review'
+  const [phase, setPhase]   = React.useState('count');
+  const [count, setCount]   = React.useState('');      // 'one' | 'multi'
 
-  const canSend = first.trim() && email.includes('@');
+  // form fields
+  const [first, setFirst]   = React.useState('');
+  const [last,  setLast]    = React.useState('');
+  const [email, setEmail]   = React.useState('');
+  const [rel,   setRel]     = React.useState('');
+  const [pct,   setPct]     = React.useState('');      // % responsibility (multi only)
+  const [pctMode, setPctMode] = React.useState('set'); // 'set' | 'ask'
+
+  const [sent, setSent]     = React.useState([]);
+
+  const isMulti   = count === 'multi';
+  const canSend   = first.trim() && email.includes('@') && (!isMulti || pctMode === 'ask' || (pct !== '' && Number(pct) > 0 && Number(pct) <= 100));
+  const totalPctAssigned = sent.filter(p=>p.pctMode==='set').reduce((s,p)=>s+Number(p.pct||0),0);
 
   const send = () => {
-    setSent(p=>[...p,{first,last,email,rel}]);
-    setJustSent(true);
-    setFirst(''); setLast(''); setEmail(''); setRel('');
+    setSent(p=>[...p, {first, last, email, rel, pct: pctMode==='ask'?null:pct, pctMode}]);
+    setFirst(''); setLast(''); setEmail(''); setRel(''); setPct(''); setPctMode('set');
+    // After adding one payer: if single, go to review; if multi, stay on form to add more
+    if (!isMulti) setPhase('review');
   };
 
   const finish = () => {
-    const skipped = sent.length === 0;
-    setS(p=>({...p, skippedInvite: skipped, authPayers: sent}));
+    setS(p=>({...p, authPayers: sent}));
     nav('insurance');
   };
 
-  return (
+  // ── Phase 1: how many? ──────────────────────────────────────────────────
+  if (phase === 'count') return (
     <ScreenWrap>
-      <Header title="Invite a Payer" onBack={goBack}/>
-      <div className="px-5 pb-8">
-        <p className="text-hz-muted text-[13px] mb-5">They'll receive an email with a secure link to set up their payment method.</p>
+      <StepBar current={3}/>
+      <div className="px-5 pt-5 pb-8">
+        <button onClick={goBack} aria-label="Go back" className="flex items-center gap-1.5 text-hz-accent text-[12px] font-medium mb-4 hover:opacity-75 transition-opacity">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Back
+        </button>
+        <p className="text-[18px] font-bold text-hz-text mb-2">Invite your payers</p>
+        <p className="text-hz-muted text-[13px] mb-6 leading-relaxed">How many other people will be paying on your account?</p>
+        <RadioCard selected={count==='one'} onClick={()=>setCount('one')} aria-label="One other person will pay">
+          <p className="text-[14px] font-semibold text-hz-text">Just one person</p>
+          <p className="text-[12px] text-hz-muted mt-0.5">One other person will handle all payments.</p>
+        </RadioCard>
+        <RadioCard selected={count==='multi'} onClick={()=>setCount('multi')} aria-label="Two or more people will pay">
+          <p className="text-[14px] font-semibold text-hz-text">Two or more people</p>
+          <p className="text-[12px] text-hz-muted mt-0.5">Multiple payers, each responsible for a portion.</p>
+        </RadioCard>
+        <Btn onClick={()=>{ if(count) setPhase('form'); }} disabled={!count}>Continue</Btn>
+      </div>
+    </ScreenWrap>
+  );
+
+  // ── Phase 2: invite form ────────────────────────────────────────────────
+  if (phase === 'form') return (
+    <ScreenWrap>
+      <StepBar current={3}/>
+      <div className="px-5 pt-5 pb-8 overflow-y-auto">
+        <button onClick={()=>setPhase(sent.length > 0 ? 'review' : 'count')} aria-label="Go back"
+          className="flex items-center gap-1.5 text-hz-accent text-[12px] font-medium mb-4 hover:opacity-75 transition-opacity">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Back
+        </button>
+
+        <p className="text-[18px] font-bold text-hz-text mb-1">
+          {sent.length === 0 ? 'Invite payer' : `Invite payer ${sent.length + 1}`}
+        </p>
+        <p className="text-hz-muted text-[13px] mb-5 leading-relaxed">
+          They'll receive an email with a secure link to create their account and set up payments.
+        </p>
+
+        {/* Previously invited — compact chips */}
         {sent.length > 0 && (
-          <div className="mb-4">
+          <div className="mb-4 space-y-1.5">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint mb-2">Invited so far</p>
             {sent.map((p,i)=>(
-              <div key={i} className="flex items-center gap-3 bg-hz-teal-bg border border-hz-teal/30 rounded-hz px-4 py-3 mb-2">
-                <span aria-hidden="true" className="text-hz-teal text-lg">✓</span>
-                <div>
-                  <p className="text-[13px] font-semibold text-hz-text">{p.first} {p.last}</p>
-                  <p className="text-[11px] text-hz-muted">{p.email}{p.rel ? ' · '+p.rel : ''}</p>
+              <div key={i} className="flex items-center gap-2.5 bg-hz-teal-bg border border-hz-teal/25 rounded-hz-sm px-3 py-2">
+                <span aria-hidden="true" className="text-hz-teal text-sm">✓</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[12px] font-semibold text-hz-text truncate">{p.first} {p.last}</p>
+                  <p className="text-[11px] text-hz-muted truncate">{p.email}</p>
                 </div>
+                {isMulti && (
+                  <span className="text-[11px] font-semibold text-hz-teal flex-shrink-0">
+                    {p.pctMode==='ask' ? 'Ask AP' : p.pct+'%'}
+                  </span>
+                )}
               </div>
             ))}
           </div>
         )}
-        {justSent && sent.length > 0 ? (
-          <div className="text-center py-4 mb-4">
-            <p className="text-hz-muted text-[13px] mb-4">Invite sent! Send another or continue.</p>
-            <button onClick={()=>setJustSent(false)} aria-label="Invite another person"
-              className="text-hz-indigo text-[13px] font-medium">+ Invite another person</button>
-          </div>
-        ) : (
-          <>
-            <div className="flex gap-3">
-              <Input label="First name" id="invite-first" value={first} onChange={setFirst} placeholder="Jane" className="flex-1 mb-0"/>
-              <Input label="Last name" id="invite-last" value={last} onChange={setLast} placeholder="Doe" className="flex-1 mb-0"/>
+
+        <div className="flex gap-3">
+          <Input label="First name" id="inv-first" value={first} onChange={setFirst} placeholder="Jane" className="flex-1 mb-0"/>
+          <Input label="Last name"  id="inv-last"  value={last}  onChange={setLast}  placeholder="Doe"  className="flex-1 mb-0"/>
+        </div>
+        <div className="mb-4"/>
+        <Input label="Email address" id="inv-email" value={email} onChange={setEmail} type="email" placeholder="jane@example.com"/>
+        <Input label="Relationship (optional)" id="inv-rel" value={rel} onChange={setRel} placeholder="e.g. Parent, Guardian"/>
+
+        {/* Percentage assignment — only for multi-payer */}
+        {isMulti && (
+          <div className="mb-4 bg-hz-cloud border border-hz-accent/20 rounded-hz-sm px-4 py-3 space-y-3">
+            <p className="text-[12px] font-semibold text-hz-text">Payment responsibility</p>
+            <p className="text-[11px] text-hz-muted leading-relaxed">What portion of the total balance will this person be responsible for?</p>
+            <div className="flex gap-2">
+              <button onClick={()=>setPctMode('set')} aria-pressed={pctMode==='set'}
+                className={`flex-1 py-2 rounded-hz-sm text-[12px] font-semibold border transition-colors ${pctMode==='set' ? 'bg-hz-indigo text-white border-hz-indigo' : 'bg-hz-card text-hz-muted border-[rgba(100,92,220,0.2)]'}`}>
+                Set a %
+              </button>
+              <button onClick={()=>setPctMode('ask')} aria-pressed={pctMode==='ask'}
+                className={`flex-1 py-2 rounded-hz-sm text-[12px] font-semibold border transition-colors ${pctMode==='ask' ? 'bg-hz-indigo text-white border-hz-indigo' : 'bg-hz-card text-hz-muted border-[rgba(100,92,220,0.2)]'}`}>
+                Ask them when they sign in
+              </button>
             </div>
-            <div className="mb-4"/>
-            <Input label="Email address" id="invite-email" value={email} onChange={setEmail} type="email" placeholder="jane@example.com"/>
-            <Input label="Relationship (optional)" id="invite-rel" value={rel} onChange={setRel} placeholder="e.g. Parent, Guardian"/>
-            <Btn onClick={send} disabled={!canSend} className="mb-3">Send Invite</Btn>
-          </>
+            {pctMode === 'set' && (
+              <div>
+                <div className="relative">
+                  <input
+                    type="number" min="1" max="100" value={pct}
+                    onChange={e=>setPct(e.target.value)}
+                    placeholder="e.g. 50"
+                    aria-label="Percentage of balance this person is responsible for"
+                    className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 pr-8 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-hz-hint text-[13px] font-semibold">%</span>
+                </div>
+                {sent.length > 0 && (
+                  <p className="text-[11px] text-hz-muted mt-1.5">
+                    Already assigned: <span className="font-semibold text-hz-text">{totalPctAssigned}%</span>
+                    {pct && Number(pct) > 0 ? <> — this invite: <span className="font-semibold text-hz-text">{pct}%</span> — total: <span className={`font-semibold ${totalPctAssigned+Number(pct)>100?'text-hz-danger':'text-hz-text'}`}>{totalPctAssigned+Number(pct)}%</span></> : null}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         )}
-        <Divider/>
-        <button onClick={finish} aria-label={sent.length > 0 ? 'Continue to next step' : 'Skip inviting a payer for now'}
-          className="w-full text-center text-hz-hint text-[13px] py-2 hover:text-hz-muted transition-colors">
-          {sent.length > 0 ? 'Continue →' : 'Skip for now'}
+
+        <Btn onClick={send} disabled={!canSend}>Send Invite</Btn>
+      </div>
+    </ScreenWrap>
+  );
+
+  // ── Phase 3: review + disclaimer ────────────────────────────────────────
+  return (
+    <ScreenWrap>
+      <StepBar current={3}/>
+      <div className="px-5 pt-5 pb-24">
+        <button onClick={()=>setPhase('form')} aria-label="Add another payer"
+          className="flex items-center gap-1.5 text-hz-accent text-[12px] font-medium mb-4 hover:opacity-75 transition-opacity">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Back
         </button>
+
+        <p className="text-[18px] font-bold text-hz-text mb-1">
+          {sent.length === 1 ? '1 payer invited' : `${sent.length} payers invited`}
+        </p>
+        <p className="text-hz-muted text-[13px] mb-5">Each person will receive an email invite to set up their account.</p>
+
+        <div className="space-y-2 mb-5">
+          {sent.map((p,i)=>(
+            <div key={i} className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-hz-cloud flex items-center justify-center text-[12px] font-bold text-hz-indigo flex-shrink-0">
+                {(p.first[0]||'?').toUpperCase()}{(p.last[0]||'').toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-hz-text">{p.first} {p.last}</p>
+                <p className="text-[11px] text-hz-muted truncate">{p.email}{p.rel ? ' · '+p.rel : ''}</p>
+              </div>
+              {isMulti && (
+                <div className="text-right flex-shrink-0">
+                  <p className="text-[12px] font-bold text-hz-indigo">{p.pctMode==='ask' ? '—' : p.pct+'%'}</p>
+                  <p className="text-[9px] text-hz-hint uppercase tracking-wide">{p.pctMode==='ask' ? 'AP sets' : 'of balance'}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {isMulti && (
+          <div className="mb-4">
+            <button onClick={()=>setPhase('form')} aria-label="Invite another payer"
+              className="w-full py-2.5 rounded-hz-pill border border-hz-accent/30 text-hz-indigo text-[13px] font-semibold hover:bg-hz-cloud transition-colors">
+              + Invite another payer
+            </button>
+          </div>
+        )}
+
+        {/* Student responsibility disclaimer */}
+        <div className="bg-hz-amber-bg border border-hz-amber/40 rounded-hz-sm px-4 py-3 mb-5 flex gap-2.5">
+          <span aria-hidden="true" className="text-hz-amber text-base flex-shrink-0 mt-0.5">⚠️</span>
+          <p className="text-[12px] text-hz-muted leading-relaxed">
+            <span className="font-semibold text-hz-text">Heads up: </span>
+            Even if an authorized payer doesn't make their payment, the full balance ultimately remains your responsibility as the student. Unpaid amounts may result in account holds.
+          </p>
+        </div>
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 bg-hz-card border-t border-[rgba(100,92,220,0.1)] px-4 py-3">
+        <Btn onClick={finish}>Continue</Btn>
       </div>
     </ScreenWrap>
   );
