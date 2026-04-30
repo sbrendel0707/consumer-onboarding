@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Consumer Onboarding Prototypes</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #080f1e;
+  color: #f1f5f9;
+  min-height: 100vh;
+  padding: 60px 24px 80px;
+}
+
+/* ── HEADER ── */
+.header {
+  max-width: 880px;
+  margin: 0 auto 52px;
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #3b82f6;
+  margin-bottom: 12px;
+}
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #f8fafc;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+.context-block {
+  background: rgba(37,99,235,.08);
+  border: 1px solid rgba(37,99,235,.2);
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.7;
+  max-width: 640px;
+}
+.context-block strong { color: #cbd5e1; font-weight: 600; }
+
+/* ── SECTION LABEL ── */
+.section-label {
+  max-width: 880px;
+  margin: 0 auto 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #475569;
+}
+
+/* ── GRID ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 14px;
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+/* ── BASE TILE ── */
+.tile {
+  background: #0f1e38;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: border-color .15s, background .15s, transform .15s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── LINKED TILE ── */
+a.tile {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+a.tile:hover {
+  background: #132240;
+  border-color: rgba(59,130,246,.45);
+  transform: translateY(-2px);
+}
+a.tile::after {
+  content: '→';
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  font-size: 16px;
+  color: rgba(59,130,246,.55);
+  transition: color .15s, right .15s;
+}
+a.tile:hover::after {
+  color: #60a5fa;
+  right: 18px;
+}
+
+/* ── COMING SOON TILE ── */
+.tile-soon {
+  opacity: .5;
+  cursor: default;
+}
+.tile-soon .tile-name { color: #94a3b8; }
+
+.soon-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: #64748b;
+  background: rgba(100,116,139,.12);
+  border: 1px solid rgba(100,116,139,.2);
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+
+/* ── TILE CONTENT ── */
+.tile-scenario {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: #3b82f6;
+  margin-bottom: 4px;
+}
+.tile-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #f1f5f9;
+  line-height: 1.3;
+}
+
+/* ── INSTITUTION SETTINGS ── */
+.settings-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: #475569;
+  margin-bottom: 8px;
+}
+.settings-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chip {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 6px;
+  padding: 3px 9px;
+  line-height: 1.5;
+}
+.chip.highlight {
+  color: #93c5fd;
+  background: rgba(37,99,235,.1);
+  border-color: rgba(37,99,235,.25);
+}
+.chip.tbd {
+  color: #475569;
+  background: transparent;
+  border-color: rgba(255,255,255,.05);
+  font-style: italic;
+}
+
+/* ── DIVIDER ── */
+.tile-divider {
+  height: 1px;
+  background: rgba(255,255,255,.06);
+  margin: 0;
+}
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="eyebrow">Nelnet · UX Prototypes</div>
+    <h1>Consumer Onboarding Prototypes</h1>
+    <div class="context-block">
+      All scenarios below represent students authenticating via <strong>SAML SSO</strong> directly from their university's portal, with <strong>full ERP integration</strong> — charges, financial aid, and enrollment data are synced automatically. <strong>Authorized payers are managed within Nelnet's system</strong>; the student controls who has access and at what level.
+    </div>
+  </div>
+
+  <div class="section-label">Scenarios</div>
+
+  <div class="grid">
+
+    <!-- ── 1. First Time Student ── -->
+    <a class="tile" href="/User feedback complete student experience.html">
+      <div>
+        <div class="tile-scenario">Student</div>
+        <div class="tile-name">First Time Student</div>
+      </div>
+      <div class="tile-divider"></div>
+      <div>
+        <div class="settings-label">Institution Settings</div>
+        <div class="settings-chips">
+          <span class="chip highlight">GradGuard enabled</span>
+          <span class="chip highlight">Flexible payment plans</span>
+          <span class="chip">ACH + Credit Card</span>
+          <span class="chip">3 university disclosures</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- ── 2. Returning Student ── -->
+    <div class="tile tile-soon">
+      <span class="soon-badge">Coming soon</span>
+      <div>
+        <div class="tile-scenario">Student</div>
+        <div class="tile-name">Returning Student</div>
+      </div>
+      <div class="tile-divider"></div>
+      <div>
+        <div class="settings-label">Institution Settings</div>
+        <div class="settings-chips">
+          <span class="chip tbd">TBD</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 3. New AP — single payer (themselves) ── -->
+    <div class="tile tile-soon">
+      <span class="soon-badge">Coming soon</span>
+      <div>
+        <div class="tile-scenario">Authorized Party</div>
+        <div class="tile-name">New Authorized Party — Single Payer</div>
+      </div>
+      <div class="tile-divider"></div>
+      <div>
+        <div class="settings-label">Institution Settings</div>
+        <div class="settings-chips">
+          <span class="chip tbd">TBD</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4. New AP — multiple payers ── -->
+    <div class="tile tile-soon">
+      <span class="soon-badge">Coming soon</span>
+      <div>
+        <div class="tile-scenario">Authorized Party</div>
+        <div class="tile-name">New Authorized Party — Multiple Payers</div>
+      </div>
+      <div class="tile-divider"></div>
+      <div>
+        <div class="settings-label">Institution Settings</div>
+        <div class="settings-chips">
+          <span class="chip tbd">TBD</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5. AP non-payer ── -->
+    <div class="tile tile-soon">
+      <span class="soon-badge">Coming soon</span>
+      <div>
+        <div class="tile-scenario">Authorized Party</div>
+        <div class="tile-name">Authorized Party — Non-Payer</div>
+      </div>
+      <div class="tile-divider"></div>
+      <div>
+        <div class="settings-label">Institution Settings</div>
+        <div class="settings-chips">
+          <span class="chip tbd">TBD</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 6. Returning AP ── -->
+    <div class="tile tile-soon">
+      <span class="soon-badge">Coming soon</span>
+      <div>
+        <div class="tile-scenario">Authorized Party</div>
+        <div class="tile-name">Returning Authorized Party</div>
+      </div>
+      <div class="tile-divider"></div>
+      <div>
+        <div class="settings-label">Institution Settings</div>
+        <div class="settings-chips">
+          <span class="chip tbd">TBD</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
