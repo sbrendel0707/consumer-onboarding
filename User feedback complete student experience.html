@@ -750,7 +750,7 @@ const PayerScreen = ({nav, goBack, S, setS}) => {
   const next = () => {
     if (!payer) return;
     setS(p=>({...p, payer}));
-    if (payer === 'other') nav('invite');
+    if (payer === 'other' || payer === 'combo') nav('invite');
     else nav('insurance');
   };
 
@@ -782,6 +782,12 @@ const PayerScreen = ({nav, goBack, S, setS}) => {
 // ─── InviteScreen ────────────────────────────────────────────────────────
 // Single-page progressive reveal: select count → form expands inline → add more collapses prior cards
 const InviteScreen = ({nav, goBack, S, setS}) => {
+  const isCombo = S.payer === 'combo';
+
+  // combo-only: student's own share
+  const [studentPct,    setStudentPct]    = React.useState('');
+  const [studentPctSet, setStudentPctSet] = React.useState(false); // confirmed % → reveals count
+
   const [count,   setCount]   = React.useState('');   // 'one' | 'multi'
   const [sent,    setSent]    = React.useState([]);   // committed payers
 
@@ -792,12 +798,16 @@ const InviteScreen = ({nav, goBack, S, setS}) => {
   const [rel,     setRel]     = React.useState('');
   const [pct,     setPct]     = React.useState('');
   const [pctMode, setPctMode] = React.useState('set');
-  const [showForm, setShowForm] = React.useState(false); // revealed after count chosen
+  const [showForm, setShowForm] = React.useState(false);
 
   const isMulti = count === 'multi';
+  const remainingPct = studentPctSet ? 100 - Number(studentPct) : 100;
   const totalPctAssigned = sent.filter(p=>p.pctMode==='set').reduce((s,p)=>s+Number(p.pct||0), 0);
   const canSend = first.trim() && email.includes('@') &&
     (!isMulti || pctMode === 'ask' || (pct !== '' && Number(pct) > 0 && Number(pct) <= 100));
+
+  // For combo: count question only shows after student % is confirmed
+  const showCountSection = !isCombo || studentPctSet;
 
   const handleCountSelect = (val) => {
     setCount(val);
@@ -810,11 +820,10 @@ const InviteScreen = ({nav, goBack, S, setS}) => {
   };
 
   const finish = () => {
-    // If there's an unsent form with enough info, commit it first
     const finalSent = (first.trim() && email.includes('@'))
       ? [...sent, {first, last, email, rel, pct: pctMode==='ask' ? null : pct, pctMode}]
       : sent;
-    setS(p=>({...p, authPayers: finalSent}));
+    setS(p=>({...p, authPayers: finalSent, studentPct: studentPctSet ? Number(studentPct) : null}));
     nav('insurance');
   };
 
@@ -828,13 +837,80 @@ const InviteScreen = ({nav, goBack, S, setS}) => {
         <BackBtn onClick={goBack}/>
 
         <p className="text-[18px] font-bold text-hz-text mb-2">Invite your payers</p>
-        <p className="text-hz-muted text-[13px] mb-5 leading-relaxed">How many other people will be paying on your account?</p>
+        <p className="text-hz-muted text-[13px] mb-5 leading-relaxed">
+          {isCombo
+            ? "Let's figure out how to split your balance."
+            : "How many other people will be paying on your account?"}
+        </p>
 
-        {/* Count selector — tapping immediately reveals form, no Continue button */}
+        {/* ── COMBO ONLY: student's own share ── */}
+        {isCombo && (
+          <div className="mb-5">
+            <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-4 space-y-3">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint">Your share</p>
+              <p className="text-[13px] text-hz-muted leading-relaxed">What percentage of your total school costs will <span className="font-semibold text-hz-text">you</span> be paying?</p>
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1">
+                  <input
+                    type="number" min="1" max="99" value={studentPct}
+                    onChange={e=>{ setStudentPct(e.target.value); setStudentPctSet(false); }}
+                    placeholder="e.g. 50"
+                    aria-label="Percentage you will pay"
+                    disabled={studentPctSet}
+                    className={`w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 pr-8 text-[14px] font-semibold text-hz-indigo focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors ${studentPctSet ? 'bg-hz-cloud' : 'bg-hz-card'}`}/>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-hz-hint text-[13px] font-semibold">%</span>
+                </div>
+                {!studentPctSet && (
+                  <button
+                    onClick={()=>{ if(Number(studentPct)>0 && Number(studentPct)<100) setStudentPctSet(true); }}
+                    disabled={!(Number(studentPct)>0 && Number(studentPct)<100)}
+                    className={`px-4 py-2.5 rounded-hz-sm text-[13px] font-semibold transition-colors flex-shrink-0 ${
+                      Number(studentPct)>0 && Number(studentPct)<100
+                        ? 'bg-hz-indigo text-white hover:opacity-90'
+                        : 'bg-hz-cloud text-hz-hint cursor-not-allowed'}`}>
+                    Confirm
+                  </button>
+                )}
+                {studentPctSet && (
+                  <button onClick={()=>{ setStudentPctSet(false); setCount(''); setShowForm(false); setSent([]); }}
+                    className="text-hz-accent text-[12px] font-medium hover:opacity-75 transition-opacity flex-shrink-0">
+                    Edit
+                  </button>
+                )}
+              </div>
+              {studentPctSet && (
+                <div className="flex items-center justify-between pt-1 border-t border-[rgba(100,92,220,0.08)]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-hz-indigo"/>
+                    <span className="text-[12px] text-hz-muted">Your share</span>
+                  </div>
+                  <span className="text-[13px] font-bold text-hz-indigo">{studentPct}%</span>
+                </div>
+              )}
+              {studentPctSet && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-hz-teal"/>
+                    <span className="text-[12px] text-hz-muted">Others will cover</span>
+                  </div>
+                  <span className="text-[13px] font-bold text-hz-teal">{remainingPct}%</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Count selector — only shown after student % confirmed (combo) or immediately (other) */}
+        {showCountSection && (
         <div className="space-y-2 mb-5">
+          <p className="text-hz-muted text-[13px] mb-3 leading-relaxed">
+            {isCombo
+              ? `How many people will cover the remaining ${remainingPct}%?`
+              : 'How many other people will be paying on your account?'}
+          </p>
           {[
-            {val:'one',   label:'Just one person',    sub:'One person will handle all payments.'},
-            {val:'multi', label:'Two or more people', sub:'Multiple payers, each responsible for a portion.'},
+            {val:'one',   label:'Just one person',    sub: isCombo ? `One person covers the remaining ${remainingPct}%.` : 'One other person will handle all payments.'},
+            {val:'multi', label:'Two or more people', sub: isCombo ? `Multiple people split the remaining ${remainingPct}%.` : 'Multiple payers, each responsible for a portion.'},
           ].map(opt=>(
             <button key={opt.val} onClick={()=>handleCountSelect(opt.val)}
               aria-pressed={count===opt.val}
@@ -844,9 +920,7 @@ const InviteScreen = ({nav, goBack, S, setS}) => {
                   : 'border-[rgba(100,92,220,0.2)] bg-hz-card hover:border-hz-accent/40'
               }`}>
               <div className="flex items-center gap-3">
-                <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
-                  count===opt.val ? 'border-hz-indigo' : 'border-hz-hint'
-                }`}>
+                <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${count===opt.val ? 'border-hz-indigo' : 'border-hz-hint'}`}>
                   {count===opt.val && <div className="w-2 h-2 rounded-full bg-hz-indigo"/>}
                 </div>
                 <div>
@@ -857,6 +931,7 @@ const InviteScreen = ({nav, goBack, S, setS}) => {
             </button>
           ))}
         </div>
+        )}
 
         {/* Form — slides in after count is chosen */}
         {showForm && (
@@ -913,11 +988,14 @@ const InviteScreen = ({nav, goBack, S, setS}) => {
                   className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
               </div>
 
-              {/* Single payer: static 100% note */}
+              {/* Single payer: responsibility note */}
               {!isMulti && (
                 <div className="bg-hz-cloud rounded-hz-sm px-3 py-2 flex gap-2 items-start">
                   <span aria-hidden="true" className="text-hz-accent text-sm flex-shrink-0">ℹ️</span>
-                  <p className="text-[11px] text-hz-muted leading-relaxed">This person will be responsible for <span className="font-semibold text-hz-text">100%</span> of your school costs.</p>
+                  <p className="text-[11px] text-hz-muted leading-relaxed">
+                    This person will be responsible for <span className="font-semibold text-hz-text">{isCombo ? `${remainingPct}%` : '100%'}</span> of your school costs.
+                    {isCombo && <span className="text-hz-hint"> (the remaining {remainingPct}% after your share)</span>}
+                  </p>
                 </div>
               )}
 
