@@ -431,6 +431,37 @@ body {
 }
 .sub-section-title { font-size: 16px; font-weight: 700; color: var(--hz-text); }
 
+/* ── Locked section badge ── */
+.locked-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--hz-teal);
+  background: var(--hz-teal-bg);
+  border: 1px solid rgba(13,122,85,.2);
+  border-radius: 6px;
+  padding: 2px 9px;
+  vertical-align: middle;
+  margin-left: 10px;
+  letter-spacing: .3px;
+}
+
+/* Vision intro tagline */
+.vision-tagline {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--hz-text);
+  line-height: 1.6;
+  padding: 16px 20px;
+  background: var(--hz-cloud);
+  border: 1px solid rgba(100,92,220,.2);
+  border-left: 3px solid var(--hz-indigo);
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
 /* ── Coming soon ── */
 .coming-soon {
   background: var(--hz-card);
@@ -581,89 +612,93 @@ body {
 
     <!-- ════════════════════════════════════════
          HORIZON CONSUMER VISION
+         ⚠ LOCKED — text is owner-approved and must not be changed
+            by prototype iterations. Only update with explicit instruction.
     ════════════════════════════════════════ -->
     <section id="vision" class="prd-section">
       <div class="section-eyebrow">Foundation</div>
-      <h2 class="section-title">Horizon Consumer Product Vision</h2>
+      <h2 class="section-title">Horizon Consumer Product Vision <span class="locked-badge">🔒 Version locked</span></h2>
       <hr class="section-divider"/>
 
-      <div class="vision-item" data-modified="2026-04-30">
-        <div class="vision-icon">🧭</div>
-        <div>
-          <div class="vision-title">Guided by Situation</div>
-          <div class="vision-body">Horizon guides each consumer through the experience they need, based on their current financial situation and the choices they've already made — without unnecessary friction.</div>
-        </div>
-      </div>
+      <p class="vision-tagline">Horizon guides each consumer through the experience they need, based on their current financial situation and the choices they've already made—without unnecessary friction.</p>
 
-      <div class="vision-item" data-modified="2026-04-30">
+      <div class="vision-item">
         <div class="vision-icon">🔗</div>
         <div>
-          <div class="vision-title">End-to-End Continuity</div>
-          <div class="vision-body">One continuous experience — from deciding how to pay when amounts are still estimated, to completing payment once balances are final — so consumers always see the next action, understand why it matters, and move seamlessly from planning to payment.</div>
+          <div class="vision-title">An End&#8209;to&#8209;End Consumer Payment Experience</div>
+          <div class="vision-body">Horizon provides one continuous experience—from deciding how to pay when amounts are still estimated to completing payment once balances are final—so consumers always see the next action, understand why it matters, and can move seamlessly from planning to payment.</div>
         </div>
       </div>
 
-      <div class="vision-item" data-modified="2026-04-30">
+      <div class="vision-item">
         <div class="vision-icon">🎯</div>
         <div>
           <div class="vision-title">Guided and Personalized, Not Generic</div>
-          <div class="vision-body">The experience adapts to each user's situation, decisions, account changes, and constraints — showing what matters to them, not every possible option at once.</div>
+          <div class="vision-body">The experience adapts to each user's situation, decisions, account changes, and constraints—showing what matters to them, not every possible option at once.</div>
         </div>
       </div>
 
-      <div class="vision-item" data-modified="2026-04-30">
+      <div class="vision-item">
         <div class="vision-icon">💡</div>
         <div>
-          <div class="vision-title">Decision-First Experiences</div>
-          <div class="vision-body">Don't just tell users what they owe, when it's due, and how to pay. Present what they need to decide on, based on their situation, and clearly explain why that decision matters.</div>
+          <div class="vision-title">Decision&#8209;First Experiences</div>
+          <div class="vision-body">Don't just tell users what they owe, when it's due, and how to pay.<br/>Horizon presents what they need to decide on, based on their situation, and clearly explains why that decision matters.</div>
         </div>
       </div>
 
-      <div class="vision-item" data-modified="2026-04-30">
+      <div class="vision-item">
         <div class="vision-icon">📊</div>
         <div>
           <div class="vision-title">Relevance Without Overload</div>
-          <div class="vision-body">Empower users with timely, relevant information — starting with what they need to know, with seamless access to full details when deeper understanding is required.</div>
+          <div class="vision-body">Empower users with timely, relevant information—starting with what they need to know, and providing seamless access to full details when deeper understanding is required.</div>
         </div>
       </div>
 
-      <div class="vision-item" data-modified="2026-04-30">
+      <div class="vision-item">
         <div class="vision-icon">💬</div>
         <div>
           <div class="vision-title">Changes Communicated in Natural Language</div>
-          <div class="vision-body">Users don't understand change through labels — they understand it through reasons and outcomes. Communicate using a clear cause → effect model: what triggered the change and what it means for the user.</div>
+          <div class="vision-body">Users don't understand change through labels—they understand it through reasons and outcomes.<br/>Horizon communicates updates using a clear cause → effect model, explaining what triggered the change and what it means for the user.</div>
         </div>
       </div>
 
-      <div class="vision-item" data-modified="2026-04-30">
+      <div class="vision-item">
         <div class="vision-icon">⚡</div>
         <div>
           <div class="vision-title">Fewer Clicks, Fewer Screens</div>
-          <div class="vision-body">Consumers come here to pay for school. Remove unnecessary steps and screens so users complete what they came to do — quickly and confidently.</div>
+          <div class="vision-body">Consumers come here to pay for school.<br/>Horizon removes unnecessary steps and screens so users can complete what they came to do—quickly and confidently.</div>
         </div>
       </div>
 
-      <div class="vision-item" data-modified="2026-04-30">
+      <div class="vision-item">
         <div class="vision-icon">🚫</div>
         <div>
           <div class="vision-title">No Duplicate Entry. Ever.</div>
-          <div class="vision-body">Students are never asked to re-enter information the school already has. Horizon pulls data directly from the institution's ERP and uses existing Nelnet payment history term over term — confirming or adjusting only what's changed.</div>
+          <div class="vision-body">Students are never asked to re&#8209;enter information the school already has.<br/>Horizon pulls data directly from the institution's ERP and uses existing Nelnet payment history term over term—confirming or adjusting only what's changed.</div>
         </div>
       </div>
 
-      <div class="vision-item" data-modified="2026-04-30">
+      <div class="vision-item">
         <div class="vision-icon">💳</div>
         <div>
           <div class="vision-title">Modern Payment Experience</div>
-          <div class="vision-body">Horizon looks and feels like the modern payment systems consumers use every day — Apple Pay and other modern methods — without workarounds or barriers.</div>
+          <div class="vision-body">Horizon looks and feels like the modern payment systems consumers use every day.<br/>If I want to pay with Apple Pay or other modern methods, I can—without workarounds or barriers.</div>
         </div>
       </div>
 
-      <div class="vision-item" data-modified="2026-04-30">
+      <div class="vision-item">
         <div class="vision-icon">📱</div>
         <div>
           <div class="vision-title">Phone &amp; Text First</div>
-          <div class="vision-body">Text and phone are primary — not secondary — channels for communication and support. Meet users where they already are.</div>
+          <div class="vision-body">Meet users where they already are.<br/>Text and phone are primary—not secondary—channels for communication and support.</div>
+        </div>
+      </div>
+
+      <div class="vision-item">
+        <div class="vision-icon">🏁</div>
+        <div>
+          <div class="vision-title">Outcome</div>
+          <div class="vision-body">Horizon removes unnecessary screens, steps, and assumptions—replacing them with guided, role&#8209;aware experiences that reflect how people actually manage money today.<br/>Whether I'm responsible for paying, learning how to pay, or making sure someone else does, Horizon shows me exactly what matters now—and what to do next.</div>
         </div>
       </div>
     </section>
@@ -671,25 +706,26 @@ body {
 
     <!-- ════════════════════════════════════════
          ONBOARDING VISION
+         ⚠ LOCKED — do not modify unless owner explicitly requests a change.
     ════════════════════════════════════════ -->
     <section id="onboarding-vision" class="prd-section">
       <div class="section-eyebrow">Foundation</div>
-      <h2 class="section-title">Onboarding Vision</h2>
+      <h2 class="section-title">Onboarding Vision <span class="locked-badge">🔒 Version locked</span></h2>
       <hr class="section-divider"/>
 
-      <div class="req-item" data-modified="2026-04-30">
+      <div class="req-item">
         <p class="req-text"><strong>Set-it-and-forget-it outcome.</strong> Once onboarding is complete, a student who makes no changes to their account or payment method should realistically never need to re-enter the system during the term if they don't want to. All required decisions, preferences, and payment setup must be fully captured upfront.</p>
       </div>
 
-      <div class="req-item" data-modified="2026-04-30">
+      <div class="req-item">
         <p class="req-text"><strong>One decision at a time.</strong> Onboarding is structured around presenting one decision at a time. Each question reveals the next only after the previous is answered. If a later decision would logically prompt reconsideration of an earlier answer, editing backward is always possible — but the student is never asked to handle two open decisions at once.</p>
       </div>
 
-      <div class="req-item" data-modified="2026-04-30">
+      <div class="req-item">
         <p class="req-text"><strong>ERP-first data strategy.</strong> Any value the ERP already holds — name, student ID, charges, financial aid, enrollment status, contact info from SSO — must be pre-populated. Students are never asked to type what the system already knows. The experience confirms or adjusts existing data; it does not re-collect it.</p>
       </div>
 
-      <div class="req-item" data-modified="2026-04-30">
+      <div class="req-item">
         <p class="req-text"><strong>Scenario-driven communication setup.</strong> Onboarding collects the specific information needed to personalize every subsequent communication and to-do for that student's exact situation: payment plan type, authorized parties added, insurance decisions, and communication preferences all feed into what the student sees and receives after signup.</p>
       </div>
     </section>
