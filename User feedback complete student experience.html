@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Student Onboarding – React Prototype</title>
+<title>First Time Student Onboarding – Horizon Prototype</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
@@ -108,25 +108,142 @@ const Input = ({label, id, value, onChange, type='text', placeholder='', error='
   );
 };
 
-const Select = ({label, id, value, onChange, options, className=''}) => {
-  const selectId = id || (label ? label.toLowerCase().replace(/\s+/g,'-') : undefined);
+// ─── CustomSelect ─────────────────────────────────────────────────────────
+// Fully styled popover select — replaces native <select> across all screens.
+// Supports keyboard nav (↑↓ navigate, Enter/Space selects, Escape closes),
+// click-outside dismiss, animated chevron, checkmark on selected option.
+const CustomSelect = ({label, id, value, onChange, options, placeholder='Select…', className=''}) => {
+  const [open,         setOpen]         = React.useState(false);
+  const [highlightIdx, setHighlightIdx] = React.useState(-1);
+  const containerRef = React.useRef(null);
+  const triggerId = id ? id + '-btn'  : undefined;
+  const listId    = id ? id + '-list' : undefined;
+
+  const selectedOpt  = options.find(o => (o.value !== undefined ? o.value : o) === value);
+  const displayLabel = selectedOpt ? (selectedOpt.label !== undefined ? selectedOpt.label : selectedOpt) : placeholder;
+  const isEmpty      = !value;
+
+  // Click-outside to close
+  React.useEffect(() => {
+    if (!open) return;
+    const handler = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const openDropdown = () => {
+    const startIdx = options.findIndex(o => (o.value !== undefined ? o.value : o) === value);
+    setHighlightIdx(startIdx >= 0 ? startIdx : 0);
+    setOpen(true);
+  };
+
+  const selectOption = (val) => { onChange(val); setOpen(false); };
+
+  const handleKeyDown = (e) => {
+    if (!open) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); openDropdown(); }
+      return;
+    }
+    if      (e.key === 'Escape')    { setOpen(false); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); setHighlightIdx(i => Math.min(i + 1, options.length - 1)); }
+    else if (e.key === 'ArrowUp')   { e.preventDefault(); setHighlightIdx(i => Math.max(i - 1, 0)); }
+    else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (highlightIdx >= 0 && highlightIdx < options.length) {
+        selectOption(options[highlightIdx].value !== undefined ? options[highlightIdx].value : options[highlightIdx]);
+      }
+    }
+  };
+
   return (
-    <div className={'mb-4 '+className}>
-      {label && <label htmlFor={selectId} className="block text-xs font-semibold text-hz-muted mb-1">{label}</label>}
-      <div className="relative">
-        <select id={selectId} value={value} onChange={e=>onChange(e.target.value)}
-          className="w-full bg-hz-card border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-4 py-3 pr-10 text-hz-text text-[14px] font-medium outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 appearance-none cursor-pointer transition-colors">
-          {options.map(o => <option key={o.value||o} value={o.value||o}>{o.label||o}</option>)}
-        </select>
-        <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M3 5l4 4 4-4" stroke="#645CDC" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-      </div>
+    <div className={'mb-4 relative ' + className} ref={containerRef}>
+      {label && (
+        <label htmlFor={triggerId} className="block text-xs font-semibold text-hz-muted mb-1.5">{label}</label>
+      )}
+
+      {/* Trigger button */}
+      <button
+        id={triggerId}
+        type="button"
+        role="combobox"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={listId}
+        onKeyDown={handleKeyDown}
+        onClick={() => open ? setOpen(false) : openDropdown()}
+        className={[
+          'w-full bg-hz-card rounded-hz-sm px-4 py-3 text-[14px] font-medium text-left',
+          'flex items-center justify-between gap-2',
+          'border transition-all duration-150',
+          open
+            ? 'border-hz-accent ring-2 ring-hz-accent/20 shadow-sm'
+            : 'border-[rgba(100,92,220,0.2)] hover:border-hz-accent/50 hover:shadow-sm',
+          isEmpty ? 'text-hz-hint' : 'text-hz-text',
+        ].join(' ')}
+      >
+        <span className="truncate flex-1">{displayLabel}</span>
+        {/* Animated chevron */}
+        <svg
+          width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"
+          className={'flex-shrink-0 text-hz-accent transition-transform duration-200 ' + (open ? 'rotate-180' : '')}
+        >
+          <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+
+      {/* Dropdown panel */}
+      {open && (
+        <ul
+          id={listId}
+          role="listbox"
+          aria-label={label || 'Options'}
+          className="absolute z-50 w-full mt-1.5 bg-hz-card border border-[rgba(100,92,220,0.18)] rounded-hz-sm overflow-hidden overflow-y-auto"
+          style={{
+            maxHeight: '13.5rem',
+            boxShadow: '0 8px 32px rgba(45,31,163,0.13), 0 2px 8px rgba(45,31,163,0.06)',
+          }}
+        >
+          {options.map((o, i) => {
+            const val      = o.value  !== undefined ? o.value  : o;
+            const lbl      = o.label  !== undefined ? o.label  : o;
+            const isSel    = val === value;
+            const isHl     = i === highlightIdx;
+            return (
+              <li
+                key={String(val)}
+                role="option"
+                aria-selected={isSel}
+                onMouseEnter={() => setHighlightIdx(i)}
+                onMouseDown={(e) => { e.preventDefault(); selectOption(val); }}
+                className={[
+                  'px-4 py-2.5 text-[13px] font-medium cursor-pointer',
+                  'flex items-center justify-between gap-2 select-none',
+                  'transition-colors duration-75',
+                  isSel
+                    ? 'bg-hz-cloud text-hz-indigo'
+                    : isHl
+                    ? 'bg-hz-bg text-hz-text'
+                    : 'text-hz-text hover:bg-hz-bg',
+                ].join(' ')}
+              >
+                <span className="flex-1 truncate">{lbl}</span>
+                {isSel && (
+                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true" className="flex-shrink-0 text-hz-accent">
+                    <path d="M2 6.5l3.5 3.5 5.5-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 };
+// Alias so any existing <Select …/> usage keeps working
+const Select = CustomSelect;
 
 const Card = ({children, className=''}) => (
   <div className={'bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz p-4 '+className}>{children}</div>
@@ -383,33 +500,87 @@ const Toast = ({msg, show}) => (
 );
 
 // ─── ProtoIntroScreen ────────────────────────────────────────────────────
-const ProtoIntroScreen = ({nav}) => (
-  <ScreenWrap portal={false}>
-  <div className="flex flex-col px-6 py-12 h-full">
-    <div className="flex-1 flex flex-col justify-center">
-      <div className="mb-6">
-        <span className="text-[11px] font-bold tracking-widest uppercase text-hz-accent">Prototype</span>
+const ProtoIntroScreen = ({nav}) => {
+  const [copied, setCopied] = React.useState(false);
+
+  const copyLink = () => {
+    const url = window.location.href;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      }).catch(() => fallbackCopy(url));
+    } else {
+      fallbackCopy(url);
+    }
+  };
+  const fallbackCopy = (url) => {
+    const el = document.createElement('textarea');
+    el.value = url; el.style.position = 'fixed'; el.style.opacity = '0';
+    document.body.appendChild(el); el.select();
+    try { document.execCommand('copy'); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch(e) {}
+    document.body.removeChild(el);
+  };
+
+  return (
+    <ScreenWrap portal={false}>
+    <div className="flex flex-col px-6 py-10 h-full overflow-y-auto">
+      <div className="flex-1 flex flex-col justify-center">
+
+        {/* Top row: eyebrow + share button */}
+        <div className="flex items-center justify-between mb-5">
+          <span className="text-[11px] font-bold tracking-widest uppercase text-hz-accent">Prototype</span>
+          <button
+            onClick={copyLink}
+            aria-label="Copy link to this prototype"
+            className={[
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-hz-pill text-[11px] font-semibold',
+              'border transition-all duration-150',
+              copied
+                ? 'bg-hz-teal-bg border-hz-teal/40 text-hz-teal'
+                : 'bg-hz-card border-[rgba(100,92,220,0.2)] text-hz-indigo hover:bg-hz-cloud hover:border-hz-accent/40',
+            ].join(' ')}
+          >
+            {copied ? (
+              <>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Copied!
+              </>
+            ) : (
+              <>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M8 1H3a1 1 0 00-1 1v7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  <rect x="4" y="3" width="6" height="8" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+                </svg>
+                Share link
+              </>
+            )}
+          </button>
+        </div>
+
+        <h1 className="text-2xl font-bold text-hz-text mb-3 leading-snug">First Time Student<br/>Onboarding</h1>
+        <p className="text-hz-muted text-[14px] leading-relaxed mb-6">
+          You are a first-year student at <strong className="text-hz-text">Claude University</strong> receiving your first bill for Fall term.
+          You'll review your balance and set up how you'd like to pay.
+        </p>
+        <Card className="mb-6">
+          <p className="text-[13px] font-semibold text-hz-text mb-2">Your scenario:</p>
+          <ul className="text-[13px] text-hz-muted space-y-1.5">
+            <li>• Tuition + fees: <strong className="text-hz-text">$8,500</strong></li>
+            <li>• Applied aid (merit + Pell): <strong className="text-hz-text">−$2,300</strong></li>
+            <li>• Anticipated aid (loan): <strong className="text-hz-text">−$1,000</strong></li>
+            <li>• Balance due: <strong className="text-hz-teal">$5,200</strong> by May 1</li>
+          </ul>
+        </Card>
+        <p className="text-hz-hint text-[12px] mb-8">This prototype covers account setup through the post-enrollment home screen. Click through all 25 screens.</p>
       </div>
-      <h1 className="text-2xl font-bold text-hz-text mb-4 leading-snug">Student Onboarding<br/>Complete Experience</h1>
-      <p className="text-hz-muted text-[14px] leading-relaxed mb-6">
-        You are a first-year student at <strong className="text-hz-text">Claude University</strong> receiving your first bill for Fall term.
-        You'll review your balance and set up how you'd like to pay.
-      </p>
-      <Card className="mb-6">
-        <p className="text-[13px] font-semibold text-hz-text mb-2">Your scenario:</p>
-        <ul className="text-[13px] text-hz-muted space-y-1.5">
-          <li>• Tuition + fees: <strong className="text-hz-text">$8,500</strong></li>
-          <li>• Applied aid (merit + Pell): <strong className="text-hz-text">−$2,300</strong></li>
-          <li>• Anticipated aid (loan): <strong className="text-hz-text">−$1,000</strong></li>
-          <li>• Balance due: <strong className="text-hz-teal">$5,200</strong> by May 1</li>
-        </ul>
-      </Card>
-      <p className="text-hz-hint text-[12px] mb-8">This prototype covers account setup through the post-enrollment home screen. Click through all 25 screens.</p>
+      <Btn onClick={()=>nav('welcome')} aria-label="Begin setup">I understand — begin setup</Btn>
     </div>
-    <Btn onClick={()=>nav('welcome')} aria-label="Begin setup">I understand — begin setup</Btn>
-  </div>
-  </ScreenWrap>
-);
+    </ScreenWrap>
+  );
+};
 
 
 // ─── WelcomeScreen ───────────────────────────────────────────────────────
@@ -674,23 +845,15 @@ const SecurityQuestionsScreen = ({nav, goBack, S, setS}) => {
           <div key={i} className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3 space-y-2.5">
             <p className="text-[11px] font-bold text-hz-hint uppercase tracking-widest">Question {i+1} of 2</p>
             <div>
-              <label htmlFor={`q-select-${i}`} className="text-[12px] font-semibold text-hz-text block mb-1.5">Choose a question</label>
-              <div className="relative">
-                <select
-                  id={`q-select-${i}`}
-                  value={item.q}
-                  onChange={e=>setQ(i,e.target.value)}
-                  aria-required="true"
-                  className="w-full bg-hz-card border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 pr-10 text-[13px] font-medium text-hz-text appearance-none cursor-pointer focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors">
-                  <option value="">Select a question…</option>
-                  {available(i).map(q=><option key={q} value={q}>{q}</option>)}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <path d="M3 5l4 4 4-4" stroke="#645CDC" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-              </div>
+              <CustomSelect
+                id={`q-select-${i}`}
+                label="Choose a question"
+                value={item.q}
+                onChange={val => setQ(i, val)}
+                placeholder="Select a question…"
+                options={available(i).map(q => ({value: q, label: q}))}
+                className="mb-0"
+              />
             </div>
             {item.q && (
               <div>
@@ -1496,15 +1659,15 @@ const InsuranceScreen = ({nav, goBack, S, setS}) => {
           {/* State selector — reveals when out-of-state selected */}
           {inState === 'no' && (
             <div className="pt-1">
-              <label htmlFor="ins-state" className="block text-[11px] font-semibold text-hz-hint mb-1.5">Which state do you live in?</label>
-              <div className="relative">
-                <select id="ins-state" value={selectedState} onChange={e=>{ setSelectedState(e.target.value); setChoice(''); }}
-                  className="w-full appearance-none bg-hz-bg border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors pr-8">
-                  <option value="">Select your state</option>
-                  {US_STATES.map(st=><option key={st} value={st}>{st}</option>)}
-                </select>
-                <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-hz-hint text-[10px]">▼</div>
-              </div>
+              <CustomSelect
+                id="ins-state"
+                label="Which state do you live in?"
+                value={selectedState}
+                onChange={val => { setSelectedState(val); setChoice(''); }}
+                placeholder="Select your state"
+                options={US_STATES.map(st => ({value: st, label: st}))}
+                className="mb-0"
+              />
             </div>
           )}
         </div>
@@ -4063,10 +4226,11 @@ const App = () => {
       {/* Screen selector (dev helper) */}
       <div className="fixed top-4 right-4 z-50">
         <label htmlFor="screen-jump" className="sr-only">Jump to screen</label>
+        <div className="relative">
         <select id="screen-jump"
           value={screen}
           onChange={e => { navStack.current = []; setScreen(e.target.value); }}
-          className="bg-hz-card border border-[rgba(100,92,220,0.2)] text-hz-text text-[11px] rounded-hz-sm px-2 py-1.5 shadow-sm outline-none focus:border-hz-accent max-w-[190px]"
+          className="appearance-none bg-hz-card border border-[rgba(100,92,220,0.2)] text-hz-text text-[11px] rounded-hz-sm pl-2.5 pr-7 py-1.5 shadow-sm outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 max-w-[190px] cursor-pointer transition-colors hover:border-hz-accent/50 font-medium"
           title="Jump to screen">
           <optgroup label="── Intro">
             <option value="proto-intro">Landing / Intro</option>
@@ -4116,6 +4280,12 @@ const App = () => {
             <option value="account-details">Account details</option>
           </optgroup>
         </select>
+        <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+          <svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M3 5l4 4 4-4" stroke="#645CDC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        </div>
       </div>
 
       {/* Phone frame */}

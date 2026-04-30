@@ -369,6 +369,102 @@ body {
   /* render this element with role="alert" or aria-live="polite" */
 }
 
+/* ── Select / Dropdown ──
+   Custom popover select — replaces native <select> for consistent cross-browser styling.
+   Pattern: .hz-select-wrap > button.hz-select-trigger + ul.hz-select-dropdown > li.hz-select-option
+   ARIA: trigger has role="combobox" aria-haspopup="listbox" aria-expanded aria-controls.
+         list has role="listbox". options have role="option" aria-selected. */
+
+.hz-select-wrap {
+  position: relative;
+  margin-bottom: 1rem;
+}
+.hz-select-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--hz-muted);
+  margin-bottom: 6px;
+}
+.hz-select-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--hz-card);
+  border: 1.5px solid var(--hz-border);
+  border-radius: var(--hz-radius-sm);
+  padding: .75rem 1rem;
+  font-family: var(--hz-font);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--hz-text);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .15s, box-shadow .15s;
+}
+.hz-select-trigger[aria-expanded="true"] {
+  border-color: var(--hz-accent);
+  box-shadow: 0 0 0 3px rgba(100,92,220,.15);
+}
+.hz-select-trigger:hover:not([aria-expanded="true"]) {
+  border-color: rgba(100,92,220,.4);
+}
+.hz-select-trigger:focus-visible {
+  border-color: var(--hz-accent);
+  outline: 3px solid var(--hz-accent);
+  outline-offset: 1px;
+  border-radius: var(--hz-radius-sm);
+}
+.hz-select-trigger-placeholder { color: var(--hz-hint); }
+
+/* Animated chevron */
+.hz-select-chevron {
+  flex-shrink: 0;
+  color: var(--hz-accent);
+  transition: transform .2s ease;
+}
+.hz-select-trigger[aria-expanded="true"] .hz-select-chevron { transform: rotate(180deg); }
+
+/* Dropdown panel */
+.hz-select-dropdown {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--hz-card);
+  border: 1.5px solid rgba(100,92,220,.18);
+  border-radius: var(--hz-radius-sm);
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(45,31,163,.13), 0 2px 8px rgba(45,31,163,.06);
+  list-style: none;
+}
+
+/* Option items */
+.hz-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: .625rem 1rem;
+  font-family: var(--hz-font);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--hz-text);
+  cursor: pointer;
+  transition: background .07s;
+  user-select: none;
+}
+.hz-select-option:hover,
+.hz-select-option.hz-hl { background: var(--hz-bg); }
+.hz-select-option[aria-selected="true"] {
+  background: var(--hz-cloud);
+  color: var(--hz-indigo);
+}
+
 /* ── Bottom action bar (mobile) ── */
 .hz-action-bar {
   position: sticky;
