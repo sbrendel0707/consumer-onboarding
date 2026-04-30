@@ -1997,14 +1997,17 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
   const actionText   = {amber:'text-hz-amber', blue:'text-hz-indigo', danger:'text-hz-danger'};
 
   return (
-    <ScreenWrap portal={true} showAccount={true} onAccountClick={()=>nav('account-details')}>
+    <ScreenWrap portal={true}>
 
-      {/* Greeting — inline, not a second banner */}
+      {/* Greeting — AJ bubble is the account link; no duplicate in header */}
       <div className="px-4 pt-4 pb-2 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-full bg-hz-cloud border border-hz-accent/20 flex items-center justify-center text-[13px] font-bold text-hz-indigo flex-shrink-0">AJ</div>
+        <button onClick={()=>nav('account-details')} aria-label="Go to my account"
+          className="w-9 h-9 rounded-full bg-hz-cloud border border-hz-accent/20 flex items-center justify-center text-[13px] font-bold text-hz-indigo flex-shrink-0 hover:bg-hz-cloud/80 hover:border-hz-accent/40 active:scale-95 transition-all">
+          AJ
+        </button>
         <div>
           <p className="text-[16px] font-bold text-hz-text leading-tight">Hi, Alex 👋</p>
-          <p className="text-[11px] text-hz-hint">Student ID 1234567 · Fall 2025</p>
+          <p className="text-[11px] text-hz-hint">Student ID 1234567</p>
         </div>
       </div>
 
@@ -2022,11 +2025,11 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
             </div>
           ) : (
             <div className="px-4 pt-4 pb-3 space-y-3">
-              {/* Open balance — primary number */}
+              {/* Open balance — number left, label right */}
               <div>
                 <div className="flex items-baseline justify-between">
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-hz-amber">Open balance</span>
                   <span className="text-[24px] font-bold text-hz-text leading-none">{fmt(openBal)}</span>
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-hz-hint">Open balance</span>
                 </div>
                 <p className="text-[11px] text-hz-hint mt-0.5">Hasn't been scheduled or added to a plan yet</p>
               </div>
