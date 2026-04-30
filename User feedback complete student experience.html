@@ -548,7 +548,7 @@ const SecurityQuestionsScreen = ({nav, goBack, S, setS}) => {
       <div className="px-4 pt-4 pb-24 space-y-4">
         <div className="mb-1">
           <p className="text-[18px] font-bold text-hz-text">Security questions</p>
-          <p className="text-[13px] text-hz-muted mt-1">Choose 2 security questions. We'll use these to verify your identity if you ever need to access your account without your university login.</p>
+          <p className="text-[13px] text-hz-muted mt-1">Choose 2 security questions. If you ever call our support team, we'll use these to verify you as a caller.</p>
         </div>
 
         {qs.map((item,i)=>(
@@ -574,25 +574,22 @@ const SecurityQuestionsScreen = ({nav, goBack, S, setS}) => {
               </div>
             </div>
             {item.q && (
-              <div className="relative">
+              <div>
                 <label htmlFor={`q-answer-${i}`} className="text-[12px] font-semibold text-hz-text block mb-1.5">Your answer</label>
-                <input id={`q-answer-${i}`} type={showA[i]?'text':'password'} value={item.a}
+                <input id={`q-answer-${i}`} type="text" value={item.a}
                   onChange={e=>setA(i,e.target.value)}
                   placeholder="Enter your answer"
                   aria-required="true"
-                  className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 pr-16 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
-                <button onClick={()=>toggleShow(i)} aria-label={showA[i]?'Hide answer':'Show answer'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 mt-[11px] text-hz-accent text-[11px] font-semibold hover:opacity-75 transition-opacity">
-                  {showA[i]?'Hide':'Show'}
-                </button>
+                  className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[13px] text-hz-text focus:outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 transition-colors"/>
               </div>
             )}
           </div>
         ))}
 
-        <div className="bg-hz-cloud border border-[rgba(100,92,220,0.15)] rounded-hz-sm px-3 py-2.5 flex gap-2">
-          <span aria-hidden="true" className="text-hz-accent text-sm flex-shrink-0">🔒</span>
-          <p className="text-[11px] text-hz-muted leading-relaxed">Your answers are encrypted and never shared. They're only used to verify your identity.</p>
+        {/* 🔖 Product note */}
+        <div className="bg-hz-amber-bg border border-hz-amber/40 rounded-hz-sm px-3 py-2.5 flex gap-2">
+          <span aria-hidden="true" className="text-hz-amber text-sm flex-shrink-0">📌</span>
+          <p className="text-[11px] text-hz-muted leading-relaxed"><span className="font-semibold text-hz-text">Product note:</span> Check whether security questions can be obtained from the ERP — if so, this step may not be needed.</p>
         </div>
       </div>
 
@@ -719,21 +716,21 @@ const PayerScreen = ({nav, goBack, S, setS}) => {
 
   return (
     <ScreenWrap>
-      <Header title="Who's Paying?" onBack={goBack}/>
       <StepBar current={3}/>
-      <div className="px-5 pb-8">
-        <p className="text-hz-muted text-[13px] mb-6">Let us know how payments will be made so we can set things up correctly.</p>
+      <div className="px-5 pt-5 pb-8">
+        <p className="text-[18px] font-bold text-hz-text mb-2">Who's paying?</p>
+        <p className="text-hz-muted text-[13px] mb-6 leading-relaxed">We want to know who will be logging in to this payment portal to submit payments, so we know what tasks are most relevant to you.</p>
         <RadioCard selected={payer==='self'} onClick={()=>setPayer('self')} aria-label="I will pay myself">
           <p className="text-[14px] font-semibold text-hz-text">I'll pay myself</p>
-          <p className="text-[12px] text-hz-muted mt-0.5">Set up your payment method and plan</p>
+          <p className="text-[12px] text-hz-muted mt-0.5 leading-snug">I will submit payments — whether that's from my bank account, employer reimbursement, or even scholarships that were first paid out to me.</p>
         </RadioCard>
         <RadioCard selected={payer==='other'} onClick={()=>setPayer('other')} aria-label="Someone else is paying">
           <p className="text-[14px] font-semibold text-hz-text">Someone else is paying</p>
-          <p className="text-[12px] text-hz-muted mt-0.5">Invite a parent, guardian, or sponsor</p>
+          <p className="text-[12px] text-hz-muted mt-0.5 leading-snug">Invite someone else — or multiple people — into your payment portal to make payments for you.</p>
         </RadioCard>
         <RadioCard selected={payer==='combo'} onClick={()=>setPayer('combo')} aria-label="We will share the payments">
           <p className="text-[14px] font-semibold text-hz-text">We'll share the payments</p>
-          <p className="text-[12px] text-hz-muted mt-0.5">Invite someone and set up your portion too</p>
+          <p className="text-[12px] text-hz-muted mt-0.5 leading-snug">You'll cover parts of your school costs while someone else pays other parts.</p>
         </RadioCard>
         <Btn onClick={next} disabled={!payer}>Continue</Btn>
       </div>
