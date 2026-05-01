@@ -462,6 +462,106 @@ body {
   margin-bottom: 14px;
 }
 
+/* ── Feature headers ── */
+.feature-group { margin: 44px 0 0; }
+.feature-group-eyebrow {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--hz-hint);
+  margin-bottom: 3px;
+}
+.feature-group-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--hz-text);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--hz-border);
+}
+.feature-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: 34px 0 12px;
+  padding-bottom: 9px;
+  border-bottom: 1.5px solid var(--hz-border);
+}
+.feature-icon { font-size: 17px; flex-shrink: 0; margin-top: 2px; }
+.feature-title { font-size: 14.5px; font-weight: 700; color: var(--hz-text); margin-bottom: 3px; }
+.feature-meta  { font-size: 11px; color: var(--hz-hint); line-height: 1.4; }
+
+/* Scenario applicability chips */
+.scenario-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+.scenario-chip {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+.sc-active  { background: var(--hz-cloud); color: var(--hz-indigo); }
+.sc-all     { background: var(--hz-teal-bg); color: var(--hz-teal); }
+.sc-pending { background: var(--hz-bg); color: var(--hz-hint); border: 1px dashed rgba(100,92,220,.2); }
+.sc-inst    { background: #F0EBF8; color: #6B35A8; }
+
+/* Cross-scenario note — a living callout that grows as more scenarios are added */
+.cross-note {
+  background: var(--hz-teal-bg);
+  border: 1px solid rgba(13,122,85,.2);
+  border-left: 3px solid var(--hz-teal);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--hz-muted);
+  line-height: 1.55;
+  margin: 8px 0 14px;
+}
+.cross-note strong { color: #0D7A55; }
+
+/* QA priority table */
+.qa-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  background: var(--hz-card);
+  border: 1px solid var(--hz-border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.qa-table th {
+  text-align: left;
+  padding: 9px 13px;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--hz-hint);
+  background: var(--hz-bg);
+  border-bottom: 1px solid var(--hz-border);
+}
+.qa-table td {
+  padding: 9px 13px;
+  border-bottom: 1px solid var(--hz-border);
+  color: var(--hz-text);
+  vertical-align: top;
+}
+.qa-table tr:last-child td { border-bottom: none; }
+.qa-table td:first-child { color: var(--hz-accent); font-weight: 700; font-size: 11px; width: 28px; }
+.qa-table td:nth-child(2) { font-weight: 600; }
+.qa-table td code {
+  background: var(--hz-cloud);
+  color: var(--hz-indigo);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10.5px;
+}
+
+/* Nav sub-item indentation */
+.nav-link.nav-sub-item { padding-left: 19px; font-size: 12px; color: var(--hz-hint); }
+.nav-link.nav-sub-item:hover { color: var(--hz-indigo); }
+
 /* ── Coming soon ── */
 .coming-soon {
   background: var(--hz-card);
@@ -591,6 +691,27 @@ body {
         <span class="nav-sub">Coming soon</span>
       </a>
     </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Features · Onboarding</div>
+      <a href="#feat-auth"               class="nav-link nav-sub-item">Authentication</a>
+      <a href="#feat-balance-overview"   class="nav-link nav-sub-item">Balance Overview</a>
+      <a href="#feat-tuition-insurance"  class="nav-link nav-sub-item">Tuition Insurance</a>
+      <a href="#feat-how-to-pay"         class="nav-link nav-sub-item">How to Pay</a>
+      <a href="#feat-authorized-parties" class="nav-link nav-sub-item">Authorized Parties</a>
+      <a href="#feat-communications"     class="nav-link nav-sub-item">Communications</a>
+      <a href="#feat-disclosures"        class="nav-link nav-sub-item">Disclosures</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Features · Home Screen</div>
+      <a href="#feat-account-settings"     class="nav-link nav-sub-item">Account Settings</a>
+      <a href="#feat-todos"                class="nav-link nav-sub-item">To-dos</a>
+      <a href="#feat-recent-activity"      class="nav-link nav-sub-item">Recent Activity</a>
+      <a href="#feat-upcoming"             class="nav-link nav-sub-item">Upcoming Payments</a>
+      <a href="#feat-account-presentment"  class="nav-link nav-sub-item">Account Presentment</a>
+      <a href="#feat-quick-actions"        class="nav-link nav-sub-item">Quick Actions</a>
+    </div>
   </nav>
 
   <!-- Main content -->
@@ -600,7 +721,7 @@ body {
     <header class="doc-header">
       <div class="doc-eyebrow">Nelnet · Horizon</div>
       <h1 class="doc-title">Consumer Onboarding — Product Requirements</h1>
-      <p class="doc-meta">Living document · updated alongside prototype iterations · Last updated April 30, 2026</p>
+      <p class="doc-meta">Living document · updated alongside prototype iterations · Last updated May 1, 2026</p>
       <div class="share-tip">
         🔗 <span>This page can be shared directly. It contains no links to prototype files — recipients will only see requirements.</span>
       </div>
@@ -1228,12 +1349,594 @@ body {
       <div class="coming-soon">Requirements coming soon.</div>
     </section>
 
+
+    <!-- ════════════════════════════════════════
+         FEATURES — ONBOARDING
+    ════════════════════════════════════════ -->
+    <section id="feat-onboarding" class="prd-section">
+      <div class="section-eyebrow">Features</div>
+      <h2 class="section-title">Onboarding Features</h2>
+      <hr class="section-divider"/>
+
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">How to read this section</div>
+        <p>Each feature below represents a discrete step or capability within the onboarding flow. Requirements here are written cross-scenario — they describe behavior across all current and future scenarios. Scenario chips indicate which scenarios each feature currently applies to, and which are pending.</p>
+        <p>When a new scenario is added, return to each relevant feature and update its requirements and scenario chips to reflect any scenario-specific business rules.</p>
+      </div>
+
+      <!-- ── Authentication ── -->
+      <div class="feature-header" id="feat-auth">
+        <div class="feature-icon">🔐</div>
+        <div>
+          <div class="feature-title">Authentication</div>
+          <div class="feature-meta">How consumers enter the Horizon experience</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-pending">S3–S6 · Authorized Parties</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> Authentication method differs by user type. Students always authenticate via institution SSO. Authorized parties authenticate via a Nelnet-issued invite link and create independent credentials — they never use the student's login.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Student authentication is exclusively via institution SAML SSO.</strong> Students access Horizon by clicking a link within their institution's portal. The session is pre-authenticated — no Nelnet username or password is required. Students never create a Horizon-specific login.</p>
+        <p class="req-why"><strong>Why:</strong> Eliminates credential friction and ensures identity is always validated through the institution's existing auth system.</p>
+        <div class="req-tags"><span class="tag tag-erp">ERP: identity + enrollment passed via SSO token</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>The SSO token carries enrollment, identity, and authorization context.</strong> The institution passes student name, email, enrollment status, and account identifiers as part of the SAML assertion. Horizon reads these values directly — students are never asked to re-enter what the school already knows.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span><span class="tag tag-erp">ERP integration</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Authorized party (AP) authentication is separate from the student's credentials.</strong> When a student invites an authorized party, Nelnet sends that person a unique invite link. The AP follows the link to create their own Nelnet account. They never share or reuse the student's login. Their access and permissions are scoped to exactly what the student granted.</p>
+        <div class="req-tags"><span class="tag tag-if">IF: Student has set up APs → AP invite link exists</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Session state persists through onboarding.</strong> If a student begins onboarding but doesn't complete it in one session (e.g., chooses "I'll complete this later" on the authorized parties step), their progress is saved. When they re-enter via SSO, they resume from where they left off — or can choose to start over.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+
+      <!-- ── Balance Overview ── -->
+      <div class="feature-header" id="feat-balance-overview">
+        <div class="feature-icon">💰</div>
+        <div>
+          <div class="feature-title">Balance Overview</div>
+          <div class="feature-meta">How account charges and financial aid are presented</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-pending">S3–S4 · New AP (Payer)</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> Balance is always derived from ERP in real time. No balance is ever hard-coded or estimated by Horizon. Returning students see a comparison of prior-term vs. current-term amounts. APs see only the balance components the student has granted visibility to.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Display a full balance breakdown on entry to the payment decision step.</strong> Show: total charges (tuition + institutional fees), financial aid applied, school enrollment fee (if applicable), and the resulting net balance. Each component must be labeled clearly — no abbreviations the student may not recognize.</p>
+        <div class="req-tags"><span class="tag tag-erp">ERP: charges + financial aid</span><span class="tag tag-inst">Institution: enrollment fee amount</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Distinguish estimated vs. finalized balances.</strong> If the ERP has not yet posted final charges (e.g., registration is still open), the balance is marked "estimated" with a plain-language explanation. Decisions made on an estimated balance (e.g., POT enrollment) are confirmed again once the balance is finalized.</p>
+        <div class="req-tags"><span class="tag tag-erp">ERP: balance finalization flag</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Balance math must always resolve to $0 open balance when fully enrolled in Pay Over Time.</strong> net balance − down payment − on-plan amount = $0. No rounding or UI artifact should show a non-zero open balance when the student has enrolled their entire balance in a plan.</p>
+        <div class="req-tags"><span class="tag tag-req">Required · Bug prevention</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Insurance premium is excluded from the "balance owed" calculation.</strong> When a student accepts tuition insurance, the premium is charged immediately as a separate transaction — it does not add to the open balance that feeds the payment plan or pay-in-full flow.</p>
+        <div class="req-tags"><span class="tag tag-if">IF: GradGuard enabled + student accepted insurance</span></div>
+      </div>
+
+
+      <!-- ── Tuition Insurance ── -->
+      <div class="feature-header" id="feat-tuition-insurance">
+        <div class="feature-icon">🛡️</div>
+        <div>
+          <div class="feature-title">Tuition Insurance</div>
+          <div class="feature-meta">GradGuard integration — opt-in/opt-out decision during onboarding</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-inst">Institution-configured</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> Tuition insurance is an institution-level toggle. When enabled, every new student in onboarding is presented the offer. The offer is not re-surfaced to returning students who already made a decision in a prior term unless the institution resets the offer. APs are never offered tuition insurance — it is a student-only decision.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Insurance step is conditional on institution enabling GradGuard.</strong> If GradGuard is not enabled for the institution, this step is skipped entirely — no placeholder, no mention of it.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution: GradGuard toggle</span><span class="tag tag-if">IF: GradGuard enabled → show insurance step</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Present the insurance offer with the calculated premium for this student's enrollment.</strong> The premium is derived from the student's total charges and the institution's GradGuard plan. Show the annual premium amount, what is covered (medical withdrawal, academic dismissal, etc.), and the GradGuard plan name. Do not require the student to navigate elsewhere to understand what they're buying.</p>
+        <div class="req-tags"><span class="tag tag-erp">ERP: enrollment charges for premium calc</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Student may accept or decline. Both paths must be equally accessible — no dark patterns.</strong> "Accept" and "Decline" must be visually equivalent choices. Do not pre-select "Accept", do not style "Decline" as a secondary/tertiary action.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>If accepted: premium is charged immediately as a separate transaction.</strong> The insurance premium appears in Recent Activity on the home screen — NOT in Upcoming Payments. It is not folded into the POT plan installments. The student's effective balance for payment decisions is the net balance excluding the premium.</p>
+        <div class="req-tags"><span class="tag tag-if">IF: insurance accepted → premium in recent activity, NOT upcoming</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Active insurance is always visible on the home screen with the GradGuard claims number.</strong> Once enrolled, an insurance card appears on the home screen showing the policy status and GradGuard's claims phone number (800-918-2899). This number must be reachable at any time — not buried in settings.</p>
+        <div class="req-tags"><span class="tag tag-if">IF: insurance accepted → home screen insurance card visible</span></div>
+      </div>
+
+
+      <!-- ── How to Pay ── -->
+      <div class="feature-header" id="feat-how-to-pay">
+        <div class="feature-icon">💳</div>
+        <div>
+          <div class="feature-title">How to Pay</div>
+          <div class="feature-meta">Payment path selection, payment plan setup, and method enrollment</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-pending">S3–S4 · New AP (Payer)</span>
+        <span class="scenario-chip sc-inst">Institution-configured</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> Returning students may have a saved payment method and/or a prior POT plan. Their "How to Pay" step is abbreviated — confirm prior method still valid, present new-term plan options. APs can set up their own payment path independently of the student's — each payer has a distinct method on file.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Two primary paths: Pay in Full or Pay Over Time (POT).</strong> The choice is presented clearly at the top of the payment step. The institution configures whether POT is offered, and may offer one or more distinct POT plans. If only one plan exists, the student is not shown a plan picker — they simply confirm the single plan.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution: POT enabled + plan count</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>POT plans require a down payment selection before the schedule is confirmed.</strong> The down payment amount and/or percentage is configurable per plan. The resulting installment schedule (number of payments, amount per installment, payment dates, plan end date) must be displayed in a natural-language summary — not a raw table — before the student commits.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution: down payment rules per plan</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Card service fee (2.75%) must be disclosed before the student selects a payment method.</strong> The fee notice must appear as contextual copy on the payment method selection screen — not in a tooltip, not buried in disclosures. ACH (bank) payments must be clearly identified as having no service fee.</p>
+        <div class="req-tags"><span class="tag tag-req">Required · Regulatory</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Auto-pay enrollment for POT installments requires explicit disclosure.</strong> When the student selects a payment method for a POT plan, a clear notice explains that all future installments will be automatically charged to this method on their scheduled dates. The student must acknowledge this before the plan is confirmed — not buried in small print.</p>
+        <div class="req-tags"><span class="tag tag-req">Required · Regulatory</span><span class="tag tag-if">IF: payment path = POT → auto-pay disclosure required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Supported payment methods: ACH (bank account) and credit/debit card.</strong> Additional methods (Apple Pay, PayPal, etc.) may be added in future iterations per the product vision. Institution may restrict available methods. If a method type is not configured by the institution, it is not shown.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution: allowed payment method types</span></div>
+      </div>
+
+
+      <!-- ── Authorized Parties ── -->
+      <div class="feature-header" id="feat-authorized-parties">
+        <div class="feature-icon">👥</div>
+        <div>
+          <div class="feature-title">Authorized Parties</div>
+          <div class="feature-meta">Student-controlled access management for third-party payers and viewers</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-pending">S3 · New AP — Single Payer</span>
+        <span class="scenario-chip sc-pending">S4 · New AP — Multi Payer</span>
+        <span class="scenario-chip sc-pending">S5 · AP Non-Payer</span>
+        <span class="scenario-chip sc-pending">S6 · Returning AP</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> The student is always the owner of authorized party access. APs cannot modify their own permissions — only the student can. Each AP scenario (S3–S6) will add AP-perspective requirements to this feature. As those scenarios are built, update this section to capture full business logic for each AP type and permission combination.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Students control who has access and at what level.</strong> During onboarding, the student is offered the opportunity to set up authorized parties. They specify: the AP's name and email, a balance visibility cap (percentage of the total balance the AP can see), and whether the AP can make payments. APs are managed within Nelnet's system — not within the institution's ERP.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>This step may be deferred during onboarding.</strong> The student can choose "I'll complete this later" on the AP invite screen. If they have started filling in any AP details, a partial-save modal is presented: they can save their progress and continue to the next step, or start over and skip the step entirely. Saved progress is pre-populated when they return.</p>
+        <div class="req-tags"><span class="tag tag-if">IF: partial data entered → partial-save modal on defer</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Invited APs receive a Nelnet-issued invite link at their email address.</strong> The invite link allows the AP to create independent Nelnet credentials. They do not share the student's login. Their session is scoped to the permissions granted by the student.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Guest payment links are distinct from authorized party access.</strong> A guest payment link allows a one-time payment by a third party with zero ongoing access. The student sets a maximum payment cap (≤ open balance) and an optional note. The recipient cannot log in, cannot see the full account, and cannot make a second payment with the same link. The UI must make this distinction unambiguous — "guest payer" and "authorized party" must never appear interchangeable.</p>
+        <div class="req-tags"><span class="tag tag-req">Required · Critical</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Multiple APs may be added during a single onboarding session.</strong> The student can add more than one authorized party before completing the onboarding flow. Each AP has independently-configured permissions. There is no hard limit specified — institution may configure a maximum if needed.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution: AP count limit (optional)</span></div>
+      </div>
+
+
+      <!-- ── Communications ── -->
+      <div class="feature-header" id="feat-communications">
+        <div class="feature-icon">📬</div>
+        <div>
+          <div class="feature-title">Communications</div>
+          <div class="feature-meta">Contact information and notification preference management</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-pending">S3–S6 · Authorized Parties</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> Each user (student or AP) has independent communication preferences. A student's preferences do not affect their APs, and vice versa. Returning users are taken directly to a confirmation/edit screen — they are not re-prompted to enter information already on file.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Primary email is pre-populated from the SSO token and is required.</strong> The student can update or add additional email addresses. At least one email address must always be on file.</p>
+        <div class="req-tags"><span class="tag tag-erp">ERP / SSO: primary email</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Students may add multiple email addresses and phone numbers.</strong> There is no single-value limit on contact info. Each additional address or number has an "Add another email / Add another phone" affordance. Any entry can be removed except the primary (SSO) email.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Text (SMS) preferences are split into two independent categories: Informational and Marketing.</strong> <em>Informational texts</em> cover account activity — billing updates, payment confirmations, plan change alerts. Default is on. <em>Marketing texts</em> cover promotional content — default is off. These two categories are shown as separate, labeled toggles. Transactional confirmations (receipts, one-time passcodes) are always sent and are not shown as a user toggle.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Phone number is required to enable SMS notifications.</strong> If no phone number is on file, SMS toggles are inactive and labeled "Add a phone number to enable." Once a number is added, the toggles become active.</p>
+        <div class="req-tags"><span class="tag tag-if">IF: no phone → SMS toggles disabled</span></div>
+      </div>
+
+
+      <!-- ── Disclosures ── -->
+      <div class="feature-header" id="feat-disclosures">
+        <div class="feature-icon">📄</div>
+        <div>
+          <div class="feature-title">Disclosures &amp; E-Signature</div>
+          <div class="feature-meta">Sequential acknowledgment of institution and Nelnet disclosures</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-pending">S3–S4 · New AP (Payer)</span>
+        <span class="scenario-chip sc-inst">Institution-configured count</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> Disclosure requirements vary by user type. Students typically have more disclosures than APs. Returning users who have previously signed disclosures may only need to re-sign if terms have changed. As additional scenarios are added, specify which disclosure sets apply to each user type.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Disclosures are presented as a sequential accordion — one section at a time.</strong> The student must open and read each disclosure section before the next one unlocks. They cannot skip ahead. The progress indicator shows how many sections remain. All sections must be acknowledged before the e-signature field activates.</p>
+        <div class="req-tags"><span class="tag tag-req">Required · Regulatory</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Institution configures the number and content of disclosure sections (default: 4).</strong> Disclosure content is pulled from the institution's configured disclosure templates. Nelnet may include a universal disclosure section in addition to institution-specific sections.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution: disclosure count + content</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>E-signature is required after all disclosure sections are acknowledged.</strong> The signature field requires the student to type their full name and check a confirmation checkbox. The typed name must be at least 3 non-whitespace characters. Submission is blocked until all sections are acknowledged, the name is typed, and the checkbox is checked.</p>
+        <div class="req-tags"><span class="tag tag-req">Required · Regulatory</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Each disclosure section must be downloadable as a PDF.</strong> A "Download PDF" link is available within each expanded disclosure section. The PDF is generated from the same disclosure content shown on screen — not a different document.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         FEATURES — HOME SCREEN
+    ════════════════════════════════════════ -->
+    <section id="feat-home" class="prd-section">
+      <div class="section-eyebrow">Features · Home Screen</div>
+      <h2 class="section-title">Home Screen Features</h2>
+      <hr class="section-divider"/>
+
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Context</div>
+        <p>The home screen is the persistent hub a consumer returns to after completing onboarding. It surfaces the most important information and actions for their current account state — adapting in real time as charges post, plans change, payments are made, and authorized parties take action.</p>
+        <p>Requirements below define each home screen module independently. As more scenarios are added (APs, returning students), return here to extend each module's rules for those user types.</p>
+      </div>
+
+
+      <!-- ── Account Settings ── -->
+      <div class="feature-header" id="feat-account-settings">
+        <div class="feature-icon">⚙️</div>
+        <div>
+          <div class="feature-title">Account Settings</div>
+          <div class="feature-meta">Personal info, payment methods, authorized parties, and notification preferences</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-pending">S3–S6 · Authorized Parties</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> Settings belong to the individual user. A student's settings page always shows authorized party management. An AP's settings page never includes AP management (APs cannot invite sub-parties). Returning students see pre-populated values from prior term.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Account Settings is accessible from the home screen at all times — not gated behind completion of any other action.</strong> A persistent settings entry point (gear icon or equivalent) must be available in the home screen header or navigation area.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Settings contains four sub-sections:</strong> (1) Personal contact info — name, email addresses, phone numbers; (2) Payment methods — saved bank accounts and cards, with add/remove; (3) Authorized parties — view current APs, add new, remove, or update permissions; (4) Notification preferences — same informational/marketing SMS split as during onboarding.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Changes made in Settings take effect immediately and do not trigger re-onboarding.</strong> Updating a phone number, adding a payment method, or removing an AP does not restart or re-surface any previously completed onboarding steps.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>An AP can be removed by the student at any time from Settings.</strong> Removing an AP immediately revokes their access — they can no longer log in or view account information. An email notification is sent to the AP at the time of removal.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+
+      <!-- ── To-dos ── -->
+      <div class="feature-header" id="feat-todos">
+        <div class="feature-icon">✅</div>
+        <div>
+          <div class="feature-title">To-dos</div>
+          <div class="feature-meta">Outstanding actions that require the student's attention</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-pending">S3–S6 · Authorized Parties</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> To-do items are scoped to the user's role. A student sees to-dos related to their account decisions and payments. An AP sees to-dos relevant to their specific responsibilities (e.g., a pending payment they were invited to make). To-dos for one user are never shown to another.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>To-dos are action-required items that the user has not yet completed.</strong> Examples: unsigned disclosures, incomplete onboarding (deferred AP setup), payment due within 7 days, payment method expiring, open balance with no payment path set, AP invitation pending acceptance.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Each to-do links directly to the relevant action.</strong> Tapping a to-do item routes the user to the exact screen or step where they can complete the action — not to a generic settings page.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>To-dos are automatically dismissed when the action is completed.</strong> No manual "dismiss" is needed for completed items — they disappear from the list. Time-sensitive items (payment past-due, method expired) remain until resolved even if previously acknowledged.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>When no to-dos exist, the section is either hidden or shows a neutral empty state.</strong> Do not show an empty to-do section with placeholder text that implies the user might be missing something. Empty state copy should be affirmative: e.g., "You're all caught up."</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+
+      <!-- ── Recent Activity ── -->
+      <div class="feature-header" id="feat-recent-activity">
+        <div class="feature-icon">🕐</div>
+        <div>
+          <div class="feature-title">Recent Activity</div>
+          <div class="feature-meta">All account transactions from the last 30 days</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-pending">S3–S4 · New AP (Payer)</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> Returning students' recent activity spans the current and prior term if within 30 days. APs only see activity they themselves initiated, unless the student has granted full account visibility. The 30-day window is the same for all user types.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Recent Activity shows all account transactions posted in the last 30 days.</strong> Transaction types include: payments made (by student or AP), credits applied, financial aid posted, institutional fees charged, tuition insurance premium charged, plan enrollment fees.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span><span class="tag tag-erp">ERP: transaction feed</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Tuition insurance premium appears in Recent Activity — not in Upcoming Payments.</strong> Because the premium is charged at the moment of acceptance (not on a future schedule), it is a completed transaction. Showing it in Upcoming would incorrectly imply it's a future obligation.</p>
+        <div class="req-tags"><span class="tag tag-if">IF: GradGuard enabled + student accepted → premium in recent activity</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Each activity item shows: description, date, amount, and status.</strong> Status values: Posted, Pending, Reversed. Amount is signed: payments are shown as negative (reducing balance), charges are positive.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Items are sorted chronologically, most recent first.</strong> If there are more than a practical display limit (e.g., 5 items), a "View all activity" link reveals the full list or navigates to a dedicated transaction history screen.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+
+      <!-- ── Upcoming Payments ── -->
+      <div class="feature-header" id="feat-upcoming">
+        <div class="feature-icon">📅</div>
+        <div>
+          <div class="feature-title">Upcoming Payments</div>
+          <div class="feature-meta">Scheduled payments due in the next 30 days</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-pending">S3–S4 · New AP (Payer)</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> APs who have their own payment plan see their own upcoming installments — not the student's full schedule (unless explicitly granted). The 30-day window is standard across user types.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Upcoming Payments shows only scheduled installments due within the next 30 days.</strong> This section does not include: one-time payments the user may choose to make, the tuition insurance premium (already charged), or charges not yet due. It reflects auto-pay commitments — scheduled, automatic debits from the payment method on file.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span><span class="tag tag-if">IF: payment path = POT → upcoming installments shown</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Each upcoming item shows: due date, amount, and payment method to be charged.</strong> If the payment method on file has expired or is flagged as invalid, the item is highlighted as requiring attention — and a to-do item is simultaneously generated.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>When no payments are due in the next 30 days, the Upcoming section is hidden.</strong> Do not show an empty state for this section — it should not exist on screen unless there is at least one upcoming item to show.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+
+      <!-- ── Account Presentment ── -->
+      <div class="feature-header" id="feat-account-presentment">
+        <div class="feature-icon">📊</div>
+        <div>
+          <div class="feature-title">Account Presentment</div>
+          <div class="feature-meta">Current balance snapshot, plan status, and enrollment context</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-pending">S3–S4 · New AP (Payer)</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> APs see only the balance amounts the student has granted visibility to — if the student set a 50% cap, the AP sees 50% of the actual balance. Returning students see current-term balance, with prior-term context available on request. Balance is always synced from ERP in real time — never cached or stale.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Account Presentment is the primary balance summary on the home screen.</strong> It shows: total charges for the current term, financial aid applied, net balance, current open balance (amount not covered by a payment plan or prior payments), and amount currently on a payment plan.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span><span class="tag tag-erp">ERP: real-time balance</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Balance components are shown as a clear breakdown — not a single number.</strong> Students should be able to understand at a glance what they owe, what's covered by aid, and what remains to be paid vs. what's already on a plan. A single "Balance: $X,XXX" without context fails this requirement.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>When enrolled in Pay Over Time, show the active plan status inline.</strong> Plan summary: plan name, number of remaining installments, next payment amount and date. The student should not need to navigate elsewhere to know when their next payment is.</p>
+        <div class="req-tags"><span class="tag tag-if">IF: payment path = POT → plan summary visible on home screen</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Open balance is $0 when the student is fully enrolled in a POT plan.</strong> The math must always resolve: net balance − down payment − on-plan amount = $0 open balance. No rounding artifact should produce a non-zero open balance when the student has enrolled their entire net balance in a plan.</p>
+        <div class="req-tags"><span class="tag tag-req">Required · Bug prevention</span></div>
+      </div>
+
+
+      <!-- ── Quick Actions ── -->
+      <div class="feature-header" id="feat-quick-actions">
+        <div class="feature-icon">⚡</div>
+        <div>
+          <div class="feature-title">Quick Actions</div>
+          <div class="feature-meta">Dynamic, prioritized shortcuts surfaced based on account state</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-active">S1 · First Time Student</span>
+        <span class="scenario-chip sc-pending">S2 · Returning Student</span>
+        <span class="scenario-chip sc-pending">S3–S6 · Authorized Parties</span>
+      </div>
+      <div class="cross-note"><strong>Cross-scenario rule:</strong> Quick actions are determined by account state, not user type alone. The same logic engine evaluates conditions for students and APs — but the available action set differs by role. APs never see "Add Authorized Party." Students see "View AP Payment Plan" only when an AP has enrolled in one. As scenarios are added, extend the priority table below to include AP-specific actions and their conditions.</div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Quick actions are dynamic — they appear, change, and disappear based on real-time account state.</strong> The system evaluates conditions on every home screen load and renders only the actions currently relevant to this user. No quick action is ever hard-coded to always display.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Quick actions follow a strict priority order.</strong> When multiple actions are valid simultaneously, they are displayed in the order defined in the priority table below. The highest-priority action is always shown first. Institution configuration may suppress individual actions, but cannot reorder them.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Quick Action Priority Table — Student Scenarios</strong></p>
+        <table class="qa-table" style="margin-top:12px">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Action Label</th>
+              <th>Condition (shows when…)</th>
+              <th>Destination / Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Pay Balance</td>
+              <td>Open balance &gt; $0</td>
+              <td>One-time payment flow</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Set Up Payment Plan</td>
+              <td>No active POT plan AND institution offers POT</td>
+              <td>Payment plan setup flow</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Add Tuition Insurance</td>
+              <td>GradGuard enabled AND student has not yet accepted or declined</td>
+              <td>Insurance offer screen</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Add Authorized Party</td>
+              <td>No authorized parties on file</td>
+              <td>AP invite screen</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Manage Payment Methods</td>
+              <td>No saved payment method on file</td>
+              <td>Payment methods settings</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>View AP Payment Plan</td>
+              <td>At least one AP has an active POT plan</td>
+              <td>Read-only AP POT plan view</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Tuition Insurance</td>
+              <td>Student has accepted insurance (active policy)</td>
+              <td>Insurance details &amp; GradGuard claims (800-918-2899)</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="req-tags"><span class="tag tag-req">Priority order is fixed</span><span class="tag tag-inst">Institution may suppress individual actions</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>The maximum number of quick actions displayed simultaneously is determined by the UI layout — not a business rule cap.</strong> All valid actions from the priority table should be shown. If the layout needs to limit visible items (e.g., for mobile), a "See all" affordance must reveal the remaining actions — they must never be permanently hidden.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>Each quick action has a label, a one-line supporting description, and an icon.</strong> The supporting description provides context so the user understands what tapping the action will do — not just what it is. Example: "Tuition Insurance" alone is less useful than "Tuition Insurance · GradGuard · claims: 800-918-2899".</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-01">
+        <p class="req-text"><strong>When no quick actions are valid, the Quick Actions section is hidden.</strong> This state is rare (fully paid, no pending items, insurance already decided, APs already set up, payment method on file) but must be handled gracefully — never show an empty quick actions section.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+    </section>
+
+
   </main>
 </div><!-- end layout -->
 
 
 <script>
-const DOC_DATE = '2026-04-30';
+const DOC_DATE = '2026-05-01';
 
 function storageKey(name) {
   return 'hz_prd_seen_' + name.toLowerCase().replace(/\s+/g, '_');
