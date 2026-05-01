@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Consumer Home — Horizon Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*:focus-visible {
+  outline: 3px solid #2D1FA3;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+button.bg-hz-indigo:focus-visible,
+button.bg-hz-teal:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+</style>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        'hz-indigo':    '#2D1FA3',
+        'hz-mid':       '#4A4580',
+        'hz-accent':    '#645CDC',
+        'hz-cloud':     '#EEF0FF',
+        'hz-teal':      '#0D7A55',
+        'hz-teal-bg':   '#E1F5EE',
+        'hz-amber':     '#EF9F27',
+        'hz-amber-bg':  '#FAEEDA',
+        'hz-danger':    '#E24B4A',
+        'hz-danger-bg': '#F7C1C1',
+        'hz-bg':        '#F4F5FF',
+        'hz-card':      '#FFFFFF',
+        'hz-text':      '#1A1060',
+        'hz-muted':     '#57548D',
+        'hz-hint':      '#6B6899',
+        'hz-border':    'rgba(100,92,220,0.14)',
+      },
+      fontFamily: {
+        sans: ["'Plus Jakarta Sans'", 'system-ui', 'sans-serif'],
+      },
+      borderRadius: {
+        'hz':     '18px',
+        'hz-sm':  '12px',
+        'hz-pill':'99px',
+      },
+    },
+  },
+}
+</script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-hz-bg">
+<div id="root"></div>
+<script type="text/babel">
+
+// ═══ BEGIN SHARED HOME COMPONENTS — sync to all b-series prototypes when editing ═══
+
+// ─── Financial constants ───────────────────────────────────────────────────
+const TOTAL_CHARGES   = 8500;
+const APPLIED_AID     = 2300;
+const ANTICIPATED_AID = 1000;
+const BALANCE_DUE     = 5200;
+const POT_DOWN        = 520;
+const NELNET_FEE      = 25;
+const POT_DOWN_TOTAL  = 545;
+const POT_BALANCE     = 4680;
+const CARD_FEE_PCT    = 2.75;
+const fmt  = (n) => '$' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtK = (n) => '$' + Number(n).toLocaleString('en-US', {maximumFractionDigits:0});
+
+// ─── Default returning student state ──────────────────────────────────────
+const HOME_DEFAULT_STATE = {
+  payPlan: 'pot',
+  potFreq: 'monthly',
+  potFreqLabel: 'month',
+  potInstall: 517,
+  potCount: 9,
+  potDown: 520,
+  potTotalToday: 545,
+  methodSaved: true,
+  methodType: 'ach',
+  insAccepted: true,
+  insPremium: 162,
+  insState: 'CO',
+  authPayers: [{first:'Janet', last:'Johnson', email:'janet.johnson@email.com', pct:null}],
+  commsEmail: 'alex.johnson@student.claude.edu',
+  commsPhone: '(720) 555-0198',
+  smsMarketing: false,
+  apActive: true,
+  hasPhone: true,
+  secQsDeferred: false,
+  insDeferred: false,
+  payDeferred: false,
+  skippedInvite: false,
+  skippedMethod: false,
+  tfa: 'sms',
+  payer: 'me',
+};
+
+// ─── Shared UI components ─────────────────────────────────────────────────
+const Btn = ({children, onClick, className='', disabled=false, variant='primary', 'aria-label':ariaLabel}) => {
+  const base = 'w-full py-3.5 rounded-hz-pill font-semibold text-[15px] transition-all active:scale-[0.97] ';
+  const v = { primary:'bg-hz-indigo text-white hover:opacity-90', ghost:'bg-hz-cloud text-hz-indigo hover:opacity-90', outline:'border border-[rgba(100,92,220,0.3)] text-hz-indigo hover:bg-hz-cloud', danger:'bg-hz-danger text-white hover:opacity-90', success:'bg-hz-teal text-white hover:opacity-90' };
+  return <button onClick={onClick} disabled={disabled} aria-label={ariaLabel} className={base+(v[variant]||v.primary)+' '+className+(disabled?' opacity-40 cursor-not-allowed':'')}>{children}</button>;
+};
+
+const Input = ({label, id, value, onChange, type='text', placeholder='', error='', hint='', className=''}) => {
+  const inputId = id || (label ? label.toLowerCase().replace(/\s+/g,'-') : undefined);
+  return (
+    <div className={'mb-4 '+className}>
+      {label && <label htmlFor={inputId} className="block text-xs font-semibold text-hz-muted mb-1">{label}</label>}
+      <input id={inputId} type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder}
+        className={'w-full bg-white border rounded-hz-sm px-4 py-3 text-hz-text placeholder-hz-hint text-[15px] outline-none focus:border-hz-accent transition-colors '+(error?'border-hz-danger':'border-[rgba(100,92,220,0.14)]')} />
+      {error && <p className="text-hz-danger text-xs mt-1" role="alert">{error}</p>}
+      {hint && <p className="text-hz-hint text-xs mt-1">{hint}</p>}
+    </div>
+  );
+};
+
+const Card = ({children, className=''}) => <div className={'bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz p-4 '+className}>{children}</div>;
+const Divider = () => <div className="border-t border-[rgba(100,92,220,0.1)] my-3"/>;
+const Row = ({label, value, sub, bold=false}) => (
+  <div className="flex justify-between items-start py-1.5">
+    <span className={'text-[13px] '+(bold?'text-hz-text font-semibold':'text-hz-muted')}>{label}</span>
+    <div className="text-right"><span className={'text-[13px] '+(bold?'text-hz-text font-semibold':'text-hz-text')}>{value}</span>{sub && <p className="text-hz-hint text-[11px]">{sub}</p>}</div>
+  </div>
+);
+const Badge = ({children, color='blue'}) => {
+  const c = { blue:'bg-hz-cloud text-hz-indigo', green:'bg-hz-teal-bg text-hz-teal', amber:'bg-hz-amber-bg text-hz-amber', red:'bg-hz-danger-bg text-hz-danger' };
+  return <span className={'inline-block px-2 py-0.5 rounded-hz-pill text-[11px] font-semibold '+(c[color]||c.blue)}>{children}</span>;
+};
+const Toggle = ({on, onChange, 'aria-label':ariaLabel}) => (
+  <button onClick={()=>onChange(!on)} role="switch" aria-checked={on} aria-label={ariaLabel}
+    className={'relative w-12 h-7 rounded-full transition-colors '+(on?'bg-hz-teal':'bg-[rgba(100,92,220,0.2)]')}>
+    <span aria-hidden="true" className={'absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-all '+(on?'left-6':'left-1')}/>
+  </button>
+);
+const RadioCard = ({selected, onClick, children, className='', 'aria-label':ariaLabel}) => (
+  <button onClick={onClick} aria-pressed={selected} aria-label={ariaLabel}
+    className={'w-full text-left p-4 rounded-hz border transition-all mb-3 '+(selected?'border-hz-accent bg-hz-cloud':'border-[rgba(100,92,220,0.14)] bg-hz-card hover:border-hz-accent/40')+' '+className}>
+    <div className="flex items-start gap-3">
+      <div aria-hidden="true" className={'mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 '+(selected?'border-hz-indigo':'border-hz-hint')}>
+        {selected && <div className="w-2.5 h-2.5 rounded-full bg-hz-indigo"/>}
+      </div>
+      <div className="flex-1">{children}</div>
+    </div>
+  </button>
+);
+const ChevronLeft = () => <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+const BrowserBar = () => (
+  <div className="bg-[#F1F3F4] border-b border-gray-200 px-3 py-1.5 flex items-center gap-1.5 flex-shrink-0">
+    <svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#34A853" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span className="text-[10px] text-gray-500 flex-1 text-center font-medium">pay.claude.edu</span>
+  </div>
+);
+const PortalHeader = ({onAccountClick, showAccount=false}) => (
+  <div className="bg-hz-indigo px-4 py-2 flex items-center justify-between flex-shrink-0">
+    <div className="flex items-center gap-2">
+      <div className="w-6 h-6 rounded-md bg-white/25 flex items-center justify-center"><span className="text-white font-black text-[11px]">CU</span></div>
+      <span className="text-[13px] font-semibold text-white">Claude University</span>
+    </div>
+    {showAccount && <button onClick={onAccountClick} aria-label="Go to account settings" className="flex flex-col items-center gap-0.5 group"><div className="w-7 h-7 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-[11px] font-bold text-white group-hover:bg-white/30 transition-colors">AJ</div><span className="text-[8px] text-white/60 font-medium uppercase tracking-wide">Account</span></button>}
+  </div>
+);
+const ScreenWrap = ({children, portal=true}) => (
+  <div className="flex flex-col h-full overflow-hidden bg-hz-bg">
+    {portal && <BrowserBar/>}
+    {portal && <PortalHeader/>}
+    <div className="flex-1 overflow-y-auto">{children}</div>
+  </div>
+);
+const Header = ({title, onBack, right}) => (
+  <div className="sticky top-0 bg-hz-card border-b border-[rgba(100,92,220,0.1)] px-2 py-2.5 flex items-center gap-1 z-10">
+    {onBack && <button onClick={onBack} aria-label="Go back" className="flex items-center gap-0.5 text-hz-muted text-[12px] font-medium px-2 py-1.5 rounded-hz-sm hover:text-hz-indigo hover:bg-hz-cloud transition-colors flex-shrink-0"><ChevronLeft/><span className="sr-only">Back</span></button>}
+    <p className="text-[15px] font-semibold text-hz-text flex-1 px-1">{title}</p>
+    {right}
+  </div>
+);
+
+// ─── HomeScreen ───────────────────────────────────────────────────────────
+const HomeScreen = ({nav, goBack, S, setS}) => {
+  const netBalance  = BALANCE_DUE;
+  const paidFull    = S.payPlan === 'full';
+  const potPaidDown = S.payPlan === 'pot' ? (S.potDown || POT_DOWN) : 0;
+  const onPlan      = S.payPlan === 'pot' ? Math.max(0, netBalance - potPaidDown) : 0;
+  const openBal     = paidFull ? 0 : Math.max(0, netBalance - potPaidDown - onPlan);
+
+  const planPct = netBalance > 0 ? Math.round(onPlan / netBalance * 100) : 0;
+  const openPct = netBalance > 0 ? Math.max(0, 100 - planPct) : 0;
+
+  const actions = [];
+  if (openBal > 0 && !paidFull && S.payPlan !== 'later')
+    actions.push({id:'open-bal', icon:'⚡', color:'blue', title:'Open balance needs attention', sub:`${fmt(openBal)} hasn't been paid or scheduled to be paid yet`, screen:'howpay', cta:'Address now'});
+  if (S.payPlan === 'later')
+    actions.push({id:'scheduled', icon:'📅', color:'blue', title:'Payment scheduled', sub:`${fmt(BALANCE_DUE)} scheduled before May 1`, screen:'pay-now', cta:'View details'});
+  if (S.secQsDeferred)
+    actions.push({id:'sec-q', icon:'🔒', color:'blue', title:'Set up security questions', sub:'Required if you ever need to verify yourself by phone with support', screen:'security-questions', cta:'Complete now'});
+  if (S.insDeferred)
+    actions.push({id:'ins', icon:'🛡️', color:'blue', title:'Review tuition protection', sub:'You deferred your insurance decision — a deadline may apply', screen:'insurance', cta:'Review now'});
+  if (S.payDeferred)
+    actions.push({id:'pay', icon:'💳', color:'blue', title:'Complete payment setup', sub:"You haven't decided how you'll pay your balance yet", screen:'howpay', cta:'Set up now'});
+
+  const upcoming = [];
+  if (S.payPlan === 'pot' && S.potInstall)
+    upcoming.push({date:'May 10, 2026', amount:S.potInstall, label:'Payment plan installment', note:'Auto-pay'});
+  if (S.payPlan === 'later')
+    upcoming.push({date:'Apr 30, 2026', amount:BALANCE_DUE, label:'Scheduled payment'});
+
+  const infoBalance = [];
+  const infoAccount = [];
+  const infoPayers  = [];
+  infoBalance.push({date:'Apr 15', text:'Pell Grant ($1,100) applied to your account'});
+  infoBalance.push({date:'Apr 15', text:'Anticipated federal loan ($1,000) reflected in balance'});
+  if (S.insAccepted && S.insPremium) infoBalance.push({date:'Today', text:`GradGuard tuition insurance premium ${fmt(S.insPremium)} paid — coverage active`});
+  infoAccount.push({date:'Today', text:'Account setup complete — all steps finished'});
+  if (S.authPayers?.length > 0)
+    S.authPayers.forEach(p=>infoPayers.push({date:'Today', text:`Invite sent to ${p.first} ${p.last} (${p.email})`}));
+  const showInfoHub = infoBalance.length || infoAccount.length || infoPayers.length;
+
+  return (
+    <ScreenWrap portal={true}>
+      <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+        <p className="text-[24px] font-bold text-hz-text leading-none">Hi, Alex 👋</p>
+        <button onClick={()=>nav('account-details')} aria-label="Go to my account" className="flex flex-col items-center gap-0.5 group active:scale-95 transition-transform">
+          <div className="w-10 h-10 rounded-full bg-hz-cloud border border-hz-accent/20 flex items-center justify-center text-[13px] font-bold text-hz-indigo group-hover:bg-hz-cloud/80 group-hover:border-hz-accent/40 transition-colors">AJ</div>
+          <span className="text-[9px] font-semibold text-hz-hint uppercase tracking-wide">Account</span>
+        </button>
+      </div>
+      <div className="px-4 pb-8 space-y-5 pt-2">
+        {actions.length > 0 && (
+          <div>
+            <p className="text-[11px] font-semibold text-hz-hint mb-2.5">To dos</p>
+            <div className="space-y-2">
+              {actions.map(a=>(
+                <div key={a.id} className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz overflow-hidden flex" role="alert">
+                  <div className="w-1 flex-shrink-0 bg-hz-accent"/>
+                  <div className="flex-1 px-4 py-3 flex items-center justify-between gap-3 min-w-0">
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-hz-text leading-tight">{a.title}</p>
+                      <p className="text-[11px] text-hz-muted mt-0.5 leading-snug">{a.sub}</p>
+                    </div>
+                    <button onClick={()=>nav(a.screen)} className="flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-hz-indigo text-white hover:opacity-85 transition-opacity">{a.cta}</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        <p className="text-[11px] font-semibold text-hz-hint mb-2.5">Account summary</p>
+        <Card className="p-0 overflow-hidden">
+          {paidFull ? (
+            <div className="px-5 py-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-hz-teal-bg flex items-center justify-center text-xl flex-shrink-0" aria-hidden="true">✅</div>
+              <div><p className="text-[16px] font-bold text-hz-teal">Paid in full</p><p className="text-[12px] text-hz-muted mt-0.5">No outstanding balance. Nice work!</p></div>
+            </div>
+          ) : (
+            <div className="px-5 pt-5 pb-4 space-y-4">
+              <div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[28px] font-bold text-hz-text leading-none tracking-tight">{fmt(openBal)}</span>
+                  <span className="text-[11px] font-semibold uppercase tracking-widest text-hz-hint">Open balance</span>
+                </div>
+                <p className="text-[12px] text-hz-hint mt-1">Hasn't been paid or scheduled to be paid yet</p>
+              </div>
+              {S.payPlan === 'pot' && (
+                <div className="flex items-center justify-between bg-hz-teal-bg/60 rounded-hz-sm px-3 py-2.5">
+                  <div><p className="text-[12px] font-medium text-hz-teal">On payment plan</p><p className="text-[11px] text-hz-hint mt-0.5">Next {fmt(S.potInstall)} · autopay</p></div>
+                  <p className="text-[15px] font-bold text-hz-teal">{fmt(onPlan)}</p>
+                </div>
+              )}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-hz-hint">Total balance</span>
+                  <span className="text-[12px] font-semibold text-hz-text">{fmt(netBalance)}</span>
+                </div>
+                <div className="w-full h-1.5 rounded-full overflow-hidden flex bg-[rgba(100,92,220,0.08)]">
+                  {planPct > 0 && <div style={{width:planPct+'%'}} className="bg-hz-teal h-full rounded-l-full"/>}
+                  {openPct > 0 && <div style={{width:openPct+'%'}} className={`bg-hz-accent/50 h-full ${planPct===0?'rounded-full':'rounded-r-full'}`}/>}
+                </div>
+                <div className="flex gap-3">
+                  {planPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-full bg-hz-teal inline-block"/>On plan</span>}
+                  {openPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-full bg-hz-accent/50 inline-block"/>Open</span>}
+                </div>
+              </div>
+            </div>
+          )}
+          <div className="px-5 pb-4">
+            <button onClick={()=>nav('costs')} className="w-full flex items-center justify-center py-2 rounded-full border border-[rgba(100,92,220,0.2)] text-[12px] font-semibold text-hz-indigo hover:bg-hz-cloud transition-colors">View full statement</button>
+          </div>
+        </Card>
+        {S.insAccepted && S.insPremium > 0 && (
+          <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-hz-teal-bg flex items-center justify-center text-xl flex-shrink-0" aria-hidden="true">🛡️</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[14px] font-bold text-hz-text">Tuition Insurance Active</p>
+                <p className="text-[12px] text-hz-muted mt-0.5 leading-snug">GradGuard protection covers your enrollment investment if you withdraw for a covered reason.</p>
+                <div className="mt-2 space-y-1">
+                  <div className="flex justify-between text-[11px]"><span className="text-hz-hint">Annual premium</span><span className="font-semibold text-hz-text">{fmt(S.insPremium)}</span></div>
+                  <div className="flex justify-between text-[11px]"><span className="text-hz-hint">Policy status</span><span className="font-semibold text-hz-teal">Active</span></div>
+                  <div className="flex justify-between text-[11px]"><span className="text-hz-hint">Need to file a claim?</span><a href="tel:+18009182899" className="font-semibold text-hz-accent hover:underline">800-918-2899</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        <div>
+          <p className="text-[11px] font-semibold text-hz-hint mb-2.5">Upcoming · next 30 days</p>
+          {upcoming.length === 0 ? <p className="text-[12px] text-hz-hint px-1">Nothing scheduled in the next 30 days.</p> : (
+            <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz divide-y divide-[rgba(100,92,220,0.07)] overflow-hidden">
+              {upcoming.map((p,i)=>(
+                <div key={i} className="px-4 py-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0"><p className="text-[13px] font-medium text-hz-text truncate">{p.label}</p><p className="text-[11px] text-hz-hint mt-0.5">{p.date}{p.note && <span className="text-hz-teal"> · {p.note}</span>}</p></div>
+                  <span className="text-[14px] font-bold text-hz-indigo flex-shrink-0">{fmt(p.amount)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        {showInfoHub && (
+          <div>
+            <p className="text-[11px] font-semibold text-hz-hint mb-2.5">Recent activity · last 30 days</p>
+            <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz overflow-hidden">
+              {[...infoBalance, ...infoAccount, ...infoPayers].map((item,i,arr)=>(
+                <div key={i} className={`px-4 py-3 flex items-start gap-3 ${i < arr.length-1 ? 'border-b border-[rgba(100,92,220,0.06)]' : ''}`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-hz-accent/40 flex-shrink-0 mt-1.5"/>
+                  <div className="min-w-0"><p className="text-[12px] text-hz-muted leading-snug">{item.text}</p><p className="text-[10px] text-hz-hint mt-0.5">{item.date}</p></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {(() => {
+          const hasAPs = (S.authPayers?.length ?? 0) > 0;
+          const hasPot = S.payPlan === 'pot';
+          const hasIns = S.insAccepted && S.insPremium > 0;
+          const qaItems = [
+            ...(hasPot ? [{label:'My Pay Over Time Plan', sub:`${fmt(S.potInstall || 517)}/installment · autopay on`, icon:'📆', screen:'manage-pot'}] : []),
+            ...(hasIns ? [{label:'Tuition Insurance', sub:'GradGuard · claims: 800-918-2899', icon:'🛡️', screen:'home'}] : []),
+            {label:'Authorized Parties', sub:'Manage people who have access to your account to pay on your behalf', icon:'👥', screen:'manage-ap', badge: hasAPs ? String(S.authPayers.length) : null},
+            {label:'Guest Payment Link', sub:'Send a one-time payment link, no account needed', icon:'🔗', screen:'guest'},
+            {label:'Make a Payment', sub: hasPot ? 'Pay an installment or make an extra payment' : 'Pay your balance now', icon:'💳', screen:'pay-now'},
+            {label:'Account History', sub:'Payments, balance changes & activity', icon:'📋', screen:'history'},
+            ...(hasAPs ? [{label:'AP Pay Over Time Plans', sub:'View plans your authorized parties set up', icon:'📊', screen:'ap-pot'}] : []),
+          ];
+          return (
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint mb-2">Quick actions</p>
+              <div className="grid grid-cols-2 gap-2">
+                {qaItems.map(a=>(
+                  <button key={a.screen} onClick={()=>nav(a.screen)} aria-label={a.label}
+                    className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz p-3 flex flex-col items-start gap-1 hover:bg-hz-cloud/40 active:scale-[0.98] transition-all text-left relative">
+                    <div className="flex items-center gap-1.5 w-full">
+                      <span aria-hidden="true" className="text-xl leading-none flex-shrink-0">{a.icon}</span>
+                      {a.badge && <span className="ml-auto bg-hz-indigo text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center flex-shrink-0">{a.badge}</span>}
+                    </div>
+                    <p className="text-[12px] font-semibold text-hz-text leading-tight">{a.label}</p>
+                    <p className="text-[10px] text-hz-hint leading-snug">{a.sub}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── CostsScreen ─────────────────────────────────────────────────────────
+const CostsScreen = ({nav, goBack, S, setS}) => (
+  <ScreenWrap>
+    <Header title="Your Bill" onBack={goBack} right={
+      <button onClick={()=>nav('print')} aria-label="Print statement" className="text-hz-indigo text-[13px] font-medium">Print</button>
+    }/>
+    <div className="px-5 pb-8">
+      <Card className="mb-4">
+        <p className="text-[13px] font-semibold text-hz-muted mb-3">Charges — Fall 2025</p>
+        <Row label="Tuition (12 credit hours)" value="$6,000"/>
+        <Row label="Student Services Fee" value="$450"/>
+        <Row label="Technology Fee" value="$200"/>
+        <Row label="Health & Recreation Fee" value="$350"/>
+        <Row label="Parking Permit" value="$150"/>
+        <Row label="Lab / Course Fees" value="$350" sub="varies by course"/>
+        <Row label="Orientation Fee" value="$200"/>
+        <Row label="Misc. Fees" value="$600"/>
+        <Divider/>
+        <Row label="Total Charges" value={fmt(TOTAL_CHARGES)} bold/>
+      </Card>
+      <Card>
+        <p className="text-[13px] font-semibold text-hz-muted mb-3">Financial Aid Applied</p>
+        <Row label="Merit Scholarship" value="−$1,200"/>
+        <Row label="Pell Grant" value="−$1,100"/>
+        <Divider/>
+        <Row label="Applied Aid" value={'−'+fmt(APPLIED_AID)}/>
+        <div className="mt-3 bg-hz-amber-bg border border-hz-amber/30 rounded-hz-sm p-3">
+          <p className="text-[12px] font-semibold text-hz-text mb-1">Anticipated Aid</p>
+          <Row label="Fed. Subsidized Loan" value="−$1,000"/>
+          <p className="text-[10px] text-hz-hint mt-1">Pending disbursement — included in balance calculation</p>
+        </div>
+        <Divider/>
+        <Row label="Balance Due" value={fmt(BALANCE_DUE)} bold/>
+      </Card>
+    </div>
+  </ScreenWrap>
+);
+
+// ─── PrintScreen ─────────────────────────────────────────────────────────
+const PrintScreen = ({nav, goBack, S, setS}) => (
+  <ScreenWrap>
+    <Header title="Statement" onBack={goBack} right={
+      <button onClick={()=>window.print()} aria-label="Print this statement" className="text-hz-indigo text-[13px] font-medium"><span aria-hidden="true">🖨</span> Print</button>
+    }/>
+    <div className="px-4 pb-8">
+      <div className="bg-white rounded-hz p-5 text-gray-900 border border-[rgba(100,92,220,0.14)]">
+        <div className="border-b border-gray-200 pb-4 mb-4">
+          <p className="text-lg font-bold text-gray-900">Claude University</p>
+          <p className="text-sm text-gray-500">Student Account Statement</p>
+          <p className="text-sm text-gray-500 mt-1">Fall 2025 · Alex Johnson · ID: 1234567</p>
+        </div>
+        <div className="mb-4">
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Charges</p>
+          {[['Tuition (12 credit hours)','$6,000'],['Student Services Fee','$450'],['Technology Fee','$200'],
+            ['Health & Recreation Fee','$350'],['Parking Permit','$150'],['Lab / Course Fees','$350'],
+            ['Orientation Fee','$200'],['Misc. Fees','$600']].map(([l,v])=>(
+            <div key={l} className="flex justify-between py-1 text-sm border-b border-gray-100">
+              <span className="text-gray-700">{l}</span><span className="text-gray-900 font-medium">{v}</span>
+            </div>
+          ))}
+          <div className="flex justify-between py-1.5 text-sm font-bold mt-1">
+            <span>Total Charges</span><span>{fmt(TOTAL_CHARGES)}</span>
+          </div>
+        </div>
+        <div className="mb-4">
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Financial Aid</p>
+          {[['Merit Scholarship','−$1,200'],['Pell Grant','−$1,100'],['Fed. Subsidized Loan (anticipated)','−$1,000']].map(([l,v])=>(
+            <div key={l} className="flex justify-between py-1 text-sm border-b border-gray-100">
+              <span className="text-gray-700">{l}</span><span className="text-green-700 font-medium">{v}</span>
+            </div>
+          ))}
+          <div className="flex justify-between py-1.5 text-sm font-bold mt-1">
+            <span>Total Aid</span><span className="text-green-700">−{fmt(TOTAL_CHARGES-BALANCE_DUE)}</span>
+          </div>
+        </div>
+        <div className="bg-gray-50 rounded-xl p-3">
+          <div className="flex justify-between text-base font-bold">
+            <span>Balance Due</span><span>{fmt(BALANCE_DUE)}</span>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">Due: May 1, 2026</p>
+        </div>
+      </div>
+    </div>
+  </ScreenWrap>
+);
+
+// ─── PayNowScreen ─────────────────────────────────────────────────────────
+const PayNowScreen = ({nav, goBack, S, setS}) => {
+  const [step, setStep] = React.useState(1);
+  const [amtChoice, setAmtChoice] = React.useState('');
+  const [customAmt, setCustomAmt] = React.useState('');
+
+  const amount = amtChoice==='full' ? (S.payPlan==='pot'?POT_BALANCE:BALANCE_DUE)
+    : amtChoice==='next' ? S.potInstall
+    : parseFloat(customAmt) || 0;
+
+  const canStep1 = amtChoice && (amtChoice !== 'custom' || amount > 0);
+
+  const handleDone = () => { nav('home'); };
+
+  return (
+    <ScreenWrap>
+      <Header title="Make a Payment" onBack={step===1?goBack:()=>setStep(p=>p-1)}/>
+      <div className="px-5 pb-8">
+        {step === 1 && (
+          <>
+            <p className="text-hz-muted text-[13px] mb-5">How much would you like to pay?</p>
+            {S.payPlan==='pot' && (
+              <RadioCard selected={amtChoice==='next'} onClick={()=>setAmtChoice('next')} aria-label={`Next installment — ${fmt(S.potInstall)}`}>
+                <p className="text-[14px] font-semibold text-hz-text">Next installment</p>
+                <p className="text-[12px] text-hz-muted mt-0.5">{fmt(S.potInstall)}</p>
+              </RadioCard>
+            )}
+            <RadioCard selected={amtChoice==='full'} onClick={()=>setAmtChoice('full')} aria-label={`Pay remaining balance — ${fmt(S.payPlan==='pot'?POT_BALANCE:BALANCE_DUE)}`}>
+              <p className="text-[14px] font-semibold text-hz-text">Pay remaining balance</p>
+              <p className="text-[12px] text-hz-muted mt-0.5">{fmt(S.payPlan==='pot'?POT_BALANCE:BALANCE_DUE)}</p>
+            </RadioCard>
+            <RadioCard selected={amtChoice==='custom'} onClick={()=>setAmtChoice('custom')} aria-label="Custom amount — enter any amount">
+              <p className="text-[14px] font-semibold text-hz-text">Custom amount</p>
+              <p className="text-[12px] text-hz-muted mt-0.5">Enter any amount</p>
+            </RadioCard>
+            {amtChoice==='custom' && (
+              <Input label="Amount" id="custom-amount" value={customAmt} onChange={setCustomAmt} placeholder="$0.00" type="number"/>
+            )}
+            <Btn onClick={()=>setStep(2)} disabled={!canStep1}>Continue</Btn>
+          </>
+        )}
+        {step === 2 && (
+          <>
+            <Card className="mb-5">
+              <Row label="Payment amount" value={fmt(amount)} bold/>
+              <Divider/>
+              {S.methodSaved ? (
+                <div className="flex items-center gap-3 mt-2">
+                  <span aria-hidden="true" className="text-xl">🏦</span>
+                  <div>
+                    <p className="text-[13px] font-semibold text-hz-text">Checking ••••4521</p>
+                    <p className="text-[11px] text-hz-muted">Chase Bank · ACH</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-[12px] text-hz-muted mt-2">No saved method · will use entered details</p>
+              )}
+            </Card>
+            <Btn onClick={()=>setStep(3)} aria-label={`Submit payment of ${fmt(amount)}`}>Submit Payment</Btn>
+          </>
+        )}
+        {step === 3 && (
+          <div className="flex flex-col items-center text-center pt-8">
+            <div aria-hidden="true" className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center text-3xl mb-4">✅</div>
+            <h2 className="text-xl font-bold text-hz-text mb-2">Payment Submitted!</h2>
+            <p className="text-hz-muted text-[13px] mb-6">{fmt(amount)} has been submitted. Processing within 1–3 business days.</p>
+            <Btn onClick={handleDone}>Return to Home</Btn>
+          </div>
+        )}
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── ManageAPScreen ───────────────────────────────────────────────────────
+const ManageAPScreen = ({nav, goBack, S, setS}) => {
+  const [apActive, setApActive] = React.useState(
+    () => Object.fromEntries((S.authPayers || []).map((_,i) => [i, true]))
+  );
+  const [showConfirm, setShowConfirm] = React.useState(null);
+  const [saved, setSaved] = React.useState(false);
+
+  const toggleAP = (i) => {
+    if (apActive[i]) { setShowConfirm(i); } else { setApActive(p => ({...p, [i]: true})); }
+  };
+  const confirmDeactivate = () => {
+    setApActive(p => ({...p, [showConfirm]: false}));
+    setShowConfirm(null);
+  };
+
+  const activeCount = Object.values(apActive).filter(Boolean).length;
+
+  return (
+    <ScreenWrap>
+      <Header title="Authorized Parties" onBack={goBack}/>
+      <div className="px-5 pb-10 space-y-4 pt-2">
+        <div className="bg-hz-cloud border border-hz-accent/20 rounded-hz px-4 py-3">
+          <p className="text-[12px] text-hz-muted leading-relaxed">
+            Authorized parties have <strong className="text-hz-text">full payment access</strong> to your account —
+            they can view your balance, set up payment plans, and make payments. You control who has access.
+          </p>
+        </div>
+        {(!S.authPayers || S.authPayers.length === 0) ? (
+          <Card>
+            <div className="py-4 text-center">
+              <p className="text-[14px] font-semibold text-hz-text mb-1">No authorized parties yet</p>
+              <p className="text-[12px] text-hz-muted">Invite someone to help pay your balance.</p>
+            </div>
+          </Card>
+        ) : (
+          <Card className="p-0 divide-y divide-[rgba(100,92,220,0.07)] overflow-hidden">
+            {S.authPayers.map((ap, i) => {
+              const isActive = apActive[i] ?? true;
+              return (
+                <div key={i} className="px-4 py-3.5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-bold flex-shrink-0 ${isActive ? 'bg-hz-cloud text-hz-indigo' : 'bg-[rgba(100,92,220,0.06)] text-hz-hint'}`}>
+                        {(ap.first?.[0]||'?').toUpperCase()}{(ap.last?.[0]||'').toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className={`text-[13px] font-semibold leading-tight ${isActive ? 'text-hz-text' : 'text-hz-hint line-through'}`}>{ap.first} {ap.last}</p>
+                        <p className="text-[11px] text-hz-hint truncate">{ap.email}</p>
+                        {ap.pct != null ? <span className="text-[10px] text-hz-muted">{ap.pct}% of your balance</span> : <span className="text-[10px] text-hz-muted">Full balance access</span>}
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                      <button role="switch" aria-checked={isActive} onClick={()=>toggleAP(i)} aria-label={`${isActive?'Deactivate':'Reactivate'} ${ap.first} ${ap.last}`}
+                        className={`relative w-11 h-6 rounded-full transition-colors ${isActive?'bg-hz-teal':'bg-hz-cloud'}`}>
+                        <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${isActive?'left-[22px]':'left-0.5'}`}/>
+                      </button>
+                      <span className={`text-[10px] font-bold uppercase tracking-wide ${isActive?'text-hz-teal':'text-hz-hint'}`}>{isActive ? 'Active' : 'Inactive'}</span>
+                    </div>
+                  </div>
+                  {isActive && (
+                    <div className="mt-2 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-hz-amber flex-shrink-0"/>
+                      <p className="text-[10px] text-hz-hint">Invite sent · awaiting account setup</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </Card>
+        )}
+        {S.authPayers?.length > 0 && (
+          <p className="text-[11px] text-hz-hint text-center">{activeCount} of {S.authPayers.length} authorized {S.authPayers.length===1?'party':'parties'} active</p>
+        )}
+        <Btn onClick={()=>nav('home')} variant="ghost" aria-label="Invite another authorized party">+ Invite another authorized party</Btn>
+        {showConfirm !== null && (
+          <div className="absolute inset-0 bg-black/50 z-50 flex items-end" role="dialog" aria-modal="true" aria-labelledby="ap-deact-title">
+            <div className="bg-hz-card w-full rounded-t-[20px] px-5 pt-5 pb-8 space-y-4">
+              <div className="w-10 h-1 bg-[rgba(100,92,220,0.2)] rounded-full mx-auto"/>
+              <p id="ap-deact-title" className="text-[17px] font-bold text-hz-text">Remove access?</p>
+              <p className="text-[13px] text-hz-muted leading-relaxed">
+                <strong className="text-hz-text">{S.authPayers[showConfirm]?.first} {S.authPayers[showConfirm]?.last}</strong> will lose access to your account immediately. Any active payment plans they've set up will not be cancelled.
+              </p>
+              <div className="bg-hz-amber-bg border border-hz-amber/40 rounded-hz-sm px-3 py-2.5 flex gap-2 items-start">
+                <span aria-hidden="true" className="flex-shrink-0 text-hz-amber">⚠️</span>
+                <p className="text-[11px] text-hz-muted leading-relaxed">You can re-activate them at any time from this screen.</p>
+              </div>
+              <Btn onClick={confirmDeactivate}>Yes, remove access</Btn>
+              <button onClick={()=>setShowConfirm(null)} className="w-full text-center text-hz-muted text-[13px] py-1 hover:text-hz-text transition-colors">Cancel</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── APPotScreen ──────────────────────────────────────────────────────────
+const APPotScreen = ({nav, goBack, S, setS}) => {
+  const apPlans = (S.authPayers || []).map((ap, i) => {
+    if (i === 0) return { ap, hasplan: true, remaining: 2400, installAmt: 267, freq: 'Monthly', nextDate: 'May 10, 2026', totalInstalls: 9, paidInstalls: 0 };
+    return { ap, hasplan: false };
+  });
+  const demoPlans = apPlans.length === 0 ? [{
+    ap: { first:'Janet', last:'Johnson', email:'janet.johnson@email.com', pct:null },
+    hasplan: true, remaining: 2400, installAmt: 267, freq: 'Monthly', nextDate: 'May 10, 2026', totalInstalls: 9, paidInstalls: 0,
+  }] : apPlans;
+
+  return (
+    <ScreenWrap>
+      <Header title="AP Pay Over Time Plans" onBack={goBack}/>
+      <div className="px-5 pb-10 space-y-4 pt-2">
+        <p className="text-[13px] text-hz-muted leading-relaxed">Payment plans your authorized parties have set up for your account. Payments go directly toward your balance.</p>
+        {demoPlans.map((item, i) => (
+          <Card key={i} className="p-0 overflow-hidden">
+            <div className="px-4 pt-4 pb-3 flex items-center gap-3 border-b border-[rgba(100,92,220,0.07)]">
+              <div className="w-9 h-9 rounded-full bg-hz-cloud flex items-center justify-center text-[12px] font-bold text-hz-indigo flex-shrink-0">
+                {(item.ap.first?.[0]||'?').toUpperCase()}{(item.ap.last?.[0]||'').toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="text-[13px] font-semibold text-hz-text">{item.ap.first} {item.ap.last}</p>
+                <p className="text-[11px] text-hz-hint truncate">{item.ap.email}</p>
+              </div>
+              {item.hasplan && <span className="ml-auto text-[10px] font-bold text-hz-teal bg-hz-teal-bg px-2 py-0.5 rounded-full flex-shrink-0">Active</span>}
+            </div>
+            {item.hasplan ? (
+              <div className="px-4 py-3 space-y-0 divide-y divide-[rgba(100,92,220,0.06)]">
+                <div className="flex items-center justify-between py-2"><p className="text-[12px] text-hz-muted">Remaining balance</p><p className="text-[13px] font-bold text-hz-text">{fmt(item.remaining)}</p></div>
+                <div className="flex items-center justify-between py-2"><p className="text-[12px] text-hz-muted">Per installment</p><p className="text-[13px] font-semibold text-hz-text">{fmt(item.installAmt)}</p></div>
+                <div className="flex items-center justify-between py-2"><p className="text-[12px] text-hz-muted">Frequency</p><p className="text-[13px] text-hz-text">{item.freq}</p></div>
+                <div className="flex items-center justify-between py-2"><p className="text-[12px] text-hz-muted">Next payment</p><p className="text-[13px] text-hz-text">{item.nextDate}</p></div>
+                <div className="flex items-center justify-between py-2"><p className="text-[12px] text-hz-muted">Progress</p><p className="text-[13px] text-hz-text">{item.paidInstalls} of {item.totalInstalls} payments</p></div>
+                <div className="pt-3 pb-1">
+                  <div className="w-full h-1.5 bg-hz-cloud rounded-full overflow-hidden">
+                    <div className="bg-hz-teal h-full rounded-full transition-all" style={{width: Math.round(item.paidInstalls / item.totalInstalls * 100) + '%'}}/>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="px-4 py-4 flex items-center gap-3">
+                <span aria-hidden="true" className="text-hz-hint text-xl">⏳</span>
+                <p className="text-[12px] text-hz-muted">{item.ap.first} hasn't set up a Pay Over Time plan yet.</p>
+              </div>
+            )}
+          </Card>
+        ))}
+        <div className="bg-hz-cloud border border-hz-accent/20 rounded-hz-sm px-3 py-2.5 flex gap-2 items-start">
+          <span aria-hidden="true" className="flex-shrink-0 text-hz-hint">ℹ️</span>
+          <p className="text-[11px] text-hz-muted leading-relaxed">
+            You can view AP plans but cannot modify them. Contact your authorized party if changes are needed.
+            To remove an authorized party's access, visit <button onClick={()=>nav('manage-ap')} className="text-hz-accent underline">Authorized Parties</button>.
+          </p>
+        </div>
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── GuestScreen ─────────────────────────────────────────────────────────
+const GuestScreen = ({nav, goBack, S, setS}) => {
+  const [email, setEmail]   = React.useState('');
+  const [note,  setNote]    = React.useState('');
+  const [capAmt, setCapAmt] = React.useState('');
+  const [sent,  setSent]    = React.useState(false);
+
+  const onPlan   = S.payPlan === 'pot' ? POT_BALANCE : 0;
+  const paidFull = S.payPlan === 'full';
+  const openBal  = paidFull ? 0 : BALANCE_DUE - onPlan;
+
+  const handleSend = () => { if (!email.includes('@')) return; setSent(true); };
+
+  if (sent) return (
+    <ScreenWrap>
+      <div className="flex flex-col items-center justify-center px-8 text-center py-8">
+        <div aria-hidden="true" className="w-16 h-16 rounded-full bg-hz-cloud flex items-center justify-center text-3xl mb-4">🔗</div>
+        <h2 className="text-xl font-bold text-hz-text mb-2">Link Sent!</h2>
+        <p className="text-hz-muted text-[13px] mb-2 leading-relaxed">A one-time payment link has been sent to <strong className="text-hz-text">{email}</strong>.</p>
+        <p className="text-[12px] text-hz-hint mb-6 leading-relaxed">They can pay up to {fmt(capAmt && parseFloat(capAmt) > 0 && parseFloat(capAmt) <= openBal ? parseFloat(capAmt) : openBal)} without creating an account. The link expires after one use.</p>
+        <Btn onClick={()=>nav('home')}>Return to Home</Btn>
+      </div>
+    </ScreenWrap>
+  );
+
+  return (
+    <ScreenWrap>
+      <Header title="Guest Payment Link" onBack={goBack}/>
+      <div className="px-5 pb-8 space-y-4">
+        <div className="bg-hz-cloud border border-hz-accent/20 rounded-hz px-4 py-3 space-y-1">
+          <p className="text-[13px] font-semibold text-hz-text">What is a guest payment link?</p>
+          <p className="text-[12px] text-hz-muted leading-relaxed">A secure, one-time link you send to someone — like a parent or relative — so they can make a payment directly toward your balance. <strong className="text-hz-text">No account required.</strong> The link expires after it's used once.</p>
+        </div>
+        <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-3 flex items-center justify-between">
+          <div>
+            <p className="text-[11px] text-hz-hint">Your open balance</p>
+            <p className="text-[16px] font-bold text-hz-text">{fmt(openBal)}</p>
+            <p className="text-[10px] text-hz-hint mt-0.5">Maximum a guest can pay</p>
+          </div>
+          <span aria-hidden="true" className="text-3xl">💰</span>
+        </div>
+        <Input label="Recipient's email address" id="guest-email" value={email} onChange={setEmail} type="email" placeholder="parent@example.com"/>
+        <Input label={`Cap amount (optional, max ${fmt(openBal)})`} id="guest-cap" value={capAmt} onChange={setCapAmt} type="number" hint={`Leave blank and they can pay up to the full ${fmt(openBal)} open balance`} placeholder={fmt(openBal)}/>
+        <Input label="Note to recipient (optional)" id="guest-note" value={note} onChange={setNote} placeholder="e.g. Fall 2025 tuition — thanks!"/>
+        <div className="bg-hz-amber-bg border border-hz-amber/40 rounded-hz-sm px-3 py-2.5 flex gap-2 items-start">
+          <span aria-hidden="true" className="flex-shrink-0 text-hz-amber">ℹ️</span>
+          <p className="text-[11px] text-hz-muted leading-relaxed">This is different from an authorized party. Guest payers can make a single payment only — they won't have ongoing access to your account or balance information.</p>
+        </div>
+        <Btn onClick={handleSend} disabled={!email.includes('@')} aria-label="Send guest payment link">Send Payment Link</Btn>
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── ManagePotScreen ──────────────────────────────────────────────────────
+const ManagePotScreen = ({nav, goBack, S, setS}) => {
+  const [showSched, setShowSched] = React.useState(false);
+  const payments = Array.from({length: Math.min(S.potCount||5, 5)}, (_,i) => ({
+    num: i+1,
+    date: `May ${1+(i*(S.potFreqLabel==='month'?30:S.potFreqLabel==='half-month'?15:14))}`,
+    amt: S.potInstall || 517,
+    status: i===0?'upcoming':'future',
+  }));
+
+  return (
+    <ScreenWrap>
+      <Header title="Manage Pay Over Time" onBack={goBack}/>
+      <div className="px-5 pb-8">
+        <Card className="mb-4">
+          <div className="flex justify-between items-start mb-3">
+            <div>
+              <p className="text-[13px] text-hz-muted mb-1">Remaining Balance</p>
+              <p className="text-2xl font-bold text-hz-text">{fmt(POT_BALANCE)}</p>
+            </div>
+            <Badge color="blue">Active</Badge>
+          </div>
+          <Row label="Installments remaining" value={`${S.potCount || 9}`}/>
+          <Row label="Amount per payment" value={fmt(S.potInstall || 517)}/>
+          <Row label="Frequency" value={S.potFreqLabel==='month'?'Monthly':S.potFreqLabel==='half-month'?'Twice Monthly':'Every 2 Weeks'}/>
+        </Card>
+        <button onClick={()=>setShowSched(p=>!p)} aria-expanded={showSched} aria-controls="payment-schedule"
+          className="w-full flex justify-between items-center py-3 px-4 bg-hz-cloud border border-[rgba(100,92,220,0.14)] rounded-hz mb-4">
+          <span className="text-[14px] font-medium text-hz-text">View Schedule</span>
+          <span aria-hidden="true" className="text-hz-hint">{showSched?'▲':'▼'}</span>
+        </button>
+        {showSched && (
+          <Card id="payment-schedule" className="mb-4">
+            {payments.map((p,i)=>(
+              <div key={i} className="flex justify-between items-center py-2 border-b border-[rgba(100,92,220,0.1)] last:border-0">
+                <div>
+                  <p className="text-[13px] text-hz-text">Payment {p.num}</p>
+                  <p className="text-[11px] text-hz-hint">{p.date}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[13px] font-semibold text-hz-text">{fmt(p.amt)}</p>
+                  <Badge color={p.status==='upcoming'?'amber':'blue'} className="text-[10px]">{p.status}</Badge>
+                </div>
+              </div>
+            ))}
+            {(S.potCount||9) > 5 && <p className="text-center text-hz-hint text-[11px] pt-2">+ {(S.potCount||9)-5} more payments</p>}
+          </Card>
+        )}
+        <div className="space-y-3">
+          <Btn onClick={()=>nav('change-dates-ob')} variant="ghost">Change Payment Dates</Btn>
+          <Btn onClick={()=>nav('change-autopay-ob')} variant="ghost">Change Auto-Pay Method</Btn>
+          <Btn onClick={()=>nav('pay-next-ob')} variant="primary" aria-label="Pay next scheduled payment">Pay Next Payment</Btn>
+          <Btn onClick={()=>nav('pay-now')} variant="ghost">Make Extra Payment</Btn>
+          <Btn onClick={()=>nav('home')} variant="outline" aria-label="Cancel your Pay Over Time plan">Cancel Plan</Btn>
+        </div>
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── ChangeDatesScreen ───────────────────────────────────────────────────
+const ChangeDatesScreen = ({nav, goBack, S, setS}) => {
+  const [mode, setMode] = React.useState('');
+  const [newDay, setNewDay] = React.useState('');
+  const [specificPmt, setSpecificPmt] = React.useState('');
+  const [specificDate, setSpecificDate] = React.useState('');
+  const [done, setDone] = React.useState(false);
+
+  const handleSave = () => setDone(true);
+
+  if (done) return (
+    <ScreenWrap>
+      <div className="flex flex-col items-center justify-center px-8 text-center py-8">
+        <div aria-hidden="true" className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center text-3xl mb-4">✅</div>
+        <h2 className="text-xl font-bold text-hz-text mb-2">Dates Updated</h2>
+        <p className="text-hz-muted text-[13px] mb-6">{mode==='all' ? `All future payments moved to day ${newDay} of each ${S.potFreqLabel||'month'}.` : `Payment ${specificPmt} rescheduled to ${specificDate}.`}</p>
+        <Btn onClick={()=>nav('manage-pot')}>Return to Plan</Btn>
+      </div>
+    </ScreenWrap>
+  );
+
+  return (
+    <ScreenWrap>
+      <Header title="Change Payment Dates" onBack={goBack}/>
+      <div className="px-5 pb-8">
+        <p className="text-hz-muted text-[13px] mb-5">Would you like to change all future payments or just one?</p>
+        <RadioCard selected={mode==='all'} onClick={()=>setMode('all')} aria-label="Change all future payments to a new day of the month">
+          <p className="text-[14px] font-semibold text-hz-text">All future payments</p>
+          <p className="text-[12px] text-hz-muted mt-0.5">Move to a new day of the month</p>
+        </RadioCard>
+        <RadioCard selected={mode==='one'} onClick={()=>setMode('one')} aria-label="Change one specific payment date">
+          <p className="text-[14px] font-semibold text-hz-text">One specific payment</p>
+          <p className="text-[12px] text-hz-muted mt-0.5">Reschedule a single upcoming payment</p>
+        </RadioCard>
+        {mode==='all' && <Input label="New day of month" id="new-day" value={newDay} onChange={setNewDay} placeholder="e.g. 15" type="number" hint="1–28"/>}
+        {mode==='one' && (
+          <>
+            <Input label="Payment number" id="specific-pmt" value={specificPmt} onChange={setSpecificPmt} placeholder="e.g. 2" type="number"/>
+            <Input label="New date" id="specific-date" value={specificDate} onChange={setSpecificDate} type="date"/>
+          </>
+        )}
+        {mode && <Btn onClick={handleSave} disabled={mode==='all'?!newDay:(!specificPmt||!specificDate)}>Save Changes</Btn>}
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── ChangeAutopayScreen ──────────────────────────────────────────────────
+const ChangeAutopayScreen = ({nav, goBack, S, setS}) => {
+  const [selected, setSelected] = React.useState('current');
+  const [showAdd, setShowAdd] = React.useState(false);
+  const [routing, setRouting] = React.useState('');
+  const [acct, setAcct] = React.useState('');
+  const [done, setDone] = React.useState(false);
+
+  const handleSave = () => {
+    if (showAdd && routing && acct) { setS(p=>({...p, methodSaved:true})); }
+    setDone(true);
+  };
+
+  if (done) return (
+    <ScreenWrap>
+      <div className="flex flex-col items-center justify-center px-8 text-center py-8">
+        <div aria-hidden="true" className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center text-3xl mb-4">✅</div>
+        <h2 className="text-xl font-bold text-hz-text mb-2">Auto-Pay Updated</h2>
+        <p className="text-hz-muted text-[13px] mb-6">Future installments will be drafted from your updated payment method.</p>
+        <Btn onClick={()=>nav('manage-pot')}>Return to Plan</Btn>
+      </div>
+    </ScreenWrap>
+  );
+
+  return (
+    <ScreenWrap>
+      <Header title="Change Auto-Pay Method" onBack={goBack}/>
+      <div className="px-5 pb-8">
+        <p className="text-hz-muted text-[13px] mb-5">Select a payment method for future installments:</p>
+        {S.methodSaved && (
+          <RadioCard selected={selected==='current'} onClick={()=>{setSelected('current');setShowAdd(false);}} aria-label="Use current saved bank account Checking ending 4521">
+            <div className="flex items-center gap-3">
+              <span aria-hidden="true" className="text-lg">🏦</span>
+              <div>
+                <p className="text-[14px] font-semibold text-hz-text">Checking ••••4521</p>
+                <p className="text-[12px] text-hz-muted">Chase Bank · ACH</p>
+              </div>
+            </div>
+          </RadioCard>
+        )}
+        {!showAdd ? (
+          <button onClick={()=>{setShowAdd(true);setSelected('new');}} aria-label="Add a new bank account"
+            className="w-full text-left p-4 rounded-hz border border-dashed border-[rgba(100,92,220,0.3)] hover:border-hz-accent/60 transition-colors text-hz-indigo text-[13px] font-medium mb-6">
+            + Add new bank account
+          </button>
+        ) : (
+          <div className="mb-4">
+            <p className="text-[13px] font-semibold text-hz-text mb-3">New Bank Account</p>
+            <Input label="Routing number" id="autopay-routing" value={routing} onChange={setRouting} placeholder="9 digits"/>
+            <Input label="Account number" id="autopay-acct" value={acct} onChange={setAcct} placeholder="Account number"/>
+          </div>
+        )}
+        <Btn onClick={handleSave} disabled={selected==='new'&&(!routing||!acct)}>Save Method</Btn>
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── PayNextScreen ────────────────────────────────────────────────────────
+const PayNextScreen = ({nav, goBack, S, setS}) => {
+  const [method, setMethod] = React.useState(S.methodSaved?'saved':'ach');
+  const [routing, setRouting] = React.useState('');
+  const [acct, setAcct] = React.useState('');
+  const [done, setDone] = React.useState(false);
+
+  const amount = S.potInstall || 517;
+  const canPay = method==='saved' || (routing.length>=9 && acct.length>=8);
+
+  const handlePay = () => {
+    if (!S.methodSaved && routing && acct) setS(p=>({...p,methodSaved:true}));
+    setDone(true);
+  };
+
+  if (done) return (
+    <ScreenWrap>
+      <div className="flex flex-col items-center justify-center px-8 text-center py-8">
+        <div aria-hidden="true" className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center text-3xl mb-4">✅</div>
+        <h2 className="text-xl font-bold text-hz-text mb-2">Payment Submitted!</h2>
+        <p className="text-hz-muted text-[13px] mb-6">{fmt(amount)} installment payment submitted successfully.</p>
+        <Btn onClick={()=>nav('manage-pot')}>Return to Plan</Btn>
+      </div>
+    </ScreenWrap>
+  );
+
+  return (
+    <ScreenWrap>
+      <Header title="Pay Next Installment" onBack={goBack}/>
+      <div className="px-5 pb-8">
+        <Card className="mb-5">
+          <Row label="Next installment" value={fmt(amount)} bold/>
+          <Row label="Due date" value="May 10, 2026"/>
+          <Row label="Remaining after payment" value={fmt(Math.max(0, POT_BALANCE-amount))}/>
+        </Card>
+        <p className="text-[13px] font-semibold text-hz-text mb-3">Payment Method</p>
+        {S.methodSaved ? (
+          <>
+            <RadioCard selected={method==='saved'} onClick={()=>setMethod('saved')} aria-label="Use saved checking account ending 4521">
+              <div className="flex items-center gap-3">
+                <span aria-hidden="true" className="text-lg">🏦</span>
+                <div>
+                  <p className="text-[13px] font-semibold text-hz-text">Checking ••••4521</p>
+                  <p className="text-[11px] text-hz-muted">Chase Bank · ACH</p>
+                </div>
+              </div>
+            </RadioCard>
+            <RadioCard selected={method==='new'} onClick={()=>setMethod('new')} aria-label="Use a different payment method">
+              <p className="text-[13px] text-hz-text">Use different method</p>
+            </RadioCard>
+          </>
+        ) : null}
+        {(method==='new' || !S.methodSaved) && (
+          <>
+            <Input label="Routing number" id="paynext-routing" value={routing} onChange={setRouting} placeholder="9 digits"/>
+            <Input label="Account number" id="paynext-acct" value={acct} onChange={setAcct} placeholder="Account number"/>
+          </>
+        )}
+        <Btn onClick={handlePay} disabled={!canPay} aria-label={`Pay ${fmt(amount)} installment`}>Pay {fmt(amount)}</Btn>
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── AccountDetailsScreen ─────────────────────────────────────────────────
+const AccountDetailsScreen = ({nav, goBack, S, setS}) => {
+  const [firstName,  setFirstName]  = React.useState('Alex');
+  const [lastName,   setLastName]   = React.useState('Johnson');
+  const [prefName,   setPrefName]   = React.useState('');
+  const [editDemo,   setEditDemo]   = React.useState(false);
+  const [emails, setEmails] = React.useState([S.commsEmail || 'alex.johnson@student.claude.edu']);
+  const [phones, setPhones] = React.useState([S.commsPhone || '(720) 555-0198']);
+  const [editContactIdx, setEditContactIdx] = React.useState({emails:{}, phones:{}});
+
+  const addEmail = () => setEmails(p=>[...p,'']);
+  const addPhone = () => setPhones(p=>[...p,'']);
+  const updateEmail = (i,v) => setEmails(p=>p.map((e,idx)=>idx===i?v:e));
+  const updatePhone = (i,v) => setPhones(p=>p.map((e,idx)=>idx===i?v:e));
+  const removeEmail = (i) => setEmails(p=>p.filter((_,idx)=>idx!==i));
+  const removePhone = (i) => setPhones(p=>p.filter((_,idx)=>idx!==i));
+  const toggleEditEmail = (i) => setEditContactIdx(p=>({...p, emails:{...p.emails, [i]:!p.emails[i]}}));
+  const toggleEditPhone = (i) => setEditContactIdx(p=>({...p, phones:{...p.phones, [i]:!p.phones[i]}}));
+
+  const [smsMarketing, setSmsMarketing] = React.useState(S.smsMarketing ?? false);
+  const [editSec, setEditSec] = React.useState(false);
+  const [saved, setSaved] = React.useState(false);
+  const save = () => {
+    setS(p=>({...p, smsMarketing, commsEmail: emails[0], commsPhone: phones[0]}));
+    setEditDemo(false);
+    setSaved(true);
+    setTimeout(()=>setSaved(false), 2200);
+  };
+
+  return (
+    <ScreenWrap>
+      <Header title="My Account" onBack={goBack}/>
+      <div className="px-5 pb-10 space-y-5 pt-3">
+        <Card>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint">Demographics</p>
+            <button onClick={()=>setEditDemo(e=>!e)} className="text-hz-accent text-[12px] font-medium hover:opacity-75 transition-opacity" aria-label={editDemo?'Done editing demographics':'Edit demographics'}>{editDemo ? 'Done' : 'Edit'}</button>
+          </div>
+          <div className="space-y-0 divide-y divide-[rgba(100,92,220,0.07)]">
+            <div className="flex items-center justify-between py-2.5">
+              <p className="text-[11px] text-hz-hint w-28 flex-shrink-0">First name</p>
+              {editDemo
+                ? <input value={firstName} onChange={e=>setFirstName(e.target.value)} aria-label="First name" className="flex-1 text-[13px] text-hz-text border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-2 py-1 focus:outline-none focus:border-hz-accent focus:ring-1 focus:ring-hz-accent/20"/>
+                : <p className="flex-1 text-[13px] font-medium text-hz-text text-right">{firstName}</p>}
+            </div>
+            <div className="flex items-center justify-between py-2.5">
+              <p className="text-[11px] text-hz-hint w-28 flex-shrink-0">Last name</p>
+              {editDemo
+                ? <input value={lastName} onChange={e=>setLastName(e.target.value)} aria-label="Last name" className="flex-1 text-[13px] text-hz-text border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-2 py-1 focus:outline-none focus:border-hz-accent focus:ring-1 focus:ring-hz-accent/20"/>
+                : <p className="flex-1 text-[13px] font-medium text-hz-text text-right">{lastName}</p>}
+            </div>
+            <div className="flex items-center justify-between py-2.5">
+              <p className="text-[11px] text-hz-hint w-28 flex-shrink-0">Preferred name</p>
+              {editDemo
+                ? <input value={prefName} onChange={e=>setPrefName(e.target.value)} placeholder="Optional" aria-label="Preferred name" className="flex-1 text-[13px] text-hz-text border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-2 py-1 focus:outline-none focus:border-hz-accent focus:ring-1 focus:ring-hz-accent/20 placeholder:text-hz-hint/60"/>
+                : <p className="flex-1 text-[13px] font-medium text-hz-text text-right">{prefName || <span className="text-hz-hint italic font-normal">Not set</span>}</p>}
+            </div>
+            <div className="flex items-center justify-between py-2.5">
+              <p className="text-[11px] text-hz-hint w-28 flex-shrink-0">Student ID</p>
+              <p className="flex-1 text-[13px] font-medium text-hz-text text-right">1234567</p>
+            </div>
+          </div>
+          {editDemo && <p className="text-[10px] text-hz-hint mt-2">Student ID is managed by your school and cannot be changed here.</p>}
+        </Card>
+
+        <Card>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-3">Contact Information</p>
+          <div className="mb-4">
+            <p className="text-[12px] font-semibold text-hz-text mb-2">Email addresses</p>
+            <div className="space-y-2">
+              {emails.map((e,i)=>(
+                <div key={i} className="flex items-center gap-2">
+                  {editContactIdx.emails[i]
+                    ? <input type="email" value={e} onChange={ev=>updateEmail(i,ev.target.value)} aria-label={`Email address ${i+1}`} className="flex-1 text-[13px] text-hz-text border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-2 py-1.5 focus:outline-none focus:border-hz-accent focus:ring-1 focus:ring-hz-accent/20"/>
+                    : <p className="flex-1 text-[13px] text-hz-text">{e || <span className="text-hz-hint italic">Enter email</span>}</p>}
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <button onClick={()=>toggleEditEmail(i)} className="text-[11px] text-hz-accent font-medium hover:opacity-75 transition-opacity" aria-label={editContactIdx.emails[i]?`Done editing email ${i+1}`:`Edit email ${i+1}`}>{editContactIdx.emails[i] ? 'Done' : 'Edit'}</button>
+                    {i > 0 && <button onClick={()=>removeEmail(i)} aria-label={`Remove email ${i+1}`} className="text-hz-hint text-[11px] hover:text-hz-danger transition-colors ml-1">Remove</button>}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button onClick={addEmail} className="mt-2 text-[12px] text-hz-accent font-medium flex items-center gap-1 hover:opacity-75 transition-opacity" aria-label="Add another email address">
+              <span aria-hidden="true" className="text-base leading-none">+</span> Add another email
+            </button>
+          </div>
+          <Divider/>
+          <div className="mt-3">
+            <p className="text-[12px] font-semibold text-hz-text mb-2">Phone numbers</p>
+            <div className="space-y-2">
+              {phones.map((p,i)=>(
+                <div key={i} className="flex items-center gap-2">
+                  {editContactIdx.phones[i]
+                    ? <input type="tel" value={p} onChange={ev=>updatePhone(i,ev.target.value)} aria-label={`Phone number ${i+1}`} className="flex-1 text-[13px] text-hz-text border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-2 py-1.5 focus:outline-none focus:border-hz-accent focus:ring-1 focus:ring-hz-accent/20"/>
+                    : <p className="flex-1 text-[13px] text-hz-text">{p || <span className="text-hz-hint italic">Enter phone</span>}</p>}
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <button onClick={()=>toggleEditPhone(i)} className="text-[11px] text-hz-accent font-medium hover:opacity-75 transition-opacity" aria-label={editContactIdx.phones[i]?`Done editing phone ${i+1}`:`Edit phone ${i+1}`}>{editContactIdx.phones[i] ? 'Done' : 'Edit'}</button>
+                    {i > 0 && <button onClick={()=>removePhone(i)} aria-label={`Remove phone ${i+1}`} className="text-hz-hint text-[11px] hover:text-hz-danger transition-colors ml-1">Remove</button>}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button onClick={addPhone} className="mt-2 text-[12px] text-hz-accent font-medium flex items-center gap-1 hover:opacity-75 transition-opacity" aria-label="Add another phone number">
+              <span aria-hidden="true" className="text-base leading-none">+</span> Add another phone
+            </button>
+          </div>
+        </Card>
+
+        <Card>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-1">Text Message Opt-Ins</p>
+          <p className="text-[12px] text-hz-muted mb-4 leading-relaxed">These preferences were set during your account setup. You can update your marketing opt-in at any time.</p>
+          <div className="flex items-start justify-between gap-4 py-3 border-b border-[rgba(100,92,220,0.08)]">
+            <div className="flex-1">
+              <p className="text-[13px] font-semibold text-hz-text">Transactional texts</p>
+              <p className="text-[11px] text-hz-muted mt-0.5 leading-snug">Payment confirmations, due date reminders, balance alerts. Required for account activity.</p>
+            </div>
+            <div className="flex flex-col items-center gap-0.5 flex-shrink-0 pt-0.5">
+              <div className="w-11 h-6 rounded-full bg-hz-teal flex items-center justify-end pr-0.5" aria-label="Transactional texts — always on">
+                <div className="w-5 h-5 rounded-full bg-white shadow-sm"/>
+              </div>
+              <span className="text-[9px] font-bold text-hz-teal uppercase tracking-wide">Required</span>
+            </div>
+          </div>
+          <div className="flex items-start justify-between gap-4 py-3">
+            <div className="flex-1">
+              <p className="text-[13px] font-semibold text-hz-text">Information &amp; marketing texts</p>
+              <p className="text-[11px] text-hz-muted mt-0.5 leading-snug">Financial aid tips, payment plan offers, scholarship alerts, savings opportunities.</p>
+            </div>
+            <Toggle on={smsMarketing} onChange={setSmsMarketing} aria-label="Toggle information and marketing texts"/>
+          </div>
+          {!smsMarketing && <p className="text-[10px] text-hz-hint mt-1 leading-relaxed">You're opted out of marketing texts. You may miss financial aid reminders and savings opportunities.</p>}
+        </Card>
+
+        <Card>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint">Security Questions</p>
+            <button onClick={()=>nav('home')} className="text-hz-accent text-[12px] font-medium hover:opacity-75 transition-opacity" aria-label="Change security questions">Change</button>
+          </div>
+          <p className="text-[12px] text-hz-muted mb-3 leading-relaxed">Used to verify you as a caller when you contact support by phone.</p>
+          {S.secQsDeferred ? (
+            <div className="bg-hz-amber-bg border border-hz-amber/40 rounded-hz-sm px-3 py-2.5 flex items-start gap-2">
+              <span aria-hidden="true" className="text-hz-amber flex-shrink-0">⏰</span>
+              <div>
+                <p className="text-[12px] font-semibold text-hz-text">Security questions not set up yet</p>
+                <p className="text-[11px] text-hz-muted mt-0.5">You deferred this during setup. Tap "Change" to complete it now.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-0 divide-y divide-[rgba(100,92,220,0.07)]">
+              <div className="py-2.5">
+                <p className="text-[11px] text-hz-hint mb-0.5">Question 1</p>
+                <p className="text-[12px] font-medium text-hz-text">What was the name of your first pet?</p>
+                <p className="text-[12px] text-hz-hint mt-0.5 font-mono tracking-widest">••••••••</p>
+              </div>
+              <div className="py-2.5">
+                <p className="text-[11px] text-hz-hint mb-0.5">Question 2</p>
+                <p className="text-[12px] font-medium text-hz-text">What street did you grow up on?</p>
+                <p className="text-[12px] text-hz-hint mt-0.5 font-mono tracking-widest">••••••••</p>
+              </div>
+            </div>
+          )}
+        </Card>
+
+        <Btn onClick={save} aria-label="Save account changes">{saved ? '✓ Saved' : 'Save changes'}</Btn>
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── HistoryScreen ────────────────────────────────────────────────────────
+const HistoryScreen = ({nav, goBack, S, setS}) => {
+  const [tab, setTab] = React.useState('all');
+
+  const allItems = [
+    {type:'payment', date:'Apr 14, 2026', desc:'Down payment + fee',        amt:'+'+fmt(POT_DOWN_TOTAL), color:'green', icon:'💳'},
+    {type:'balance', date:'Apr 12, 2026', desc:'Fall 2025 bill posted',     amt:'+'+fmt(TOTAL_CHARGES),  color:'amber', icon:'📋'},
+    {type:'aid',     date:'Apr 10, 2026', desc:'Pell Grant applied',        amt:'−$1,100',               color:'green', icon:'🎓'},
+    {type:'aid',     date:'Apr 10, 2026', desc:'Merit Scholarship applied', amt:'−$1,200',               color:'green', icon:'🏆'},
+    {type:'comms',   date:'Apr 8,  2026', desc:'Welcome email sent',        amt:'',                      color:'blue',  icon:'✉️'},
+    {type:'comms',   date:'Apr 8,  2026', desc:'Account created',           amt:'',                      color:'blue',  icon:'👤'},
+  ];
+
+  const filtered = tab==='all' ? allItems
+    : tab==='payments' ? allItems.filter(i=>i.type==='payment')
+    : tab==='balance'  ? allItems.filter(i=>i.type==='balance'||i.type==='aid')
+    : allItems.filter(i=>i.type==='comms');
+
+  const TABS = [{v:'all',l:'All'},{v:'payments',l:'Payments'},{v:'balance',l:'Balance'},{v:'comms',l:'Comms'}];
+
+  return (
+    <ScreenWrap>
+      <Header title="Account History" onBack={goBack}/>
+      <div className="px-5 pb-8">
+        <div className="flex bg-hz-cloud rounded-hz p-1 mb-5" role="tablist">
+          {TABS.map(t=>(
+            <button key={t.v} onClick={()=>setTab(t.v)} role="tab" aria-selected={tab===t.v}
+              className={'flex-1 py-1.5 rounded-hz-sm text-[12px] font-medium transition-all '+(tab===t.v?'bg-hz-indigo text-white':'text-hz-muted hover:text-hz-text')}>
+              {t.l}
+            </button>
+          ))}
+        </div>
+        {filtered.length === 0 ? (
+          <div className="text-center py-12 text-hz-hint text-[13px]">No items in this category</div>
+        ) : (
+          <div className="space-y-3" role="tabpanel">
+            {filtered.map((item,i)=>(
+              <Card key={i} className="flex items-center gap-3 p-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0 ${item.color==='green'?'bg-hz-teal-bg':item.color==='amber'?'bg-hz-amber-bg':'bg-hz-cloud'}`} aria-hidden="true">{item.icon}</div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-medium text-hz-text truncate">{item.desc}</p>
+                  <p className="text-[11px] text-hz-hint">{item.date}</p>
+                </div>
+                {item.amt && <span className={`text-[13px] font-semibold flex-shrink-0 ${item.color==='green'?'text-hz-teal':item.color==='amber'?'text-hz-amber':'text-hz-text'}`}>{item.amt}</span>}
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ═══ END SHARED HOME COMPONENTS ═══
+
+// ─── App ──────────────────────────────────────────────────────────────────
+const App = () => {
+  const [screen, setScreen] = React.useState('home');
+  const [S, setS] = React.useState(HOME_DEFAULT_STATE);
+  const navStack = React.useRef([]);
+  const nav    = (s) => { navStack.current.push(screen); setScreen(s); };
+  const goBack = () => { const p = navStack.current.pop(); if (p) setScreen(p); };
+
+  const screens = {
+    'home':              <HomeScreen          nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'costs':             <CostsScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'print':             <PrintScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'pay-now':           <PayNowScreen        nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'manage-ap':         <ManageAPScreen      nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'ap-pot':            <APPotScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'guest':             <GuestScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'manage-pot':        <ManagePotScreen     nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'change-dates-ob':   <ChangeDatesScreen   nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'change-autopay-ob': <ChangeAutopayScreen nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'pay-next-ob':       <PayNextScreen       nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'history':           <HistoryScreen       nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'account-details':   <AccountDetailsScreen nav={nav} goBack={goBack} S={S} setS={setS}/>,
+  };
+
+  const SCREEN_OPTIONS = [
+    {v:'home',              l:'Home'},
+    {v:'costs',             l:'View bill'},
+    {v:'print',             l:'Print statement'},
+    {v:'pay-now',           l:'Make a payment'},
+    {v:'guest',             l:'Guest payment link'},
+    {v:'manage-ap',         l:'Manage authorized parties'},
+    {v:'ap-pot',            l:'AP pay over time plans'},
+    {v:'manage-pot',        l:'Manage my plan'},
+    {v:'change-dates-ob',   l:'Change payment dates'},
+    {v:'change-autopay-ob', l:'Change autopay'},
+    {v:'pay-next-ob',       l:'Pay next installment'},
+    {v:'history',           l:'Payment history'},
+    {v:'account-details',   l:'Account details'},
+  ];
+
+  return (
+    <div className="min-h-screen bg-hz-bg flex items-center justify-center font-sans p-4">
+      {/* Back to index link */}
+      <a href="index.html" aria-label="Back to index"
+        className="fixed top-4 left-4 z-50 bg-hz-card hover:bg-hz-cloud border border-[rgba(100,92,220,0.2)] text-hz-indigo text-[13px] font-medium px-3 py-2 rounded-hz-sm transition-colors shadow-sm">
+        ← Back to index
+      </a>
+
+      {/* Screen selector (dev helper) */}
+      <div className="fixed top-4 right-4 z-50">
+        <label htmlFor="screen-jump" className="sr-only">Jump to screen</label>
+        <div className="relative">
+          <select id="screen-jump" value={screen} onChange={e => { navStack.current = []; setScreen(e.target.value); }}
+            className="appearance-none bg-hz-card border border-[rgba(100,92,220,0.2)] text-hz-text text-[11px] rounded-hz-sm pl-2.5 pr-7 py-1.5 shadow-sm outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 max-w-[210px] cursor-pointer transition-colors hover:border-hz-accent/50 font-medium"
+            title="Jump to screen">
+            <optgroup label="── 1b · Consumer Home">
+              {SCREEN_OPTIONS.map(o=><option key={o.v} value={o.v}>{o.l}</option>)}
+            </optgroup>
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+            <svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M3 5l4 4 4-4" stroke="#645CDC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* Phone frame */}
+      <div className="relative w-[390px] h-[844px] bg-hz-card overflow-hidden rounded-[44px] shadow-2xl border border-[rgba(100,92,220,0.18)] flex-shrink-0">
+        {/* Notch */}
+        <div aria-hidden="true" className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-black rounded-b-2xl z-30"/>
+        {/* Screen content */}
+        <div className="absolute inset-0 pt-7">
+          {screens[screen] || screens['home']}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

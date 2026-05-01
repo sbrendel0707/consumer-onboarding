@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Consumer Onboarding Prototypes — Horizon</title>
+<title>Consumer Prototypes — Horizon</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="design-system/horizon.css"/>
 <style>
@@ -168,9 +168,9 @@ a.tile:hover::after { opacity: 1; right: 16px; }
 
   <div class="header">
     <div class="eyebrow">Nelnet · UX Prototypes</div>
-    <h1>Consumer Onboarding Prototypes</h1>
+    <h1>Consumer Prototypes</h1>
     <div class="context-block">
-      All scenarios represent students authenticating via <strong>SAML SSO</strong> directly from their university's portal, with <strong>full ERP integration</strong> — charges, financial aid, and enrollment data synced automatically. <strong>Authorized payers are managed within Nelnet's system</strong>; the student controls who has access and at what level.
+      <strong>Onboarding scenarios (a-series)</strong> represent students authenticating via <strong>SAML SSO</strong> directly from their university's portal, with <strong>full ERP integration</strong>. <strong>Home page scenarios (b-series)</strong> start from the consumer home page — the shared home page and all screens reachable from it are <strong>living components</strong>: editing <code style="font-family:monospace;font-size:11px;background:rgba(100,92,220,.08);padding:1px 5px;border-radius:4px;">consumer-home.html</code> propagates to all b-series prototypes.
     </div>
   </div>
 
@@ -195,14 +195,17 @@ a.tile:hover::after { opacity: 1; right: 16px; }
     </a>
   </div>
 
-  <div class="section-label">Scenarios</div>
+  <div class="section-label">Onboarding Scenarios</div>
 
-  <div class="grid">
+  <div class="grid" style="margin-bottom: 36px;">
 
-    <!-- ── 1. First Time Student ── -->
-    <a class="tile hz-card" href="User feedback complete student experience.html" aria-label="First Time Student prototype">
+    <!-- ── 1a. First Time Student ── -->
+    <a class="tile hz-card" href="User feedback complete student experience.html" aria-label="1a · First Time Student prototype">
       <div>
-        <div class="tile-scenario">Student</div>
+        <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;font-weight:800;background:rgba(100,92,220,.12);color:#3C3489;padding:2px 7px;border-radius:5px;letter-spacing:.3px;">1a</span>
+          <span>Student</span>
+        </div>
         <div class="tile-name">First Time Student Onboarding</div>
       </div>
       <div class="hz-divider"></div>
@@ -217,11 +220,14 @@ a.tile:hover::after { opacity: 1; right: 16px; }
       </div>
     </a>
 
-    <!-- ── 2. Returning Student ── -->
+    <!-- ── 2a. Returning Student ── -->
     <div class="tile hz-card tile-soon" aria-hidden="true">
       <span class="soon-badge">Coming soon</span>
       <div>
-        <div class="tile-scenario">Student</div>
+        <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;font-weight:800;background:rgba(100,92,220,.07);color:var(--hz-hint);padding:2px 7px;border-radius:5px;letter-spacing:.3px;">2a</span>
+          <span>Student</span>
+        </div>
         <div class="tile-name">Returning Student</div>
       </div>
       <div class="hz-divider"></div>
@@ -231,11 +237,14 @@ a.tile:hover::after { opacity: 1; right: 16px; }
       </div>
     </div>
 
-    <!-- ── 3. New AP — single payer ── -->
+    <!-- ── 3a. New AP — single payer ── -->
     <div class="tile hz-card tile-soon" aria-hidden="true">
       <span class="soon-badge">Coming soon</span>
       <div>
-        <div class="tile-scenario">Authorized Party</div>
+        <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;font-weight:800;background:rgba(100,92,220,.07);color:var(--hz-hint);padding:2px 7px;border-radius:5px;letter-spacing:.3px;">3a</span>
+          <span>Authorized Party</span>
+        </div>
         <div class="tile-name">New Authorized Party — Single Payer</div>
       </div>
       <div class="hz-divider"></div>
@@ -245,11 +254,14 @@ a.tile:hover::after { opacity: 1; right: 16px; }
       </div>
     </div>
 
-    <!-- ── 4. New AP — multiple payers ── -->
+    <!-- ── 4a. New AP — multiple payers ── -->
     <div class="tile hz-card tile-soon" aria-hidden="true">
       <span class="soon-badge">Coming soon</span>
       <div>
-        <div class="tile-scenario">Authorized Party</div>
+        <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;font-weight:800;background:rgba(100,92,220,.07);color:var(--hz-hint);padding:2px 7px;border-radius:5px;letter-spacing:.3px;">4a</span>
+          <span>Authorized Party</span>
+        </div>
         <div class="tile-name">New Authorized Party — Multiple Payers</div>
       </div>
       <div class="hz-divider"></div>
@@ -259,11 +271,14 @@ a.tile:hover::after { opacity: 1; right: 16px; }
       </div>
     </div>
 
-    <!-- ── 5. AP non-payer ── -->
+    <!-- ── 5a. AP non-payer ── -->
     <div class="tile hz-card tile-soon" aria-hidden="true">
       <span class="soon-badge">Coming soon</span>
       <div>
-        <div class="tile-scenario">Authorized Party</div>
+        <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;font-weight:800;background:rgba(100,92,220,.07);color:var(--hz-hint);padding:2px 7px;border-radius:5px;letter-spacing:.3px;">5a</span>
+          <span>Authorized Party</span>
+        </div>
         <div class="tile-name">Authorized Party — Non-Payer</div>
       </div>
       <div class="hz-divider"></div>
@@ -273,16 +288,63 @@ a.tile:hover::after { opacity: 1; right: 16px; }
       </div>
     </div>
 
-    <!-- ── 6. Returning AP ── -->
+    <!-- ── 6a. Returning AP ── -->
     <div class="tile hz-card tile-soon" aria-hidden="true">
       <span class="soon-badge">Coming soon</span>
       <div>
-        <div class="tile-scenario">Authorized Party</div>
+        <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;font-weight:800;background:rgba(100,92,220,.07);color:var(--hz-hint);padding:2px 7px;border-radius:5px;letter-spacing:.3px;">6a</span>
+          <span>Authorized Party</span>
+        </div>
         <div class="tile-name">Returning Authorized Party</div>
       </div>
       <div class="hz-divider"></div>
       <div>
         <div class="settings-label">Institution Settings</div>
+        <div class="settings-chips"><span class="chip tbd">TBD</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label">Home Page Scenarios</div>
+
+  <div class="grid">
+
+    <!-- ── 1b. Student Payer Plan Balance Increase ── -->
+    <a class="tile hz-card" href="home-1b-balance-increase.html" aria-label="1b · Student Payer Plan Balance Increase prototype">
+      <div>
+        <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;font-weight:800;background:rgba(13,122,85,.12);color:#0D7A55;padding:2px 7px;border-radius:5px;letter-spacing:.3px;">1b</span>
+          <span style="color:var(--hz-teal);">Student · Home</span>
+        </div>
+        <div class="tile-name">Student Payer Plan Balance Increase</div>
+      </div>
+      <div class="hz-divider"></div>
+      <div>
+        <div class="settings-label">Scenario Setup</div>
+        <div class="settings-chips">
+          <span class="chip highlight">Starts at home page</span>
+          <span class="chip">On payment plan</span>
+          <span class="chip">+$350 new lab fee</span>
+          <span class="chip">Open balance to address</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- ── 2b placeholder ── -->
+    <div class="tile hz-card tile-soon" aria-hidden="true">
+      <span class="soon-badge">Coming soon</span>
+      <div>
+        <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;font-weight:800;background:rgba(13,122,85,.06);color:var(--hz-hint);padding:2px 7px;border-radius:5px;letter-spacing:.3px;">2b</span>
+          <span>Student · Home</span>
+        </div>
+        <div class="tile-name">More scenarios coming</div>
+      </div>
+      <div class="hz-divider"></div>
+      <div>
+        <div class="settings-label">Scenario Setup</div>
         <div class="settings-chips"><span class="chip tbd">TBD</span></div>
       </div>
     </div>
