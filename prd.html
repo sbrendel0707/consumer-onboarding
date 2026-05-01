@@ -868,6 +868,41 @@ body {
   white-space: nowrap;
 }
 .sophie-download-btn:hover { opacity: .85; }
+
+/* Vision items need position:relative so the absolutely-positioned
+   edit button and edited tag are contained within the card */
+.sophie-mode [data-sophie-vision] .vision-item {
+  position: relative;
+  cursor: default;
+}
+.sophie-mode [data-sophie-vision] .vision-item:hover .sophie-edit-btn {
+  display: inline-flex;
+}
+.sophie-mode [data-sophie-vision] .vision-item:hover .sophie-edited-tag {
+  display: none !important;
+}
+
+/* Section-level "Add principle" button — appears at the bottom of each
+   owner-authored vision / perspective section */
+.sophie-add-vision-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: 1.5px dashed rgba(100,92,220,.25);
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--hz-accent);
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background .12s, border-color .12s;
+  text-align: left;
+}
+.sophie-add-vision-btn:hover { background: var(--hz-cloud); border-color: var(--hz-accent); }
 </style>
 </head>
 <body>
@@ -3103,19 +3138,25 @@ sections.forEach(function(s) { io.observe(s); });
 // file to replace the source.
 // ══════════════════════════════════════════════════════════════
 
-var SOPHIE_EDITS_KEY = 'hz_prd_sophie_edits'; // {reqId: {reqText, reqWhy, editedAt}}
-var SOPHIE_ADDED_KEY = 'hz_prd_sophie_added'; // [{id, afterId, reqText, reqWhy, editedAt}]
+var SOPHIE_EDITS_KEY        = 'hz_prd_sophie_edits';        // {reqId: {reqText, reqWhy, editedAt}}
+var SOPHIE_ADDED_KEY        = 'hz_prd_sophie_added';        // [{id, afterId, reqText, reqWhy, editedAt}]
+var SOPHIE_VISION_ADDED_KEY = 'hz_prd_sophie_vision_added'; // [{id, sectionId, afterId, visionTitle, visionBody, editedAt}]
 
 function getSophieEdits() {
   try { return JSON.parse(localStorage.getItem(SOPHIE_EDITS_KEY) || '{}'); }
   catch (e) { return {}; }
 }
 function storeSophieEdits(edits) { localStorage.setItem(SOPHIE_EDITS_KEY, JSON.stringify(edits)); }
-function getSophieAdded()  {
+function getSophieAdded() {
   try { return JSON.parse(localStorage.getItem(SOPHIE_ADDED_KEY) || '[]'); }
   catch (e) { return []; }
 }
 function storeSophieAdded(arr) { localStorage.setItem(SOPHIE_ADDED_KEY, JSON.stringify(arr)); }
+function getSophieVisionAdded() {
+  try { return JSON.parse(localStorage.getItem(SOPHIE_VISION_ADDED_KEY) || '[]'); }
+  catch (e) { return []; }
+}
+function storeSophieVisionAdded(arr) { localStorage.setItem(SOPHIE_VISION_ADDED_KEY, JSON.stringify(arr)); }
 
 // Stable content-hash ID from first 50 visible chars
 function hashReqText(str) {
@@ -3202,6 +3243,40 @@ function buildReqElement(data) {
     (data.reqWhy ? '<p class="req-why">' + data.reqWhy + '</p>' : '') +
     '<div class="req-tags"></div>';
   return el;
+}
+
+function buildVisionElement(data) {
+  var el = document.createElement('div');
+  el.className = 'vision-item';
+  el.dataset.reqId      = data.id;
+  el.dataset.modified   = data.editedAt || DOC_DATE;
+  el.dataset.sophieEdit = data.editedAt || DOC_DATE;
+  el.innerHTML =
+    '<div class="vision-icon">' + (data.icon || '💡') + '</div>' +
+    '<div>' +
+      '<div class="vision-title">' + (data.visionTitle || '') + '</div>' +
+      '<div class="vision-body">'  + (data.visionBody  || '') + '</div>' +
+    '</div>';
+  return el;
+}
+
+// Re-insert Sophie's custom-added vision items into their sections
+function applySophieVisionAdded() {
+  var added = getSophieVisionAdded();
+  // Process in creation order so chained insertions (add after an add) resolve correctly
+  added.forEach(function (item) {
+    if (document.querySelector('[data-req-id="' + item.id + '"]')) return; // already in DOM
+    var section = document.getElementById(item.sectionId);
+    if (!section) return;
+    var newEl = buildVisionElement(item);
+    if (item.afterId) {
+      var anchor = document.querySelector('[data-req-id="' + item.afterId + '"]');
+      if (anchor) { anchor.after(newEl); return; }
+    }
+    // Fallback: before the add-button (or append to section)
+    var addBtn = section.querySelector('.sophie-add-vision-btn');
+    addBtn ? addBtn.before(newEl) : section.appendChild(newEl);
+  });
 }
 
 // Wire edit button + edited tag onto a req-item (idempotent)
@@ -3519,20 +3594,23 @@ function enterVisionEditMode(el) {
     bodyLabel.after(taBody);
   }
 
-  // Controls: Save / Cancel only (no "add below" for vision items)
+  // Controls: Save / Cancel / ＋ Add principle below
   var controls = document.createElement('div');
   controls.className = 'sophie-controls';
-  var btnSave   = mkBtn('Save',   'sophie-btn-save');
-  var btnCancel = mkBtn('Cancel', 'sophie-btn-cancel');
+  var btnSave   = mkBtn('Save',                       'sophie-btn-save');
+  var btnCancel = mkBtn('Cancel',                     'sophie-btn-cancel');
+  var btnAdd    = mkBtn('＋ Add principle below',     'sophie-btn-add');
   controls.appendChild(btnSave);
   controls.appendChild(btnCancel);
+  controls.appendChild(btnAdd);
   el.appendChild(controls);
 
-  btnSave.addEventListener('click',   function () { commitVisionEdit(el, taTitle, taBody); });
+  btnSave.addEventListener('click',   function () { commitVisionEdit(el, taTitle, taBody, false); });
+  btnAdd.addEventListener('click',    function () { commitVisionEdit(el, taTitle, taBody, true);  });
   btnCancel.addEventListener('click', function () { abortVisionEdit(el); });
 }
 
-function commitVisionEdit(el, taTitle, taBody) {
+function commitVisionEdit(el, taTitle, taBody, andAddBelow) {
   var rawTitle = (taTitle ? taTitle.value : '').trim();
   var rawBody  = (taBody  ? taBody.value  : '').trim();
 
@@ -3562,16 +3640,25 @@ function commitVisionEdit(el, taTitle, taBody) {
 
   // Persist with type flag so applySophieEdits knows to use vision selectors
   var edits = getSophieEdits();
-  edits[el.dataset.reqId] = {
+  var saved = {
     type:        'vision',
     visionTitle: el.querySelector('.vision-title') ? el.querySelector('.vision-title').innerHTML : '',
     visionBody:  el.querySelector('.vision-body')  ? el.querySelector('.vision-body').innerHTML  : '',
     editedAt:    DOC_DATE
   };
+  edits[el.dataset.reqId] = saved;
   storeSophieEdits(edits);
+
+  // Also keep the vision-added list in sync (for Sophie-created items)
+  syncVisionAddedItem(el.dataset.reqId, saved);
 
   el.style.outline = '2px solid var(--hz-teal)';
   setTimeout(function () { el.style.outline = ''; }, 1300);
+
+  if (andAddBelow) {
+    var section = el.closest('[data-sophie-vision]');
+    if (section) insertNewVisionItemAfter(el, section);
+  }
 }
 
 function abortVisionEdit(el) {
@@ -3601,6 +3688,60 @@ function abortVisionEdit(el) {
 }
 
 
+// ── Vision section: add-principle button + insert logic ─────
+
+function addVisionSectionButtons() {
+  document.querySelectorAll('[data-sophie-vision]').forEach(function (section) {
+    if (section.querySelector('.sophie-add-vision-btn')) return; // already wired
+    var btn = document.createElement('button');
+    btn.className = 'sophie-add-vision-btn';
+    btn.innerHTML = '＋ Add principle';
+    btn.addEventListener('click', function () {
+      var items = section.querySelectorAll('.vision-item');
+      var last  = items.length ? items[items.length - 1] : null;
+      insertNewVisionItemAfter(last, section);
+    });
+    section.appendChild(btn);
+  });
+}
+
+function insertNewVisionItemAfter(afterEl, section) {
+  var newId  = 'sv-' + Date.now();
+  var newEl  = buildVisionElement({
+    id: newId, sectionId: section.id,
+    afterId: afterEl ? afterEl.dataset.reqId : null,
+    visionTitle: '', visionBody: '', editedAt: DOC_DATE
+  });
+
+  if (afterEl) {
+    afterEl.after(newEl);
+  } else {
+    var addBtn = section.querySelector('.sophie-add-vision-btn');
+    addBtn ? addBtn.before(newEl) : section.appendChild(newEl);
+  }
+
+  var added = getSophieVisionAdded();
+  added.push({ id: newId, sectionId: section.id,
+    afterId: afterEl ? afterEl.dataset.reqId : null,
+    visionTitle: '', visionBody: '', editedAt: DOC_DATE });
+  storeSophieVisionAdded(added);
+
+  decorateVisionItem(newEl);
+  newEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setTimeout(function () { enterVisionEditMode(newEl); }, 80);
+}
+
+function syncVisionAddedItem(id, data) {
+  var added   = getSophieVisionAdded();
+  var changed = false;
+  added = added.map(function (item) {
+    if (item.id !== id) return item;
+    changed = true;
+    return Object.assign({}, item, data);
+  });
+  if (changed) storeSophieVisionAdded(added);
+}
+
 // ── Boot ────────────────────────────────────────────────────
 function initSophieMode() {
   document.body.classList.add('sophie-mode');
@@ -3614,14 +3755,20 @@ function initSophieMode() {
   // 3. Re-insert any Sophie-added requirements
   applySophieAdded();
 
-  // 4. Wire edit buttons & edited tags onto all req-items
+  // 4. Re-insert any Sophie-added vision principles
+  applySophieVisionAdded();
+
+  // 5. Wire edit buttons & edited tags onto all req-items
   //    (including newly inserted ones from step 3)
   document.querySelectorAll('.req-item').forEach(decorateReqItem);
 
-  // 5. Wire edit buttons onto vision items in owner-authored sections
+  // 6. Wire edit buttons onto vision items (including newly restored ones from step 4)
   document.querySelectorAll('[data-sophie-vision] .vision-item').forEach(decorateVisionItem);
 
-  // 5. Add "Bake & download" button to visitor bar
+  // 7. Add section-level "+ Add principle" buttons to every owner-authored section
+  addVisionSectionButtons();
+
+  // 8. Add "Bake & download" button to visitor bar
   var bar = document.getElementById('visitor-bar');
   if (bar && !bar.querySelector('.sophie-download-btn')) {
     var dlBtn = document.createElement('button');
