@@ -85,12 +85,24 @@ body {
   color: var(--hz-hint);
   margin-top: 1px;
 }
+.nav-update-badge {
+  float: right;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 10px;
+  padding: 2px 6px;
+  margin-top: 1px;
+  white-space: nowrap;
+}
 
 .main {
   flex: 1;
   min-width: 0;
-  padding: 52px 52px 100px;
-  max-width: 860px;
+  padding: 52px clamp(28px, 4vw, 72px) 100px;
 }
 
 /* ── Name overlay ── */
@@ -3038,6 +3050,32 @@ document.getElementById('name-form').addEventListener('submit', function(e) {
   openAsViewer(name);
 });
 
+function updateNavWithChanges() {
+  // Remove any stale badges first
+  document.querySelectorAll('.nav-update-badge').forEach(function(b) { b.remove(); });
+
+  // For each nav link that points to an anchor, check how many changed items are inside that section
+  document.querySelectorAll('.nav-link[href^="#"]').forEach(function(link) {
+    var targetId = link.getAttribute('href').slice(1);
+    var section  = document.getElementById(targetId);
+    if (!section) return;
+
+    // Count .changed items scoped to this section only (not nested sections)
+    // Use a temporary approach: count direct-descendant changed items
+    var changed = section.querySelectorAll('.changed');
+    // Subtract those that belong to a nested section with its own nav link
+    var nested = section.querySelectorAll('section[id] .changed');
+    var ownCount = changed.length - nested.length;
+    if (ownCount <= 0) return;
+
+    var badge = document.createElement('span');
+    badge.className = 'nav-update-badge';
+    badge.textContent = ownCount;
+    // Prepend so it floats right before text renders
+    link.insertBefore(badge, link.firstChild);
+  });
+}
+
 function openAsViewer(name) {
   const key      = storageKey(name);
   const lastSeen = localStorage.getItem(key) || '2000-01-01';
@@ -3080,6 +3118,9 @@ function openAsViewer(name) {
       '<strong>' + count + ' requirement' + (count !== 1 ? 's' : '') +
       ' updated since your last visit.</strong> Items are highlighted in amber throughout the document — scroll through or jump to a section from the left nav.';
     banner.style.display = 'block';
+
+    // Annotate nav links with per-section counts
+    updateNavWithChanges();
   }
 }
 
@@ -3088,6 +3129,8 @@ function switchViewer() {
   document.querySelectorAll('.changed').forEach(function(el) {
     el.classList.remove('changed');
   });
+  // Clear nav badges
+  document.querySelectorAll('.nav-update-badge').forEach(function(b) { b.remove(); });
   document.getElementById('visitor-bar').style.display  = 'none';
   document.getElementById('change-banner').style.display = 'none';
   document.getElementById('visitor-change-pill').style.display = 'none';
