@@ -619,6 +619,125 @@ body {
   .if-block { margin-left: 8px; }
 }
 
+/* ── Institution Configuration ── */
+.inst-scope {
+  background: var(--hz-card);
+  border: 1px solid var(--hz-border);
+  border-left: 3px solid var(--hz-indigo);
+  border-radius: 13px;
+  padding: 16px 20px;
+  margin-bottom: 32px;
+}
+.inst-scope-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .9px;
+  color: var(--hz-indigo);
+  margin-bottom: 8px;
+}
+.inst-scope p {
+  font-size: 13px;
+  color: var(--hz-muted);
+  line-height: 1.7;
+}
+.inst-scope strong { color: var(--hz-text); font-weight: 600; }
+
+.inst-group { margin-bottom: 40px; }
+.inst-group-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 9px;
+  border-bottom: 1.5px solid var(--hz-border);
+}
+.inst-group-icon { font-size: 16px; flex-shrink: 0; }
+.inst-group-title { font-size: 14.5px; font-weight: 700; color: var(--hz-text); }
+
+.inst-item {
+  background: var(--hz-card);
+  border: 1px solid var(--hz-border);
+  border-radius: 11px;
+  padding: 13px 15px;
+  margin-bottom: 7px;
+  position: relative;
+}
+.inst-item-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--hz-text);
+  margin-bottom: 3px;
+}
+.inst-item-desc {
+  font-size: 12px;
+  color: var(--hz-muted);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+.inst-options-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.inst-options-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--hz-hint);
+  margin-right: 2px;
+  flex-shrink: 0;
+}
+.iopt {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 9px;
+  border-radius: 5px;
+  border: 1px solid var(--hz-border);
+  background: var(--hz-bg);
+  color: var(--hz-muted);
+  white-space: nowrap;
+}
+.iopt-on {
+  background: var(--hz-cloud);
+  color: var(--hz-indigo);
+  border-color: rgba(100,92,220,.25);
+  font-weight: 600;
+}
+.iopt-off {
+  background: var(--hz-bg);
+  color: var(--hz-hint);
+}
+.iopt-variable {
+  background: #F0EBF8;
+  color: #6B35A8;
+  border-color: rgba(107,53,168,.2);
+}
+.iopt-proto {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: var(--hz-teal);
+  background: var(--hz-teal-bg);
+  border: 1px solid rgba(13,122,85,.2);
+  border-radius: 4px;
+  padding: 1px 7px;
+  margin-left: 4px;
+}
+.inst-item-impact {
+  font-size: 12px;
+  color: var(--hz-muted);
+  line-height: 1.6;
+  border-top: 1px solid var(--hz-border);
+  padding-top: 8px;
+}
+.inst-item-impact strong { color: var(--hz-text); font-weight: 600; }
+.inst-item-impact .arrow { color: var(--hz-accent); font-weight: 700; margin: 0 3px; }
+
 /* ══════════════════════════════════════════
    SOPHIE INLINE EDIT MODE
    All .sophie-* styles — only active when
@@ -832,6 +951,17 @@ body {
       <a href="#feat-authorized-parties" class="nav-link nav-sub-item">Authorized Parties</a>
       <a href="#feat-communications"     class="nav-link nav-sub-item">Communications</a>
       <a href="#feat-disclosures"        class="nav-link nav-sub-item">Disclosures</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Institution Config</div>
+      <a href="#inst-config"            class="nav-link">Overview &amp; Scope</a>
+      <a href="#inst-payment-methods"   class="nav-link nav-sub-item">Payment Methods</a>
+      <a href="#inst-pay-over-time"     class="nav-link nav-sub-item">Pay Over Time</a>
+      <a href="#inst-insurance"         class="nav-link nav-sub-item">Tuition Insurance</a>
+      <a href="#inst-auth-parties"      class="nav-link nav-sub-item">Authorized Parties</a>
+      <a href="#inst-disclosures"       class="nav-link nav-sub-item">Disclosures</a>
+      <a href="#inst-communications"    class="nav-link nav-sub-item">Communications</a>
     </div>
 
     <div class="nav-group">
@@ -2057,6 +2187,363 @@ body {
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>When no quick actions are valid, the Quick Actions section is hidden.</strong> This state is rare (fully paid, no pending items, insurance already decided, APs already set up, payment method on file) but must be handled gracefully — never show an empty quick actions section.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
+      </div>
+
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         INSTITUTION CONFIGURATION
+    ════════════════════════════════════════ -->
+    <section id="inst-config" class="prd-section">
+      <div class="section-eyebrow">Institution Configuration</div>
+      <h2 class="section-title">Institution Configuration Options</h2>
+      <hr class="section-divider"/>
+
+      <!-- Scope statement -->
+      <div class="inst-scope">
+        <div class="inst-scope-label">Scope of this section</div>
+        <p>All scenarios represent students authenticating via <strong>SAML SSO</strong> directly from their university's portal, with <strong>full ERP integration</strong> — charges, financial aid, and enrollment data synced automatically. <strong>Authorized payers are managed within Nelnet's system</strong>; the student controls who has access and at what level.</p>
+        <p style="margin-top:10px;">This section documents every institution-level setting that changes what a student or authorized party sees and can do inside the Horizon experience. Settings are configured per institution at the time of implementation. Where the current prototype uses a specific value, that value is marked <span class="iopt-proto" style="display:inline-block">Prototype default</span>.</p>
+      </div>
+
+
+      <!-- ── Payment Methods ── -->
+      <div class="inst-group" id="inst-payment-methods">
+        <div class="inst-group-header">
+          <div class="inst-group-icon">💳</div>
+          <div class="inst-group-title">Payment Methods</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">ACH / Bank Account</div>
+          <div class="inst-item-desc">Allow students and authorized payers to pay via direct bank transfer (ACH). No service fee applies to ACH payments.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Enabled <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt iopt-off">Disabled</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> If disabled, bank account will not appear as a payment option. Students will only see card-based methods — meaning the 2.75% service fee will always apply.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Credit Card</div>
+          <div class="inst-item-desc">Allow payments via credit card. A service fee applies; the percentage is institution-configured (see below).</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Enabled <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt iopt-off">Disabled</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> If disabled, credit card will not appear as a payment option. The service fee disclosure note is also suppressed when all card types are disabled.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Debit Card</div>
+          <div class="inst-item-desc">Allow payments via debit card. Treated the same as credit card for fee and routing purposes unless the institution explicitly separates them.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Enabled <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt iopt-off">Disabled</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> Same as credit card. If both credit and debit are disabled but ACH is on, students pay via bank account only with no service fee.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Card Service Fee Percentage</div>
+          <div class="inst-item-desc">The percentage added to any card-based payment (credit or debit). Disclosed to the student before they select a payment method, and reflected in the payment confirmation total.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-variable">Institution-configured % <span class="iopt-proto">2.75% in prototype</span></span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> The fee notice reads "Card payments include a <strong>[X]% service fee</strong>" — the percentage is dynamic. A student paying $1,000 by card at 2.75% sees their total displayed as $1,027.50 before confirming. ACH always shows no fee.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">School Enrollment Fee</div>
+          <div class="inst-item-desc">A one-time, non-refundable fee charged by the institution at the time the student confirms their payment setup. Appears as a separate line item in the balance breakdown.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-variable">$0 (waived) or institution-set amount <span class="iopt-proto">$25 in prototype</span></span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> When set to $0 the enrollment fee line is hidden entirely. When set to a positive amount it appears in the balance summary and is included in the total the student pays at confirmation. It does not roll into POT installments.</div>
+        </div>
+      </div>
+
+
+      <!-- ── Pay Over Time ── -->
+      <div class="inst-group" id="inst-pay-over-time">
+        <div class="inst-group-header">
+          <div class="inst-group-icon">📆</div>
+          <div class="inst-group-title">Pay Over Time (Payment Plans)</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Pay Over Time — Feature Toggle</div>
+          <div class="inst-item-desc">Master on/off for payment plan offerings. When disabled, students only see the Pay in Full path during onboarding.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Enabled <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt iopt-off">Disabled</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> If disabled, the "How to Pay" step shows only Pay in Full. The POT plan setup screens, plan confirmation, and the "Set Up Payment Plan" quick action on the home screen are all suppressed.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Number of Plans Offered</div>
+          <div class="inst-item-desc">How many distinct Pay Over Time plans the institution makes available to students. Each plan can have different down payment requirements, installment counts, dates, and fees.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">1 plan <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt">2 plans</span>
+            <span class="iopt">3+ plans</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> When exactly 1 plan is configured, the student skips the plan-selection screen and goes directly to down payment selection for that plan. When 2 or more plans exist, the student sees a plan picker first and chooses between the available options.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Down Payment Configuration (per plan)</div>
+          <div class="inst-item-desc">Defines how the required down payment is determined for each plan. Can be a fixed percentage of the net balance, a tiered range the student selects within, or a flat minimum amount.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-variable">Fixed % of balance <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt iopt-variable">Student-selected % within a min–max range</span>
+            <span class="iopt iopt-variable">Flat minimum dollar amount</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> A fixed percentage requires no input from the student — the down payment is shown and confirmed. A range lets the student choose how much to put down (within bounds), showing how their selection changes the installment amount in real time. This is one of the highest-impact configuration decisions for perceived flexibility.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Number of Installments (per plan)</div>
+          <div class="inst-item-desc">How many equal installment payments the remaining balance is divided into after the down payment. Drives the per-installment amount displayed during plan confirmation.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-variable">Institution-configured count per plan <span class="iopt-proto">4 in prototype</span></span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> Directly determines the installment amount shown in the natural-language plan summary: "you'll be charged [frequency] — [N] payments of [$X] each." Smaller installment counts mean larger per-payment amounts.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Payment Frequency (per plan)</div>
+          <div class="inst-item-desc">How often installment payments are charged — monthly is the most common, but institutions may offer bi-weekly or term-specific schedules.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Monthly <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt">Bi-weekly</span>
+            <span class="iopt iopt-variable">Custom schedule</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> The payment frequency label appears in the plan summary ("charged monthly") and determines the spacing between dates in the installment schedule. It also affects the Upcoming Payments module — a monthly plan will show at most one upcoming installment at a time.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Plan Start Date &amp; End Date (per plan)</div>
+          <div class="inst-item-desc">The date range during which the plan is active. The first installment date is derived from the plan start date; the final installment aligns with the plan end date.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-variable">Institution-configured per plan and term <span class="iopt-proto">End date: Dec 15, 2026 in prototype</span></span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> Both dates appear in the plan confirmation summary. If today's date is after the plan start, the first installment due date is adjusted to the next valid payment date in the schedule.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Plan Enrollment Fee (per plan)</div>
+          <div class="inst-item-desc">An optional fee charged to the student when they enroll in a specific Pay Over Time plan. Distinct from the school enrollment fee — this is plan-specific and may differ across plans at the same institution.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt">$0 (no fee)</span>
+            <span class="iopt iopt-variable">Institution-set flat amount</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> When a plan enrollment fee exists, it is shown as a separate line in the plan confirmation screen and added to the amount due today alongside the down payment. It is not rolled into future installments.</div>
+        </div>
+      </div>
+
+
+      <!-- ── Tuition Insurance ── -->
+      <div class="inst-group" id="inst-insurance">
+        <div class="inst-group-header">
+          <div class="inst-group-icon">🛡️</div>
+          <div class="inst-group-title">Tuition Insurance (GradGuard)</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">GradGuard — Feature Toggle</div>
+          <div class="inst-item-desc">Master on/off for the tuition insurance offering. When enabled, students are presented an insurance offer during onboarding with their calculated premium.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Enabled <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt iopt-off">Disabled</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> If disabled, the insurance step is skipped entirely — no mention of GradGuard anywhere in the experience. The "Add Tuition Insurance" and "Tuition Insurance" quick actions are also suppressed. The insurance card on the home screen never appears.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">GradGuard Plan / Premium Calculation</div>
+          <div class="inst-item-desc">The specific GradGuard plan the institution has contracted, which determines the premium percentage applied to the student's total enrollment charges to produce their individual premium quote.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-variable">Institution-specific plan rate (applied to total charges)</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> The dollar amount of the premium shown to the student is entirely determined by this rate × their total charges. Two students at the same institution with different enrollment amounts will see different premium quotes for the same plan.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Insurance Offer Re-presentation</div>
+          <div class="inst-item-desc">Whether the insurance offer is re-surfaced to a returning student in a new term if they previously declined (or if it's a new term's policy year).</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-variable">Re-present each term</span>
+            <span class="iopt">Never re-present after decline</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> A student who declined insurance last term will either see the offer again at the start of this term (re-present) or proceed past the step automatically (never re-present). This setting is most relevant for Scenario 2 (Returning Student) and will be documented further there.</div>
+        </div>
+      </div>
+
+
+      <!-- ── Authorized Parties ── -->
+      <div class="inst-group" id="inst-auth-parties">
+        <div class="inst-group-header">
+          <div class="inst-group-icon">👥</div>
+          <div class="inst-group-title">Authorized Parties</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Authorized Party Feature — Toggle</div>
+          <div class="inst-item-desc">Master on/off for the ability to invite and manage authorized parties. When disabled, the AP invite step is removed from onboarding and the AP management section is hidden from Account Settings.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Enabled <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt iopt-off">Disabled</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> If disabled, students cannot add payers or viewers. The "Add Authorized Party" quick action is suppressed. APs cannot receive invite links or log in.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Maximum Authorized Parties per Student</div>
+          <div class="inst-item-desc">The maximum number of authorized parties a student may add to their account simultaneously. Once the limit is reached, the "Add Authorized Party" option is replaced with a message indicating the limit.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Unlimited <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt iopt-variable">Institution-set limit (e.g. 2, 5)</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> Students at institutions with a limit see the AP invite step disabled once they reach it. The "Add Authorized Party" quick action is hidden at that point even if other AP conditions would normally show it.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Available AP Permission Levels</div>
+          <div class="inst-item-desc">Which levels of access a student can grant to an authorized party. Institutions may restrict the available options to control the maximum access an AP can receive.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">View only</span>
+            <span class="iopt iopt-on">Can make payments <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt">Can manage payment methods</span>
+            <span class="iopt">Full account access</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> The permission level picker shown to the student during AP setup only shows options the institution has enabled. A student at an institution that only allows "View only" and "Can make payments" will never see the "Full access" option, regardless of what they might want to grant.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Guest Payment Links</div>
+          <div class="inst-item-desc">Allow students to generate a one-time payment link for a third party who should be able to make a single payment with no ongoing account access. Distinct from an authorized party — the recipient cannot log in and the link expires after one use.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Enabled <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt iopt-off">Disabled</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> When enabled, students see a "Send guest payment link" option when managing their AP settings. When disabled, this option is hidden and the student's only option for involving a third party is to add a full authorized party.</div>
+        </div>
+      </div>
+
+
+      <!-- ── Disclosures ── -->
+      <div class="inst-group" id="inst-disclosures">
+        <div class="inst-group-header">
+          <div class="inst-group-icon">📄</div>
+          <div class="inst-group-title">Disclosures</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Number of Disclosure Sections</div>
+          <div class="inst-item-desc">How many sequential disclosure accordion sections the student must open and acknowledge before they can e-sign. Each section is a distinct policy or agreement — e.g., payment terms, refund policy, enrollment agreement, Nelnet terms.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-variable">Institution-configured (1–N) <span class="iopt-proto">4 sections in prototype</span></span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> More sections = more steps before the e-sign field activates. The progress indicator updates accordingly. Each section requires an explicit acknowledgment tap before the next opens. The total count is shown so students know what to expect upfront.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Disclosure Content &amp; Templates</div>
+          <div class="inst-item-desc">The actual text of each disclosure section. Institutions provide their own policy text. Nelnet may include a universal section in addition to institution-specific sections. Content is managed outside this prototype.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-variable">Institution-provided text per section</span>
+            <span class="iopt">Nelnet universal section (appended)</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> Students see exactly the disclosure text their institution has configured. The PDF download for each section produces a document matching that institution's content — not a generic template. Changes to disclosure content require an institution to update their configured templates.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">E-Signature Requirement</div>
+          <div class="inst-item-desc">Whether a typed full-name signature and confirmation checkbox are required to complete the disclosures step. In practice this should always be required, but is documented here as a configuration point.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Required <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt iopt-off">Waived (acknowledgment only)</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> When required, the student must type their name (min 3 characters) and check a confirmation box before submitting. The submit button remains disabled until both conditions are met. When waived, acknowledgment of each section alone is sufficient to proceed.</div>
+        </div>
+      </div>
+
+
+      <!-- ── Communications ── -->
+      <div class="inst-group" id="inst-communications">
+        <div class="inst-group-header">
+          <div class="inst-group-icon">📬</div>
+          <div class="inst-group-title">Communications</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Available Notification Channels</div>
+          <div class="inst-item-desc">Which notification channels are offered to students during the Communications setup step. Email is always required. SMS is optional — institutions may enable or disable text messaging entirely.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Email (always on)</span>
+            <span class="iopt iopt-on">SMS / Text <span class="iopt-proto">Prototype default: enabled</span></span>
+            <span class="iopt iopt-off">SMS disabled</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> If SMS is disabled by the institution, the phone number field and all SMS preference toggles are hidden. The Communications step becomes email-only. Students are not asked for a phone number if SMS is not offered.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Informational SMS Default State</div>
+          <div class="inst-item-desc">The default opt-in state for informational text messages (billing updates, payment confirmations, plan changes). Students can always change this, but the starting position is institution-configured.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Default ON <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt">Default OFF</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> Default ON means students are opted into informational texts unless they explicitly turn them off. Default OFF means students receive no texts unless they opt in. This is a meaningful business rule — institutions in regulated environments may require explicit opt-in.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">Marketing SMS — Visibility</div>
+          <div class="inst-item-desc">Whether the marketing text messages toggle is shown to students at all. Some institutions may not have a marketing SMS program and should not surface an irrelevant preference toggle.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Shown (default OFF) <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt iopt-off">Hidden</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> When hidden, the Communications step is simpler — students see only the informational SMS toggle without a separate marketing row. When shown, the toggle defaults to OFF and students can choose to opt in.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-01">
+          <div class="inst-item-name">University Disclosure Count in Context Block</div>
+          <div class="inst-item-desc">The number shown in the "institution settings" chip on the index page and referenced in onboarding — specifically the count of university-specific disclosures a student will see.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-variable">Institution-configured count <span class="iopt-proto">3 university disclosures in prototype</span></span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> This count is surfaced in the onboarding progress indicator so students know upfront how many institution-specific disclosures they will encounter versus Nelnet's universal terms.</div>
+        </div>
       </div>
 
     </section>
