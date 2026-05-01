@@ -618,6 +618,137 @@ body {
   .visitor-bar { padding: 9px 20px; }
   .if-block { margin-left: 8px; }
 }
+
+/* ══════════════════════════════════════════
+   SOPHIE INLINE EDIT MODE
+   All .sophie-* styles — only active when
+   body has class "sophie-mode"
+══════════════════════════════════════════ */
+
+/* ✏ Edit button — hidden until item is hovered */
+.sophie-edit-btn {
+  display: none;
+  position: absolute;
+  top: 8px; right: 10px;
+  background: var(--hz-card);
+  border: 1px solid rgba(100,92,220,.28);
+  border-radius: 7px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--hz-accent);
+  font-family: inherit;
+  cursor: pointer;
+  line-height: 1.5;
+  transition: background .1s, border-color .1s;
+  z-index: 4;
+  align-items: center;
+  gap: 4px;
+}
+.sophie-edit-btn:hover  { background: var(--hz-cloud); border-color: var(--hz-accent); }
+.sophie-mode .req-item:hover .sophie-edit-btn { display: inline-flex; }
+/* push below the "Updated" badge when it's present */
+.sophie-mode .req-item.changed:hover .sophie-edit-btn { top: 34px; }
+/* fade the Updated badge so edit btn can be seen clearly */
+.sophie-mode .req-item.changed:hover::after { opacity: 0; transition: opacity .1s; }
+
+/* ✎ Edited tag — shown on Sophie-touched items */
+.sophie-edited-tag {
+  display: none;
+  position: absolute;
+  bottom: 8px; right: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: var(--hz-teal);
+  background: var(--hz-teal-bg);
+  border: 1px solid rgba(13,122,85,.22);
+  border-radius: 5px;
+  padding: 2px 7px;
+  pointer-events: none;
+}
+/* hide the tag while hovering (edit btn is showing) */
+.sophie-mode .req-item:hover .sophie-edited-tag { display: none !important; }
+
+/* Inline textareas for editing */
+.sophie-ta {
+  width: 100%;
+  border: 1.5px solid var(--hz-accent);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--hz-text);
+  background: #fbfbff;
+  outline: none;
+  resize: vertical;
+  min-height: 64px;
+  line-height: 1.55;
+  margin-bottom: 6px;
+  display: block;
+  box-sizing: border-box;
+}
+.sophie-ta-why {
+  font-size: 12px;
+  color: var(--hz-muted);
+  min-height: 44px;
+  border-color: rgba(100,92,220,.3);
+}
+.sophie-ta:focus { border-color: var(--hz-indigo); box-shadow: 0 0 0 3px rgba(100,92,220,.1); }
+.sophie-ta-why-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--hz-hint);
+  margin: 6px 0 3px;
+}
+
+/* Save / Cancel / Add-below controls */
+.sophie-controls {
+  display: flex;
+  gap: 7px;
+  margin-top: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.sophie-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 15px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity .12s;
+  line-height: 1.4;
+}
+.sophie-btn:hover     { opacity: .82; }
+.sophie-btn-save      { background: var(--hz-indigo); color: #fff; }
+.sophie-btn-cancel    { background: var(--hz-bg); color: var(--hz-muted); border: 1px solid var(--hz-border); }
+.sophie-btn-add       { background: transparent; color: var(--hz-teal); border: 1px solid rgba(13,122,85,.3); margin-left: auto; }
+.sophie-btn-add:hover { background: var(--hz-teal-bg); opacity: 1; }
+
+/* Bake & download button (in visitor bar) */
+.sophie-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--hz-indigo);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 13px;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity .12s;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+.sophie-download-btn:hover { opacity: .85; }
 </style>
 </head>
 <body>
@@ -1974,9 +2105,10 @@ function openAsViewer(name) {
   var bar = document.getElementById('visitor-bar');
   bar.style.display = 'flex';
 
-  // Show prototype home link only for Sophie
+  // Show prototype home link only for Sophie; activate edit mode
   if (name.toLowerCase() === 'sophie') {
     document.getElementById('home-link').style.display = 'flex';
+    initSophieMode();
   }
 
   // Show change pill + banner if there are updates
@@ -2004,6 +2136,13 @@ function switchViewer() {
   document.getElementById('home-link').style.display = 'none';
   document.getElementById('name-input').value = '';
   document.getElementById('name-overlay').style.display = 'flex';
+
+  // Tear down Sophie edit mode
+  document.body.classList.remove('sophie-mode');
+  var dlBtn = document.querySelector('.sophie-download-btn');
+  if (dlBtn) dlBtn.remove();
+  // Cancel any open edit (abort gracefully)
+  document.querySelectorAll('.req-item[data-editing]').forEach(abortEdit);
 }
 
 // ── Active nav highlight on scroll ──
@@ -2021,6 +2160,386 @@ var io = new IntersectionObserver(function(entries) {
 }, { rootMargin: '-20% 0px -72% 0px' });
 
 sections.forEach(function(s) { io.observe(s); });
+
+
+// ══════════════════════════════════════════════════════════════
+// SOPHIE INLINE EDIT MODE
+//
+// Edits are saved to localStorage under hz_prd_sophie_edits and
+// hz_prd_sophie_added — they persist across refreshes and are
+// re-applied on top of whatever the base HTML says.
+//
+// IDs are content-hashes of the first 50 chars of each req-item's
+// visible text. If Claude rewrites an item's text, the hash changes
+// and that specific Sophie edit no longer applies — which is the
+// correct behavior (the edit was for the old text). All other
+// Sophie edits are unaffected.
+//
+// "Bake & download" produces a prd.html with Sophie's edits written
+// into the actual HTML so all other viewers see them. Commit that
+// file to replace the source.
+// ══════════════════════════════════════════════════════════════
+
+var SOPHIE_EDITS_KEY = 'hz_prd_sophie_edits'; // {reqId: {reqText, reqWhy, editedAt}}
+var SOPHIE_ADDED_KEY = 'hz_prd_sophie_added'; // [{id, afterId, reqText, reqWhy, editedAt}]
+
+function getSophieEdits() {
+  try { return JSON.parse(localStorage.getItem(SOPHIE_EDITS_KEY) || '{}'); }
+  catch (e) { return {}; }
+}
+function storeSophieEdits(edits) { localStorage.setItem(SOPHIE_EDITS_KEY, JSON.stringify(edits)); }
+function getSophieAdded()  {
+  try { return JSON.parse(localStorage.getItem(SOPHIE_ADDED_KEY) || '[]'); }
+  catch (e) { return []; }
+}
+function storeSophieAdded(arr) { localStorage.setItem(SOPHIE_ADDED_KEY, JSON.stringify(arr)); }
+
+// Stable content-hash ID from first 50 visible chars
+function hashReqText(str) {
+  var h = 0, s = (str || '').trim().slice(0, 50);
+  for (var i = 0; i < s.length; i++) { h = (Math.imul(31, h) + s.charCodeAt(i)) | 0; }
+  return 'r' + Math.abs(h).toString(36);
+}
+function assignReqIds() {
+  document.querySelectorAll('.req-item').forEach(function (el) {
+    if (el.dataset.reqId) return; // already has one (e.g. Sophie-added item)
+    var txt = el.querySelector('.req-text');
+    el.dataset.reqId = txt ? hashReqText(txt.innerText) : hashReqText(String(Date.now() + Math.random()));
+  });
+}
+
+// Re-apply Sophie's stored edits on top of the base HTML
+function applySophieEdits() {
+  var edits = getSophieEdits();
+  Object.keys(edits).forEach(function (id) {
+    var data = edits[id];
+    var el = document.querySelector('[data-req-id="' + id + '"]');
+    if (!el) return;
+    var textEl = el.querySelector('.req-text');
+    var whyEl  = el.querySelector('.req-why');
+    if (textEl && data.reqText !== undefined) textEl.innerHTML = data.reqText;
+    if (data.reqWhy !== undefined) {
+      if (whyEl) {
+        if (data.reqWhy) { whyEl.innerHTML = data.reqWhy; }
+        else             { whyEl.remove(); }
+      } else if (data.reqWhy) {
+        var nw = document.createElement('p');
+        nw.className = 'req-why';
+        nw.innerHTML = data.reqWhy;
+        var tags = el.querySelector('.req-tags');
+        tags ? tags.before(nw) : el.appendChild(nw);
+      }
+    }
+    el.dataset.sophieEdit = data.editedAt || DOC_DATE;
+    el.dataset.modified   = data.editedAt || DOC_DATE;
+  });
+}
+
+// Re-insert Sophie's custom-added items
+function applySophieAdded() {
+  var added = getSophieAdded();
+  // Process in order so chains (add after an add) work correctly
+  added.forEach(function (item) {
+    if (document.querySelector('[data-req-id="' + item.id + '"]')) return; // already in DOM
+    var anchor = document.querySelector('[data-req-id="' + item.afterId + '"]');
+    if (!anchor) return;
+    var newEl = buildReqElement(item);
+    anchor.after(newEl);
+  });
+}
+
+function buildReqElement(data) {
+  var el = document.createElement('div');
+  el.className = 'req-item';
+  el.dataset.reqId      = data.id;
+  el.dataset.modified   = data.editedAt || DOC_DATE;
+  el.dataset.sophieEdit = data.editedAt || DOC_DATE;
+  el.innerHTML =
+    '<p class="req-text">' + (data.reqText || '') + '</p>' +
+    (data.reqWhy ? '<p class="req-why">' + data.reqWhy + '</p>' : '') +
+    '<div class="req-tags"></div>';
+  return el;
+}
+
+// Wire edit button + edited tag onto a req-item (idempotent)
+function decorateReqItem(el) {
+  if (el.querySelector('.sophie-edit-btn')) return;
+
+  var editBtn = document.createElement('button');
+  editBtn.className = 'sophie-edit-btn';
+  editBtn.innerHTML = '✏ Edit';
+  editBtn.setAttribute('aria-label', 'Edit this requirement');
+  editBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    enterEditMode(el);
+  });
+  el.appendChild(editBtn);
+
+  var tag = document.createElement('span');
+  tag.className = 'sophie-edited-tag';
+  tag.textContent = '✎ Edited';
+  tag.style.display = el.dataset.sophieEdit ? 'block' : 'none';
+  el.appendChild(tag);
+}
+
+function enterEditMode(el) {
+  if (el.dataset.editing) return;
+  el.dataset.editing = '1';
+
+  var editBtn = el.querySelector('.sophie-edit-btn');
+  var tag     = el.querySelector('.sophie-edited-tag');
+  if (editBtn) editBtn.style.display = 'none';
+  if (tag)     tag.style.display     = 'none';
+
+  var textEl = el.querySelector('.req-text');
+  var whyEl  = el.querySelector('.req-why');
+
+  // Stash originals for cancel
+  el.dataset.origText = textEl ? textEl.innerHTML : '';
+  el.dataset.origWhy  = whyEl  ? whyEl.innerHTML  : '';
+
+  // Main text textarea
+  var taText = document.createElement('textarea');
+  taText.className = 'sophie-ta sophie-ta-text';
+  taText.value = textEl ? textEl.innerText.trim() : '';
+  taText.rows  = Math.max(3, Math.ceil(taText.value.length / 72));
+  if (textEl) textEl.replaceWith(taText);
+  else el.insertBefore(taText, el.firstChild);
+  taText.focus();
+  taText.setSelectionRange(taText.value.length, taText.value.length);
+
+  // Why label + textarea
+  var whyLabel = document.createElement('p');
+  whyLabel.className = 'sophie-ta-why-label';
+  whyLabel.textContent = 'Why / Rationale';
+
+  var taWhy = document.createElement('textarea');
+  taWhy.className = 'sophie-ta sophie-ta-why';
+  taWhy.placeholder = 'Rationale for this requirement (optional)…';
+  // Strip leading "Why: " prefix for editing clarity
+  taWhy.value = whyEl ? whyEl.innerText.replace(/^Why:\s*/i, '').trim() : '';
+  taWhy.rows  = Math.max(2, Math.ceil(taWhy.value.length / 90));
+
+  if (whyEl) {
+    whyEl.replaceWith(whyLabel);
+    whyLabel.after(taWhy);
+  } else {
+    var tagsEl = el.querySelector('.req-tags');
+    if (tagsEl) { tagsEl.before(whyLabel); whyLabel.after(taWhy); }
+    else        { el.appendChild(whyLabel); el.appendChild(taWhy); }
+  }
+
+  // Controls: Save / Cancel / + Add requirement below
+  var controls = document.createElement('div');
+  controls.className = 'sophie-controls';
+
+  var btnSave   = mkBtn('Save',                     'sophie-btn-save');
+  var btnCancel = mkBtn('Cancel',                   'sophie-btn-cancel');
+  var btnAdd    = mkBtn('＋ Add requirement below', 'sophie-btn-add');
+
+  controls.appendChild(btnSave);
+  controls.appendChild(btnCancel);
+  controls.appendChild(btnAdd);
+  el.appendChild(controls);
+
+  btnSave.addEventListener('click',   function () { commitEdit(el, taText, taWhy, false); });
+  btnAdd.addEventListener('click',    function () { commitEdit(el, taText, taWhy, true);  });
+  btnCancel.addEventListener('click', function () { abortEdit(el); });
+}
+
+function mkBtn(label, cls) {
+  var b = document.createElement('button');
+  b.className = 'sophie-btn ' + cls;
+  b.textContent = label;
+  return b;
+}
+
+function commitEdit(el, taText, taWhy, andAddBelow) {
+  var rawText = (taText ? taText.value : '').trim();
+  var rawWhy  = (taWhy  ? taWhy.value  : '').trim();
+
+  // Rebuild .req-text
+  var pText = document.createElement('p');
+  pText.className = 'req-text';
+  pText.innerHTML = toHTML(rawText);
+  taText.replaceWith(pText);
+
+  // Rebuild or remove .req-why
+  var whyLabel = el.querySelector('.sophie-ta-why-label');
+  if (rawWhy) {
+    var pWhy = document.createElement('p');
+    pWhy.className = 'req-why';
+    pWhy.innerHTML = '<strong>Why:</strong> ' + toHTML(rawWhy);
+    taWhy.replaceWith(pWhy);
+    if (whyLabel) whyLabel.remove();
+  } else {
+    if (taWhy)     taWhy.remove();
+    if (whyLabel)  whyLabel.remove();
+  }
+
+  var controls = el.querySelector('.sophie-controls');
+  if (controls) controls.remove();
+  delete el.dataset.editing;
+
+  // Mark and timestamp
+  el.dataset.sophieEdit = DOC_DATE;
+  el.dataset.modified   = DOC_DATE;
+
+  var tag = el.querySelector('.sophie-edited-tag');
+  if (tag)     tag.style.display = 'block';
+  var editBtn = el.querySelector('.sophie-edit-btn');
+  if (editBtn) editBtn.style.display = '';
+
+  // Persist edit to localStorage
+  var edits   = getSophieEdits();
+  var finalTextEl = el.querySelector('.req-text');
+  var finalWhyEl  = el.querySelector('.req-why');
+  edits[el.dataset.reqId] = {
+    reqText:  finalTextEl ? finalTextEl.innerHTML : '',
+    reqWhy:   finalWhyEl  ? finalWhyEl.innerHTML  : '',
+    editedAt: DOC_DATE
+  };
+  storeSophieEdits(edits);
+
+  // Also update the "added" list if this is a Sophie-created item
+  syncAddedItem(el.dataset.reqId, edits[el.dataset.reqId]);
+
+  // Flash confirmation
+  el.style.outline = '2px solid var(--hz-teal)';
+  setTimeout(function () { el.style.outline = ''; }, 1300);
+
+  if (andAddBelow) insertNewReqAfter(el);
+}
+
+function abortEdit(el) {
+  var taText   = el.querySelector('.sophie-ta-text');
+  var taWhy    = el.querySelector('.sophie-ta-why');
+  var label    = el.querySelector('.sophie-ta-why-label');
+  var controls = el.querySelector('.sophie-controls');
+  var editBtn  = el.querySelector('.sophie-edit-btn');
+  var tag      = el.querySelector('.sophie-edited-tag');
+
+  // Restore original req-text
+  var pText = document.createElement('p');
+  pText.className = 'req-text';
+  pText.innerHTML = el.dataset.origText || '';
+  if (taText) taText.replaceWith(pText);
+  else el.insertBefore(pText, el.firstChild);
+
+  // Restore original req-why (or remove if there wasn't one)
+  if (el.dataset.origWhy) {
+    var pWhy = document.createElement('p');
+    pWhy.className = 'req-why';
+    pWhy.innerHTML = el.dataset.origWhy;
+    if (taWhy) taWhy.replaceWith(pWhy);
+    else {
+      var tagsEl2 = el.querySelector('.req-tags');
+      tagsEl2 ? tagsEl2.before(pWhy) : el.appendChild(pWhy);
+    }
+  } else {
+    if (taWhy) taWhy.remove();
+  }
+
+  if (label)    label.remove();
+  if (controls) controls.remove();
+  delete el.dataset.editing;
+
+  if (editBtn) editBtn.style.display = '';
+  if (tag)     tag.style.display = el.dataset.sophieEdit ? 'block' : 'none';
+}
+
+function insertNewReqAfter(afterEl) {
+  var newId = 'sa-' + Date.now();
+  var newEl = buildReqElement({ id: newId, afterId: afterEl.dataset.reqId, reqText: '', reqWhy: '', editedAt: DOC_DATE });
+  afterEl.after(newEl);
+  decorateReqItem(newEl);
+
+  // Save to added list
+  var added = getSophieAdded();
+  added.push({ id: newId, afterId: afterEl.dataset.reqId, reqText: '', reqWhy: '', editedAt: DOC_DATE });
+  storeSophieAdded(added);
+
+  newEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Small delay so scroll settles before the textareas resize
+  setTimeout(function () { enterEditMode(newEl); }, 80);
+}
+
+function syncAddedItem(id, data) {
+  var added   = getSophieAdded();
+  var changed = false;
+  added = added.map(function (item) {
+    if (item.id !== id) return item;
+    changed = true;
+    return Object.assign({}, item, { reqText: data.reqText, reqWhy: data.reqWhy, editedAt: data.editedAt });
+  });
+  if (changed) storeSophieAdded(added);
+}
+
+// Minimal markdown → safe HTML (**bold**, newlines)
+function toHTML(str) {
+  return (str || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+// ── Bake & Download ──────────────────────────────────────────
+// Clones the live DOM, strips Sophie-mode UI widgets, and downloads
+// prd.html — commit this file to make Sophie's edits visible to everyone.
+function downloadUpdatedHTML() {
+  var clone = document.documentElement.cloneNode(true);
+
+  // Strip Sophie edit UI from clone
+  clone.querySelectorAll(
+    '.sophie-edit-btn, .sophie-edited-tag, .sophie-controls,' +
+    ' .sophie-ta, .sophie-ta-why-label, .sophie-download-btn'
+  ).forEach(function (el) { el.remove(); });
+
+  // Remove Sophie-mode class
+  clone.querySelector('body').classList.remove('sophie-mode');
+
+  // Keep name overlay — other viewers still need to identify themselves
+
+  var html = '<!DOCTYPE html>\n' + clone.outerHTML;
+  var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href = url; a.download = 'prd.html';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(function () { URL.revokeObjectURL(url); }, 3000);
+}
+
+// ── Boot ────────────────────────────────────────────────────
+function initSophieMode() {
+  document.body.classList.add('sophie-mode');
+
+  // 1. Assign stable content-hash IDs to every req-item
+  assignReqIds();
+
+  // 2. Re-apply any previously saved Sophie edits
+  applySophieEdits();
+
+  // 3. Re-insert any Sophie-added requirements
+  applySophieAdded();
+
+  // 4. Wire edit buttons & edited tags onto all req-items
+  //    (including newly inserted ones from step 3)
+  document.querySelectorAll('.req-item').forEach(decorateReqItem);
+
+  // 5. Add "Bake & download" button to visitor bar
+  var bar = document.getElementById('visitor-bar');
+  if (bar && !bar.querySelector('.sophie-download-btn')) {
+    var dlBtn = document.createElement('button');
+    dlBtn.className = 'sophie-download-btn';
+    dlBtn.innerHTML = '⬇ Bake &amp; download';
+    dlBtn.title =
+      'Download prd.html with your edits written directly into the file.\n' +
+      'Commit the downloaded file to the repo so all viewers see your changes.';
+    dlBtn.addEventListener('click', downloadUpdatedHTML);
+    bar.appendChild(dlBtn);
+  }
+}
 </script>
 </body>
 </html>
