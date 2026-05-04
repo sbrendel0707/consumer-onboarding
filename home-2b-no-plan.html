@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Consumer Home — Horizon Prototype</title>
+<title>2b · Simple Balance No Plan — Horizon Prototype</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
@@ -59,18 +59,17 @@ tailwind.config = {
 <body class="bg-hz-bg">
 <div id="root"></div>
 <script type="text/babel">
+// ═══ BEGIN SHARED HOME COMPONENTS — sync from consumer-home.html ═══
 
-// ═══ BEGIN SHARED HOME COMPONENTS — sync to all b-series prototypes when editing ═══
-
-// ─── Financial constants ───────────────────────────────────────────────────
-const TOTAL_CHARGES   = 8500;
+// ─── Financial constants — scenario-specific ──────────────────────────────
+const TOTAL_CHARGES   = 11050;
 const APPLIED_AID     = 2300;
-const ANTICIPATED_AID = 1000;
-const BALANCE_DUE     = 5200;
-const POT_DOWN        = 520;
+const ANTICIPATED_AID = 0;
+const BALANCE_DUE     = 8750;
+const POT_DOWN        = 0;
 const NELNET_FEE      = 25;
-const POT_DOWN_TOTAL  = 545;
-const POT_BALANCE     = 4680;
+const POT_DOWN_TOTAL  = 0;
+const POT_BALANCE     = 0;
 const CARD_FEE_PCT    = 2.75;
 const fmt  = (n) => '$' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtK = (n) => '$' + Number(n).toLocaleString('en-US', {maximumFractionDigits:0});
@@ -1495,28 +1494,137 @@ const HistoryScreen = ({nav, goBack, S, setS}) => {
 
 // ═══ END SHARED HOME COMPONENTS ═══
 
+// ─── CostsScreen override — Emily Johnson ────────────────────────────────
+const CostsScreen = ({nav, goBack, S, setS}) => (
+  <ScreenWrap>
+    <Header title="Your Bill" onBack={goBack} right={
+      <button onClick={()=>nav('print')} aria-label="Print statement" className="text-hz-indigo text-[13px] font-medium">Print</button>
+    }/>
+    <div className="px-5 pb-8">
+      <Card className="mb-4">
+        <p className="text-[13px] font-semibold text-hz-muted mb-3">Charges — Fall 2025</p>
+        <Row label="Fall Tuition" value="$6,500"/>
+        <Row label="Student Activity Fee" value="$250"/>
+        <Row label="Housing — Fall Semester" value="$2,800"/>
+        <Row label="Meal Plan — Semester" value="$1,500"/>
+        <Divider/>
+        <Row label="Total Charges" value={fmt(TOTAL_CHARGES)} bold/>
+      </Card>
+      <Card>
+        <p className="text-[13px] font-semibold text-hz-muted mb-3">Financial Aid &amp; Payments</p>
+        <Row label="Financial Aid Disbursement" value="−$2,000"/>
+        <Row label="Payment Received" value="−$300"/>
+        <Divider/>
+        <Row label="Applied" value={'−'+fmt(APPLIED_AID)}/>
+        <Divider/>
+        <Row label="Balance Due" value={fmt(BALANCE_DUE)} bold/>
+        <p className="text-[11px] text-hz-hint mt-2">Due: September 15, 2025</p>
+      </Card>
+    </div>
+  </ScreenWrap>
+);
+
+// ─── HistoryScreen override — scenario-specific ───────────────────────────
+const HistoryScreen = ({nav, goBack, S, setS}) => {
+  const [tab, setTab] = React.useState('all');
+  const allItems = [
+    {type:'payment', date:'Sep 10, 2025', desc:'Payment received', amt:'−$300.00', color:'green', icon:'💳'},
+    {type:'aid', date:'Sep 1, 2025', desc:'Financial Aid disbursement', amt:'−$2,000.00', color:'green', icon:'🎓'},
+    {type:'balance', date:'Aug 25, 2025', desc:'Meal Plan Fall Semester', amt:'+$1,500.00', color:'amber', icon:'📋'},
+    {type:'balance', date:'Aug 20, 2025', desc:'Housing Fall Semester', amt:'+$2,800.00', color:'amber', icon:'📋'},
+    {type:'balance', date:'Aug 15, 2025', desc:'Fall Tuition and fees posted', amt:'+$6,750.00', color:'amber', icon:'📋'},
+    {type:'comms', date:'Aug 10, 2025', desc:'Account created', amt:'', color:'blue', icon:'👤'},
+  ];
+  const filtered = tab==='all' ? allItems : tab==='payments' ? allItems.filter(i=>i.type==='payment') : tab==='balance' ? allItems.filter(i=>i.type==='balance'||i.type==='aid') : allItems.filter(i=>i.type==='comms');
+  const TABS = [{v:'all',l:'All'},{v:'payments',l:'Payments'},{v:'balance',l:'Balance'},{v:'comms',l:'Comms'}];
+  return (
+    <ScreenWrap>
+      <Header title="Account History" onBack={goBack}/>
+      <div className="px-5 pb-8">
+        <div className="flex bg-hz-cloud rounded-hz p-1 mb-5" role="tablist">
+          {TABS.map(t=>(<button key={t.v} onClick={()=>setTab(t.v)} role="tab" aria-selected={tab===t.v} className={'flex-1 py-1.5 rounded-hz-sm text-[12px] font-medium transition-all '+(tab===t.v?'bg-hz-indigo text-white':'text-hz-muted hover:text-hz-text')}>{t.l}</button>))}
+        </div>
+        {filtered.length === 0 ? <div className="text-center py-12 text-hz-hint text-[13px]">No items in this category</div> : (
+          <div className="space-y-3" role="tabpanel">
+            {filtered.map((item,i)=>(
+              <Card key={i} className="flex items-center gap-3 p-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0 ${item.color==='green'?'bg-hz-teal-bg':item.color==='amber'?'bg-hz-amber-bg':item.color==='red'?'bg-hz-danger-bg':'bg-hz-cloud'}`} aria-hidden="true">{item.icon}</div>
+                <div className="flex-1 min-w-0"><p className="text-[13px] font-medium text-hz-text truncate">{item.desc}</p><p className="text-[11px] text-hz-hint">{item.date}</p></div>
+                {item.amt && <span className={`text-[13px] font-semibold flex-shrink-0 ${item.color==='green'?'text-hz-teal':item.color==='amber'?'text-hz-amber':item.color==='red'?'text-hz-danger':'text-hz-text'}`}>{item.amt}</span>}
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── Scenario state ───────────────────────────────────────────────────────
+const SCENARIO_STATE = {
+  firstName: 'Emily',
+  initials: 'EJ',
+  emoji: '👋',
+  payPlan: 'none',
+  methodSaved: false,
+  insAccepted: false,
+  insPremium: 0,
+  authPayers: [],
+  commsEmail: 'emily.johnson@student.claude.edu',
+  commsPhone: '(303) 555-0142',
+  smsMarketing: false,
+  secQsDeferred: false,
+  insDeferred: false,
+  payDeferred: false,
+  skippedInvite: false,
+  skippedMethod: false,
+  tfa: 'email',
+  payer: 'me',
+  balanceCard: {
+    mode: 'open',
+    openAmount: 8750,
+    dueDate: 'September 15, 2025',
+    totalBalance: 8750,
+    registrationHold: false,
+  },
+  todos: [
+    {id:'balance-due', icon:'📅', color:'blue',
+     title:'Balance due September 15',
+     sub:'$8,750.00 is due — set up a payment plan or pay in full',
+     screen:'pay-now', cta:'Pay or plan'}
+  ],
+  upcomingPayments: [],
+  recentActivity: [
+    {date:'Sep 10', text:'Payment received — $300.00 applied to your account', type:'payment'},
+    {date:'Sep 1', text:'Financial Aid disbursement — $2,000.00 applied to your account', type:'aid'},
+    {date:'Aug 25', text:'Meal Plan Fall Semester — $1,500.00 charged to your account', type:'balance'},
+    {date:'Aug 20', text:'Housing Fall Semester — $2,800.00 charged to your account', type:'balance'},
+    {date:'Aug 15', text:'Fall Tuition and fees posted — $6,750.00 total charges', type:'balance'},
+  ],
+};
+
 // ─── App ──────────────────────────────────────────────────────────────────
 const App = () => {
   const [screen, setScreen] = React.useState('home');
-  const [S, setS] = React.useState(HOME_DEFAULT_STATE);
+  const [S, setS] = React.useState(SCENARIO_STATE);
   const navStack = React.useRef([]);
   const nav    = (s) => { navStack.current.push(screen); setScreen(s); };
   const goBack = () => { const p = navStack.current.pop(); if (p) setScreen(p); };
 
   const screens = {
-    'home':              <HomeScreen          nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'costs':             <CostsScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'print':             <PrintScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'pay-now':           <PayNowScreen        nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'manage-ap':         <ManageAPScreen      nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'ap-pot':            <APPotScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'guest':             <GuestScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'manage-pot':        <ManagePotScreen     nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'change-dates-ob':   <ChangeDatesScreen   nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'change-autopay-ob': <ChangeAutopayScreen nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'pay-next-ob':       <PayNextScreen       nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'history':           <HistoryScreen       nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'account-details':   <AccountDetailsScreen nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'home':                <HomeScreen          nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'costs':               <CostsScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'print':               <PrintScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'pay-now':             <PayNowScreen        nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'manage-ap':           <ManageAPScreen      nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'ap-pot':              <APPotScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'guest':               <GuestScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'manage-pot':          <ManagePotScreen     nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'change-dates-ob':     <ChangeDatesScreen   nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'change-autopay-ob':   <ChangeAutopayScreen nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'pay-next-ob':         <PayNextScreen       nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'history':             <HistoryScreen       nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'account-details':     <AccountDetailsScreen nav={nav} goBack={goBack} S={S} setS={setS}/>,
   };
 
   const SCREEN_OPTIONS = [
@@ -1548,9 +1656,9 @@ const App = () => {
         <label htmlFor="screen-jump" className="sr-only">Jump to screen</label>
         <div className="relative">
           <select id="screen-jump" value={screen} onChange={e => { navStack.current = []; setScreen(e.target.value); }}
-            className="appearance-none bg-hz-card border border-[rgba(100,92,220,0.2)] text-hz-text text-[11px] rounded-hz-sm pl-2.5 pr-7 py-1.5 shadow-sm outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 max-w-[210px] cursor-pointer transition-colors hover:border-hz-accent/50 font-medium"
+            className="appearance-none bg-hz-card border border-[rgba(100,92,220,0.2)] text-hz-text text-[11px] rounded-hz-sm pl-2.5 pr-7 py-1.5 shadow-sm outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 max-w-[220px] cursor-pointer transition-colors hover:border-hz-accent/50 font-medium"
             title="Jump to screen">
-            <optgroup label="── 1b · Consumer Home">
+            <optgroup label="── 2b · Simple Balance No Plan">
               {SCREEN_OPTIONS.map(o=><option key={o.v} value={o.v}>{o.l}</option>)}
             </optgroup>
           </select>
