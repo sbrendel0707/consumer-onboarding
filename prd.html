@@ -1185,7 +1185,29 @@ body {
       <div class="nav-group-label">Problems &amp; Needs</div>
       <a href="#inst-problems" class="nav-link">Institution Problems &amp; Needs</a>
       <a href="#consumer-problems" class="nav-link">Consumer Problems &amp; Needs</a>
-      <a href="#process-flow" class="nav-link">End-to-End Process Flow</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Institution Process Flow</div>
+      <a href="#inst-flow-hl"            class="nav-link">High-Level End-to-End</a>
+      <a href="#inst-flow-contract"      class="nav-link nav-sub-item">Contract &amp; System Setup</a>
+      <a href="#inst-flow-billing"       class="nav-link nav-sub-item">Term Billing &amp; Setup</a>
+      <a href="#inst-flow-access"        class="nav-link nav-sub-item">Student Account Access</a>
+      <a href="#inst-flow-payments"      class="nav-link nav-sub-item">Payment Processing</a>
+      <a href="#inst-flow-midterm"       class="nav-link nav-sub-item">Mid-Term Account Changes</a>
+      <a href="#inst-flow-disbursements" class="nav-link nav-sub-item">Disbursements &amp; Refunds</a>
+      <a href="#inst-flow-collections"   class="nav-link nav-sub-item">Collections Escalation</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">NBS Process Flow</div>
+      <a href="#nbs-flow-hl"             class="nav-link">High-Level End-to-End</a>
+      <a href="#nbs-flow-student-setup"  class="nav-link nav-sub-item">Student Account Setup</a>
+      <a href="#nbs-flow-plan-admin"     class="nav-link nav-sub-item">Payment Plan Administration</a>
+      <a href="#nbs-flow-guarantee"      class="nav-link nav-sub-item">Guarantee Program Processing</a>
+      <a href="#nbs-flow-collections"    class="nav-link nav-sub-item">Collections &amp; LTPP</a>
+      <a href="#nbs-flow-disbursements"  class="nav-link nav-sub-item">Disbursements</a>
+      <a href="#nbs-flow-reporting"      class="nav-link nav-sub-item">Reporting &amp; Reconciliation</a>
     </div>
 
     <div class="nav-group">
@@ -1228,32 +1250,28 @@ body {
     </div>
 
     <div class="nav-group">
-      <div class="nav-group-label">Guarantee Plans</div>
-      <a href="#guarantee-overview"     class="nav-link">Overview &amp; Why It's Different</a>
-      <a href="#guarantee-config"       class="nav-link nav-sub-item">Configuration</a>
-      <a href="#guarantee-enrollment"   class="nav-link nav-sub-item">Enrollment Requirements</a>
-      <a href="#guarantee-maintenance"  class="nav-link nav-sub-item">Agreement Maintenance</a>
-      <a href="#guarantee-process"      class="nav-link nav-sub-item">The Guarantee Process</a>
-      <a href="#guarantee-reports"      class="nav-link nav-sub-item">Reports</a>
-    </div>
-
-    <div class="nav-group">
-      <div class="nav-group-label">Long-Term Payment Plans</div>
-      <a href="#ltpp-overview"    class="nav-link">Overview &amp; Why It's Different</a>
-      <a href="#ltpp-config"      class="nav-link nav-sub-item">Configuration</a>
-      <a href="#ltpp-enrollment"  class="nav-link nav-sub-item">Enrollment Requirements</a>
-      <a href="#ltpp-payments"    class="nav-link nav-sub-item">Payment Processing</a>
-      <a href="#ltpp-comms"       class="nav-link nav-sub-item">Communications</a>
-      <a href="#ltpp-termination" class="nav-link nav-sub-item">Termination &amp; Default</a>
-    </div>
-
-    <div class="nav-group">
-      <div class="nav-group-label">International Payment Plans</div>
-      <a href="#intl-overview"    class="nav-link">Overview &amp; Why It's Different</a>
-      <a href="#intl-enrollment"  class="nav-link nav-sub-item">Enrollment &amp; Plan Selection</a>
-      <a href="#intl-invoicing"   class="nav-link nav-sub-item">Invoicing &amp; Notifications</a>
-      <a href="#intl-vendors"     class="nav-link nav-sub-item">Vendor Integration</a>
-      <a href="#intl-currency"    class="nav-link nav-sub-item">Currency &amp; Amounts</a>
+      <div class="nav-group-label">Payment Plans</div>
+      <a href="#pp-standard"         class="nav-link">Standard Plans</a>
+      <a href="#pp-pastdue"          class="nav-link">Past-Due Payment Plans</a>
+      <a href="#ltpp-overview"       class="nav-link">Long-Term Payment Plans</a>
+      <a href="#ltpp-config"         class="nav-link nav-sub-item">LTPP · Configuration</a>
+      <a href="#ltpp-enrollment"     class="nav-link nav-sub-item">LTPP · Enrollment</a>
+      <a href="#ltpp-payments"       class="nav-link nav-sub-item">LTPP · Payment Processing</a>
+      <a href="#ltpp-comms"          class="nav-link nav-sub-item">LTPP · Communications</a>
+      <a href="#ltpp-termination"    class="nav-link nav-sub-item">LTPP · Termination</a>
+      <a href="#intl-overview"       class="nav-link">International Payment Plans</a>
+      <a href="#intl-enrollment"     class="nav-link nav-sub-item">Intl · Enrollment &amp; Selection</a>
+      <a href="#intl-invoicing"      class="nav-link nav-sub-item">Intl · Invoicing</a>
+      <a href="#intl-vendors"        class="nav-link nav-sub-item">Intl · Vendor Integration</a>
+      <a href="#intl-currency"       class="nav-link nav-sub-item">Intl · Currency</a>
+      <a href="#pp-hidden"           class="nav-link">Hidden Plans</a>
+      <a href="#guarantee-overview"  class="nav-link">Guarantee Plans</a>
+      <a href="#guarantee-config"    class="nav-link nav-sub-item">Guarantee · Configuration</a>
+      <a href="#guarantee-enrollment" class="nav-link nav-sub-item">Guarantee · Enrollment</a>
+      <a href="#guarantee-maintenance" class="nav-link nav-sub-item">Guarantee · Maintenance</a>
+      <a href="#guarantee-process"   class="nav-link nav-sub-item">Guarantee · Process</a>
+      <a href="#guarantee-reports"   class="nav-link nav-sub-item">Guarantee · Reports</a>
+      <a href="#pp-custom"           class="nav-link">Custom Plans</a>
     </div>
 
     <div class="nav-group">
@@ -2235,9 +2253,9 @@ body {
     <!-- ════════════════════════════════════════
          END-TO-END PROCESS FLOW
     ════════════════════════════════════════ -->
-    <section id="process-flow" class="prd-section">
-      <div class="section-eyebrow">Process Flow</div>
-      <h2 class="section-title">End-to-End Process Flow</h2>
+    <section id="inst-flow-hl" class="prd-section">
+      <div class="section-eyebrow">Institution Process Flow</div>
+      <h2 class="section-title">Institution Process Flow — High-Level End-to-End</h2>
       <hr class="section-divider"/>
 
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:8px;">This section maps the complete process from institution onboarding through ongoing student account management — tracing how a school's actions and system events flow into Horizon and drive the consumer experience. Sub-processes (billing, refunds, disbursements) are called out separately.</p>
@@ -2247,7 +2265,7 @@ body {
       </div>
 
       <!-- Phase 1 -->
-      <div class="process-phase">
+      <div id="inst-flow-contract-hl" class="process-phase">
         <div class="process-phase-header">
           <div class="process-phase-num">1</div>
           <div>
@@ -2301,7 +2319,7 @@ body {
       </div>
 
       <!-- Phase 2 -->
-      <div class="process-phase">
+      <div id="inst-flow-billing-hl" class="process-phase">
         <div class="process-phase-header">
           <div class="process-phase-num">2</div>
           <div>
@@ -2342,7 +2360,7 @@ body {
       </div>
 
       <!-- Phase 3 -->
-      <div class="process-phase">
+      <div id="inst-flow-access-hl" class="process-phase">
         <div class="process-phase-header">
           <div class="process-phase-num">3</div>
           <div>
@@ -2387,7 +2405,7 @@ body {
       </div>
 
       <!-- Phase 4 -->
-      <div class="process-phase">
+      <div id="inst-flow-payments-hl" class="process-phase">
         <div class="process-phase-header">
           <div class="process-phase-num">4</div>
           <div>
@@ -2421,7 +2439,7 @@ body {
       </div>
 
       <!-- Phase 5 -->
-      <div class="process-phase">
+      <div id="inst-flow-midterm-hl" class="process-phase">
         <div class="process-phase-header">
           <div class="process-phase-num">5</div>
           <div>
@@ -2455,7 +2473,7 @@ body {
       </div>
 
       <!-- Phase 6 -->
-      <div class="process-phase">
+      <div id="inst-flow-disbursements-hl" class="process-phase">
         <div class="process-phase-header">
           <div class="process-phase-num">6</div>
           <div>
@@ -2533,7 +2551,7 @@ body {
       </div>
 
       <!-- Phase 7 -->
-      <div class="process-phase">
+      <div id="inst-flow-collections-hl" class="process-phase">
         <div class="process-phase-header">
           <div class="process-phase-num">7</div>
           <div>
@@ -2639,6 +2657,307 @@ body {
         </div>
       </div>
 
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         INSTITUTION PROCESS FLOW — DETAIL SECTIONS
+    ════════════════════════════════════════ -->
+
+    <section id="inst-flow-contract" class="prd-section">
+      <div class="section-eyebrow">Institution Process Flow · Phase 1</div>
+      <h2 class="section-title">Contract &amp; System Setup — Detail</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">Deep-dive on the one-time onboarding process when an institution first contracts with Nelnet for Horizon. Covers everything from initial scoping through go-live readiness.</p>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detailed process steps for contract negotiation, SOW scoping, implementation kickoff, ERP integration specifics (Banner vs. Colleague vs. Workday vs. PeopleSoft paths), data migration, UAT, training, and go-live sign-off. Each step should identify actors (Institution, Nelnet Impl, Nelnet Tech, ERP vendor) and key inputs/outputs. Flag any steps where Horizon's scope ends and an external system or team begins.</span>
+      </div>
+    </section>
+
+    <section id="inst-flow-billing" class="prd-section">
+      <div class="section-eyebrow">Institution Process Flow · Phase 2</div>
+      <h2 class="section-title">Term Billing &amp; Setup — Detail</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">Deep-dive on the recurring per-term billing cycle: how the institution generates and posts charges in the SIS, how Horizon ingests them, and what configuration the institution must complete each term before students are notified.</p>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detail on: the billing run process in the SIS (who runs it, what triggers it, what charge categories are generated), RTAA data feed timing and retry logic, term configuration checklist in the Horizon admin portal (plan windows, down payment settings, late fee schedule, communication schedule), how aid is applied against charges, and what happens when a student's charges are updated after initial posting (add/drop adjustments).</span>
+      </div>
+    </section>
+
+    <section id="inst-flow-access" class="prd-section">
+      <div class="section-eyebrow">Institution Process Flow · Phase 3</div>
+      <h2 class="section-title">Student Account Access &amp; Onboarding — Detail</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">Deep-dive on how a student first reaches Horizon, how authentication works across SSO paths, and what the institution controls about the first-access experience.</p>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detail on: all authentication paths (SSO from SIS portal, direct link from email, deep-link to specific action), what the institution can configure about the onboarding flow (required disclosures, first-screen messaging, help text), how authorized parties are invited and authenticated, and what Horizon does when a student arrives but their RTAA data is not yet available (loading states, error states, retry logic).</span>
+      </div>
+    </section>
+
+    <section id="inst-flow-payments" class="prd-section">
+      <div class="section-eyebrow">Institution Process Flow · Phase 4</div>
+      <h2 class="section-title">Payment Processing — Detail</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">Deep-dive on payment lifecycle from the institution's perspective: how payments post back to the SIS, how the institution monitors payment activity, and how failed payments are handled.</p>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detail on: RTPN (real-time payment notification) posting process and timing, how the institution's SIS receives and applies payment postings, payment method processing paths (ACH, card, Apple/Google Pay, international), failed payment handling and retry logic, return/chargeback process from institution's perspective, how the admin portal surfaces payment activity and exceptions, and settlement/reconciliation cycle.</span>
+      </div>
+    </section>
+
+    <section id="inst-flow-midterm" class="prd-section">
+      <div class="section-eyebrow">Institution Process Flow · Phase 5</div>
+      <h2 class="section-title">Mid-Term Account Changes — Detail</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">Deep-dive on how mid-term charge changes, add/drop adjustments, aid changes, and enrollment status changes flow through Horizon and affect active payment plans and outstanding balances.</p>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detail on: how add/drop charge changes are pushed to Horizon via RTAA and how active payment plans are recalculated, how late financial aid disbursements affect balances and plans, what happens when a student withdraws mid-term (refund calculation, plan cancellation), institution admin tools for manual balance adjustments, and how Horizon communicates balance changes to the student.</span>
+      </div>
+    </section>
+
+    <section id="inst-flow-disbursements" class="prd-section">
+      <div class="section-eyebrow">Institution Process Flow · Phase 6</div>
+      <h2 class="section-title">Disbursements &amp; Refunds — Detail</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">Deep-dive on the disbursement process: how credit balances are identified, how the institution authorizes refunds, and how Horizon routes disbursements to the student's preferred method. Includes the batch credit card refund sub-process.</p>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detail on: how credit balances are created (overpayment, excess aid, withdrawal refund), the institution's role in authorizing disbursements vs. what Horizon handles automatically, student refund preference setup (bank account, card), disbursement routing logic, the batch credit card refund process (including the regulatory constraint that CC refunds must go back to the original card), timing SLAs, and how disbursement status is surfaced in the student portal and admin portal.</span>
+      </div>
+    </section>
+
+    <section id="inst-flow-collections" class="prd-section">
+      <div class="section-eyebrow">Institution Process Flow · Phase 7</div>
+      <h2 class="section-title">Collections Escalation — Detail</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">Deep-dive on what happens when a student fails to pay: the escalation sequence from initial payment failure through late fee assessment, plan termination, and referral to outside collections. Covers both standard plan defaults and LTPP defaults.</p>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detail on: the standard payment failure communication sequence (how many notices, at what intervals, what channels), late fee assessment triggers and amounts, hold placement on student accounts in the SIS (transcript hold, registration hold), payment plan termination lifecycle, LTPP-specific collections handoff (see LTPP section for plan-level detail), institution configuration options for collections escalation thresholds, and the process for referring accounts to an outside collections agency. Include actor responsibilities at each step (institution, Nelnet, student, collections agency).</span>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         NBS PROCESS FLOW
+    ════════════════════════════════════════ -->
+    <section id="nbs-flow-hl" class="prd-section">
+      <div class="section-eyebrow">NBS Process Flow</div>
+      <h2 class="section-title">NBS Process Flow — High-Level End-to-End</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">This section maps the complete end-to-end process from NBS's (Nelnet Business Solutions) internal perspective — the operations, touchpoints, and responsibilities that sit on Nelnet's side of the institution relationship. This is distinct from the Institution Process Flow, which maps what the institution does. NBS owns: implementation and onboarding, ongoing account management, payment plan administration, guarantee program operations, collections management, disbursement execution, and reporting and reconciliation.</p>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add the high-level NBS end-to-end process flow, following the same process-phase format used in the Institution Process Flow section. Key phases to cover at a high level: (1) Client Onboarding &amp; Implementation, (2) Student Account Setup, (3) Payment Plan Administration, (4) Guarantee Program Processing, (5) Collections &amp; LTPP Operations, (6) Disbursement Execution, (7) Reporting &amp; Reconciliation. Use process-phase, process-track, and process-step components matching the Institution Process Flow visual style. Tag each step with actor labels: NBS Operations, NBS Tech, NBS Finance, Nelnet Treasury, Institution, Student.</span>
+      </div>
+    </section>
+
+    <section id="nbs-flow-student-setup" class="prd-section">
+      <div class="section-eyebrow">NBS Process Flow · Detail</div>
+      <h2 class="section-title">NBS — Student Account Setup</h2>
+      <hr class="section-divider"/>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detail on NBS's process for managing student account setup from the NBS side: how NBS receives student account data from the institution's SIS, data validation and exception handling, how NBS creates and maintains student records in Horizon, and what NBS does when account data is incomplete or invalid. Include NBS tools used and SLAs for account setup completion.</span>
+      </div>
+    </section>
+
+    <section id="nbs-flow-plan-admin" class="prd-section">
+      <div class="section-eyebrow">NBS Process Flow · Detail</div>
+      <h2 class="section-title">NBS — Payment Plan Administration</h2>
+      <hr class="section-divider"/>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detail on NBS's role in payment plan operations: plan enrollment processing (what NBS validates and what is fully automated), scheduled payment processing cycle, returned payment handling and retry, plan modification requests from institutions, and escalation paths when a plan exception requires NBS human review. Include NBS monitoring and alerting processes for plan health.</span>
+      </div>
+    </section>
+
+    <section id="nbs-flow-guarantee" class="prd-section">
+      <div class="section-eyebrow">NBS Process Flow · Detail</div>
+      <h2 class="section-title">NBS — Guarantee Program Processing</h2>
+      <hr class="section-divider"/>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detail on NBS's guarantee program operations: how NBS monitors agreements approaching the Guarantee Date, the remittance calculation and payment process (1st and 2nd remittance), how NBS tracks the Maximum Amount across institutions, the Default Date monitoring process, and how NBS manages state-specific fee schedule compliance (VA, FL, GA). Reference the Guarantee Plans requirements section for the plan-level requirements; this section should focus on NBS operational process.</span>
+      </div>
+    </section>
+
+    <section id="nbs-flow-collections" class="prd-section">
+      <div class="section-eyebrow">NBS Process Flow · Detail</div>
+      <h2 class="section-title">NBS — Collections &amp; LTPP Operations</h2>
+      <hr class="section-divider"/>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detail on NBS's role in collections and LTPP: how NBS monitors past-due accounts eligible for LTPP, how NBS coordinates with institutions to offer LTPP as an alternative to direct collections referral, NBS's process when an LTPP is terminated (notification to institution, account handoff), and any NBS-managed collections outreach that occurs before or alongside LTPP. Also cover NBS's relationship with outside collections agencies when accounts are referred.</span>
+      </div>
+    </section>
+
+    <section id="nbs-flow-disbursements" class="prd-section">
+      <div class="section-eyebrow">NBS Process Flow · Detail</div>
+      <h2 class="section-title">NBS — Disbursements</h2>
+      <hr class="section-divider"/>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detail on NBS's disbursement operations: how NBS receives and validates disbursement instructions from institutions, the payment routing process (ACH, check, card refund), Nelnet Treasury's role in disbursement funding, settlement timing and float management, exception handling for failed disbursements, and the batch credit card refund sub-process (regulatory constraints, timing, reconciliation). Cross-reference with the Institution Process Flow Phase 6 (Disbursements) which covers the institution's perspective.</span>
+      </div>
+    </section>
+
+    <section id="nbs-flow-reporting" class="prd-section">
+      <div class="section-eyebrow">NBS Process Flow · Detail</div>
+      <h2 class="section-title">NBS — Reporting &amp; Reconciliation</h2>
+      <hr class="section-divider"/>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add detail on NBS's reporting and reconciliation operations: daily reconciliation cycle between Horizon transaction records and bank settlement, how NBS produces and delivers institution-facing reports, NBS internal finance reporting (revenue recognition, guarantee exposure, collections pipeline), and how discrepancies are identified and resolved. Cross-reference with the Guarantee Plans reports section which covers guarantee-specific reports.</span>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         PAYMENT PLANS — STANDARD
+    ════════════════════════════════════════ -->
+    <section id="pp-standard" class="prd-section">
+      <div class="section-eyebrow">Payment Plans</div>
+      <h2 class="section-title">Standard Payment Plans</h2>
+      <p class="section-subtitle">Standard payment plans are the core payment plan product — auto-debit, term-based, offered to enrolled students with current-term balances. All other payment plan types (LTPP, International, Guarantee, Hidden, Custom) are variants that share this base or differ explicitly from it.</p>
+      <hr class="section-divider"/>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Term-Based Enrollment Window.</strong> Standard plans must be configured per term with an enrollment open date and enrollment close date. Students may only enroll during this window. The window is configured by the institution admin in the Horizon admin portal and may differ by term, campus, or student population segment.</p>
+        <p class="req-why"><strong>Why:</strong> Institutions need control over when payment plans are available to prevent students from enrolling in plans after charges are nearly paid or too late in the term to spread meaningfully. The enrollment window is also tied to the institution's financial reporting cycles.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Auto-Debit Authorization.</strong> Enrollment in a standard plan requires the student to authorize automatic debits from a saved payment method (bank account or card) on the plan's scheduled due dates. The student must explicitly accept the auto-debit terms during plan enrollment. No manual payment step is required for each installment.</p>
+        <p class="req-why"><strong>Why:</strong> Auto-debit is the core value proposition of Nelnet's payment plan product — it removes the burden of remembering to pay each installment and reduces non-payment rates vs. invoice-based plans. It also reduces institution administrative overhead compared to manually-managed plans.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Installment Schedule Options.</strong> Institutions must be able to configure the number of installments available for each term (e.g., 2-month, 3-month, 4-month, 5-month options). The plan amount is divided evenly across installments after any down payment. The student selects their preferred schedule at enrollment.</p>
+        <p class="req-why"><strong>Why:</strong> Different institutions and students have different payment capacity. A student at a school with a $5,000/term balance may need 5 payments of $1,000; a student at a $2,000/term program may only need 2. Offering multiple schedule options increases plan adoption by letting students choose the installment size that fits their cash flow.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Down Payment Configuration.</strong> Institutions may optionally require a down payment at plan enrollment. The down payment amount or percentage must be configurable. The first installment may serve as the down payment, or the down payment may be collected separately at enrollment with subsequent installments beginning after.</p>
+        <p class="req-why"><strong>Why:</strong> Down payments reduce the institution's exposure if a student defaults on the plan immediately after enrolling. Some institutions require them; others do not. Configurability is required to match institutional policy.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Balance Eligibility.</strong> The institution must be able to configure a minimum balance required to enroll in a payment plan (e.g., students with less than $100 outstanding may not enroll). The plan must be calculated on the student's unpaid balance at time of enrollment after financial aid has been applied.</p>
+        <p class="req-why"><strong>Why:</strong> Payment plans with very small balances have higher overhead (transaction fees, customer service) relative to their value. A minimum balance threshold protects profitability and avoids confusion for students who effectively have no meaningful balance to spread.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-text"><strong>One Plan Per Student Per Term.</strong> A student may only be on one active standard payment plan per term. The system must prevent duplicate standard plan enrollment for the same term. If a student's balance changes significantly after enrollment, the plan may be adjusted (see Institution Process Flow — Mid-Term Account Changes) but a second plan cannot be opened.</p>
+        <p class="req-why"><strong>Why:</strong> Multiple simultaneous plans for the same term balance create reconciliation complexity, confuse the student, and create financial reporting problems for the institution. The constraint is intentional and enforced by the system.</p>
+      </div>
+
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add additional standard plan requirements covering: plan modification after enrollment (what can change and what cannot), plan cancellation by the student vs. by the institution, what happens when a student's balance changes after enrollment (add/drop adjustments), payment method management (can the student change their payment method mid-plan?), plan completion confirmation, and any state-specific standard plan regulations that apply broadly.</span>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         PAYMENT PLANS — PAST-DUE
+    ════════════════════════════════════════ -->
+    <section id="pp-pastdue" class="prd-section">
+      <div class="section-eyebrow">Payment Plans</div>
+      <h2 class="section-title">Past-Due Payment Plans</h2>
+      <p class="section-subtitle">Past-due payment plans cover balances that have aged beyond the standard term payment window but are not large enough or old enough to qualify for LTPP. They bridge the gap between a missed standard plan and full LTPP eligibility. Duration is typically 2–6 months.</p>
+      <hr class="section-divider"/>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Eligibility: Aged Balance Without Active Plan.</strong> A student is eligible for a past-due plan when they have an outstanding balance from a prior term, are not currently on a payment plan for that balance, and the balance falls within the institution's configured past-due plan threshold (e.g., less than $5,000 and less than 6 months overdue). Balances above the threshold route to LTPP eligibility.</p>
+        <p class="req-why"><strong>Why:</strong> Past-due plans give institutions a middle option between the standard plan (for current students, term-based) and LTPP (for significant past-due balances, long duration). Without this tier, institutions have no structured offering for the student who missed a term payment but has a moderate balance that could be resolved in a few months.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Auto-Debit, Same Mechanic as Standard Plans.</strong> Past-due plans use the same auto-debit payment mechanic as standard plans. The student authorizes automatic debits at enrollment. This is distinct from LTPP only in duration and eligibility thresholds, not in payment mechanic.</p>
+        <p class="req-why"><strong>Why:</strong> Consistency in payment mechanic across plan types reduces the student's learning curve and reduces engineering complexity. Past-due plans use the same infrastructure as standard plans; only configuration differs.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Late Fee Handling.</strong> The institution must be able to configure whether late fees pause while a student is on a past-due plan (same as LTPP behavior) or continue to accrue. Pausing late fees is a common incentive for the student to enroll in the plan rather than ignore the balance.</p>
+        <p class="req-why"><strong>Why:</strong> If late fees continue to accrue during a past-due plan, the student's balance grows even as they make payments — this can undermine confidence in the plan and increase default rates. Pausing fees is a meaningful incentive that different institutions may choose to offer or not offer depending on their policy.</p>
+      </div>
+
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Review the distinction between Past-Due Payment Plans and LTPP. The primary differentiators are duration (2–6 months vs. 12–36+ months) and balance threshold (lower vs. higher). Confirm whether these should be two separately configured plan types in the system or whether LTPP is a superset that handles both. If they are distinct, add requirements for: returned payment handling, plan termination, institution notification, and communications — following the same pattern as the LTPP section but with shorter-duration parameters.</span>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         PAYMENT PLANS — HIDDEN
+    ════════════════════════════════════════ -->
+    <section id="pp-hidden" class="prd-section">
+      <div class="section-eyebrow">Payment Plans</div>
+      <h2 class="section-title">Hidden Plans</h2>
+      <p class="section-subtitle">Hidden plans are payment plan options that are not visible to the general student population. A student can only access a hidden plan if they receive a one-off invite from an institution admin. Used for special arrangements, exceptions, or plans offered to specific student cohorts.</p>
+      <hr class="section-divider"/>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Admin-Only Creation and Invitation.</strong> Hidden plans must not be visible in the standard plan enrollment flow. An institution admin must create the plan (with specific terms: schedule, amount, dates) and explicitly invite a specific student to it. The invitation is delivered to the student via email with a direct link to enroll in that specific hidden plan.</p>
+        <p class="req-why"><strong>Why:</strong> Some students require individually negotiated payment arrangements that differ from the institution's standard plan options — different amounts, different timing, a specific exception granted by the bursar. These should not be visible to other students, should not require a separate agreement outside Horizon, and should be tracked in Horizon like any other plan.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Invitation Expiry.</strong> Hidden plan invitations must expire after a configurable number of days. If the student does not enroll before expiry, the invitation becomes invalid. The admin must be able to re-send or extend the invitation.</p>
+        <p class="req-why"><strong>Why:</strong> An expired invitation that can still be accessed creates operational risk — the institution may have changed the student's status or terms after sending the invitation. Expiry ensures the admin remains in control of when the arrangement is still valid.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-text"><strong>One-Time Use Invitation.</strong> Each hidden plan invitation is single-use. Once the student enrolls, the invitation link is consumed and cannot be reused. The plan can only be accessed through the student's active plan view after enrollment, not by re-clicking the invitation link.</p>
+        <p class="req-why"><strong>Why:</strong> Prevents a student from sharing their invitation link with other students who then enroll in the same special arrangement. Also prevents accidental double-enrollment if the student clicks the link more than once.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Full Plan Mechanics Apply.</strong> Once enrolled, a hidden plan behaves like any other payment plan: auto-debit, plan status tracking, payment confirmation, returned payment handling, and plan termination follow standard plan rules. The "hidden" designation only affects discovery (student cannot find it without an invitation) — not plan behavior.</p>
+        <p class="req-why"><strong>Why:</strong> Reusing standard plan mechanics for hidden plans minimizes the engineering surface area of the feature. The only unique behavior is the invitation and access control layer.</p>
+      </div>
+
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Confirm the scope of hidden plans: Can they be term-based (like standard plans) or are they always custom schedule? Can an admin create a hidden plan for a student who already has an active standard plan? Can hidden plan terms differ from any institution-configured defaults (e.g., a zero-down-payment hidden plan at an institution that requires down payments)? Add any audit/reporting requirements for tracking which admin created each hidden plan invitation and when it was accepted.</span>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         PAYMENT PLANS — CUSTOM
+    ════════════════════════════════════════ -->
+    <section id="pp-custom" class="prd-section">
+      <div class="section-eyebrow">Payment Plans</div>
+      <h2 class="section-title">Custom Plans</h2>
+      <p class="section-subtitle">Custom plans give institution admins the ability to create a fully bespoke payment schedule for an individual student on the fly — specific payment dates, specific amounts, outside the standard installment templates. Used for highly individualized arrangements that standard and hidden plans cannot accommodate.</p>
+      <hr class="section-divider"/>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Admin-Created, Fully Bespoke Schedule.</strong> An institution admin must be able to create a custom plan by defining: the total plan amount, each individual payment date, and each individual payment amount. Payment amounts do not need to be equal. Payment dates do not need to follow a monthly schedule. The admin creates this directly in the Horizon admin portal for a specific student.</p>
+        <p class="req-why"><strong>Why:</strong> Some student situations require payment arrangements that no templated schedule can accommodate — a student paying in large lump sums on employer reimbursement cycles, a student with an irregular income pattern, or a complex financial arrangement worked out with a financial aid advisor. Custom plans give the institution the flexibility to honor these arrangements within Horizon rather than managing them in a spreadsheet outside the system.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Student Notification and Enrollment Confirmation.</strong> When an admin creates a custom plan, the student must receive a notification with the plan details and must confirm/accept the plan before it becomes active. The student should be able to view the full schedule before accepting. After acceptance, the auto-debit authorization is established for each scheduled payment.</p>
+        <p class="req-why"><strong>Why:</strong> The student must consent to the specific payment schedule and authorize each debit. A plan created entirely by the admin with no student confirmation would not satisfy the auto-debit authorization requirements and could create disputes if the student claims they didn't know about specific payment dates.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-text"><strong>Partial Amount Custom Plans.</strong> A custom plan does not need to cover the student's entire outstanding balance. An admin may create a custom plan for a specific subset of the balance (e.g., a $2,000 custom plan for a student with a $5,000 balance, where the remaining $3,000 is being handled through financial aid or another process). The system must clearly show the student what balance is and is not covered by the custom plan.</p>
+        <p class="req-why"><strong>Why:</strong> Complex financial situations often involve multiple sources of funds covering different portions of a balance. The custom plan may cover only the portion the student is personally responsible for while a scholarship, employer reimbursement, or pending appeal covers the rest.</p>
+      </div>
+
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Clarify the relationship between custom plans and hidden plans — are they the same feature with different names, or are they distinct? The user described hidden plans as "one-off invite from admin" and custom plans as "create one-off plan for an individual student on the fly." If they are distinct: hidden plans may use standard installment amounts/dates but are invitation-only, while custom plans have fully bespoke amounts and dates. Confirm this distinction and add requirements for: plan modification after student acceptance, admin audit trail, reporting on custom plans (how are they included in institution reports?), and whether custom plans have the same returned payment and termination rules as standard plans.</span>
+      </div>
     </section>
 
 
