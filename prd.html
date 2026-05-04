@@ -915,6 +915,221 @@ body {
   text-align: left;
 }
 .sophie-add-vision-btn:hover { background: var(--hz-cloud); border-color: var(--hz-accent); }
+
+/* ── Sophie review flag ── */
+.sophie-flag {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #FFFBF0;
+  border: 1px solid rgba(239,159,39,.35);
+  border-left: 3px solid var(--hz-amber);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11.5px;
+  color: #7A4F00;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+.sophie-flag-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--hz-amber);
+  white-space: nowrap;
+  margin-top: 1px;
+}
+
+/* ── Problem statement ── */
+.problem-stmt {
+  background: #FFF3F3;
+  border: 1px solid rgba(226,75,74,.18);
+  border-left: 3px solid var(--hz-danger);
+  border-radius: 12px;
+  padding: 15px 18px;
+  margin-bottom: 14px;
+}
+.problem-stmt-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: var(--hz-danger);
+  margin-bottom: 7px;
+}
+.problem-stmt p {
+  font-size: 13px;
+  color: var(--hz-text);
+  line-height: 1.65;
+  margin-bottom: 6px;
+}
+.problem-stmt p:last-child { margin-bottom: 0; }
+
+/* ── Need item ── */
+.need-group { margin-bottom: 28px; }
+.need-group-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: var(--hz-muted);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--hz-border);
+}
+.need-item {
+  background: var(--hz-card);
+  border: 1px solid var(--hz-border);
+  border-radius: 11px;
+  padding: 13px 15px;
+  margin-bottom: 7px;
+}
+.need-item-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--hz-text);
+  margin-bottom: 4px;
+}
+.need-item-body {
+  font-size: 12.5px;
+  color: var(--hz-muted);
+  line-height: 1.55;
+}
+.need-why {
+  font-size: 12px;
+  color: var(--hz-muted);
+  line-height: 1.5;
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid var(--hz-border);
+}
+.need-why strong { color: var(--hz-text); font-weight: 600; }
+.need-sub-list {
+  margin: 8px 0 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+.need-sub-list li {
+  font-size: 12px;
+  color: var(--hz-muted);
+  padding: 3px 0 3px 14px;
+  position: relative;
+  line-height: 1.5;
+}
+.need-sub-list li::before {
+  content: '·';
+  position: absolute;
+  left: 4px;
+  color: var(--hz-accent);
+  font-weight: 700;
+}
+
+/* ── Process flow ── */
+.process-phase { margin-bottom: 36px; }
+.process-phase-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.process-phase-num {
+  width: 30px; height: 30px;
+  background: var(--hz-indigo);
+  color: white;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.process-phase-title { font-size: 15px; font-weight: 700; color: var(--hz-text); }
+.process-phase-sub { font-size: 11.5px; color: var(--hz-hint); margin-top: 1px; }
+.process-track {
+  position: relative;
+  padding-left: 30px;
+  margin-left: 15px;
+}
+.process-track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--hz-border);
+}
+.process-step {
+  position: relative;
+  margin-bottom: 10px;
+}
+.process-step::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 13px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--hz-accent);
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px var(--hz-accent);
+}
+.process-step-card {
+  background: var(--hz-card);
+  border: 1px solid var(--hz-border);
+  border-radius: 10px;
+  padding: 11px 14px;
+}
+.process-step-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--hz-text);
+  margin-bottom: 4px;
+}
+.process-step-body {
+  font-size: 12px;
+  color: var(--hz-muted);
+  line-height: 1.55;
+}
+.process-actors { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.process-actor {
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 5px;
+  letter-spacing: .3px;
+}
+.actor-inst    { background: #F0EBF8; color: #6B35A8; }
+.actor-nelnet  { background: var(--hz-cloud); color: var(--hz-indigo); }
+.actor-student { background: var(--hz-teal-bg); color: var(--hz-teal); }
+.actor-system  { background: var(--hz-bg); color: var(--hz-hint); border: 1px solid var(--hz-border); }
+.process-sub-steps {
+  margin-top: 9px;
+  padding-left: 12px;
+  border-left: 2px solid var(--hz-border);
+}
+.process-sub-step {
+  font-size: 11.5px;
+  color: var(--hz-muted);
+  padding: 3px 0;
+  line-height: 1.5;
+}
+.process-sub-step::before { content: '→ '; color: var(--hz-accent); font-weight: 600; }
+.process-callout {
+  background: var(--hz-cloud);
+  border: 1px solid rgba(100,92,220,.2);
+  border-left: 3px solid var(--hz-accent);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 12px;
+  color: var(--hz-muted);
+  line-height: 1.55;
+  margin-top: 10px;
+}
+.process-callout strong { color: var(--hz-indigo); }
 </style>
 </head>
 <body>
@@ -966,7 +1181,14 @@ body {
     </div>
 
     <div class="nav-group">
-      <div class="nav-group-label">Scenarios</div>
+      <div class="nav-group-label">Problems &amp; Needs</div>
+      <a href="#inst-problems" class="nav-link">Institution Problems &amp; Needs</a>
+      <a href="#consumer-problems" class="nav-link">Consumer Problems &amp; Needs</a>
+      <a href="#process-flow" class="nav-link">End-to-End Process Flow</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Scenarios — Onboarding</div>
       <a href="#s1" class="nav-link">
         1 · First Time Student
         <span class="nav-sub">New student, full onboarding</span>
@@ -1244,18 +1466,22 @@ body {
 
       <div class="req-item">
         <p class="req-text"><strong>Set-it-and-forget-it outcome.</strong> Once onboarding is complete, a student who makes no changes to their account or payment method should realistically never need to re-enter the system during the term if they don't want to. All required decisions, preferences, and payment setup must be fully captured upfront.</p>
+        <p class="req-why"><strong>Why:</strong> Students who must repeatedly return to configure or re-enter information are more likely to abandon the process. Capturing everything upfront reduces ongoing friction and support contacts throughout the term.</p>
       </div>
 
       <div class="req-item">
         <p class="req-text"><strong>One decision at a time.</strong> Onboarding is structured around presenting one decision at a time. Each question reveals the next only after the previous is answered. If a later decision would logically prompt reconsideration of an earlier answer, editing backward is always possible — but the student is never asked to handle two open decisions at once.</p>
+        <p class="req-why"><strong>Why:</strong> Students new to the payment portal are often anxious and unfamiliar with financial terms. Presenting multiple open decisions simultaneously increases cognitive load, raises abandonment risk, and leads to poor choices made without full context.</p>
       </div>
 
       <div class="req-item">
         <p class="req-text"><strong>ERP-first data strategy.</strong> Any value the ERP already holds — name, student ID, charges, financial aid, enrollment status, contact info from SSO — must be pre-populated. Students are never asked to type what the system already knows. The experience confirms or adjusts existing data; it does not re-collect it.</p>
+        <p class="req-why"><strong>Why:</strong> Duplicate data entry is a core product anti-pattern. Re-entering known information wastes the student's time, introduces transcription errors, and signals to users that the system is not integrated with their school — eroding trust.</p>
       </div>
 
       <div class="req-item">
         <p class="req-text"><strong>Scenario-driven communication setup.</strong> Onboarding collects the specific information needed to personalize every subsequent communication and to-do for that student's exact situation: payment plan type, authorized parties added, insurance decisions, and communication preferences all feed into what the student sees and receives after signup.</p>
+        <p class="req-why"><strong>Why:</strong> Generic communications are ignored or misinterpreted. Every downstream message — payment reminders, plan confirmations, aid status alerts — must be grounded in decisions the student actually made. Without capturing this context upfront, personalization is impossible.</p>
       </div>
     </section>
 
@@ -1597,6 +1823,789 @@ body {
 
 
     <!-- ════════════════════════════════════════
+         INSTITUTION PROBLEMS & NEEDS
+    ════════════════════════════════════════ -->
+    <section id="inst-problems" class="prd-section">
+      <div class="section-eyebrow">Problems &amp; Needs</div>
+      <h2 class="section-title">Institution Problems &amp; Needs</h2>
+      <hr class="section-divider"/>
+
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:24px;">This section captures the core problems institutions face and the needs that drive Horizon's features and configuration options. These are the <em>underlying reasons</em> the product exists — not the feature outcomes. Every feature or configuration option in this PRD should trace back to at least one of these institution needs.</p>
+
+      <!-- Problem 1 -->
+      <div class="need-group">
+        <div class="need-group-label">1 · Account Presentment &amp; Student Support Burden</div>
+
+        <div class="problem-stmt">
+          <div class="problem-stmt-label">Problem Statement</div>
+          <p>Students and authorized payers frequently cannot self-serve when trying to understand their account balance, charges, or financial aid status. This results in avoidable contact volume to bursar and student accounts offices — staff spend significant time on calls and emails explaining things the product should communicate clearly. The burden compounds at the start of every term.</p>
+          <p>Discovery interviews found that students operate by immediately seeking one simple number (the amount due), then working backwards to understand it. Too many competing numbers and unclear terminology on current account views cause confusion, erode trust, and increase support costs.</p>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Reduce contact volume from students who don't understand their balance</div>
+          <div class="need-item-body">Institutions need the system to surface balance information clearly enough that students can self-serve without calling — the "one number" they need must be immediately obvious, with contextual explanations available on demand.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Bursar offices at large institutions receive thousands of contacts per term, many of which are identical questions about anticipated aid, charge meanings, or which number to pay. Each avoidable contact consumes staff time and delays help to students who have genuinely complex issues.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Enable service staff to view exactly what the student sees</div>
+          <div class="need-item-body">When a student calls for help, the institution's service representative must be able to pull up the student's exact view — including the same balance data, to-dos, and action states — so they can guide the student without asking them to describe what they're looking at.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Mismatched views between staff and students extend call times, reduce resolution rates, and frustrate both parties. The service portal is a force multiplier for staff efficiency.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Proactively identify students who need to take action</div>
+          <div class="need-item-body">Institutions need the system to automatically identify students with outstanding balances, expiring plans, or upcoming deadlines and communicate with them directly — without requiring staff to manually identify and contact each one.</div>
+          <div class="need-why"><strong>Why it matters:</strong> In traditional models, identifying who needs to act and deciding what to send them is manual, error-prone, and inconsistent. Automating this removes institutional administrative burden and ensures no student is missed.</div>
+        </div>
+      </div>
+
+      <!-- Problem 2 -->
+      <div class="need-group">
+        <div class="need-group-label">2 · Charge Categorization &amp; Payment Application</div>
+
+        <div class="problem-stmt">
+          <div class="problem-stmt-label">Problem Statement</div>
+          <p>Institutions post charges across multiple types — tuition, mandatory fees, housing, lab fees, printing charges, and more. Without the ability to categorize these charges, the student-facing view is a flat list that is hard to scan, understand, or act on. Internally, institutions also need categorization to drive payment plan eligibility rules and precise payment application back to the SIS.</p>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Group transactions by charge category</div>
+          <div class="need-item-body">Institutions need the ability to define charge categories (e.g., Tuition, Mandatory Fees, Housing, Miscellaneous Fees) and assign item types to those categories. Categories may be defined by the institution or sourced from item data.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Grouped, labeled charge summaries help students understand what they're paying for and reduce confusion from long flat lists of line items. They also give institutions the control they need for downstream payment logic.</div>
+          <ul class="need-sub-list">
+            <li>Category source: may come from item data (RTAA) or be manually assigned by the institution</li>
+            <li>School assigns item types to categories in the admin configuration</li>
+          </ul>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Drive payment plan eligibility by charge category</div>
+          <div class="need-item-body">Institutions need the ability to elect which charge categories are eligible for payment plan inclusion. Not all charges should be plan-eligible (e.g., some one-time fees should be paid immediately).</div>
+          <div class="need-why"><strong>Why it matters:</strong> Without category-level plan eligibility, institutions either over-include charges (creating plan imbalances) or under-include them (forcing students to pay fees separately). Category control lets institutions define the right plan scope for their policy.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Apply payments to specific charges in the SIS via RTPN</div>
+          <div class="need-item-body">Institutions need the system to send payment application detail back to the SIS at the charge-category level — so that a payment can be applied to the correct charge type rather than just the account balance as a whole.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Many SIS systems (Banner, PeopleSoft, Colleague) support charge-level payment posting. Without this, reconciliation is done manually or by the institution's own rules — adding staff burden and creating posting errors.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Display account details as summaries with drill-down</div>
+          <div class="need-item-body">Institutions need the ability to present balance information as category-level summaries (e.g., "Tuition &amp; Fees: $11,000") with the ability for the student to expand into individual line items. This supports both the consumer experience and institutional reporting.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Students and APs overwhelmingly scan summaries first. Flat lists of 20+ line items cause confusion and increase support contacts. Summary + detail drill-down matches how users naturally approach their bill.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Generate customizable summary statements</div>
+          <div class="need-item-body">Students and authorized payers need the ability to generate account statements filtered by charge category, term, or date range — particularly for employer reimbursement, scholarship documentation, and tax records.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Many students and families receive tuition reimbursement from employers or scholarship organizations that require itemized documentation. Without flexible statement generation, students call the bursar to request custom printouts — avoidable contact volume.</div>
+        </div>
+      </div>
+
+      <!-- Problem 3 -->
+      <div class="need-group">
+        <div class="need-group-label">3 · Disbursements</div>
+
+        <div class="problem-stmt">
+          <div class="problem-stmt-label">Problem Statement</div>
+          <p>Institutions need to disburse funds to individuals and organizations that do not fit into their standard procurement and payroll systems. These include student refunds (including Title IV), research participant payments, athlete per diems, emergency grants, honoraria, and student organization funding. Current disbursement processes are manual, error-prone, and require too much Nelnet FTE to administer. Institutions also need controls that ensure security, compliance, and auditability — while distributing processing authority to the departments that initiate disbursements.</p>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Centralized control with distributed departmental processing</div>
+          <div class="need-item-body">The institution's central finance office needs to set controls (limits, approval workflows, reporting) while allowing departmental offices (Financial Aid, Athletics, Research, Student Affairs) to initiate their own disbursements within those controls.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Centralizing disbursements without distributed access creates a bottleneck — every refund must be routed through finance. Distributing without controls creates fraud and compliance exposure. The solution must do both simultaneously.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Ensure funds are in hand before disbursement</div>
+          <div class="need-item-body">The system must verify that the institution has funded the disbursement batch before any refunds are sent to recipients. Controls must ensure the system only disburses what was intended, and that everything intended was disbursed — with full reconciliation between system and bank.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Disbursing funds before receiving them creates cash flow risk and potential fraud exposure for Nelnet. Reconciliation gaps result in undetected errors and audit findings.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Support multiple disbursement methods</div>
+          <div class="need-item-body">Institutions need to offer recipients a choice of disbursement methods including: ACH/direct deposit, paper check, direct-to-card, international transfer, and mobile deposit. Students set their preferred method in their Wallet.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Not all students have bank accounts. International students need international transfer options. Students without traditional banking relationships need alternative disbursement paths to receive refunds.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Multi-level approval workflows</div>
+          <div class="need-item-body">The system needs to support configurable approval chains by department and refund type — including two-party approval for sensitive disbursements. Both Nelnet and institution staff need the ability to stop, review, and release or reject individual refunds or batches at any point in the process.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Fraud in disbursements typically exploits single-person authority. Configurable approval workflows prevent any one individual from completing a fraudulent disbursement without detection.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Handle failed disbursements, stop-pays, and reissues</div>
+          <div class="need-item-body">When a disbursement fails (ACH return, bad address for check) or is stopped, the system must notify the institution, manage the returned funds, and support reissuance through a different method.</div>
+          <div class="need-why"><strong>Why it matters:</strong> A significant percentage of first-attempt disbursements fail. Without automated handling, failed refunds sit unresolved — creating compliance risk (especially for Title IV funds) and student frustration.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Differentiate Title IV refunds from non-Title IV</div>
+          <div class="need-item-body">The system must distinguish Title IV disbursements from non-Title IV disbursements, as they have different regulatory timelines, return rules, and reporting requirements.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Title IV refunds are federally regulated with strict timelines (typically 14 days from credit balance creation). Mixing T4 and non-T4 flows without differentiation creates compliance risk and audit exposure for both the institution and Nelnet.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Segregate disbursement workspaces by department</div>
+          <div class="need-item-body">Each department (Financial Aid, Athletics, Research) needs its own isolated workspace so that their disbursements, recipients, and limits do not intermingle. Central administrators must be able to view and report across all workspaces.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Commingling disbursement types and departments makes reporting, auditing, and approvals confusing and creates compliance gaps — especially when each disbursement type has different rules and funding sources.</div>
+        </div>
+      </div>
+
+      <!-- Problem 4 -->
+      <div class="need-group">
+        <div class="need-group-label">4 · Administration &amp; Staff Tooling</div>
+
+        <div class="problem-stmt">
+          <div class="problem-stmt-label">Problem Statement</div>
+          <p>Institution staff need administrative access to manage users, configure the system, run reports, process refunds, and assist students — all from one place. Currently, these functions are fragmented across multiple tools with inconsistent interfaces, creating training burden, errors, and frustration. Service staff similarly need to view and act on student accounts without duplicating the student's own experience.</p>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Unified admin portal for all products and configurations</div>
+          <div class="need-item-body">Administrators need a single portal to access all product configuration, user management, banking setup, branding, and reporting — with smooth transitions between functional areas and no dead ends.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Fragmented admin tools increase training time, introduce errors from context-switching, and make it harder for staff to learn the system. A unified experience reduces cost-to-serve for both institutions and Nelnet.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Configurable messaging by student/payer segment</div>
+          <div class="need-item-body">Institutions need to create and edit targeted messages for specific student segments (e.g., students with past-due balances, students eligible for payment plans, students with anticipated aid) that display in the consumer portal. Nelnet also needs the ability to deploy messages to all users, subsets of clients, or specific client/user combinations.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Generic messaging is ignored. Segment-specific messaging — showing late notices only to students with overdue balances, or plan offers only to plan-eligible students — dramatically improves response rates and reduces avoidable contacts.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Service portal for student account assistance</div>
+          <div class="need-item-body">Service representatives (both institution staff and Nelnet PAS) need to search for a student, view their exact account view, reset MFA/access, and perform actions (take a payment, manage a payment plan, process a refund) on behalf of the student.</div>
+          <div class="need-why"><strong>Why it matters:</strong> When a student calls for help, the representative must be able to act — not just observe. Without action capability in the service portal, every interaction that requires a change forces the student to stay on the phone while staff work in a separate system.</div>
+        </div>
+      </div>
+
+      <!-- Problem 5 -->
+      <div class="need-group">
+        <div class="need-group-label">5 · International Payments</div>
+
+        <div class="problem-stmt">
+          <div class="problem-stmt-label">Problem Statement</div>
+          <p>International student enrollment exceeds 1 million in the U.S., contributing over $40 billion to the economy annually. These students face a disjointed payment experience: navigating from the billing system to a separate international payment gateway, providing documentation multiple times, downloading and re-uploading instructions, and waiting days for payment confirmation. Schools are increasingly offering multiple international payment providers — Flywire, CIBC, Pay My Tuition, Convera — and need a way to configure and present these options without breaking the core payment experience.</p>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Configure one or more international payment providers</div>
+          <div class="need-item-body">Institutions need to configure which international payment providers they offer (from: Flywire, CIBC, Pay My Tuition, Convera), with the ability to offer zero, one, or multiple providers simultaneously — similar to how they configure tuition insurance providers.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Schools contract independently with international payment vendors. Horizon must present the school's configured providers as a seamless part of the payment experience — not a redirect to an unrelated third-party system.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Consolidated reconciliation across all payment types</div>
+          <div class="need-item-body">School finance staff need a single reconciliation report that includes all payments — domestic ACH, credit card, and international — with each day's deposits clearly documented and matched to individual student transactions.</div>
+          <div class="need-why"><strong>Why it matters:</strong> When international and domestic payments flow through separate systems with separate reports, reconciliation becomes a manual, error-prone, multi-system process. A single consolidated report reduces staff effort and error rates significantly.</div>
+        </div>
+      </div>
+
+      <!-- Problem 6 -->
+      <div class="need-group">
+        <div class="need-group-label">6 · In-App Help &amp; AI Assistance</div>
+
+        <div class="problem-stmt">
+          <div class="problem-stmt-label">Problem Statement</div>
+          <p>Students have difficulty understanding their balance, account activity, payment options, and payment plan options — and currently resort to calling the institution. Institution administrators need to understand system capabilities and configurations — and currently call or email Nelnet support. Both create avoidable support cost.</p>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">In-app help for students and payers</div>
+          <div class="need-item-body">Students and authorized payers need contextual, in-app assistance that answers questions about their balance, charges, payment options, and plan details — without leaving the product or calling the institution.</div>
+          <div class="need-why"><strong>Why it matters:</strong> The most common student questions are predictable. AI-assisted in-app help can resolve the majority of these contacts at a fraction of the cost of live support — freeing staff for complex issues that genuinely need human judgment.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">AI-powered admin help for institutions</div>
+          <div class="need-item-body">Administrators need to be able to ask natural-language questions about system capabilities and configurations and receive direct answers — rather than searching through documentation or waiting for Nelnet support responses.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Admin configuration questions are the leading driver of Nelnet PAS support volume from institutions. AI-powered search-and-answer within the admin portal can deflect a significant percentage of these contacts at minimal marginal cost.</div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         CONSUMER PROBLEMS & NEEDS
+    ════════════════════════════════════════ -->
+    <section id="consumer-problems" class="prd-section">
+      <div class="section-eyebrow">Problems &amp; Needs</div>
+      <h2 class="section-title">Consumer Problems &amp; Needs</h2>
+      <hr class="section-divider"/>
+
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:24px;">This section captures the core problems faced by students and authorized payers — the consumers of Horizon. These needs were drawn from customer discovery interviews, behavioral research, and account presentment studies. They define <em>why</em> specific design decisions were made and should be referenced when evaluating tradeoffs in consumer-facing features.</p>
+
+      <!-- Core problem -->
+      <div class="problem-stmt">
+        <div class="problem-stmt-label">Core Problem Statement</div>
+        <p>Students and authorized payers need to understand their online account balances and access account activity quickly. Currently, account views display too many competing numbers, financial terminology is confusing, charge descriptions are unclear, and credits and charges are difficult to reconcile — all leading to avoidable contacts with the bursar's office.</p>
+        <p>Research consistently shows that users' first and primary goal is to locate <strong>one simple number</strong>: the amount they owe. They then work backwards from that number to understand it. Any design that buries or obscures that number — or presents competing figures at the same prominence — increases confusion, abandonment, and support contact volume.</p>
+      </div>
+
+      <!-- End user behavior note -->
+      <div class="process-callout" style="margin-bottom:24px;">
+        <strong>End-user behavior pattern (from discovery research):</strong> Students and APs access their accounts infrequently — typically peaking at the start of each term. Non-traditional students and APs may log in up to 10 times before the due date to check aid status, verify charges, and confirm payments. Traditional students access least frequently, often at the request of their authorized payer. Access is almost always triggered by an email notification of a balance due.
+      </div>
+
+      <!-- Job 1 -->
+      <div class="need-group">
+        <div class="need-group-label">Job 1 · Identify That a Balance Will Be Owed</div>
+
+        <div class="need-item">
+          <div class="need-item-title">Ability to identify a future balance and its due date before it is final</div>
+          <div class="need-item-body">Students and APs need to know — as early as possible — that a balance will be owed and when it will come due. This is especially critical for new students and their families who are planning finances before the first bill is posted.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Schools receive high volumes of contacts from students and APs seeking clarity on upcoming due dates, especially at the start of a new academic period. Early visibility reduces anxiety, enables financial planning, and prevents missed payments.</div>
+        </div>
+      </div>
+
+      <!-- Job 2 -->
+      <div class="need-group">
+        <div class="need-group-label">Job 2 · Locate the Amount Owed</div>
+
+        <div class="need-item">
+          <div class="need-item-title">Single, prominent "amount due" — the primary number users seek</div>
+          <div class="need-item-body">The main goal of students and APs upon logging in is to locate one simple, clear number: the amount due. That is the only number they're looking for. They proceed from there. If no amount is owed, they are effectively done — and should see that clearly.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Discovery interviews found that too many numbers on account view pages are the leading source of user confusion. Users reported not knowing which number to pay. Every additional balance figure at equal prominence increases the cognitive load and the likelihood of abandonment or a support contact.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Ability to understand financial terminology in context</div>
+          <div class="need-item-body">Many students and APs are not familiar with financial terms like credit, debit, anticipated, disbursed, pending, or balance due. Definitions must be available in context — where the term is shown — without requiring the user to navigate away or search help documentation.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Terminology confusion is a documented driver of support contacts. Users misinterpret "credit" as something they owe, confuse "anticipated" aid with applied aid, and do not understand what "disbursed" means in context — all leading to avoidable calls to the bursar.</div>
+        </div>
+      </div>
+
+      <!-- Job 3 -->
+      <div class="need-group">
+        <div class="need-group-label">Job 3 · Verify the Amount Owed</div>
+
+        <div class="need-item">
+          <div class="need-item-title">Understand the total owed across all terms and by individual term</div>
+          <div class="need-item-body">Students and APs need to determine their total financial obligation at a glance — both across all active terms and broken down by term — including the current-term balance, overdue amounts, applied credits, payment plan coverage, and due dates.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Students attending across multiple terms, or those with prior balances, can be confused about how much of their balance is current vs. overdue vs. future. Clarity at the term level prevents misapplied payments and missed deadlines.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Understand the status and composition of financial aid and credits</div>
+          <div class="need-item-body">Students and APs need to understand not just the credit total, but what it's made of — which aid packages, scholarships, loans, or grants are contributing — and the current status of each (anticipated, pending, applied, disbursed).</div>
+          <div class="need-why"><strong>Why it matters:</strong> Aid status is the single largest driver of student contact to the bursar. Students who see their balance decrease overnight — or don't see expected aid applied — immediately call to ask why. Clear status labels and explanations prevent the majority of these contacts.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">See balance after payment plan deduction</div>
+          <div class="need-item-body">Students on a payment plan need to understand their balance in two ways: the total account balance and the amount not covered by their plan. Showing only one creates confusion about what is still owed outside the plan.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Students on plans frequently call asking what they "still owe" — not understanding that their plan covers most but not all of their balance. Clear plan vs. open balance breakdown is critical for students with mixed balance types.</div>
+        </div>
+      </div>
+
+      <!-- Job 4 -->
+      <div class="need-group">
+        <div class="need-group-label">Job 4 · Verify the Charges</div>
+
+        <div class="need-item">
+          <div class="need-item-title">Locate unpaid charges quickly, with the most recent first</div>
+          <div class="need-item-body">When verifying charges, users prioritize unpaid charges and look for the most recent ones first. The charge list should surface unpaid, recent charges at the top — not show a flat chronological list of all charges.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Discovery research confirmed users scan unpaid charges first, then most-recent first. A flat reverse-chronological list of all charges (paid and unpaid, new and old) forces users to scroll and scan — increasing time-to-understanding and likelihood of calling for help.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Identify the status of each charge (paid, unpaid, credited)</div>
+          <div class="need-item-body">Every charge line item must have a visible, unambiguous status indicator. Users should not have to infer whether a charge has been paid or is still outstanding by doing mental math.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Users who cannot easily determine charge status resort to manually trying to reconcile totals — which is error-prone and time-consuming. Some users believe they have been double-charged when a charge and its subsequent credit are not clearly paired.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Identify mandatory vs. optional vs. one-time charges</div>
+          <div class="need-item-body">Students and APs need to understand which charges are required by the institution, which are optional (opt-out), and which are one-time or unusual charges that have not appeared on previous bills.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Students contact the bursar asking to opt out of charges they believe are optional, or disputing charges they don't recognize as one-time items. Clear labeling reduces these contacts and helps students make informed decisions about their obligations.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Understand the meaning of a charge description</div>
+          <div class="need-item-body">Charge descriptions from the SIS are often abbreviated, ambiguous, or institution-specific (e.g., "Day One Digital @ CU Boulder," "Room &amp; Board" where "board" meaning is unclear). Students need a plain-language explanation of what each charge is for.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Charge description confusion is one of the top drivers of bursar contacts. Providing plain-language descriptions — either directly on the charge or via an expandable tooltip — can deflect a large share of these contacts without requiring system changes to how the SIS posts charges.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Understand the reason for a change in a previously seen charge</div>
+          <div class="need-item-body">When a previously incurred charge increases or decreases (e.g., meal plan cost change, room adjustment), students need to understand why the charge is different from before — not just see a new dollar amount.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Unexpected changes to known charges trigger "sanity check" failures — users immediately suspect an error. Without an explanation, they contact the bursar. A brief change reason eliminates most of these contacts.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Reconcile charges billed on dates other than the date of service</div>
+          <div class="need-item-body">When a charge appears on the bill weeks or months after the service was used (e.g., a health center visit billed 6 weeks later), students need to be able to identify the service date alongside the billing date to confirm the charge is legitimate.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Students who see a charge with an unfamiliar date believe it is an error. Discovery interviews found this is a common source of dispute contacts — especially for health center, library, and event-related charges with delayed billing cycles.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Filter, sort, and export charges by category, term, or date range</div>
+          <div class="need-item-body">Students and APs need the ability to view and export account activity filtered by charge category (tuition, housing, etc.), term, or date range — specifically for employer reimbursement, scholarship verification, and tax documentation.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Many students receive employer tuition benefits that require documentation of tuition-specific charges, separate from fees. Bursar offices currently receive requests to manually generate these reports — a service that custom statement export would eliminate.</div>
+        </div>
+      </div>
+
+      <!-- Job 5 -->
+      <div class="need-group">
+        <div class="need-group-label">Job 5 · Troubleshoot</div>
+
+        <div class="need-item">
+          <div class="need-item-title">Dispute an incorrect charge or balance</div>
+          <div class="need-item-body">Students and APs need a clear, accessible path to flag a charge they believe is incorrect — including gathering the information needed to support that dispute — without requiring a phone call or searching for contact information.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Disputing a charge currently requires knowing who to contact, how to describe the issue, and what documentation is needed. An in-app dispute flow reduces the friction of initiating a dispute and ensures both the student and the institution have a clear record of what was flagged.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Clarify the status of an aid package or credit</div>
+          <div class="need-item-body">When the status of financial aid changes unexpectedly (e.g., anticipated aid is removed, a pending disbursement is delayed), students need immediate, plain-language context — not a cryptic status label.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Aid status changes are the highest-urgency trigger for bursar contacts. A student who sees their anticipated aid disappear will call within minutes. Contextual in-app messaging about aid status changes can dramatically reduce this call volume.</div>
+        </div>
+      </div>
+
+      <!-- AP-specific needs -->
+      <div class="need-group">
+        <div class="need-group-label">Authorized Payer — Specific Needs</div>
+
+        <div class="need-item">
+          <div class="need-item-title">View the student's account — same view as the student</div>
+          <div class="need-item-body">An authorized payer (AP) needs to see the same account view as the student, including balance, charges, aid status, and plan information — so they can support the student and make payments on their behalf without calling the student for information.</div>
+          <div class="need-why"><strong>Why it matters:</strong> APs — often parents — are frequently the primary payers. If their view is different from or less complete than the student's, it creates confusion and additional contacts. A consistent view between student and AP eliminates a significant source of call volume.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">View and manage only own payment plans and transactions</div>
+          <div class="need-item-body">An AP must be able to see that other plans exist on the account (so they know coverage is in place), but should only see the details of — and be able to make payments toward — the plans they own. They should not see other APs on the account or the name of another plan's owner.</div>
+          <div class="need-why"><strong>Why it matters:</strong> When multiple APs exist (e.g., two divorced parents), visibility into each other's payment details creates privacy concerns and potential conflict. Scoped plan visibility protects each party's financial privacy while ensuring everyone can see the overall account coverage.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">View and print disclosures and TILA for plans they own</div>
+          <div class="need-item-body">Plan owners — students or APs — need to be able to access, view, and print the disclosures and Truth in Lending Act documents associated with the payment plans they own at any time.</div>
+          <div class="need-why"><strong>Why it matters:</strong> Plan owners may need to reference disclosure terms for a dispute, a tax inquiry, or a financial audit. Access to these documents reduces bursar contacts and is a consumer financial protection requirement.</div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         END-TO-END PROCESS FLOW
+    ════════════════════════════════════════ -->
+    <section id="process-flow" class="prd-section">
+      <div class="section-eyebrow">Process Flow</div>
+      <h2 class="section-title">End-to-End Process Flow</h2>
+      <hr class="section-divider"/>
+
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:8px;">This section maps the complete process from institution onboarding through ongoing student account management — tracing how a school's actions and system events flow into Horizon and drive the consumer experience. Sub-processes (billing, refunds, disbursements) are called out separately.</p>
+      <div class="sophie-flag" style="margin-bottom:24px;">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>This process flow is a first-draft synthesis. Sophie should review each phase for accuracy against the actual implementation plan, add any missing sub-processes, and flag any steps where Horizon's scope ends and another system's scope begins. Working session recommended before this section is shared externally.</span>
+      </div>
+
+      <!-- Phase 1 -->
+      <div class="process-phase">
+        <div class="process-phase-header">
+          <div class="process-phase-num">1</div>
+          <div>
+            <div class="process-phase-title">Contract &amp; System Setup</div>
+            <div class="process-phase-sub">One-time · Institution onboards to Horizon</div>
+          </div>
+        </div>
+        <div class="process-track">
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Institution contracts with Nelnet for Horizon</div>
+              <div class="process-step-body">Scope of products (Consumer Portal, Admin Portal, Disbursements, international providers, etc.), pricing, and implementation timeline are agreed. Contract includes which ERP/SIS will be used and what integration method will be employed.</div>
+              <div class="process-actors"><span class="process-actor actor-inst">Institution</span><span class="process-actor actor-nelnet">Nelnet</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">ERP / SIS integration configured</div>
+              <div class="process-step-body">Nelnet implementation team works with the institution's IT staff to establish the ERP connector (Banner, PeopleSoft, Colleague, or other). Integration scope includes real-time account data sync (RTAA), payment posting (RTPN), and student identity via SAML SSO.</div>
+              <div class="process-actors"><span class="process-actor actor-nelnet">Nelnet</span><span class="process-actor actor-inst">Institution IT</span><span class="process-actor actor-system">ERP/SIS</span></div>
+              <div class="process-sub-steps">
+                <div class="process-sub-step">SAML SSO configured between institution portal and Horizon</div>
+                <div class="process-sub-step">RTAA (real-time account activity) data feed validated</div>
+                <div class="process-sub-step">RTPN (real-time payment notification) posting rules configured</div>
+                <div class="process-sub-step">Charge category mapping defined (Tuition, Fees, Housing, etc.)</div>
+              </div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Payment configuration</div>
+              <div class="process-step-body">Institution configures accepted payment methods (ACH, credit card, Apple Pay), payment plan rules (eligibility windows, installment schedules, down payment minimums), tuition insurance provider (if applicable), and international payment providers (if applicable).</div>
+              <div class="process-actors"><span class="process-actor actor-inst">Institution Admin</span><span class="process-actor actor-nelnet">Nelnet</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Communication &amp; disclosure setup</div>
+              <div class="process-step-body">Institution configures onboarding disclosures (required acknowledgements), communication templates (email, SMS), and segment-specific in-app messages. Nelnet configures system-level communications for failed payments, refund notifications, and plan defaults.</div>
+              <div class="process-actors"><span class="process-actor actor-inst">Institution Admin</span><span class="process-actor actor-nelnet">Nelnet</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Admin and service user provisioning</div>
+              <div class="process-step-body">Institution's admin users are provisioned with appropriate roles (bursar admin, departmental processor, service representative). Role-based access controls determine what each user can view and action.</div>
+              <div class="process-actors"><span class="process-actor actor-inst">Institution Admin</span><span class="process-actor actor-nelnet">Nelnet</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="process-phase">
+        <div class="process-phase-header">
+          <div class="process-phase-num">2</div>
+          <div>
+            <div class="process-phase-title">Term Billing &amp; Setup</div>
+            <div class="process-phase-sub">Each academic term · typically 2–3x per year</div>
+          </div>
+        </div>
+        <div class="process-track">
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Institution posts term charges in the SIS</div>
+              <div class="process-step-body">The bursar or student accounts office runs the billing process in the SIS (Banner, PeopleSoft, etc.) to generate term charges for enrolled students — tuition, mandatory fees, housing, meal plans, and any institutional-specific charges.</div>
+              <div class="process-actors"><span class="process-actor actor-inst">Bursar / Student Accounts</span><span class="process-actor actor-system">SIS / ERP</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Horizon pulls updated account data via RTAA</div>
+              <div class="process-step-body">As charges are posted in the SIS, Horizon receives real-time account activity updates. Each student's balance, charge list, aid status, and due dates are updated automatically — no manual data entry or file upload required.</div>
+              <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-system">ERP Integration</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Institution configures term-specific payment plan window</div>
+              <div class="process-step-body">The institution sets the enrollment open and close dates for payment plans for the current term, the installment schedule options, and any minimum down payment requirements.</div>
+              <div class="process-actors"><span class="process-actor actor-inst">Institution Admin</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Student notifications triggered</div>
+              <div class="process-step-body">Horizon identifies students with new balances and sends term billing notifications via email and/or SMS per the institution's configured communication rules. Messages include the balance amount, due date, and a direct link into Horizon.</div>
+              <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-student">Student / AP</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="process-phase">
+        <div class="process-phase-header">
+          <div class="process-phase-num">3</div>
+          <div>
+            <div class="process-phase-title">Student Account Access &amp; Onboarding</div>
+            <div class="process-phase-sub">Per student · first access each term</div>
+          </div>
+        </div>
+        <div class="process-track">
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Student authenticates via SSO from the institution portal</div>
+              <div class="process-step-body">The student clicks the payment portal link in their school's student portal or from a notification email. SAML SSO authenticates them automatically — no separate Nelnet credentials required.</div>
+              <div class="process-actors"><span class="process-actor actor-student">Student</span><span class="process-actor actor-system">SAML SSO</span><span class="process-actor actor-system">Horizon</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Horizon pulls full account data from ERP in real time</div>
+              <div class="process-step-body">Upon authentication, Horizon immediately syncs: student identity, enrollment status, term charges, applied aid, anticipated aid, balance due, and any existing Nelnet payment history. No data entry is required from the student.</div>
+              <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-system">ERP Integration</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">First-time student completes onboarding flow</div>
+              <div class="process-step-body">New students are guided through the onboarding experience: balance review → insurance decision → payment decision (plan or pay now) → authorized party setup → communication preferences → disclosures. Returning students go directly to their home screen with their current account state.</div>
+              <div class="process-actors"><span class="process-actor actor-student">Student</span><span class="process-actor actor-system">Horizon</span></div>
+              <div class="process-sub-steps">
+                <div class="process-sub-step">Onboarding scenarios covered in detail in the Scenarios section below</div>
+                <div class="process-sub-step">Home screen scenarios covered in the Home Screen Scenarios section</div>
+              </div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Authorized parties added and configured</div>
+              <div class="process-step-body">During or after onboarding, students can add authorized parties (parents, guardians, sponsors). Each AP receives their own access credentials and a scoped view of the account based on their designated role (payer, non-payer).</div>
+              <div class="process-actors"><span class="process-actor actor-student">Student</span><span class="process-actor actor-system">Horizon</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 4 -->
+      <div class="process-phase">
+        <div class="process-phase-header">
+          <div class="process-phase-num">4</div>
+          <div>
+            <div class="process-phase-title">Payment Processing</div>
+            <div class="process-phase-sub">Ongoing · per payment or plan enrollment</div>
+          </div>
+        </div>
+        <div class="process-track">
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Student or AP makes a payment or enrolls in a plan</div>
+              <div class="process-step-body">The student or AP selects a payment method (ACH, credit card, Apple Pay, international) and initiates a one-time payment or enrolls in a payment plan. For plans, they select installment options, set a down payment, and authorize auto-pay.</div>
+              <div class="process-actors"><span class="process-actor actor-student">Student / AP</span><span class="process-actor actor-system">Horizon</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Payment processed and ERP updated via RTPN</div>
+              <div class="process-step-body">Upon successful payment, Horizon sends a real-time payment notification (RTPN) to the SIS to post the payment to the student's account at the charge-category level (per institution configuration). The student's balance in Horizon updates to reflect the payment.</div>
+              <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-system">ERP / SIS</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Confirmation sent to student and AP</div>
+              <div class="process-step-body">A payment confirmation is sent via email (and optionally SMS) to the student and any APs who made the payment. For plan enrollments, the full schedule and TILA disclosure are delivered at this point.</div>
+              <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-student">Student / AP</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 5 -->
+      <div class="process-phase">
+        <div class="process-phase-header">
+          <div class="process-phase-num">5</div>
+          <div>
+            <div class="process-phase-title">Mid-Term Account Changes</div>
+            <div class="process-phase-sub">As needed · charge additions, aid changes, enrollment adjustments</div>
+          </div>
+        </div>
+        <div class="process-track">
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">School posts a new or changed charge in the SIS</div>
+              <div class="process-step-body">Examples: a lab fee added after course registration, a housing adjustment, a returned payment fee, or a mid-semester meal plan change. The charge posts in the SIS and is picked up by Horizon's RTAA integration.</div>
+              <div class="process-actors"><span class="process-actor actor-inst">Bursar / Registrar</span><span class="process-actor actor-system">SIS / ERP</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Student notified of account change</div>
+              <div class="process-step-body">Horizon identifies the change in account state and notifies the student via email/SMS. The home screen to-do list is updated to surface the new action item. If the change affects plan eligibility or coverage, a plan adjustment prompt may appear.</div>
+              <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-student">Student / AP</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Student addresses the change</div>
+              <div class="process-step-body">The student pays the new balance, adds it to their plan, or takes another appropriate action. Horizon guides them directly into the right flow based on the type of change.</div>
+              <div class="process-actors"><span class="process-actor actor-student">Student / AP</span><span class="process-actor actor-system">Horizon</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 6 -->
+      <div class="process-phase">
+        <div class="process-phase-header">
+          <div class="process-phase-num">6</div>
+          <div>
+            <div class="process-phase-title">Disbursements (Student Refunds)</div>
+            <div class="process-phase-sub">As needed · triggered by credit balances or financial aid excess</div>
+          </div>
+        </div>
+        <div class="process-track">
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Institution identifies students with credit balances</div>
+              <div class="process-step-body">The institution determines which students have a credit balance (e.g., overpayment, financial aid in excess of charges, dropped course credit, scholarship adjustment) and prepares a disbursement file or initiates individual refunds via the admin portal.</div>
+              <div class="process-actors"><span class="process-actor actor-inst">Bursar / Financial Aid</span><span class="process-actor actor-system">SIS / ERP</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Disbursement file loaded or manually initiated</div>
+              <div class="process-step-body">The institution uploads a batch disbursement file (SFTP or portal upload), or individual refunds are entered manually. For T4 (Title IV) refunds, differentiation from non-T4 disbursements is flagged at this step.</div>
+              <div class="process-actors"><span class="process-actor actor-inst">Bursar / FA Office</span><span class="process-actor actor-system">Horizon</span></div>
+              <div class="process-sub-steps">
+                <div class="process-sub-step">System validates file format, checks for duplicates, and rejects invalid records</div>
+                <div class="process-sub-step">File Status → Loaded / Saved &amp; Validated</div>
+                <div class="process-sub-step">Response file sent to client confirming loaded and rejected records</div>
+              </div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Student notified of pending refund; selects disbursement method</div>
+              <div class="process-step-body">Horizon notifies the student that a refund is pending. If the student has not already set a preferred disbursement method in their Wallet, they are prompted to do so now (ACH, direct-to-card, check, or international). Email sent to candidate.</div>
+              <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-student">Student</span></div>
+              <div class="process-sub-steps">
+                <div class="process-sub-step">File Status → Funds Requested · Refund Status → Pending</div>
+              </div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Funds requested from client; Payment Manager file created (Day 1)</div>
+              <div class="process-step-body">Disbursement records are created. A Payment Manager file is generated (2:12 PM CST) and funds are requested from the institution — via PMGR file for pull clients, or via email for push clients.</div>
+              <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-inst">Institution</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Refunds sent to processor; File sent to bank (Process Day 2 — Step 1)</div>
+              <div class="process-step-body">Response files from the previous day are processed. Funds received from the institution update to "Funds Received." A new Payment Manager file is created (2:12 PM CST) and refunds are sent to the processor via PMGR file. File Status → Sent to Bank. Refund Status → Sent to Processor.</div>
+              <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-nelnet">Processor</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Processor returns ACK file; checks printed (Process Day 2 — Step 2)</div>
+              <div class="process-step-body">The processor returns an ACK file. File Status → Accepted. Refund Status → Accepted by Processor. ACH refunds are submitted to the ACH network. Checks are sent to the printer to be printed and mailed. In the afternoon, a Check Issue File is received and checks are in a status of Printed (note: the actual printed date will be the next day). Disbursement records may be rejected via the ACK file or via fax to accounting — rejects produce the same results as an ACH return.</div>
+              <div class="process-actors"><span class="process-actor actor-nelnet">Processor</span><span class="process-actor actor-system">ACH Network</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">ACH confirmation received (Process Day 3)</div>
+              <div class="process-step-body">The processor returns an ACH Confirmation File. File Status → Accepted. ACH Refund Status → Success. Student receives confirmation that their refund has been sent.</div>
+              <div class="process-actors"><span class="process-actor actor-nelnet">Processor</span><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-student">Student</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">ACH returns and failures handled (Process Day 4+)</div>
+              <div class="process-step-body">If an ACH return occurs: the processor returns an ACH Return File. A check is issued via a new disbursement record, or funds are returned to the client. NOTE: refund method cannot be updated for disbursements resulting from an ACH failure. An ACH return response file is sent to the client.</div>
+              <div class="process-actors"><span class="process-actor actor-nelnet">Processor</span><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-inst">Institution</span></div>
+              <div class="process-callout"><strong>Important:</strong> The file or individual disbursements may be cancelled up to the point the process begins to create records. Once the process begins to create records, the file and/or disbursements cannot be cancelled.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 7 -->
+      <div class="process-phase">
+        <div class="process-phase-header">
+          <div class="process-phase-num">7</div>
+          <div>
+            <div class="process-phase-title">Payment Plan Default &amp; Collections Escalation</div>
+            <div class="process-phase-sub">As needed · when a plan installment is missed</div>
+          </div>
+        </div>
+        <div class="process-track">
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Plan installment missed; student notified</div>
+              <div class="process-step-body">When a scheduled installment is not collected (insufficient funds, closed account, expired card), Horizon flags the account and notifies the student immediately via email and SMS. A to-do item appears on the home screen.</div>
+              <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-student">Student / AP</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Cure window / retry attempt</div>
+              <div class="process-step-body">The student is given a window to resolve the missed payment — updating their payment method and authorizing a retry, or making a manual payment. The system may attempt an automatic retry per the institution's configured retry rules.</div>
+              <div class="process-actors"><span class="process-actor actor-student">Student / AP</span><span class="process-actor actor-system">Horizon</span></div>
+              <div class="sophie-flag">
+                <span class="sophie-flag-label">Sophie review needed</span>
+                <span>Retry rules, grace period duration, and default trigger threshold need to be confirmed against current Enterprise/Horizon business rules. These vary by institution configuration.</span>
+              </div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Plan defaults; registration hold may be applied</div>
+              <div class="process-step-body">If the missed payment is not resolved within the cure window, the plan is placed in default status. If the institution has configured a registration hold for defaulted plans, a hold is applied to the student's SIS record. The student's Horizon home screen shows a high-priority to-do with the registration hold warning.</div>
+              <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-system">SIS / ERP</span><span class="process-actor actor-inst">Institution</span></div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-step-card">
+              <div class="process-step-title">Collections escalation (outside Horizon scope)</div>
+              <div class="process-step-body">Accounts that remain unpaid after default may be referred to collections by the institution per their own policy. Horizon records the final account state and provides export data for the institution's collections process. Collections management itself is outside Horizon's direct scope.</div>
+              <div class="process-actors"><span class="process-actor actor-inst">Institution</span></div>
+              <div class="sophie-flag">
+                <span class="sophie-flag-label">Sophie review needed</span>
+                <span>Confirm the exact handoff point between Horizon's account state management and any collections integration or export. Define what data is provided and in what format.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-process: Batch CC Refunds -->
+      <div class="sub-section-header">
+        <div class="sub-section-eyebrow">Sub-Process</div>
+        <div class="sub-section-title">Batch Credit Card Refunds File Process</div>
+      </div>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">When the institution needs to return funds to students who originally paid by credit card, a separate batch credit card refund process applies. This process mirrors the standard ACH disbursement flow but routes through the card network rather than ACH.</p>
+      <div class="process-track" style="margin-left:0;padding-left:22px;">
+        <div class="process-step">
+          <div class="process-step-card">
+            <div class="process-step-title">Upload Process</div>
+            <div class="process-step-body">Client uploads a Refund Candidate File. File Status → Received.</div>
+            <div class="process-actors"><span class="process-actor actor-inst">Institution</span><span class="process-actor actor-system">Horizon</span></div>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="process-step-card">
+            <div class="process-step-title">Load Process</div>
+            <div class="process-step-body">System checks for a new candidate file every 15 minutes. Validates and rejects: duplicate files, duplicate records, invalid file format, invalid record format. Valid records are loaded and viewable only via the Payment Manager. System creates a profile for the candidate if one does not exist; updates existing profiles if name, address, or email differs. File manager refund record displays status = Loaded. File Status → Saved &amp; Validated. Response File sent to client confirming loaded and rejected records.</div>
+            <div class="process-actors"><span class="process-actor actor-system">Horizon</span></div>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="process-step-card">
+            <div class="process-step-title">Process Day 1</div>
+            <div class="process-step-body">Disbursement records created. Payment Manager File created (2:12 PM CST). Funds requested from client via PMGR file (Pull client) or via email (Push client). File Status → Funds Requested. Refund Status → Pending. Email sent to candidate.</div>
+            <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-inst">Institution</span><span class="process-actor actor-student">Student</span></div>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="process-step-card">
+            <div class="process-step-title">Process Day 2 — Step 1</div>
+            <div class="process-step-body">Response files from previous day's activity processed. Funds received from institution update client file status to Funds Received. Payment Manager File created (2:12 PM CST). Refunds sent to processor via PMGR file. File Status → Sent to Bank. Refund Status → Sent to Processor.</div>
+            <div class="process-actors"><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-nelnet">Processor</span></div>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="process-step-card">
+            <div class="process-step-title">Process Day 2 — Step 2</div>
+            <div class="process-step-body">Processor returns an ACK file. File Status → Accepted. Refund Status → Accepted by Processor. ACH refunds submitted to ACH network. Checks sent to printer to be printed and mailed. In the afternoon, Check Issue File received; checks in status Printed (printed date will actually be the next day). Note: a disbursement record may be rejected via the ACK file or via fax to accounting — rejects produce the same results as an ACH return.</div>
+            <div class="process-actors"><span class="process-actor actor-nelnet">Processor</span><span class="process-actor actor-system">ACH Network</span></div>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="process-step-card">
+            <div class="process-step-title">Process Day 3</div>
+            <div class="process-step-body">Processor returns: ACH Confirmation File. File Status → Accepted. ACH Refund Status → Success.</div>
+            <div class="process-actors"><span class="process-actor actor-nelnet">Processor</span><span class="process-actor actor-system">Horizon</span></div>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="process-step-card">
+            <div class="process-step-title">Process Day 4 or Greater — ACH Returns</div>
+            <div class="process-step-body">Processor returns an ACH Return File. Check issued via a new disbursement record, or funds returned to the client. NOTE: Refund method cannot be updated for disbursements resulting from an ACH failure. ACH return response file sent to the client.</div>
+            <div class="process-actors"><span class="process-actor actor-nelnet">Processor</span><span class="process-actor actor-system">Horizon</span><span class="process-actor actor-inst">Institution</span></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ════════════════════════════════════════
          SCENARIO 1: FIRST TIME STUDENT
     ════════════════════════════════════════ -->
     <section id="s1" class="prd-section">
@@ -1632,6 +2641,7 @@ body {
 
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">The student arrives exclusively via SAML SSO from the university portal. No Nelnet-specific username or password entry occurs within Horizon.</p>
+          <p class="req-why"><strong>Why:</strong> Requiring a separate Nelnet login creates friction and abandonment. Students are already authenticated by their institution — forcing a second login adds no security benefit and creates a barrier to completing payment setup.</p>
           <div class="req-tags"><span class="tag tag-erp">ERP / SSO</span></div>
         </div>
 
@@ -1661,6 +2671,7 @@ body {
 
       <div class="req-item" data-modified="2026-04-30">
         <p class="req-text">The balance breakdown must remain accessible to the student throughout the entire onboarding flow. They should be able to reference their balance at any point while making decisions.</p>
+        <p class="req-why"><strong>Why:</strong> Payment decisions (plan type, down payment amount, insurance acceptance) are all made in relation to the balance. Hiding or removing the balance context mid-flow forces the student to hold the number in memory, increasing errors and second-guessing.</p>
       </div>
 
 
@@ -1672,6 +2683,7 @@ body {
 
       <div class="req-item" data-modified="2026-04-30">
         <p class="req-text">This step is shown only when the institution has tuition insurance (GradGuard) enabled. If not enabled, the flow proceeds directly to Step 3.</p>
+        <p class="req-why"><strong>Why:</strong> Not all institutions offer tuition insurance. Surfacing the step when it is not available confuses students and makes the flow longer than necessary without benefit.</p>
         <div class="req-tags"><span class="tag tag-inst">Institution setting</span><span class="tag tag-if">IF: GradGuard enabled → show step</span></div>
       </div>
 
@@ -1684,6 +2696,7 @@ body {
         <div class="if-label">IF: Student answers "No, I live out of state"</div>
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">Reveal a state selector so the student can indicate their state of residence. Once a state is selected, the correct premium is calculated and the offer can be shown.</p>
+          <p class="req-why"><strong>Why:</strong> GradGuard premiums vary by state. The state selector must only appear when needed — surfacing it unconditionally would add unnecessary steps for in-state students.</p>
         </div>
       </div>
 
@@ -1694,15 +2707,18 @@ body {
 
       <div class="req-item" data-modified="2026-04-30">
         <p class="req-text">The student must have three response options: Accept, Decline, or Decide Later.</p>
+        <p class="req-why"><strong>Why:</strong> A student may not be ready to decide on insurance before completing payment setup. "Decide Later" prevents onboarding abandonment when the student needs more time to evaluate the offer.</p>
       </div>
 
       <div class="if-block">
         <div class="if-label">IF: Student accepts tuition insurance</div>
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">Display an immediate confirmation note at the point of acceptance: "[Premium amount] will be added to your sign-up costs today." The student must know the premium is part of today's payment before they proceed.</p>
+          <p class="req-why"><strong>Why:</strong> The premium is charged immediately — the student must not be surprised by an unexpected charge when they reach the payment confirmation. Transparency at the point of acceptance prevents disputes and loss of trust.</p>
         </div>
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">The insurance premium must be included in every downstream total-due-today calculation: the Pay Over Time down payment breakdown (Step 3), the payment confirmation screen (Step 4), and the success screen. The total must never show just the down payment or enrollment fee in isolation.</p>
+          <p class="req-why"><strong>Why:</strong> The total due today is the number the student will compare against their bank account. Any omission — even temporary — creates a discrepancy the student will notice and question, generating a support contact.</p>
           <div class="req-tags"><span class="tag tag-if">Cascades to: Step 3 · Step 4 · Success screen</span></div>
         </div>
       </div>
@@ -1716,6 +2732,7 @@ body {
 
       <div class="req-item" data-modified="2026-04-30">
         <p class="req-text">Present the available payment paths. Options are determined by institution settings. Always available: Pay in Full, Schedule a Payment. Conditional: Pay Over Time (shown only if the institution offers a payment plan).</p>
+        <p class="req-why"><strong>Why:</strong> Not all institutions offer payment plans. Showing options the student cannot actually use creates confusion and wasted interaction. The available set must match exactly what the institution has configured.</p>
         <div class="req-tags"><span class="tag tag-inst">Institution setting</span></div>
       </div>
 
@@ -1729,6 +2746,7 @@ body {
         <div class="if-label">PATH: Pay in Full</div>
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">Show the full balance due. Student proceeds to Step 4 (payment method collection) for the full amount.</p>
+          <p class="req-why"><strong>Why:</strong> Pay in Full is the simplest path. The student has already seen the balance — confirming it here and proceeding directly to payment method keeps the flow minimal for students who don't need installment options.</p>
         </div>
       </div>
 
@@ -1737,6 +2755,7 @@ body {
         <div class="if-label">PATH: Schedule a Payment</div>
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">Allow the student to select a future payment date. Student then proceeds to Step 4 to enter their payment method for the scheduled amount.</p>
+          <p class="req-why"><strong>Why:</strong> Some students want to pay in full but need a few extra days — for example, waiting for a paycheck or a parent's transfer. Scheduling avoids forcing them into a payment plan just to defer by a week.</p>
         </div>
       </div>
 
@@ -1756,6 +2775,7 @@ body {
 
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text"><strong>Sub-step A — Payment Frequency.</strong> Options: Weekly, Every 2 weeks, Monthly. Once confirmed, collapses to a summary row showing the selected frequency, with an Edit button.</p>
+          <p class="req-why"><strong>Why:</strong> Frequency alignment with the student's income cycle is the primary driver of plan success. A student paid bi-weekly who sets up a monthly plan may struggle; matching the cadence to their paycheck reduces missed payments.</p>
         </div>
 
         <div class="req-item" data-modified="2026-04-30">
@@ -1799,6 +2819,7 @@ body {
 
       <div class="req-item" data-modified="2026-04-30">
         <p class="req-text">Collect the payment method for the amount due today (full balance, scheduled amount, or Pay Over Time total). Accepted methods are determined by institution settings. This scenario: ACH (bank account) and Credit Card.</p>
+        <p class="req-why"><strong>Why:</strong> The payment method collected here becomes the default for all future auto-pay installments. Collecting it at this step — after the student has committed to a payment path — avoids asking for method details before the student knows what they're paying for.</p>
         <div class="req-tags"><span class="tag tag-inst">Institution setting: accepted methods</span></div>
       </div>
 
@@ -1810,6 +2831,7 @@ body {
 
       <div class="req-item" data-modified="2026-04-30">
         <p class="req-text">Before charging, present a full confirmation screen showing a complete breakdown of everything due today. For Pay Over Time, this includes: down payment, Nelnet enrollment fee, tuition insurance premium (if applicable), total due today, plus the plan summary — installment count × installment amount, payment frequency, first payment date, and remaining balance after today's payment.</p>
+        <p class="req-why"><strong>Why:</strong> The confirmation screen is the student's last opportunity to review and catch errors before money moves. A complete breakdown — not a single total — allows them to verify each component is correct and builds confidence before authorizing the charge.</p>
         <div class="req-tags"><span class="tag tag-if">IF: Insurance accepted → show premium row</span><span class="tag tag-if">IF: POT path → show plan summary</span></div>
       </div>
 
@@ -1827,20 +2849,24 @@ body {
 
       <div class="req-item" data-modified="2026-04-30">
         <p class="req-text">Collect name and email for each authorized party. Send each AP an invitation email with their account setup link immediately upon submission.</p>
+        <p class="req-why"><strong>Why:</strong> The AP needs to complete their own account setup to access the student's account. An immediate invite ensures there is no delay between the student granting access and the AP being able to act — especially important if a parent needs to make the first payment.</p>
       </div>
 
       <div class="req-item" data-modified="2026-04-30">
         <p class="req-text">The student can add multiple authorized parties, or skip this step entirely.</p>
+        <p class="req-why"><strong>Why:</strong> Not all students have parents or guardians who manage payments. Requiring AP setup to complete onboarding would block students who are self-paying. The step is optional and can be completed post-onboarding.</p>
       </div>
 
       <div class="if-block">
         <div class="if-label">IF: One or more authorized parties added</div>
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">Post-onboarding: the Manage Authorized Parties quick action on the home screen must show the names of the APs added here, not just a generic label.</p>
+          <p class="req-why"><strong>Why:</strong> Showing names rather than a generic label confirms to the student that their APs were successfully added and makes the quick action more immediately meaningful — they can see who has access at a glance.</p>
           <div class="req-tags"><span class="tag tag-if">Cascades to: Home screen quick actions</span></div>
         </div>
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">Post-onboarding: if any authorized party subsequently sets up a Pay Over Time plan, a new "AP Pay Over Time Plans" quick action must appear on the student's home screen.</p>
+          <p class="req-why"><strong>Why:</strong> The student is responsible for their account's total coverage. If a parent sets up a plan, the student needs visibility so they understand what portion of the balance is being covered by someone else's plan.</p>
           <div class="req-tags"><span class="tag tag-if">Cascades to: Home screen · IF AP creates POT plan</span></div>
         </div>
       </div>
@@ -1859,11 +2885,13 @@ body {
 
       <div class="req-item" data-modified="2026-04-30">
         <p class="req-text">Marketing/promotional SMS is opt-in and toggleable. The default for a first-time student is off unless the institution has configured a different default. Whatever state the student sets here carries forward to their Account Details screen.</p>
+        <p class="req-why"><strong>Why:</strong> Defaulting marketing SMS to off respects consumer communication preferences and regulatory requirements. The student's explicit choice here must persist — re-asking in Account Details would be inconsistent and frustrating.</p>
         <div class="req-tags"><span class="tag tag-if">Cascades to: Account Details · SMS opt-in state</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-04-30">
         <p class="req-text">The student's email address is pre-populated from SSO/ERP. No re-entry required.</p>
+        <p class="req-why"><strong>Why:</strong> No duplicate entry. The email is already known from SSO. Asking the student to type it again provides no value and would contradict the ERP-first data principle.</p>
         <div class="req-tags"><span class="tag tag-erp">ERP / SSO</span></div>
       </div>
 
@@ -1876,6 +2904,7 @@ body {
 
       <div class="req-item" data-modified="2026-04-30">
         <p class="req-text">The student must set security questions for account recovery. Answers are stored and accessible (masked) from the Account Details screen post-onboarding, with a "Change" option to update them.</p>
+        <p class="req-why"><strong>Why:</strong> Authorized parties authenticate with Nelnet credentials (not SSO), and students may need to recover their account outside of the institution's SSO flow. Security questions provide a fallback verification path for account recovery scenarios.</p>
       </div>
 
 
@@ -1903,6 +2932,7 @@ body {
 
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">Greet the student by first name — large, left-aligned. Account access (initials avatar + "Account" label) is positioned on the right side of the greeting area and is always tappable to reach Account Details. The initials avatar is the only account access entry point; no duplicate link elsewhere in the header.</p>
+          <p class="req-why"><strong>Why:</strong> A personal greeting confirms the correct student is logged in and sets a consumer-first tone. A single, consistent entry point to account settings prevents confusion about where to manage profile or payment details.</p>
         </div>
       </div>
 
@@ -1911,20 +2941,24 @@ body {
 
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">A "To dos" section appears above the account summary. To-do items are entirely dynamic — generated from the student's current account state. Show nothing in this section if there are no actionable to-dos.</p>
+          <p class="req-why"><strong>Why:</strong> The to-do list is the guided experience in action — it tells the student exactly what they still need to do without them having to interpret their balance or navigate to find it. An empty to-do section should not imply there are things left undone.</p>
         </div>
 
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">If an open (unpaid, unscheduled) balance exists: show a to-do card displaying the open amount, with the copy "Hasn't been paid or scheduled to be paid yet."</p>
+          <p class="req-why"><strong>Why:</strong> An unaddressed balance is the most actionable item on the student's account. Surfacing it as a to-do — not just in the balance summary — ensures it cannot be overlooked.</p>
           <div class="req-tags"><span class="tag tag-if">IF: Open balance exists</span></div>
         </div>
 
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">If a payment is due within the next 30 days: surface it as a to-do with the amount and due date.</p>
+          <p class="req-why"><strong>Why:</strong> Students access the portal infrequently. A timely to-do ensures they see upcoming auto-pay dates and can resolve any issues (expired card, insufficient funds) before the payment fails.</p>
           <div class="req-tags"><span class="tag tag-if">IF: Payment due within 30 days</span></div>
         </div>
 
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">Account activity from the last 30 days must be surfaced in this area as context — payments made, plan changes, etc.</p>
+          <p class="req-why"><strong>Why:</strong> Students who log in to check their account often arrive after receiving a notification. Showing recent activity confirms what has already happened, reducing contacts from students who don't know if their payment went through.</p>
         </div>
       </div>
 
@@ -1936,6 +2970,7 @@ body {
           <p class="req-text" style="margin-top:6px">&nbsp;· <strong>On Pay Over Time plan</strong> (teal/green segment) — only present if student has an active POT plan<br/>
           &nbsp;· <strong>Open balance</strong> (accent color segment) — always present if there is any open/unpaid balance</p>
           <p class="req-text" style="margin-top:6px">The proportions of each segment reflect the actual split of the student's total balance.</p>
+          <p class="req-why"><strong>Why:</strong> The visual bar makes the balance structure immediately legible. A student can see at a glance how much is covered by their plan vs. still open — without doing math. This directly reduces the "what do I still owe?" confusion that drives bursar contacts.</p>
           <div class="req-tags">
             <span class="tag tag-if">IF: POT plan active → two-segment bar</span>
             <span class="tag tag-if">IF: No POT plan → single segment</span>
@@ -1944,6 +2979,7 @@ body {
 
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">Below the balance bar: display the open balance dollar amount prominently on the left. The label "Open balance" appears to the right of the number. Brief supporting text explains what "open balance" means in this context.</p>
+          <p class="req-why"><strong>Why:</strong> The open balance is the primary number the student needs to act on. Labeling it clearly and adding supporting text reduces the terminological confusion ("which balance do I pay?") that is the leading driver of bursar contacts.</p>
         </div>
 
         <div class="req-item" data-modified="2026-04-30">
@@ -1965,6 +3001,7 @@ body {
             <strong>5. Account History</strong> — always shown<br/>
             <strong>6. AP Pay Over Time Plans</strong> — shown only if at least one authorized party has an active POT plan
           </p>
+          <p class="req-why"><strong>Why:</strong> Quick actions replace the need for navigation — the most relevant action for the student's current state should always be one tap away. Dynamic ordering ensures that a student with an active plan sees plan management first, not buried behind actions that don't apply to them.</p>
           <div class="req-tags">
             <span class="tag tag-if">IF: Student has POT → show #1</span>
             <span class="tag tag-if">IF: Any AP has POT → show #6</span>
@@ -2023,6 +3060,7 @@ body {
         <div class="subsection-label">Account Details</div>
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">Accessible from the initials avatar on the home screen. Must display: first name, last name, preferred name (editable), student ID (read-only — from ERP). Contact section: email addresses and phone numbers, each individually editable and addable. SMS opt-in section: transactional (locked on, labeled as required), marketing (toggleable). Security questions section: answers masked, with a "Change" action that launches the security question update flow.</p>
+          <p class="req-why"><strong>Why:</strong> Students need a single place to manage all their account-level settings post-onboarding. Separating these into multiple screens or burying them increases the chance a student can't find what they need and contacts support instead.</p>
           <div class="req-tags"><span class="tag tag-erp">Student ID: ERP / read-only</span></div>
         </div>
       </div>
@@ -2047,6 +3085,7 @@ body {
         <div class="subsection-label">AP Pay Over Time Plans</div>
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">Read-only view of Pay Over Time plans set up by the student's authorized parties. Accessible from quick action #6 on the home screen, which is only shown when at least one AP has an active POT plan.</p>
+          <p class="req-why"><strong>Why:</strong> The student needs to know if an AP's plan is covering their balance — especially if multiple parties are paying. Read-only access provides coverage visibility without giving the student control over an AP's plan (which belongs to the AP).</p>
           <div class="req-tags"><span class="tag tag-if">IF: AP has active POT plan → quick action visible</span></div>
         </div>
       </div>
@@ -2131,16 +3170,19 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>The SSO token carries enrollment, identity, and authorization context.</strong> The institution passes student name, email, enrollment status, and account identifiers as part of the SAML assertion. Horizon reads these values directly — students are never asked to re-enter what the school already knows.</p>
+        <p class="req-why"><strong>Why:</strong> The SSO token is the technical implementation of the no-duplicate-entry principle. If Horizon cannot read these values automatically, onboarding degrades into a manual data collection form — defeating the ERP-first strategy.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span><span class="tag tag-erp">ERP integration</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Authorized party (AP) authentication is separate from the student's credentials.</strong> When a student invites an authorized party, Nelnet sends that person a unique invite link. The AP follows the link to create their own Nelnet account. They never share or reuse the student's login. Their access and permissions are scoped to exactly what the student granted.</p>
+        <p class="req-why"><strong>Why:</strong> APs are external to the institution's identity system — they cannot use SSO. Independent credentials scoped to granted permissions ensure the AP can access what they need without ever seeing the student's login or accessing the institution's portal.</p>
         <div class="req-tags"><span class="tag tag-if">IF: Student has set up APs → AP invite link exists</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Session state persists through onboarding.</strong> If a student begins onboarding but doesn't complete it in one session (e.g., chooses "I'll complete this later" on the authorized parties step), their progress is saved. When they re-enter via SSO, they resume from where they left off — or can choose to start over.</p>
+        <p class="req-why"><strong>Why:</strong> Students are interrupted — by class, phone calls, or uncertainty about a decision. Losing all progress on re-entry is a significant friction point that would drive abandonment or duplicate submissions. Progress persistence ensures onboarding can be completed across sessions without re-work.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
@@ -2162,21 +3204,25 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Display a full balance breakdown on entry to the payment decision step.</strong> Show: total charges (tuition + institutional fees), financial aid applied, school enrollment fee (if applicable), and the resulting net balance. Each component must be labeled clearly — no abbreviations the student may not recognize.</p>
+        <p class="req-why"><strong>Why:</strong> Students make their payment decision (pay in full vs. plan) based on this breakdown. If any component is missing or unlabeled, the student cannot verify their balance is correct — leading to calls to the bursar or hesitation to complete setup.</p>
         <div class="req-tags"><span class="tag tag-erp">ERP: charges + financial aid</span><span class="tag tag-inst">Institution: enrollment fee amount</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Distinguish estimated vs. finalized balances.</strong> If the ERP has not yet posted final charges (e.g., registration is still open), the balance is marked "estimated" with a plain-language explanation. Decisions made on an estimated balance (e.g., POT enrollment) are confirmed again once the balance is finalized.</p>
+        <p class="req-why"><strong>Why:</strong> Students who enroll in a plan based on an estimated balance and later see a different amount feel misled. Clearly flagging the estimate sets expectations and triggers a re-confirmation step to keep plan terms accurate.</p>
         <div class="req-tags"><span class="tag tag-erp">ERP: balance finalization flag</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Balance math must always resolve to $0 open balance when fully enrolled in Pay Over Time.</strong> net balance − down payment − on-plan amount = $0. No rounding or UI artifact should show a non-zero open balance when the student has enrolled their entire balance in a plan.</p>
+        <p class="req-why"><strong>Why:</strong> A student who enrolls their full balance in a plan and still sees an "open balance" will call to ask what they still owe. Rounding artifacts create phantom balances that generate unnecessary support contacts and erode trust in the system's accuracy.</p>
         <div class="req-tags"><span class="tag tag-req">Required · Bug prevention</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Insurance premium is excluded from the "balance owed" calculation.</strong> When a student accepts tuition insurance, the premium is charged immediately as a separate transaction — it does not add to the open balance that feeds the payment plan or pay-in-full flow.</p>
+        <p class="req-why"><strong>Why:</strong> The insurance premium is a separate product purchase, not part of the tuition balance. Including it in the plan balance would distort installment amounts and create confusion about what is being paid off via the plan.</p>
         <div class="req-tags"><span class="tag tag-if">IF: GradGuard enabled + student accepted insurance</span></div>
       </div>
 
@@ -2198,26 +3244,31 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Insurance step is conditional on institution enabling GradGuard.</strong> If GradGuard is not enabled for the institution, this step is skipped entirely — no placeholder, no mention of it.</p>
+        <p class="req-why"><strong>Why:</strong> Mentioning an unavailable product creates confusion and support questions. If the institution hasn't contracted with GradGuard, the step must be completely invisible — not just disabled.</p>
         <div class="req-tags"><span class="tag tag-inst">Institution: GradGuard toggle</span><span class="tag tag-if">IF: GradGuard enabled → show insurance step</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Present the insurance offer with the calculated premium for this student's enrollment.</strong> The premium is derived from the student's total charges and the institution's GradGuard plan. Show the annual premium amount, what is covered (medical withdrawal, academic dismissal, etc.), and the GradGuard plan name. Do not require the student to navigate elsewhere to understand what they're buying.</p>
+        <p class="req-why"><strong>Why:</strong> Students cannot make an informed accept/decline decision if they don't know the cost and coverage. Forcing them to navigate elsewhere to understand what they're buying breaks the decision-first UX principle and increases abandonment at this step.</p>
         <div class="req-tags"><span class="tag tag-erp">ERP: enrollment charges for premium calc</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Student may accept or decline. Both paths must be equally accessible — no dark patterns.</strong> "Accept" and "Decline" must be visually equivalent choices. Do not pre-select "Accept", do not style "Decline" as a secondary/tertiary action.</p>
+        <p class="req-why"><strong>Why:</strong> Students have the right to make a genuine choice. Pre-selecting "Accept" or visually de-emphasizing "Decline" manipulates the student's decision — which is both ethically problematic and potentially a regulatory concern given the insurance context.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>If accepted: premium is charged immediately as a separate transaction.</strong> The insurance premium appears in Recent Activity on the home screen — NOT in Upcoming Payments. It is not folded into the POT plan installments. The student's effective balance for payment decisions is the net balance excluding the premium.</p>
+        <p class="req-why"><strong>Why:</strong> The premium is a completed charge, not a future obligation. Placing it in Upcoming Payments would imply a future debit that will never occur — confusing the student and generating support contacts from people wondering about the charge.</p>
         <div class="req-tags"><span class="tag tag-if">IF: insurance accepted → premium in recent activity, NOT upcoming</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Active insurance is always visible on the home screen with the GradGuard claims number.</strong> Once enrolled, an insurance card appears on the home screen showing the policy status and GradGuard's claims phone number (800-918-2899). This number must be reachable at any time — not buried in settings.</p>
+        <p class="req-why"><strong>Why:</strong> A student filing a claim after a medical withdrawal needs to reach GradGuard quickly — often in a stressful situation. Burying the claims number in settings means they can't find it when they need it most, defeating the value of the insurance product.</p>
         <div class="req-tags"><span class="tag tag-if">IF: insurance accepted → home screen insurance card visible</span></div>
       </div>
 
@@ -2240,26 +3291,31 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Two primary paths: Pay in Full or Pay Over Time (POT).</strong> The choice is presented clearly at the top of the payment step. The institution configures whether POT is offered, and may offer one or more distinct POT plans. If only one plan exists, the student is not shown a plan picker — they simply confirm the single plan.</p>
+        <p class="req-why"><strong>Why:</strong> Students should not have to choose among payment plan options they don't need to see. When only one plan exists, eliminating the picker reduces steps and avoids creating a false sense of complexity.</p>
         <div class="req-tags"><span class="tag tag-inst">Institution: POT enabled + plan count</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>POT plans require a down payment selection before the schedule is confirmed.</strong> The down payment amount and/or percentage is configurable per plan. The resulting installment schedule (number of payments, amount per installment, payment dates, plan end date) must be displayed in a natural-language summary — not a raw table — before the student commits.</p>
+        <p class="req-why"><strong>Why:</strong> A raw installment table requires the student to mentally parse numbers. A natural-language summary ("4 payments of $1,250 starting November 1") communicates the same information in a form students can actually act on and remember.</p>
         <div class="req-tags"><span class="tag tag-inst">Institution: down payment rules per plan</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Card service fee (2.75%) must be disclosed before the student selects a payment method.</strong> The fee notice must appear as contextual copy on the payment method selection screen — not in a tooltip, not buried in disclosures. ACH (bank) payments must be clearly identified as having no service fee.</p>
+        <p class="req-why"><strong>Why:</strong> Students who discover a service fee after selecting a card feel misled. Surfacing it before method selection allows them to make an informed choice — often switching to ACH to avoid the fee — and prevents post-payment disputes.</p>
         <div class="req-tags"><span class="tag tag-req">Required · Regulatory</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Auto-pay enrollment for POT installments requires explicit disclosure.</strong> When the student selects a payment method for a POT plan, a clear notice explains that all future installments will be automatically charged to this method on their scheduled dates. The student must acknowledge this before the plan is confirmed — not buried in small print.</p>
+        <p class="req-why"><strong>Why:</strong> Unexpected recurring charges are the leading cause of payment disputes and unauthorized transaction claims. Explicit acknowledgment before enrollment creates a clear consent record and reduces post-enrollment "I didn't know" contacts.</p>
         <div class="req-tags"><span class="tag tag-req">Required · Regulatory</span><span class="tag tag-if">IF: payment path = POT → auto-pay disclosure required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Supported payment methods: ACH (bank account) and credit/debit card.</strong> Additional methods (Apple Pay, PayPal, etc.) may be added in future iterations per the product vision. Institution may restrict available methods. If a method type is not configured by the institution, it is not shown.</p>
+        <p class="req-why"><strong>Why:</strong> Showing payment method types the institution hasn't enabled — even as "coming soon" — creates confusion and support questions. The available set must exactly match what the institution has contracted and configured.</p>
         <div class="req-tags"><span class="tag tag-inst">Institution: allowed payment method types</span></div>
       </div>
 
@@ -2284,26 +3340,31 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Students control who has access and at what level.</strong> During onboarding, the student is offered the opportunity to set up authorized parties. They specify: the AP's name and email, a balance visibility cap (percentage of the total balance the AP can see), and whether the AP can make payments. APs are managed within Nelnet's system — not within the institution's ERP.</p>
+        <p class="req-why"><strong>Why:</strong> The student is the account owner and must remain in control of who sees and can pay their account. Managing APs within Nelnet (not the institution ERP) allows for granular permission levels that the ERP's access model cannot support.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>This step may be deferred during onboarding.</strong> The student can choose "I'll complete this later" on the AP invite screen. If they have started filling in any AP details, a partial-save modal is presented: they can save their progress and continue to the next step, or start over and skip the step entirely. Saved progress is pre-populated when they return.</p>
+        <p class="req-why"><strong>Why:</strong> Students often need to ask a parent before inviting them — they may not have the AP's email address handy. Deferring without losing progress prevents abandonment of the full onboarding flow just because one optional step isn't ready to complete.</p>
         <div class="req-tags"><span class="tag tag-if">IF: partial data entered → partial-save modal on defer</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Invited APs receive a Nelnet-issued invite link at their email address.</strong> The invite link allows the AP to create independent Nelnet credentials. They do not share the student's login. Their session is scoped to the permissions granted by the student.</p>
+        <p class="req-why"><strong>Why:</strong> The AP has no institutional identity — they cannot use the student's SSO. A Nelnet-issued invite link bootstraps their access cleanly without requiring the institution's IT team to provision them, and ensures scoped access from the first login.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Guest payment links are distinct from authorized party access.</strong> A guest payment link allows a one-time payment by a third party with zero ongoing access. The student sets a maximum payment cap (≤ open balance) and an optional note. The recipient cannot log in, cannot see the full account, and cannot make a second payment with the same link. The UI must make this distinction unambiguous — "guest payer" and "authorized party" must never appear interchangeable.</p>
+        <p class="req-why"><strong>Why:</strong> A student who wants grandma to pay once should not be forced to grant her ongoing account access and visibility. Without a clear guest payment path, students either over-grant access (creating privacy and control issues) or turn away one-time helpers entirely.</p>
         <div class="req-tags"><span class="tag tag-req">Required · Critical</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Multiple APs may be added during a single onboarding session.</strong> The student can add more than one authorized party before completing the onboarding flow. Each AP has independently-configured permissions. There is no hard limit specified — institution may configure a maximum if needed.</p>
+        <p class="req-why"><strong>Why:</strong> Multi-payer arrangements (divorced parents, student + grandparent, scholarship sponsor + parent) are common. Requiring students to return post-onboarding to add additional APs creates an avoidable second trip through a setup flow.</p>
         <div class="req-tags"><span class="tag tag-inst">Institution: AP count limit (optional)</span></div>
       </div>
 
@@ -2325,21 +3386,25 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Primary email is pre-populated from the SSO token and is required.</strong> The student can update or add additional email addresses. At least one email address must always be on file.</p>
+        <p class="req-why"><strong>Why:</strong> No duplicate entry — the email is already known. Requiring at least one email ensures all transactional communications (payment confirmations, plan reminders) have a delivery address for the lifetime of the account.</p>
         <div class="req-tags"><span class="tag tag-erp">ERP / SSO: primary email</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Students may add multiple email addresses and phone numbers.</strong> There is no single-value limit on contact info. Each additional address or number has an "Add another email / Add another phone" affordance. Any entry can be removed except the primary (SSO) email.</p>
+        <p class="req-why"><strong>Why:</strong> Students often want payment confirmations to go to a parent's email as well as their own. Supporting multiple contact entries avoids the need for manual forwarding and ensures all parties with financial responsibility receive relevant notifications.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Text (SMS) preferences are split into two independent categories: Informational and Marketing.</strong> <em>Informational texts</em> cover account activity — billing updates, payment confirmations, plan change alerts. Default is on. <em>Marketing texts</em> cover promotional content — default is off. These two categories are shown as separate, labeled toggles. Transactional confirmations (receipts, one-time passcodes) are always sent and are not shown as a user toggle.</p>
+        <p class="req-why"><strong>Why:</strong> Bundling informational and marketing SMS into a single toggle forces students to choose between getting useful account alerts or no texts at all. Separating them lets students opt out of promotions without losing payment reminders — which directly supports collection rates.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Phone number is required to enable SMS notifications.</strong> If no phone number is on file, SMS toggles are inactive and labeled "Add a phone number to enable." Once a number is added, the toggles become active.</p>
+        <p class="req-why"><strong>Why:</strong> SMS cannot be sent without a phone number. Showing active toggles when no number is on file would create a misleading UX — the student thinks they've opted in but will never receive texts. The disabled state with a clear prompt prevents this confusion.</p>
         <div class="req-tags"><span class="tag tag-if">IF: no phone → SMS toggles disabled</span></div>
       </div>
 
@@ -2362,21 +3427,25 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Disclosures are presented as a sequential accordion — one section at a time.</strong> The student must open and read each disclosure section before the next one unlocks. They cannot skip ahead. The progress indicator shows how many sections remain. All sections must be acknowledged before the e-signature field activates.</p>
+        <p class="req-why"><strong>Why:</strong> Presenting all disclosures at once makes it trivial to scroll past without reading. Sequential unlocking creates a reasonable acknowledgment path and provides a record that each section was opened — important for legal enforceability of the agreement.</p>
         <div class="req-tags"><span class="tag tag-req">Required · Regulatory</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Institution configures the number and content of disclosure sections (default: 4).</strong> Disclosure content is pulled from the institution's configured disclosure templates. Nelnet may include a universal disclosure section in addition to institution-specific sections.</p>
+        <p class="req-why"><strong>Why:</strong> Each institution has different legal agreements, refund policies, and enrollment terms. A fixed disclosure set would not meet the compliance needs of institutions with custom policies or state-specific requirements.</p>
         <div class="req-tags"><span class="tag tag-inst">Institution: disclosure count + content</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>E-signature is required after all disclosure sections are acknowledged.</strong> The signature field requires the student to type their full name and check a confirmation checkbox. The typed name must be at least 3 non-whitespace characters. Submission is blocked until all sections are acknowledged, the name is typed, and the checkbox is checked.</p>
+        <p class="req-why"><strong>Why:</strong> A typed name signature creates a legally defensible consent record — stronger than a simple checkbox alone. The blocking validation prevents the student from accidentally submitting without completing all required acknowledgment steps.</p>
         <div class="req-tags"><span class="tag tag-req">Required · Regulatory</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Each disclosure section must be downloadable as a PDF.</strong> A "Download PDF" link is available within each expanded disclosure section. The PDF is generated from the same disclosure content shown on screen — not a different document.</p>
+        <p class="req-why"><strong>Why:</strong> Students and institutions may need to reference disclosure terms later — for a payment dispute, a withdrawal situation, or an audit. A downloadable copy ensures the student has a record of exactly what they agreed to, without needing to contact the bursar.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
@@ -2415,21 +3484,25 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Account Settings is accessible from the home screen at all times — not gated behind completion of any other action.</strong> A persistent settings entry point (gear icon or equivalent) must be available in the home screen header or navigation area.</p>
+        <p class="req-why"><strong>Why:</strong> Students need to update their contact info, payment methods, or AP access at any point in the term — not just during onboarding. Gating settings access behind other actions creates a support burden when students can't find where to make a change.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Settings contains four sub-sections:</strong> (1) Personal contact info — name, email addresses, phone numbers; (2) Payment methods — saved bank accounts and cards, with add/remove; (3) Authorized parties — view current APs, add new, remove, or update permissions; (4) Notification preferences — same informational/marketing SMS split as during onboarding.</p>
+        <p class="req-why"><strong>Why:</strong> These four areas cover all post-onboarding self-service needs. Organizing them under a single Settings entry point reduces the number of places a student must look when they need to make a change to their account.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Changes made in Settings take effect immediately and do not trigger re-onboarding.</strong> Updating a phone number, adding a payment method, or removing an AP does not restart or re-surface any previously completed onboarding steps.</p>
+        <p class="req-why"><strong>Why:</strong> Re-triggering onboarding for any settings change would be deeply disruptive — forcing a student who just wants to update their phone number through insurance and disclosure steps again. Settings changes are independent of onboarding state.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>An AP can be removed by the student at any time from Settings.</strong> Removing an AP immediately revokes their access — they can no longer log in or view account information. An email notification is sent to the AP at the time of removal.</p>
+        <p class="req-why"><strong>Why:</strong> Student circumstances change — a previously helpful payer may become a source of conflict. Immediate revocation protects the student's privacy and account control. Notifying the AP prevents confusion when they can no longer access the account.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
@@ -2451,21 +3524,25 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>To-dos are action-required items that the user has not yet completed.</strong> Examples: unsigned disclosures, incomplete onboarding (deferred AP setup), payment due within 7 days, payment method expiring, open balance with no payment path set, AP invitation pending acceptance.</p>
+        <p class="req-why"><strong>Why:</strong> The to-do list is the primary mechanism for guided UX post-onboarding. It tells users exactly what still needs their attention, eliminating the need to scan the full account to figure out what to do next.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Each to-do links directly to the relevant action.</strong> Tapping a to-do item routes the user to the exact screen or step where they can complete the action — not to a generic settings page.</p>
+        <p class="req-why"><strong>Why:</strong> To-dos that require navigating elsewhere to complete break the guided experience. A direct deep-link from alert to action is the difference between a useful prompt and a frustrating hint that still requires the user to find their own way.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>To-dos are automatically dismissed when the action is completed.</strong> No manual "dismiss" is needed for completed items — they disappear from the list. Time-sensitive items (payment past-due, method expired) remain until resolved even if previously acknowledged.</p>
+        <p class="req-why"><strong>Why:</strong> Manual dismissal creates stale lists — users dismiss items without acting, then lose track of what's real. Auto-dismissal based on account state ensures the to-do list always reflects actual outstanding actions, not user cleanup behavior.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>When no to-dos exist, the section is either hidden or shows a neutral empty state.</strong> Do not show an empty to-do section with placeholder text that implies the user might be missing something. Empty state copy should be affirmative: e.g., "You're all caught up."</p>
+        <p class="req-why"><strong>Why:</strong> An empty to-do list is a positive signal — it means the student is on top of their account. Neutral or negative empty states ("Nothing here yet") undermine that signal and can create anxiety. The tone should confirm the student has nothing left to do.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
@@ -2487,21 +3564,25 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Recent Activity shows all account transactions posted in the last 30 days.</strong> Transaction types include: payments made (by student or AP), credits applied, financial aid posted, institutional fees charged, tuition insurance premium charged, plan enrollment fees.</p>
+        <p class="req-why"><strong>Why:</strong> Students log in after receiving a notification — they want to verify what happened. A complete 30-day activity feed lets them confirm payments landed, credits posted, and fees were charged correctly without calling the bursar.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span><span class="tag tag-erp">ERP: transaction feed</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Tuition insurance premium appears in Recent Activity — not in Upcoming Payments.</strong> Because the premium is charged at the moment of acceptance (not on a future schedule), it is a completed transaction. Showing it in Upcoming would incorrectly imply it's a future obligation.</p>
+        <p class="req-why"><strong>Why:</strong> Miscategorizing a completed charge as an upcoming one would cause students to believe they owe money again in the future — generating both anxiety and a support contact to ask about it.</p>
         <div class="req-tags"><span class="tag tag-if">IF: GradGuard enabled + student accepted → premium in recent activity</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Each activity item shows: description, date, amount, and status.</strong> Status values: Posted, Pending, Reversed. Amount is signed: payments are shown as negative (reducing balance), charges are positive.</p>
+        <p class="req-why"><strong>Why:</strong> Without status and signed amounts, students cannot tell whether a payment has cleared or is still pending — and cannot easily tell what reduced their balance vs. what added to it. This distinction is required for self-service balance reconciliation.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Items are sorted chronologically, most recent first.</strong> If there are more than a practical display limit (e.g., 5 items), a "View all activity" link reveals the full list or navigates to a dedicated transaction history screen.</p>
+        <p class="req-why"><strong>Why:</strong> Students checking on a recent payment want to see it first — not buried below older transactions. Most-recent-first matches the mental model of someone verifying "did my payment go through."</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
@@ -2523,16 +3604,19 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Upcoming Payments shows only scheduled installments due within the next 30 days.</strong> This section does not include: one-time payments the user may choose to make, the tuition insurance premium (already charged), or charges not yet due. It reflects auto-pay commitments — scheduled, automatic debits from the payment method on file.</p>
+        <p class="req-why"><strong>Why:</strong> The purpose of this section is to help students anticipate auto-debits so they can ensure funds are available. Including discretionary or already-completed charges muddies this signal — students need to know specifically what will be charged automatically and when.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span><span class="tag tag-if">IF: payment path = POT → upcoming installments shown</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Each upcoming item shows: due date, amount, and payment method to be charged.</strong> If the payment method on file has expired or is flagged as invalid, the item is highlighted as requiring attention — and a to-do item is simultaneously generated.</p>
+        <p class="req-why"><strong>Why:</strong> A student needs to know which card or account will be debited — not just the amount. Surfacing an expired method warning before the debit date gives them time to update it, preventing a failed payment and the fee or penalty that follows.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>When no payments are due in the next 30 days, the Upcoming section is hidden.</strong> Do not show an empty state for this section — it should not exist on screen unless there is at least one upcoming item to show.</p>
+        <p class="req-why"><strong>Why:</strong> An empty Upcoming Payments section with copy like "No payments due" could be misread as "you have no upcoming obligations at all" — which may not be true for students whose next installment is 31+ days away. Hiding it entirely avoids false reassurance.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
@@ -2554,21 +3638,25 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Account Presentment is the primary balance summary on the home screen.</strong> It shows: total charges for the current term, financial aid applied, net balance, current open balance (amount not covered by a payment plan or prior payments), and amount currently on a payment plan.</p>
+        <p class="req-why"><strong>Why:</strong> Students return to the home screen to verify their account state. Showing all balance components in one place — charges, aid, plan coverage, open balance — eliminates the need to navigate to multiple screens to understand the full financial picture.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span><span class="tag tag-erp">ERP: real-time balance</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Balance components are shown as a clear breakdown — not a single number.</strong> Students should be able to understand at a glance what they owe, what's covered by aid, and what remains to be paid vs. what's already on a plan. A single "Balance: $X,XXX" without context fails this requirement.</p>
+        <p class="req-why"><strong>Why:</strong> Research consistently shows students seek one primary number then work backwards to understand it. A single unexplained number triggers questions — "Does this include my financial aid? My plan?" A breakdown answers those questions proactively and reduces contacts.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>When enrolled in Pay Over Time, show the active plan status inline.</strong> Plan summary: plan name, number of remaining installments, next payment amount and date. The student should not need to navigate elsewhere to know when their next payment is.</p>
+        <p class="req-why"><strong>Why:</strong> The next installment date is the most time-sensitive piece of information for a student on a plan. Surfacing it on the home screen — without requiring navigation — reduces missed payments and gives students advance notice to ensure funds are available.</p>
         <div class="req-tags"><span class="tag tag-if">IF: payment path = POT → plan summary visible on home screen</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Open balance is $0 when the student is fully enrolled in a POT plan.</strong> The math must always resolve: net balance − down payment − on-plan amount = $0 open balance. No rounding artifact should produce a non-zero open balance when the student has enrolled their entire net balance in a plan.</p>
+        <p class="req-why"><strong>Why:</strong> A phantom open balance shown to a fully-enrolled student generates an immediate support contact — they will call asking what they still owe. This is a high-frequency, entirely preventable contact category.</p>
         <div class="req-tags"><span class="tag tag-req">Required · Bug prevention</span></div>
       </div>
 
@@ -2590,11 +3678,13 @@ body {
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Quick actions are dynamic — they appear, change, and disappear based on real-time account state.</strong> The system evaluates conditions on every home screen load and renders only the actions currently relevant to this user. No quick action is ever hard-coded to always display.</p>
+        <p class="req-why"><strong>Why:</strong> A student who has already set up APs and paid in full should not see "Add Authorized Party" or "Pay Balance" cluttering their home screen. Hard-coded always-on actions quickly become noise — reducing the usefulness of the entire quick actions section for students in later account states.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Quick actions follow a strict priority order.</strong> When multiple actions are valid simultaneously, they are displayed in the order defined in the priority table below. The highest-priority action is always shown first. Institution configuration may suppress individual actions, but cannot reorder them.</p>
+        <p class="req-why"><strong>Why:</strong> When multiple actions are valid, their order communicates urgency and relevance. An open balance outstanding is more pressing than reviewing an AP plan. Fixed priority ordering ensures the student always sees the most important action first — regardless of which happened to evaluate to true last.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
@@ -2654,21 +3744,25 @@ body {
             </tr>
           </tbody>
         </table>
+        <p class="req-why"><strong>Why:</strong> The priority table encodes the product's judgment about what matters most to a student at any given account state. Documenting it formally prevents ad-hoc reordering in implementation and ensures the product experience consistently guides students toward the most important next action.</p>
         <div class="req-tags"><span class="tag tag-req">Priority order is fixed</span><span class="tag tag-inst">Institution may suppress individual actions</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>The maximum number of quick actions displayed simultaneously is determined by the UI layout — not a business rule cap.</strong> All valid actions from the priority table should be shown. If the layout needs to limit visible items (e.g., for mobile), a "See all" affordance must reveal the remaining actions — they must never be permanently hidden.</p>
+        <p class="req-why"><strong>Why:</strong> Hiding valid actions because of a business-rule cap would mean a student with an active POT plan, no payment method on file, and an AP pending — all simultaneously valid conditions — might miss a critical action. Layout constraints should never silently suppress account-relevant prompts.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Each quick action has a label, a one-line supporting description, and an icon.</strong> The supporting description provides context so the user understands what tapping the action will do — not just what it is. Example: "Tuition Insurance" alone is less useful than "Tuition Insurance · GradGuard · claims: 800-918-2899".</p>
+        <p class="req-why"><strong>Why:</strong> A label alone requires the user to know what the action does before tapping it. A supporting description eliminates that knowledge requirement — especially for first-time users who may not know what "Guest Payment Link" or "AP Pay Over Time Plans" means.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>When no quick actions are valid, the Quick Actions section is hidden.</strong> This state is rare (fully paid, no pending items, insurance already decided, APs already set up, payment method on file) but must be handled gracefully — never show an empty quick actions section.</p>
+        <p class="req-why"><strong>Why:</strong> An empty quick actions section with no content implies the product has nothing useful to show — which signals a broken or incomplete state to the student. Hiding it entirely is a cleaner result that doesn't raise unnecessary questions.</p>
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
