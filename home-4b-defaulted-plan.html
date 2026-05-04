@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Consumer Home — Horizon Prototype</title>
+<title>4b · Defaulted Payment Plan — Horizon Prototype</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
@@ -59,18 +59,17 @@ tailwind.config = {
 <body class="bg-hz-bg">
 <div id="root"></div>
 <script type="text/babel">
+// ═══ BEGIN SHARED HOME COMPONENTS — sync from consumer-home.html ═══
 
-// ═══ BEGIN SHARED HOME COMPONENTS — sync to all b-series prototypes when editing ═══
-
-// ─── Financial constants ───────────────────────────────────────────────────
-const TOTAL_CHARGES   = 8500;
-const APPLIED_AID     = 2300;
-const ANTICIPATED_AID = 1000;
-const BALANCE_DUE     = 5200;
-const POT_DOWN        = 520;
-const NELNET_FEE      = 25;
-const POT_DOWN_TOTAL  = 545;
-const POT_BALANCE     = 4680;
+// ─── Financial constants — scenario-specific ──────────────────────────────
+const TOTAL_CHARGES   = 15800;
+const APPLIED_AID     = 0;
+const ANTICIPATED_AID = 0;
+const BALANCE_DUE     = 11275;
+const POT_DOWN        = 0;
+const NELNET_FEE      = 0;
+const POT_DOWN_TOTAL  = 0;
+const POT_BALANCE     = 0;
 const CARD_FEE_PCT    = 2.75;
 const fmt  = (n) => '$' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtK = (n) => '$' + Number(n).toLocaleString('en-US', {maximumFractionDigits:0});
@@ -1495,28 +1494,114 @@ const HistoryScreen = ({nav, goBack, S, setS}) => {
 
 // ═══ END SHARED HOME COMPONENTS ═══
 
+// ─── HistoryScreen override — scenario-specific ───────────────────────────
+const HistoryScreen = ({nav, goBack, S, setS}) => {
+  const [tab, setTab] = React.useState('all');
+  const allItems = [
+    {type:'payment', date:'Nov 1, 2025', desc:'Partial payment received', amt:'−$3,000.00', color:'green', icon:'💳'},
+    {type:'balance', date:'Oct 20, 2025', desc:'Spring Tuition advance billed', amt:'+$6,500.00', color:'amber', icon:'📋'},
+    {type:'alert', date:'Oct 15, 2025', desc:'Payment plan default fee applied', amt:'+$75.00', color:'red', icon:'⚠️'},
+    {type:'alert', date:'Oct 15, 2025', desc:'Payment plan defaulted', amt:'', color:'red', icon:'🚨'},
+    {type:'balance', date:'Sep 15, 2025', desc:'Lab Fee posted (not in plan)', amt:'+$150.00', color:'amber', icon:'📋'},
+    {type:'payment', date:'Sep 1, 2025', desc:'Payment plan payment #1', amt:'−$1,800.00', color:'green', icon:'💳'},
+  ];
+  const filtered = tab==='all' ? allItems : tab==='payments' ? allItems.filter(i=>i.type==='payment') : tab==='balance' ? allItems.filter(i=>i.type==='balance'||i.type==='aid') : allItems.filter(i=>i.type==='comms');
+  const TABS = [{v:'all',l:'All'},{v:'payments',l:'Payments'},{v:'balance',l:'Balance'},{v:'comms',l:'Comms'}];
+  return (
+    <ScreenWrap>
+      <Header title="Account History" onBack={goBack}/>
+      <div className="px-5 pb-8">
+        <div className="flex bg-hz-cloud rounded-hz p-1 mb-5" role="tablist">
+          {TABS.map(t=>(<button key={t.v} onClick={()=>setTab(t.v)} role="tab" aria-selected={tab===t.v} className={'flex-1 py-1.5 rounded-hz-sm text-[12px] font-medium transition-all '+(tab===t.v?'bg-hz-indigo text-white':'text-hz-muted hover:text-hz-text')}>{t.l}</button>))}
+        </div>
+        {filtered.length === 0 ? <div className="text-center py-12 text-hz-hint text-[13px]">No items in this category</div> : (
+          <div className="space-y-3" role="tabpanel">
+            {filtered.map((item,i)=>(
+              <Card key={i} className="flex items-center gap-3 p-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0 ${item.color==='green'?'bg-hz-teal-bg':item.color==='amber'?'bg-hz-amber-bg':item.color==='red'?'bg-hz-danger-bg':'bg-hz-cloud'}`} aria-hidden="true">{item.icon}</div>
+                <div className="flex-1 min-w-0"><p className="text-[13px] font-medium text-hz-text truncate">{item.desc}</p><p className="text-[11px] text-hz-hint">{item.date}</p></div>
+                {item.amt && <span className={`text-[13px] font-semibold flex-shrink-0 ${item.color==='green'?'text-hz-teal':item.color==='amber'?'text-hz-amber':item.color==='red'?'text-hz-danger':'text-hz-text'}`}>{item.amt}</span>}
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </ScreenWrap>
+  );
+};
+
+// ─── Scenario state ───────────────────────────────────────────────────────
+const SCENARIO_STATE = {
+  firstName: 'Nicole',
+  initials: 'NM',
+  emoji: '👋',
+  payPlan: 'none',
+  methodSaved: true,
+  insAccepted: false,
+  insPremium: 0,
+  authPayers: [],
+  commsEmail: 'nicole.martinez@student.claude.edu',
+  commsPhone: '(303) 555-0199',
+  smsMarketing: false,
+  secQsDeferred: false,
+  insDeferred: false,
+  payDeferred: false,
+  skippedInvite: false,
+  skippedMethod: false,
+  tfa: 'sms',
+  payer: 'me',
+  balanceCard: {
+    mode: 'defaulted',
+    pastDueAmount: 7400,
+    futureDueAmount: 6500,
+    futureDueDate: 'December 15, 2025',
+    defaultDate: 'October 15, 2025',
+    totalBalance: 11275,
+    registrationHold: true,
+  },
+  todos: [
+    {id:'defaulted', icon:'⚠️', color:'danger',
+     title:'Payment plan defaulted — action required',
+     sub:'Full past-due balance of $7,400 is immediately due. Your registration is on hold.',
+     screen:'pay-now', cta:'Pay now'},
+    {id:'reg-hold', icon:'🔒', color:'danger',
+     title:'Registration hold is active',
+     sub:'Hold will be released once past-due balance is paid in full',
+     screen:'costs', cta:'View details'},
+  ],
+  upcomingPayments: [],
+  recentActivity: [
+    {date:'Nov 1', text:'Partial payment received — $3,000.00 applied to oldest charges', type:'payment'},
+    {date:'Oct 20', text:'Spring Tuition advance billed — $6,500.00 (due Dec 15)', type:'balance'},
+    {date:'Oct 15', text:'Payment plan default fee applied — $75.00', type:'alert'},
+    {date:'Oct 15', text:'Payment plan defaulted — missed October 1 payment', type:'alert'},
+    {date:'Sep 15', text:'Lab Fee posted — $150.00 (not in plan)', type:'balance'},
+    {date:'Sep 1', text:'Payment plan payment #1 received — $1,800.00', type:'payment'},
+  ],
+};
+
 // ─── App ──────────────────────────────────────────────────────────────────
 const App = () => {
   const [screen, setScreen] = React.useState('home');
-  const [S, setS] = React.useState(HOME_DEFAULT_STATE);
+  const [S, setS] = React.useState(SCENARIO_STATE);
   const navStack = React.useRef([]);
   const nav    = (s) => { navStack.current.push(screen); setScreen(s); };
   const goBack = () => { const p = navStack.current.pop(); if (p) setScreen(p); };
 
   const screens = {
-    'home':              <HomeScreen          nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'costs':             <CostsScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'print':             <PrintScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'pay-now':           <PayNowScreen        nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'manage-ap':         <ManageAPScreen      nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'ap-pot':            <APPotScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'guest':             <GuestScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'manage-pot':        <ManagePotScreen     nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'change-dates-ob':   <ChangeDatesScreen   nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'change-autopay-ob': <ChangeAutopayScreen nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'pay-next-ob':       <PayNextScreen       nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'history':           <HistoryScreen       nav={nav} goBack={goBack} S={S} setS={setS}/>,
-    'account-details':   <AccountDetailsScreen nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'home':                <HomeScreen          nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'costs':               <CostsScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'print':               <PrintScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'pay-now':             <PayNowScreen        nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'manage-ap':           <ManageAPScreen      nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'ap-pot':              <APPotScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'guest':               <GuestScreen         nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'manage-pot':          <ManagePotScreen     nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'change-dates-ob':     <ChangeDatesScreen   nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'change-autopay-ob':   <ChangeAutopayScreen nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'pay-next-ob':         <PayNextScreen       nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'history':             <HistoryScreen       nav={nav} goBack={goBack} S={S} setS={setS}/>,
+    'account-details':     <AccountDetailsScreen nav={nav} goBack={goBack} S={S} setS={setS}/>,
   };
 
   const SCREEN_OPTIONS = [
@@ -1548,9 +1633,9 @@ const App = () => {
         <label htmlFor="screen-jump" className="sr-only">Jump to screen</label>
         <div className="relative">
           <select id="screen-jump" value={screen} onChange={e => { navStack.current = []; setScreen(e.target.value); }}
-            className="appearance-none bg-hz-card border border-[rgba(100,92,220,0.2)] text-hz-text text-[11px] rounded-hz-sm pl-2.5 pr-7 py-1.5 shadow-sm outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 max-w-[210px] cursor-pointer transition-colors hover:border-hz-accent/50 font-medium"
+            className="appearance-none bg-hz-card border border-[rgba(100,92,220,0.2)] text-hz-text text-[11px] rounded-hz-sm pl-2.5 pr-7 py-1.5 shadow-sm outline-none focus:border-hz-accent focus:ring-2 focus:ring-hz-accent/20 max-w-[220px] cursor-pointer transition-colors hover:border-hz-accent/50 font-medium"
             title="Jump to screen">
-            <optgroup label="── 1b · Consumer Home">
+            <optgroup label="── 4b · Defaulted Payment Plan">
               {SCREEN_OPTIONS.map(o=><option key={o.v} value={o.v}>{o.l}</option>)}
             </optgroup>
           </select>

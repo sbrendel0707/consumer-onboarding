@@ -80,12 +80,16 @@ const fmtK = (n) => '$' + Number(n).toLocaleString('en-US', {maximumFractionDigi
 
 // ─── Default returning student state ──────────────────────────────────────
 const HOME_DEFAULT_STATE = {
+  firstName: 'Alex',
+  initials: 'AJ',
+  emoji: '👋',
   payPlan: 'pot',
   potFreq: 'monthly',
   potFreqLabel: 'month',
   potInstall: 517,
   potCount: 9,
   potDown: 520,
+  potBalance: 4680,
   potTotalToday: 545,
   methodSaved: true,
   methodType: 'ach',
@@ -105,6 +109,7 @@ const HOME_DEFAULT_STATE = {
   skippedMethod: false,
   tfa: 'sms',
   payer: 'me',
+  // No balanceCard set → legacy fallback mode
 };
 
 // ─── Shared UI components ─────────────────────────────────────────────────
@@ -187,86 +192,65 @@ const Header = ({title, onBack, right}) => (
   </div>
 );
 
-// ─── HomeScreen (scenario-modified) ──────────────────────────────────────
-// Modification 1: onPlan uses S.potBalance if available (caps at original plan amount)
-// Modification 2: open-bal action routes to 'balance-increase'
-// Modification 3: infoBalance includes lab fee entry
+// ─── HomeScreen — shared (scenario driven via S.balanceCard, S.todos, etc.) ─
 const HomeScreen = ({nav, goBack, S, setS}) => {
+  // ── NEW: scenario-driven fields (from S) ──────────────────────────────────
+  const bc       = S.balanceCard || null;
+  const todos    = S.todos || [];
+  const recent   = S.recentActivity || null;
+  const upcoming = S.upcomingPayments || null;
+
+  // ── LEGACY fallback (when bc not set — e.g. consumer-home.html default) ───
   const netBalance  = BALANCE_DUE;
-  const paidFull    = S.payPlan === 'full';
-  const potPaidDown = S.payPlan === 'pot' ? (S.potDown || POT_DOWN) : 0;
-  // Scenario modification: cap onPlan at S.potBalance (original plan balance) if present
-  const onPlan      = S.payPlan === 'pot' ? (S.potBalance || Math.max(0, netBalance - potPaidDown)) : 0;
-  const openBal     = paidFull ? 0 : Math.max(0, netBalance - potPaidDown - onPlan);
+  const paidFull    = !bc && S.payPlan === 'full';
+  const potPaidDown = !bc && S.payPlan === 'pot' ? (S.potDown || POT_DOWN) : 0;
+  const onPlan      = !bc && S.payPlan === 'pot' ? (S.potBalance || Math.max(0, netBalance - potPaidDown)) : 0;
+  const openBal     = !bc ? (paidFull ? 0 : Math.max(0, netBalance - potPaidDown - onPlan)) : 0;
+  const planPct     = !bc && netBalance > 0 ? Math.round(onPlan / netBalance * 100) : 0;
+  const openPct     = !bc && netBalance > 0 ? Math.max(0, 100 - planPct) : 0;
 
-  const planPct = netBalance > 0 ? Math.round(onPlan / netBalance * 100) : 0;
-  const openPct = netBalance > 0 ? Math.max(0, 100 - planPct) : 0;
+  // Legacy to-dos (when S.todos not set)
+  const legacyTodos = [];
+  if (!bc) {
+    if (openBal > 0 && !paidFull && S.payPlan !== 'later')
+      legacyTodos.push({id:'open-bal', icon:'⚡', color:'blue', title:'Open balance needs attention', sub:`${fmt(openBal)} hasn't been paid or scheduled to be paid yet`, screen:'howpay', cta:'Address now'});
+    if (S.payPlan === 'later')
+      legacyTodos.push({id:'scheduled', icon:'📅', color:'blue', title:'Payment scheduled', sub:`${fmt(BALANCE_DUE)} scheduled before May 1`, screen:'pay-now', cta:'View details'});
+    if (S.secQsDeferred)
+      legacyTodos.push({id:'sec-q', icon:'🔒', color:'blue', title:'Set up security questions', sub:'Required if you ever need to verify yourself by phone with support', screen:'security-questions', cta:'Complete now'});
+    if (S.insDeferred)
+      legacyTodos.push({id:'ins', icon:'🛡️', color:'blue', title:'Review tuition protection', sub:'You deferred your insurance decision — a deadline may apply', screen:'insurance', cta:'Review now'});
+    if (S.payDeferred)
+      legacyTodos.push({id:'pay', icon:'💳', color:'blue', title:'Complete payment setup', sub:"You haven't decided how you'll pay your balance yet", screen:'howpay', cta:'Set up now'});
+  }
+  const activeTodos = todos.length > 0 ? todos : legacyTodos;
 
-  const actions = [];
-  // Scenario modification: route open-bal to 'balance-increase' with scenario-specific copy
-  if (openBal > 0 && !paidFull && S.payPlan !== 'later')
-    actions.push({id:'open-bal', icon:'⚡', color:'blue',
-      title:'Open balance needs attention',
-      sub:`$350.00 new lab fee added — not yet covered by your plan`,
-      screen:'balance-increase', cta:'Address now'});
-  if (S.payPlan === 'later')
-    actions.push({id:'scheduled', icon:'📅', color:'blue', title:'Payment scheduled', sub:`${fmt(BALANCE_DUE)} scheduled before May 1`, screen:'pay-now', cta:'View details'});
-  if (S.secQsDeferred)
-    actions.push({id:'sec-q', icon:'🔒', color:'blue', title:'Set up security questions', sub:'Required if you ever need to verify yourself by phone with support', screen:'security-questions', cta:'Complete now'});
-  if (S.insDeferred)
-    actions.push({id:'ins', icon:'🛡️', color:'blue', title:'Review tuition protection', sub:'You deferred your insurance decision — a deadline may apply', screen:'insurance', cta:'Review now'});
-  if (S.payDeferred)
-    actions.push({id:'pay', icon:'💳', color:'blue', title:'Complete payment setup', sub:"You haven't decided how you'll pay your balance yet", screen:'howpay', cta:'Set up now'});
+  // Legacy upcoming (when S.upcomingPayments not set)
+  const legacyUpcoming = [];
+  if (!bc) {
+    if (S.payPlan === 'pot' && S.potInstall)
+      legacyUpcoming.push({date:'May 10, 2026', amount:S.potInstall, label:'Payment plan installment', note:'Auto-pay'});
+    if (S.payPlan === 'later')
+      legacyUpcoming.push({date:'Apr 30, 2026', amount:BALANCE_DUE, label:'Scheduled payment'});
+  }
+  const activeUpcoming = upcoming || legacyUpcoming;
 
-  const upcoming = [];
-  if (S.payPlan === 'pot' && S.potInstall)
-    upcoming.push({date:'May 10, 2026', amount:S.potInstall, label:'Payment plan installment', note:'Auto-pay'});
-  if (S.payPlan === 'later')
-    upcoming.push({date:'Apr 30, 2026', amount:BALANCE_DUE, label:'Scheduled payment'});
+  // Legacy recent activity (when S.recentActivity not set)
+  const legacyRecent = [];
+  if (!bc) {
+    legacyRecent.push({date:'Apr 15', text:'Pell Grant ($1,100) applied to your account', type:'aid'});
+    legacyRecent.push({date:'Apr 15', text:'Anticipated federal loan ($1,000) reflected in balance', type:'aid'});
+    if (S.insAccepted && S.insPremium) legacyRecent.push({date:'Today', text:`GradGuard tuition insurance premium ${fmt(S.insPremium)} paid — coverage active`, type:'account'});
+    legacyRecent.push({date:'Today', text:'Account setup complete — all steps finished', type:'account'});
+    if (S.authPayers?.length > 0)
+      S.authPayers.forEach(p=>legacyRecent.push({date:'Today', text:`Invite sent to ${p.first} ${p.last} (${p.email})`, type:'account'}));
+  }
+  const activeRecent = recent || legacyRecent;
 
-  const infoBalance = [];
-  const infoAccount = [];
-  const infoPayers  = [];
-  // Scenario modification: prepend the new lab fee activity
-  infoBalance.unshift({date:'Today', text:'Lab/Course Fee ($350.00) added to your account'});
-  infoBalance.push({date:'Apr 15', text:'Pell Grant ($1,100) applied to your account'});
-  infoBalance.push({date:'Apr 15', text:'Anticipated federal loan ($1,000) reflected in balance'});
-  if (S.insAccepted && S.insPremium) infoBalance.push({date:'Today', text:`GradGuard tuition insurance premium ${fmt(S.insPremium)} paid — coverage active`});
-  infoAccount.push({date:'Today', text:'Account setup complete — all steps finished'});
-  if (S.authPayers?.length > 0)
-    S.authPayers.forEach(p=>infoPayers.push({date:'Today', text:`Invite sent to ${p.first} ${p.last} (${p.email})`}));
-  const showInfoHub = infoBalance.length || infoAccount.length || infoPayers.length;
-
-  return (
-    <ScreenWrap portal={true}>
-      <div className="px-5 pt-5 pb-3 flex items-center justify-between">
-        <p className="text-[24px] font-bold text-hz-text leading-none">Hi, Alex 👋</p>
-        <button onClick={()=>nav('account-details')} aria-label="Go to my account" className="flex flex-col items-center gap-0.5 group active:scale-95 transition-transform">
-          <div className="w-10 h-10 rounded-full bg-hz-cloud border border-hz-accent/20 flex items-center justify-center text-[13px] font-bold text-hz-indigo group-hover:bg-hz-cloud/80 group-hover:border-hz-accent/40 transition-colors">AJ</div>
-          <span className="text-[9px] font-semibold text-hz-hint uppercase tracking-wide">Account</span>
-        </button>
-      </div>
-      <div className="px-4 pb-8 space-y-5 pt-2">
-        {actions.length > 0 && (
-          <div>
-            <p className="text-[11px] font-semibold text-hz-hint mb-2.5">To dos</p>
-            <div className="space-y-2">
-              {actions.map(a=>(
-                <div key={a.id} className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz overflow-hidden flex" role="alert">
-                  <div className="w-1 flex-shrink-0 bg-hz-accent"/>
-                  <div className="flex-1 px-4 py-3 flex items-center justify-between gap-3 min-w-0">
-                    <div className="min-w-0">
-                      <p className="text-[13px] font-semibold text-hz-text leading-tight">{a.title}</p>
-                      <p className="text-[11px] text-hz-muted mt-0.5 leading-snug">{a.sub}</p>
-                    </div>
-                    <button onClick={()=>nav(a.screen)} className="flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-hz-indigo text-white hover:opacity-85 transition-opacity">{a.cta}</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        <p className="text-[11px] font-semibold text-hz-hint mb-2.5">Account summary</p>
+  // ── Balance card renderer ─────────────────────────────────────────────────
+  const renderBalanceCard = () => {
+    if (!bc) {
+      return (
         <Card className="p-0 overflow-hidden">
           {paidFull ? (
             <div className="px-5 py-4 flex items-center gap-3">
@@ -289,10 +273,7 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
                 </div>
               )}
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-hz-hint">Total balance</span>
-                  <span className="text-[12px] font-semibold text-hz-text">{fmt(netBalance)}</span>
-                </div>
+                <div className="flex items-center justify-between"><span className="text-[11px] text-hz-hint">Total balance</span><span className="text-[12px] font-semibold text-hz-text">{fmt(netBalance)}</span></div>
                 <div className="w-full h-1.5 rounded-full overflow-hidden flex bg-[rgba(100,92,220,0.08)]">
                   {planPct > 0 && <div style={{width:planPct+'%'}} className="bg-hz-teal h-full rounded-l-full"/>}
                   {openPct > 0 && <div style={{width:openPct+'%'}} className={`bg-hz-accent/50 h-full ${planPct===0?'rounded-full':'rounded-r-full'}`}/>}
@@ -308,6 +289,296 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
             <button onClick={()=>nav('costs')} className="w-full flex items-center justify-center py-2 rounded-full border border-[rgba(100,92,220,0.2)] text-[12px] font-semibold text-hz-indigo hover:bg-hz-cloud transition-colors">View full statement</button>
           </div>
         </Card>
+      );
+    }
+
+    const mode = bc.mode;
+
+    if (mode === 'credit') return (
+      <Card className="p-0 overflow-hidden">
+        <div className="px-5 pt-5 pb-2 space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-hz-teal-bg flex items-center justify-center text-xl flex-shrink-0" aria-hidden="true">✅</div>
+            <div>
+              <p className="text-[15px] font-bold text-hz-teal">Credit Balance</p>
+              <p className="text-[12px] text-hz-muted mt-0.5">You've paid more than your charges</p>
+            </div>
+          </div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-[28px] font-bold text-hz-teal leading-none tracking-tight">−{fmt(bc.creditAmount)}</span>
+            <span className="text-[11px] font-semibold uppercase tracking-widest text-hz-teal">Credit</span>
+          </div>
+          <div className="bg-hz-teal-bg/60 rounded-hz-sm px-3 py-3 space-y-2">
+            <div className="flex justify-between text-[12px]"><span className="text-hz-muted">Refund processing</span><span className="font-semibold text-hz-teal">{fmt(bc.refundPending)}</span></div>
+            {bc.refundExpectedDate && <div className="flex justify-between text-[12px]"><span className="text-hz-muted">Expected by</span><span className="font-semibold text-hz-text">{bc.refundExpectedDate}</span></div>}
+            {bc.refundIssued > 0 && <div className="flex justify-between text-[12px]"><span className="text-hz-muted">Already issued</span><span className="font-semibold text-hz-text">{fmt(bc.refundIssued)}</span></div>}
+          </div>
+        </div>
+        <div className="px-5 pb-4 pt-3">
+          <button onClick={()=>nav('costs')} className="w-full flex items-center justify-center py-2 rounded-full border border-[rgba(100,92,220,0.2)] text-[12px] font-semibold text-hz-indigo hover:bg-hz-cloud transition-colors">View full statement</button>
+        </div>
+      </Card>
+    );
+
+    if (mode === 'defaulted') return (
+      <Card className="p-0 overflow-hidden border-hz-danger/30">
+        <div className="bg-hz-danger-bg/60 px-4 py-2.5 flex items-center gap-2 border-b border-hz-danger/20">
+          <span className="text-hz-danger text-sm" aria-hidden="true">⚠️</span>
+          <p className="text-[12px] font-bold text-hz-danger uppercase tracking-wide">Payment Plan Defaulted</p>
+          {bc.defaultDate && <span className="ml-auto text-[10px] text-hz-danger/70">{bc.defaultDate}</span>}
+        </div>
+        <div className="px-5 pt-4 pb-2 space-y-3">
+          <div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-[28px] font-bold text-hz-danger leading-none tracking-tight">{fmt(bc.pastDueAmount)}</span>
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-hz-danger">Past Due</span>
+            </div>
+            <p className="text-[12px] text-hz-muted mt-1">Full balance now immediately due per default terms</p>
+          </div>
+          {bc.futureDueAmount > 0 && (
+            <div className="flex items-center justify-between bg-hz-amber-bg/60 rounded-hz-sm px-3 py-2.5">
+              <div><p className="text-[12px] font-medium text-hz-text">Future charges</p><p className="text-[11px] text-hz-hint mt-0.5">Due {bc.futureDueDate}</p></div>
+              <p className="text-[14px] font-bold text-hz-text">{fmt(bc.futureDueAmount)}</p>
+            </div>
+          )}
+          {bc.registrationHold && (
+            <div className="flex items-center gap-2 bg-hz-danger-bg/40 rounded-hz-sm px-3 py-2 border border-hz-danger/20">
+              <span className="text-hz-danger text-sm" aria-hidden="true">🔒</span>
+              <p className="text-[11px] font-semibold text-hz-danger">Registration hold is active</p>
+            </div>
+          )}
+          <div className="flex items-center justify-between pt-1">
+            <span className="text-[11px] text-hz-hint">Total balance</span>
+            <span className="text-[12px] font-semibold text-hz-text">{fmt(bc.totalBalance)}</span>
+          </div>
+        </div>
+        <div className="px-5 pb-4 pt-2">
+          <button onClick={()=>nav('costs')} className="w-full flex items-center justify-center py-2 rounded-full border border-[rgba(100,92,220,0.2)] text-[12px] font-semibold text-hz-indigo hover:bg-hz-cloud transition-colors">View full statement</button>
+        </div>
+      </Card>
+    );
+
+    if (mode === 'past-due') return (
+      <Card className="p-0 overflow-hidden">
+        <div className="bg-hz-amber-bg/60 px-4 py-2.5 flex items-center gap-2 border-b border-hz-amber/20">
+          <span className="text-hz-amber text-sm" aria-hidden="true">⚠️</span>
+          <p className="text-[12px] font-bold text-hz-amber uppercase tracking-wide">Past Due Balance</p>
+        </div>
+        <div className="px-5 pt-4 pb-2 space-y-3">
+          <div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-[28px] font-bold text-hz-amber leading-none tracking-tight">{fmt(bc.pastDueAmount)}</span>
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-hz-amber">Past Due</span>
+            </div>
+            {bc.pastDueDescription && <p className="text-[12px] text-hz-muted mt-1">{bc.pastDueDescription}</p>}
+          </div>
+          <div className="divide-y divide-[rgba(100,92,220,0.07)] space-y-0">
+            {bc.currentDueAmount > 0 && (
+              <div className="flex items-center justify-between py-2">
+                <div><p className="text-[12px] text-hz-muted">Also due</p><p className="text-[10px] text-hz-hint">{bc.currentDueDate}</p></div>
+                <span className="text-[13px] font-semibold text-hz-text">{fmt(bc.currentDueAmount)}</span>
+              </div>
+            )}
+            {bc.immediateDueAmount > 0 && (
+              <div className="flex items-center justify-between py-2">
+                <p className="text-[12px] text-hz-muted">Due immediately</p>
+                <span className="text-[13px] font-semibold text-hz-text">{fmt(bc.immediateDueAmount)}</span>
+              </div>
+            )}
+            {bc.noDateAmount > 0 && (
+              <div className="flex items-center justify-between py-2">
+                <p className="text-[12px] text-hz-muted">No due date assigned</p>
+                <span className="text-[13px] text-hz-hint">{fmt(bc.noDateAmount)}</span>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center justify-between border-t border-[rgba(100,92,220,0.08)] pt-2">
+            <span className="text-[11px] text-hz-hint">Total balance</span>
+            <span className="text-[12px] font-semibold text-hz-text">{fmt(bc.totalBalance)}</span>
+          </div>
+        </div>
+        <div className="px-5 pb-4 pt-2">
+          <button onClick={()=>nav('costs')} className="w-full flex items-center justify-center py-2 rounded-full border border-[rgba(100,92,220,0.2)] text-[12px] font-semibold text-hz-indigo hover:bg-hz-cloud transition-colors">View full statement</button>
+        </div>
+      </Card>
+    );
+
+    if (mode === 'open') return (
+      <Card className="p-0 overflow-hidden">
+        <div className="px-5 pt-5 pb-4 space-y-4">
+          <div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-[28px] font-bold text-hz-text leading-none tracking-tight">{fmt(bc.openAmount)}</span>
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-hz-hint">Open Balance</span>
+            </div>
+            {bc.dueDate && <p className="text-[12px] text-hz-hint mt-1">Due {bc.dueDate}</p>}
+          </div>
+          <div className="space-y-2">
+            <div className="w-full h-1.5 rounded-full bg-hz-accent/30"/>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-hz-hint">Total balance</span>
+            <span className="text-[12px] font-semibold text-hz-text">{fmt(bc.totalBalance || bc.openAmount)}</span>
+          </div>
+        </div>
+        <div className="px-5 pb-4">
+          <button onClick={()=>nav('costs')} className="w-full flex items-center justify-center py-2 rounded-full border border-[rgba(100,92,220,0.2)] text-[12px] font-semibold text-hz-indigo hover:bg-hz-cloud transition-colors">View full statement</button>
+        </div>
+      </Card>
+    );
+
+    if (mode === 'outside-plan') return (
+      <Card className="p-0 overflow-hidden">
+        <div className="px-5 pt-5 pb-4 space-y-4">
+          <div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-[28px] font-bold text-hz-text leading-none tracking-tight">{fmt(bc.outsidePlanAmount)}</span>
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-hz-hint">Not In Plan</span>
+            </div>
+            {bc.outsidePlanDueDate && <p className="text-[12px] text-hz-hint mt-1">Due {bc.outsidePlanDueDate} · not covered by your plan</p>}
+          </div>
+          {bc.planRemaining > 0 && (
+            <div className="flex items-center justify-between bg-hz-teal-bg/60 rounded-hz-sm px-3 py-2.5">
+              <div><p className="text-[12px] font-medium text-hz-teal">On payment plan</p><p className="text-[11px] text-hz-hint mt-0.5">Next {fmt(bc.nextInstall)} · autopay {bc.nextDate}</p></div>
+              <p className="text-[15px] font-bold text-hz-teal">{fmt(bc.planRemaining)}</p>
+            </div>
+          )}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between"><span className="text-[11px] text-hz-hint">Total balance</span><span className="text-[12px] font-semibold text-hz-text">{fmt(bc.totalBalance)}</span></div>
+            {bc.totalBalance > 0 && (() => {
+              const pPct = Math.round(bc.planRemaining / bc.totalBalance * 100);
+              const oPct = Math.max(0, 100 - pPct);
+              return (
+                <div className="space-y-1">
+                  <div className="w-full h-1.5 rounded-full overflow-hidden flex bg-[rgba(100,92,220,0.08)]">
+                    {pPct > 0 && <div style={{width:pPct+'%'}} className="bg-hz-teal h-full rounded-l-full"/>}
+                    {oPct > 0 && <div style={{width:oPct+'%'}} className="bg-hz-accent/50 h-full rounded-r-full"/>}
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-full bg-hz-teal inline-block"/>On plan</span>
+                    <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-full bg-hz-accent/50 inline-block"/>Not in plan</span>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+        <div className="px-5 pb-4">
+          <button onClick={()=>nav('costs')} className="w-full flex items-center justify-center py-2 rounded-full border border-[rgba(100,92,220,0.2)] text-[12px] font-semibold text-hz-indigo hover:bg-hz-cloud transition-colors">View full statement</button>
+        </div>
+      </Card>
+    );
+
+    // on-plan-open or on-plan
+    const showOpen = mode === 'on-plan-open' && bc.openAmount > 0;
+    return (
+      <Card className="p-0 overflow-hidden">
+        <div className="px-5 pt-5 pb-4 space-y-4">
+          {showOpen ? (
+            <div>
+              <div className="flex items-baseline justify-between">
+                <span className="text-[28px] font-bold text-hz-text leading-none tracking-tight">{fmt(bc.openAmount)}</span>
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-hz-hint">Open balance</span>
+              </div>
+              <p className="text-[12px] text-hz-hint mt-1">Hasn't been paid or scheduled to be paid yet</p>
+            </div>
+          ) : (
+            <div>
+              <div className="flex items-baseline justify-between">
+                <span className="text-[28px] font-bold text-hz-teal leading-none tracking-tight">$0.00</span>
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-hz-hint">Open balance</span>
+              </div>
+              <p className="text-[12px] text-hz-teal mt-1">All covered — nothing unscheduled</p>
+            </div>
+          )}
+          {bc.planRemaining > 0 && (
+            <div className="flex items-center justify-between bg-hz-teal-bg/60 rounded-hz-sm px-3 py-2.5">
+              <div><p className="text-[12px] font-medium text-hz-teal">On payment plan</p><p className="text-[11px] text-hz-hint mt-0.5">Next {fmt(bc.nextInstall)} · autopay</p></div>
+              <p className="text-[15px] font-bold text-hz-teal">{fmt(bc.planRemaining)}</p>
+            </div>
+          )}
+          {bc.totalBalance > 0 && (() => {
+            const total = bc.totalBalance;
+            const pPct = Math.round((bc.planRemaining||0) / total * 100);
+            const oPct = Math.max(0, 100 - pPct);
+            return (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between"><span className="text-[11px] text-hz-hint">Total balance</span><span className="text-[12px] font-semibold text-hz-text">{fmt(total)}</span></div>
+                <div className="w-full h-1.5 rounded-full overflow-hidden flex bg-[rgba(100,92,220,0.08)]">
+                  {pPct > 0 && <div style={{width:pPct+'%'}} className="bg-hz-teal h-full rounded-l-full"/>}
+                  {oPct > 0 && <div style={{width:oPct+'%'}} className={`bg-hz-accent/50 h-full ${pPct===0?'rounded-full':'rounded-r-full'}`}/>}
+                </div>
+                <div className="flex gap-3">
+                  {pPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-full bg-hz-teal inline-block"/>On plan</span>}
+                  {oPct > 0 && <span className="flex items-center gap-1 text-[10px] text-hz-hint"><span className="w-2 h-2 rounded-full bg-hz-accent/50 inline-block"/>Open</span>}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+        <div className="px-5 pb-4">
+          <button onClick={()=>nav('costs')} className="w-full flex items-center justify-center py-2 rounded-full border border-[rgba(100,92,220,0.2)] text-[12px] font-semibold text-hz-indigo hover:bg-hz-cloud transition-colors">View full statement</button>
+        </div>
+      </Card>
+    );
+  };
+
+  // ── Quick actions ────────────────────────────────────────────────────────
+  const hasAPs  = (S.authPayers?.length ?? 0) > 0;
+  const hasPot  = S.payPlan === 'pot' || (bc && (bc.mode === 'on-plan' || bc.mode === 'on-plan-open' || bc.mode === 'outside-plan'));
+  const hasIns  = S.insAccepted && S.insPremium > 0;
+  const qaItems = [
+    ...(hasPot ? [{label:'My Pay Over Time Plan', sub:`${fmt(S.potInstall || bc?.nextInstall || 517)}/installment · autopay on`, icon:'📆', screen:'manage-pot'}] : []),
+    ...(hasIns ? [{label:'Tuition Insurance', sub:'GradGuard · claims: 800-918-2899', icon:'🛡️', screen:'home'}] : []),
+    {label:'Authorized Parties', sub:'Manage people who have access to your account to pay on your behalf', icon:'👥', screen:'manage-ap', badge: hasAPs ? String(S.authPayers.length) : null},
+    {label:'Guest Payment Link', sub:'Send a one-time payment link, no account needed', icon:'🔗', screen:'guest'},
+    {label:'Make a Payment', sub: hasPot ? 'Pay an installment or make an extra payment' : 'Pay your balance now', icon:'💳', screen:'pay-now'},
+    {label:'Account History', sub:'Payments, balance changes & activity', icon:'📋', screen:'history'},
+    ...(hasAPs ? [{label:'AP Pay Over Time Plans', sub:'View plans your authorized parties set up', icon:'📊', screen:'ap-pot'}] : []),
+  ];
+
+  return (
+    <ScreenWrap portal={true}>
+
+      {/* Greeting */}
+      <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+        <p className="text-[24px] font-bold text-hz-text leading-none">Hi, {S.firstName || 'Alex'} {S.emoji || '👋'}</p>
+        <button onClick={()=>nav('account-details')} aria-label="Go to my account" className="flex flex-col items-center gap-0.5 group active:scale-95 transition-transform">
+          <div className="w-10 h-10 rounded-full bg-hz-cloud border border-hz-accent/20 flex items-center justify-center text-[13px] font-bold text-hz-indigo group-hover:bg-hz-cloud/80 group-hover:border-hz-accent/40 transition-colors">{S.initials || 'AJ'}</div>
+          <span className="text-[9px] font-semibold text-hz-hint uppercase tracking-wide">Account</span>
+        </button>
+      </div>
+
+      <div className="px-4 pb-8 space-y-5 pt-2">
+
+        {/* To-dos */}
+        {activeTodos.length > 0 && (
+          <div>
+            <p className="text-[11px] font-semibold text-hz-hint mb-2.5">To dos</p>
+            <div className="space-y-2">
+              {activeTodos.map(a=>(
+                <div key={a.id} className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz overflow-hidden flex" role="alert">
+                  <div className={`w-1 flex-shrink-0 ${a.color==='danger'?'bg-hz-danger':a.color==='amber'?'bg-hz-amber':'bg-hz-accent'}`}/>
+                  <div className="flex-1 px-4 py-3 flex items-center justify-between gap-3 min-w-0">
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-hz-text leading-tight">{a.title}</p>
+                      <p className="text-[11px] text-hz-muted mt-0.5 leading-snug">{a.sub}</p>
+                    </div>
+                    {a.cta && <button onClick={()=>nav(a.screen)} className="flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-hz-indigo text-white hover:opacity-85 transition-opacity">{a.cta}</button>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Account summary label + balance card */}
+        <div>
+          <p className="text-[11px] font-semibold text-hz-hint mb-2.5">Account summary</p>
+          {renderBalanceCard()}
+        </div>
+
+        {/* Tuition Insurance */}
         {S.insAccepted && S.insPremium > 0 && (
           <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz px-4 py-4">
             <div className="flex items-start gap-3">
@@ -324,64 +595,70 @@ const HomeScreen = ({nav, goBack, S, setS}) => {
             </div>
           </div>
         )}
+
+        {/* Next 30 days */}
         <div>
-          <p className="text-[11px] font-semibold text-hz-hint mb-2.5">Upcoming · next 30 days</p>
-          {upcoming.length === 0 ? <p className="text-[12px] text-hz-hint px-1">Nothing scheduled in the next 30 days.</p> : (
+          <p className="text-[11px] font-semibold text-hz-hint mb-2.5">Next 30 days</p>
+          {activeUpcoming.length === 0 ? (
+            <p className="text-[12px] text-hz-hint px-1">No scheduled payments in the next 30 days.</p>
+          ) : (
             <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz divide-y divide-[rgba(100,92,220,0.07)] overflow-hidden">
-              {upcoming.map((p,i)=>(
+              {activeUpcoming.map((p,i)=>(
                 <div key={i} className="px-4 py-3 flex items-center justify-between gap-3">
-                  <div className="min-w-0"><p className="text-[13px] font-medium text-hz-text truncate">{p.label}</p><p className="text-[11px] text-hz-hint mt-0.5">{p.date}{p.note && <span className="text-hz-teal"> · {p.note}</span>}</p></div>
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-medium text-hz-text truncate">{p.label}</p>
+                    <p className="text-[11px] text-hz-hint mt-0.5">{p.date}{p.note && <span className="text-hz-teal"> · {p.note}</span>}</p>
+                  </div>
                   <span className="text-[14px] font-bold text-hz-indigo flex-shrink-0">{fmt(p.amount)}</span>
                 </div>
               ))}
             </div>
           )}
         </div>
-        {showInfoHub && (
+
+        {/* Last 30 days */}
+        {activeRecent.length > 0 && (
           <div>
-            <p className="text-[11px] font-semibold text-hz-hint mb-2.5">Recent activity · last 30 days</p>
+            <p className="text-[11px] font-semibold text-hz-hint mb-2.5">Last 30 days</p>
             <div className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz overflow-hidden">
-              {[...infoBalance, ...infoAccount, ...infoPayers].map((item,i,arr)=>(
+              {activeRecent.map((item,i,arr)=>(
                 <div key={i} className={`px-4 py-3 flex items-start gap-3 ${i < arr.length-1 ? 'border-b border-[rgba(100,92,220,0.06)]' : ''}`}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-hz-accent/40 flex-shrink-0 mt-1.5"/>
-                  <div className="min-w-0"><p className="text-[12px] text-hz-muted leading-snug">{item.text}</p><p className="text-[10px] text-hz-hint mt-0.5">{item.date}</p></div>
+                  <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5 ${
+                    item.type==='aid'?'bg-hz-teal':
+                    item.type==='payment'?'bg-hz-indigo':
+                    item.type==='balance'?'bg-hz-amber':
+                    item.type==='refund'?'bg-hz-teal':
+                    item.type==='alert'?'bg-hz-danger':
+                    'bg-hz-accent/40'
+                  }`}/>
+                  <div className="min-w-0">
+                    <p className="text-[12px] text-hz-muted leading-snug">{item.text}</p>
+                    <p className="text-[10px] text-hz-hint mt-0.5">{item.date}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
-        {(() => {
-          const hasAPs = (S.authPayers?.length ?? 0) > 0;
-          const hasPot = S.payPlan === 'pot';
-          const hasIns = S.insAccepted && S.insPremium > 0;
-          const qaItems = [
-            ...(hasPot ? [{label:'My Pay Over Time Plan', sub:`${fmt(S.potInstall || 517)}/installment · autopay on`, icon:'📆', screen:'manage-pot'}] : []),
-            ...(hasIns ? [{label:'Tuition Insurance', sub:'GradGuard · claims: 800-918-2899', icon:'🛡️', screen:'home'}] : []),
-            {label:'Authorized Parties', sub:'Manage people who have access to your account to pay on your behalf', icon:'👥', screen:'manage-ap', badge: hasAPs ? String(S.authPayers.length) : null},
-            {label:'Guest Payment Link', sub:'Send a one-time payment link, no account needed', icon:'🔗', screen:'guest'},
-            {label:'Make a Payment', sub: hasPot ? 'Pay an installment or make an extra payment' : 'Pay your balance now', icon:'💳', screen:'pay-now'},
-            {label:'Account History', sub:'Payments, balance changes & activity', icon:'📋', screen:'history'},
-            ...(hasAPs ? [{label:'AP Pay Over Time Plans', sub:'View plans your authorized parties set up', icon:'📊', screen:'ap-pot'}] : []),
-          ];
-          return (
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint mb-2">Quick actions</p>
-              <div className="grid grid-cols-2 gap-2">
-                {qaItems.map(a=>(
-                  <button key={a.screen} onClick={()=>nav(a.screen)} aria-label={a.label}
-                    className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz p-3 flex flex-col items-start gap-1 hover:bg-hz-cloud/40 active:scale-[0.98] transition-all text-left relative">
-                    <div className="flex items-center gap-1.5 w-full">
-                      <span aria-hidden="true" className="text-xl leading-none flex-shrink-0">{a.icon}</span>
-                      {a.badge && <span className="ml-auto bg-hz-indigo text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center flex-shrink-0">{a.badge}</span>}
-                    </div>
-                    <p className="text-[12px] font-semibold text-hz-text leading-tight">{a.label}</p>
-                    <p className="text-[10px] text-hz-hint leading-snug">{a.sub}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
+
+        {/* Quick actions */}
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint mb-2">Quick actions</p>
+          <div className="grid grid-cols-2 gap-2">
+            {qaItems.map(a=>(
+              <button key={a.label} onClick={()=>nav(a.screen)} aria-label={a.label}
+                className="bg-hz-card border border-[rgba(100,92,220,0.14)] rounded-hz p-3 flex flex-col items-start gap-1 hover:bg-hz-cloud/40 active:scale-[0.98] transition-all text-left relative">
+                <div className="flex items-center gap-1.5 w-full">
+                  <span aria-hidden="true" className="text-xl leading-none flex-shrink-0">{a.icon}</span>
+                  {a.badge && <span className="ml-auto bg-hz-indigo text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center flex-shrink-0">{a.badge}</span>}
+                </div>
+                <p className="text-[12px] font-semibold text-hz-text leading-tight">{a.label}</p>
+                <p className="text-[10px] text-hz-hint leading-snug">{a.sub}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
       </div>
     </ScreenWrap>
   );
@@ -1184,7 +1461,34 @@ const HistoryScreen = ({nav, goBack, S, setS}) => {
 // ─── Scenario state ───────────────────────────────────────────────────────
 const SCENARIO_STATE = {
   ...HOME_DEFAULT_STATE,
-  potBalance: 4680, // original plan balance — not yet adjusted for new charge
+  firstName: 'Alex',
+  initials: 'AJ',
+  emoji: '👋',
+  potBalance: 4680,
+  balanceCard: {
+    mode: 'on-plan-open',
+    openAmount: 350,
+    planRemaining: 4680,
+    nextInstall: 517,
+    nextDate: 'May 10, 2026',
+    totalBalance: 5550,
+  },
+  todos: [
+    {id:'open-bal', icon:'⚡', color:'blue',
+     title:'Open balance needs attention',
+     sub:'$350.00 new lab fee added — not yet covered by your plan',
+     screen:'balance-increase', cta:'Address now'}
+  ],
+  upcomingPayments: [
+    {date:'May 10, 2026', amount:517, label:'Payment plan installment', note:'Auto-pay'}
+  ],
+  recentActivity: [
+    {date:'Today', text:'Lab/Course Fee ($350.00) added to your account', type:'balance'},
+    {date:'Apr 15', text:'Pell Grant ($1,100) applied to your account', type:'aid'},
+    {date:'Apr 15', text:'Anticipated federal loan ($1,000) reflected in balance', type:'aid'},
+    {date:'Apr 14', text:'GradGuard tuition insurance premium $162.00 paid — coverage active', type:'account'},
+    {date:'Apr 14', text:'Account setup complete — all steps finished', type:'account'},
+  ],
 };
 
 // ─── BalanceIncreaseScreen ────────────────────────────────────────────────
