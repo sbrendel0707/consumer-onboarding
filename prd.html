@@ -1227,6 +1227,16 @@ body {
     </div>
 
     <div class="nav-group">
+      <div class="nav-group-label">Guarantee Plans</div>
+      <a href="#guarantee-overview"     class="nav-link">Overview &amp; Why It's Different</a>
+      <a href="#guarantee-config"       class="nav-link nav-sub-item">Configuration</a>
+      <a href="#guarantee-enrollment"   class="nav-link nav-sub-item">Enrollment Requirements</a>
+      <a href="#guarantee-maintenance"  class="nav-link nav-sub-item">Agreement Maintenance</a>
+      <a href="#guarantee-process"      class="nav-link nav-sub-item">The Guarantee Process</a>
+      <a href="#guarantee-reports"      class="nav-link nav-sub-item">Reports</a>
+    </div>
+
+    <div class="nav-group">
       <div class="nav-group-label">Institution Config</div>
       <a href="#inst-config"            class="nav-link">Overview &amp; Scope</a>
       <a href="#inst-payment-methods"   class="nav-link nav-sub-item">Payment Methods</a>
@@ -4120,6 +4130,305 @@ body {
             <span class="iopt iopt-variable">Institution-configured count <span class="iopt-proto">3 university disclosures in prototype</span></span>
           </div>
           <div class="inst-item-impact"><strong>Consumer impact:</strong> This count is surfaced in the onboarding progress indicator so students know upfront how many institution-specific disclosures they will encounter versus Nelnet's universal terms.</div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         GUARANTEE PAYMENT PLANS
+    ════════════════════════════════════════ -->
+    <section id="guarantee-overview" class="prd-section">
+      <div class="section-eyebrow">Guarantee Plans</div>
+      <h2 class="section-title">Guarantee Payment Plans</h2>
+      <hr class="section-divider"/>
+
+      <div class="problem-stmt">
+        <div class="problem-stmt-label">Why This Exists — Regulatory Background</div>
+        <p>In the states of <strong>Virginia, Florida, Georgia, and Alabama</strong>, state or system-wide regulations require that all tuition must be collected for students enrolled as of a state-defined <strong>Census Date</strong> in order for state-funded institutions to qualify for state funding in the following year.</p>
+        <p>A standard payment plan does not satisfy this requirement — it allows students to pay over time with no guarantee that the full amount will be collected by the Census Date. The Guarantee Program was developed to allow institutions to offer a payment plan while ensuring NBS remits the full contracted amount for every enrolled student by the deadline. NBS incurs financial risk by guaranteeing this amount, which is why enrollment fees are higher and down payments are larger the closer a student enrolls to the Guarantee Date.</p>
+      </div>
+
+      <div class="process-callout" style="margin-bottom:24px;">
+        <strong>How it fits into the product:</strong> Guarantee plans share the same consumer-facing sign-up flow as standard Pay Over Time plans — students select a plan option and proceed through the same payment, disclosure, and confirmation steps. The differences are in eligibility rules, fee structures, date-driven validations, SSN collection, and post-enrollment behavior. All requirements below define where the guarantee flow diverges from or extends the standard plan flow.
+      </div>
+
+      <!-- Terminology -->
+      <div class="need-group">
+        <div class="need-group-label">Key Terminology</div>
+
+        <div class="need-item">
+          <div class="need-item-title">Census Date</div>
+          <div class="need-item-body">The date established by the state to report enrollment numbers of students that impact state funding to those institutions. This is the last date of drop/add classes at the institution. All other Guarantee dates are calculated from this date.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Guarantee Date</div>
+          <div class="need-item-body">The date NBS determines which agreements qualify for guarantee payment to the school. Calculated as 2 business days before the Census Date — giving the school a chance to drop students before the Census Date. The Guarantee Date cannot fall on a payment day, the day prior to a payment, or within 2 days after a payment.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Last Day for Increases</div>
+          <div class="need-item-body">The last date that a school can increase the balance of an agreement prior to the Guarantee Date. Same as the last date to enroll. Once an agreement has been guaranteed, NBS will not allow increases to the amount.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">1st Remittance Date</div>
+          <div class="need-item-body">NBS remits all tuition payments collected (less any outstanding NBS fees) for agreements that were not guaranteed. May also include tuition collected for agreements that were guaranteed if the institution is configured for this. Typically about 10 business days from the Guarantee Date.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">2nd Remittance Date</div>
+          <div class="need-item-body">All guaranteed funds less decreases are remitted. Typically 30–60 days from the Guarantee Date. Calculated based on the number of days configured per the institution's contract (PSA).</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Maximum Amount</div>
+          <div class="need-item-body">The maximum amount NBS will guarantee for a single student's tuition payment plan. Any agreement amount above this threshold must be handled through one of three configured enforcement rules.</div>
+        </div>
+
+        <div class="need-item">
+          <div class="need-item-title">Default (Guarantee context)</div>
+          <div class="need-item-body">An agreement that was guaranteed but still has a remaining balance as of a specific pre-determined Default Date. The Default Date is 5 business days from the last scheduled payment date of the term.</div>
+        </div>
+      </div>
+
+      <!-- Configuration -->
+      <div id="guarantee-config" class="need-group">
+        <div class="need-group-label">Configuration Requirements</div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Guarantee plan option available alongside regular plans at the term level.</strong> Institutions in qualifying states must be able to offer guarantee plans for tuition accounts and regular payment plans for non-tuition accounts (e.g., housing) within the same term simultaneously.</p>
+          <p class="req-why"><strong>Why:</strong> Only tuition is subject to the guarantee requirement. Students may owe tuition (requiring a guarantee plan) and housing (which can use a standard plan) in the same term. The system must support both plan types co-existing for a single student in the same term — this removes a current constraint in Enterprise where only one agreement per term is supported when RTAA and balance compare are active.</p>
+          <div class="sophie-flag">
+            <span class="sophie-flag-label">Sophie review needed</span>
+            <span>The current system does not support a student having more than one agreement in the same term when RTAA and balance compare are used. Confirm whether lifting this constraint is in scope for Horizon, or whether this requires a separate term structure (e.g., "Guarantee Term — Fall 2026" and "Housing Term — Fall 2026"). This is a core architectural decision.</span>
+          </div>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Configure Guarantee stage dates from a single Census Date input.</strong> The NBS Administrator enters the Census Date; the system automatically calculates all dependent dates — Guarantee Date, Last Date to Enroll, Last Date for Increases, 1st Remittance Date, Default Date. Calculated dates are suggestions that can be edited by the NBS Administrator.</p>
+          <p class="req-why"><strong>Why:</strong> All guarantee milestones are mathematically derived from the Census Date. Calculating them automatically eliminates manual entry errors and ensures the date relationships are always consistent with program rules.</p>
+          <ul class="need-sub-list">
+            <li><strong>Census Date:</strong> Entered by NBS Admin — drives all other dates</li>
+            <li><strong>Guarantee Date:</strong> 2 business days before Census Date (cannot be on or within 2 days after a payment date)</li>
+            <li><strong>Last Date to Enroll / Last Date for Increases:</strong> 5 business days before Guarantee Date</li>
+            <li><strong>1st Remittance Date:</strong> 10 business days after Guarantee Date (with option to include guaranteed payments)</li>
+            <li><strong>2nd Remittance Date:</strong> Configurable number of days after Census Date — set per institution PSA</li>
+            <li><strong>Default Date:</strong> 5 business days from the last scheduled payment date of the term</li>
+          </ul>
+          <div class="sophie-flag">
+            <span class="sophie-flag-label">Sophie review needed</span>
+            <span>Confirm which of these calculated dates can be edited after agreements are already on the term, and which are locked once students have enrolled. Define the warning/impact when an admin edits a date that has active agreements.</span>
+          </div>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Guarantee Custodial Account.</strong> A dedicated NBS-owned custodial account must be configured for each Guarantee institution. All student tuition payments are deposited to this account prior to remittance to the institution. Institution remittances are transferred automatically from this account on the configured Remittance Dates.</p>
+          <p class="req-why"><strong>Why:</strong> Commingling guarantee funds with standard operating funds creates accounting, compliance, and reconciliation risk. A dedicated custodial account ensures that guaranteed amounts are ringfenced and available for remittance on schedule — independent of other NBS cash flows.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Maximum Guarantee Amount.</strong> The NBS Administrator configures the maximum dollar amount NBS will guarantee per student. This maximum is enforced at enrollment, during balance increases (manual, real-time, and batch), and in balance compare processes. Three enforcement modes must be configurable:</p>
+          <ul class="need-sub-list">
+            <li><strong>Deny eligibility:</strong> Student cannot enroll if the agreement amount exceeds the maximum</li>
+            <li><strong>Collect overage immediately:</strong> Student pays the overage above the maximum as an additional immediate down payment at enrollment, in addition to the standard required down payment</li>
+            <li><strong>Set up for maximum, resolve overage with school:</strong> Agreement is set up for the maximum amount; the remaining overage is handled directly between the student and institution</li>
+          </ul>
+          <p class="req-why"><strong>Why:</strong> NBS's financial exposure in guaranteeing agreements is capped per contract. Enforcing the maximum at every touch point — enrollment, balance adjustments, batch processes — prevents NBS from inadvertently guaranteeing more than the contracted limit.</p>
+          <div class="sophie-flag">
+            <span class="sophie-flag-label">Sophie review needed</span>
+            <span>The third enforcement mode (set up for max, resolve overage with school) introduces the concept of editable RTAA amounts and has not been fully scoped. Confirm whether this mode is in scope for Horizon and what the institutional data flow looks like when the student's agreement balance differs from their RTAA balance.</span>
+          </div>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Payment options validated against required percentage by Guarantee Date.</strong> When calculating installment options for a guarantee plan, the system must only present options where the cumulative payments scheduled before the Guarantee Date meet or exceed the institution-configured required percentage of the total agreement. The NBS Administrator configures the required collected percentage (e.g., 50%, 60%).</p>
+          <p class="req-why"><strong>Why:</strong> NBS guarantees the full agreement amount on the Guarantee Date, but only if the student has met their payment commitment. Preventing the system from offering installment schedules that wouldn't hit the required percentage by Guarantee Date removes a core risk vector — students signing up for plans that NBS would have to guarantee without sufficient collection.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Differentiated enrollment fees by payment option and by state system.</strong> Each payment option (based on number of installments scheduled before the Guarantee Date) has a different enrollment fee. Fee schedules vary by state and institution system. The NBS Administrator configures enrollment fees per payment option count. Current fee schedules:</p>
+          <ul class="need-sub-list">
+            <li><strong>Virginia:</strong> 1–2 payments → $45 · 3 payments → $40 · 4–6 payments → $35</li>
+            <li><strong>Florida &amp; Georgia Technical Schools:</strong> 1–2 payments → $40 · 3 payments → $35 · 4–6 payments → $30</li>
+            <li><strong>Georgia University System (Modified Guarantee):</strong> 1–2 payments → $70 · 3 payments → $60 · 4–6 payments → $50</li>
+          </ul>
+          <p class="req-why"><strong>Why:</strong> When a student enrolls later (fewer payments before the Guarantee Date), NBS collects less before the guarantee obligation triggers — increasing NBS's financial exposure. Higher enrollment fees for fewer pre-guarantee payments compensate for this increased risk. The fee structure must be dynamically applied based on the payment option the student selects, not as a flat fee.</p>
+        </div>
+      </div>
+
+      <!-- Enrollment Requirements -->
+      <div id="guarantee-enrollment" class="need-group">
+        <div class="need-group-label">Enrollment Requirements</div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Collect SSN for Plan Owner when the system detects the agreement is a guarantee plan.</strong> During enrollment for a guarantee payment plan, the system must collect and store the Social Security Number of the plan owner (student or authorized payer). SSN is used to facilitate collections in the event of a default.</p>
+          <p class="req-why"><strong>Why:</strong> NBS guarantees the institution's full tuition amount. If a student defaults, NBS must pursue collection of the outstanding balance from the plan owner. Having the SSN on file significantly improves the likelihood of successful collection and is standard practice in financial guarantee programs.</p>
+          <div class="sophie-flag">
+            <span class="sophie-flag-label">Sophie review needed</span>
+            <span>Compliance/audit requirements for SSN storage must be confirmed (encryption at rest, access controls, purge schedule, display masking, when it's included in reports or collection files). Input from Legal/Compliance required before this requirement is finalized. Also confirm whether SSN validation logic (Luhn-style check) is needed, and how to handle refusals.</span>
+          </div>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Do not allow enrollment if the student has a past-due balance from a prior term.</strong> If the student (or any of their Authorized Parties) has an unpaid defaulted amount from a previous term, enrollment in a new guarantee agreement must be blocked until the prior balance is paid in full. This rule applies regardless of who owns the existing defaulted agreement.</p>
+          <p class="req-why"><strong>Why:</strong> Allowing a student with an existing default to enroll in a new guarantee plan would expose NBS to double guarantee risk — guaranteeing a new term while a prior term balance is still outstanding. The prior default is evidence of a collection risk that must be resolved before NBS accepts new exposure.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Disclose fees and program parameters during enrollment.</strong> A disclosure must notify the plan owner that: (1) the agreement may be terminated if it becomes delinquent, and (2) NBS fees may be deducted from any amount collected. This disclosure is required before the plan owner finalizes enrollment.</p>
+          <p class="req-why"><strong>Why:</strong> The guarantee program has unique fee-withholding rules (outstanding NBS fees are deducted from remittance on non-guaranteed agreements) and a plan termination risk that does not exist in standard plans. Consumers must understand these conditions before committing.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Terminate the current agreement if a new default is detected for the student.</strong> If a new agreement is finalized before a prior-term agreement has defaulted, and the prior agreement subsequently goes into default before the new agreement is guaranteed, the new agreement must be automatically terminated or placed on hold until the prior balance is resolved.</p>
+          <p class="req-why"><strong>Why:</strong> There is a timing gap where a student can slip into default on an old term while a new term's plan is already active. Without this safeguard, NBS would be obligated to guarantee the new plan while simultaneously absorbing a prior-term default — compounding exposure.</p>
+        </div>
+      </div>
+
+      <!-- Agreement Maintenance -->
+      <div id="guarantee-maintenance" class="need-group">
+        <div class="need-group-label">Agreement Maintenance</div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Early warning for agreements at risk of not being guaranteed.</strong> For agreements that are past due prior to the Guarantee Date with no reattempts scheduled, a warning notification must be automatically sent to the student and plan owner when the system detects a returned payment that will not automatically reattempt before the Guarantee Date. The warning alerts them that the agreement is scheduled for termination on the Guarantee Date if not resolved.</p>
+          <p class="req-why"><strong>Why:</strong> Students with a returned payment close to the Guarantee Date have a brief window to act. Without proactive notification, they may be unaware their plan is about to terminate — resulting in a surprise loss of guarantee status, institutional disruption, and student confusion at a critical time.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Highlight Early Warning agreements prominently on the consumer profile page.</strong> Any agreement scheduled for termination (due to a pending guarantee risk) must display a clearly visible warning indicator on the student/AP profile — visible to all user types (NBS, institution, consumer). This ensures that service staff give accurate information when a student calls with questions.</p>
+          <p class="req-why"><strong>Why:</strong> If a service representative is unaware that an agreement is scheduled to terminate and tells the student otherwise, NBS may be pressured to guarantee an ineligible agreement — or the student may delay action based on incorrect information received from staff. The profile warning prevents this misinformation risk.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Enforce Maximum Amount during all balance increase processes.</strong> The maximum guarantee amount limit must be enforced at every point where a balance increase can occur: manual adjustments (consumer, NBS, institution), real-time balance compare, and batch balance compare. If an increase would cause the total guarantee-eligible amount to exceed the maximum, the increase must be blocked, with a clear message explaining the reason and the limit.</p>
+          <p class="req-why"><strong>Why:</strong> Balance increases can occur through multiple pathways after initial enrollment (manual adjustments, RTAA updates, batch processes). If any one of these bypasses the maximum enforcement, NBS can inadvertently take on guarantee exposure beyond its contracted limit — a direct financial risk.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Restrict institution user actions on guarantee agreements.</strong> Institution users must not be able to: modify the payment schedule, place the agreement on hold, or activate the agreement. NBS users retain full servicing capability. Key guarantee dates (Census Date, Guarantee Date, Remittance Dates) should be visible to NBS users on the servicing screen for reference when handling schedule modification requests.</p>
+          <p class="req-why"><strong>Why:</strong> Guarantee agreements have a fixed structure that is tied to regulatory dates and NBS's financial commitments. If an institution user modifies the payment schedule, it can invalidate the guarantee eligibility calculation — creating liability for NBS. Restricting institution users from these actions protects the integrity of the guarantee program.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Upload of changes must account for NBS-processed but unposted payments.</strong> The batch upload-of-changes process must calculate the comparison balance as: agreement balance minus the amount of payments processed by NBS but not yet posted to the student's account in the SIS. This prevents balance compare from treating NBS-processed payments as an outstanding balance.</p>
+          <p class="req-why"><strong>Why:</strong> For guarantee institutions, there is a timing gap between when NBS processes a payment and when it is posted to the student's SIS account. Without this adjustment, the batch process would see an apparent balance discrepancy and incorrectly attempt to increase or adjust the agreement — creating reconciliation problems and double-counting risk.</p>
+        </div>
+      </div>
+
+      <!-- The Guarantee Process -->
+      <div id="guarantee-process" class="need-group">
+        <div class="need-group-label">The Guarantee Process</div>
+
+        <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">On the Guarantee Date, the system runs an automatic job that evaluates every active agreement for the term. Agreements are classified as either guaranteed or terminated based on whether the student is current on all payments.</p>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Guarantee Day — automatic job.</strong> The system must automatically run a process on the Guarantee Date that: (1) identifies all agreements scheduled to be guaranteed, (2) identifies all agreements scheduled to terminate, and (3) updates agreement status accordingly. The process must run after all returns for that day have posted.</p>
+          <p class="req-why"><strong>Why:</strong> The Guarantee Date evaluation must be comprehensive and accurate — missing an agreement or misclassifying one creates either a financial loss for NBS (guaranteeing an ineligible agreement) or an institutional/student service problem (terminating an eligible one). The timing dependency on returns posting means the job must have a controlled execution window.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Guaranteed agreements.</strong> Agreements current on all tuition and NBS fees on the Guarantee Date are automatically guaranteed. The agreement status updates clearly to indicate guaranteed status on the student profile. The guarantee amount (estimated as payments processed + remaining scheduled payments) and, where applicable, the 1st and 2nd remittance amounts are displayed on the agreement screen for NBS and institution users.</p>
+          <p class="req-why"><strong>Why:</strong> Institution staff and NBS service teams need to see the expected remittance amounts per agreement to answer institutional and student inquiries accurately. Displaying this on the agreement eliminates the need to run a report for individual lookups.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Non-guaranteed agreements.</strong> Agreements past due on tuition and/or NBS fees on the Guarantee Date are terminated and their balance cleared. The agreement record must include the termination reason ("Agreement not guaranteed"). The remittance amount and fee accounting must also be displayed. Automatic notifications must be sent to the student and plan owner explaining that tuition collected (less outstanding NBS fees) will be remitted to the institution, and any refund will follow the institution's refund policy.</p>
+          <p class="req-why"><strong>Why:</strong> Non-guaranteed students and their payers will call the institution asking why their plan was terminated. The notification and agreement-level accounting prevent misinformation and give the institution the data needed to answer questions — and to process any applicable refund.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Remittance — automatic deposits on configured dates.</strong> All remittances to the institution must be automatically processed from the NBS Guarantee Custodial Account to the institution's configured bank account on the 1st and 2nd Remittance Dates. No manual trigger required.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions rely on the guarantee remittance for their own funding cycle (state reimbursement depends on receipt by the Census Date). Manual remittance processes introduce risk of delay, error, or missed deposit — which has regulatory and institutional financial consequences.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Default notices — automatic, with escalating intervals.</strong> On the Default Date, the system automatically generates a notification to the plan owner and student that the agreement has defaulted. Reminder notices are generated at 30-day intervals thereafter. At 90 days, a paper notice is generated and mailed to the address on file. Notices continue until the balance is resolved or the agreement is sent to collections.</p>
+          <p class="req-why"><strong>Why:</strong> Defaulted guarantee agreements represent a direct financial loss to NBS (NBS has already remitted the guaranteed amount to the institution). Proactive, escalating outreach maximizes the probability of recovery and creates a documented communication record for any subsequent collections or legal action.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Default management process.</strong> Default management for guarantee agreements follows the same structure as the Delinquency Management process in Enterprise. NBS generates an auto-dial file after 30 days of default. The agreement appears on the default report at 30-day intervals until resolved or purged for collections.</p>
+          <p class="req-why"><strong>Why:</strong> Systematic, automated default follow-up at defined intervals ensures NBS recovers as much of its guaranteed exposure as possible and maintains a consistent process that satisfies any regulatory or contractual requirements for collections outreach.</p>
+        </div>
+      </div>
+
+      <!-- Reports -->
+      <div id="guarantee-reports" class="need-group">
+        <div class="need-group-label">Reports</div>
+
+        <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:14px;">Guarantee reports are split into two audiences: <strong>institution reports</strong> (available to institution users and NBS users) and <strong>finance reports</strong> (available to NBS Finance only). A dedicated Guarantee Reports section is added to both the institution and NBS report menus.</p>
+
+        <div class="sub-section-header">
+          <div class="sub-section-eyebrow">Institution Reports</div>
+          <div class="sub-section-title">Available to Institution &amp; NBS Users</div>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Guarantee Report (by term).</strong> Available once the Guarantee has been finalized. Shows all guaranteed agreements: plan owner name, student name, student ID, original contract amount, current remaining balance, and guaranteed amount.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions need to verify which students were guaranteed so they can reconcile expected remittances, confirm enrollment counts for state funding, and respond to student inquiries about plan status.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Non-Guaranteed Report (by term).</strong> Available once the Guarantee has been finalized. Shows all agreements not guaranteed: plan owner name, student name, student ID, original contract amount, amount of payments processed, and reason not guaranteed.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions need to identify students who did not meet the guarantee threshold so they can take appropriate action (direct billing, holds, or refund processing) and understand the reason for non-guarantee at the individual student level.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Guarantee Adjustment Report (by term).</strong> On-demand report of any guaranteed agreements that have been terminated or decreased since the Guarantee Date. Includes: agreement number, plan owner, student ID, student name, agreement status, original guarantee amount, adjusted guarantee amount, current estimated remittance amount.</p>
+          <p class="req-why"><strong>Why:</strong> Post-guarantee adjustments (e.g., a student withdraws, reducing the guarantee amount) affect the institution's expected 2nd remittance. This report gives institutions real-time visibility into any changes after the guarantee snapshot — preventing surprises at remittance time.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>2nd Remittance Cash Flow Report (by term).</strong> On-demand report of the estimated 2nd remittance amount for all guaranteed agreements for the term. Allows the institution to estimate their cash flow for the 2nd remittance date.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions need to plan their cash flow around the 2nd remittance. Given that the 2nd remittance date is 30–60 days from the Guarantee Date, institutions use this report for treasury planning and to verify that the expected deposit matches their internal projections.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Remittance Reports.</strong> Shows total amount remitted for each guarantee deposit in the term. Similar structure to the existing Enterprise remittance report. Each report includes: deposit date, accounting of all payments remitted, accounting of all fees assessed (NBS fees, credit card fees). Each line item includes the reason for deposit (refund for non-guaranteed agreement, guarantee deposit 1, guarantee deposit 2).</p>
+          <p class="req-why"><strong>Why:</strong> Institutions reconcile NBS remittances against their own financial records. A detailed per-deposit report with fee accounting allows institutions to match NBS deposits to student accounts and confirm that all guarantee and non-guarantee amounts were remitted correctly.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Default Report.</strong> Cumulative list of students who have defaulted with NBS. Includes: student name, student ID, term of default, outstanding amount owed, length of time in default.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions need visibility into which students are in default so they can apply holds, notify the student independently, or refer the account to their own collections process in parallel with NBS's efforts.</p>
+        </div>
+
+        <div class="sub-section-header" style="margin-top:28px;">
+          <div class="sub-section-eyebrow">Finance Reports</div>
+          <div class="sub-section-title">NBS Finance Only</div>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Deposits Report.</strong> Shows all deposits and debits to the Guarantee Custodial Account by date, amount, and type (ACH/CC). Available as summary or detail. Detail view includes: institution, term, credit card amount (with CC type drill-down), ACH amount.</p>
+          <p class="req-why"><strong>Why:</strong> NBS Finance must track the custodial account independently from operating accounts to ensure funds are properly segregated, available for remittance, and reconcile against bank statements. This report provides the daily custodial account activity needed for that reconciliation.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Estimated Remittance Report.</strong> Projects the amount of funds needed for guarantee remittances to institutions across the next 30, 60, and 90 days. Date-driven (not term-based), based on configured remittance dates across all active guarantee institutions.</p>
+          <p class="req-why"><strong>Why:</strong> NBS Finance must ensure sufficient funds are available in the custodial account before remittance dates arrive. This forward-looking report enables treasury planning and prevents situations where the custodial account has insufficient funds to fulfill a remittance obligation.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Remittance Report (Finance).</strong> Shows actual remittances to each institution: date, institution, total remitted. Available as summary or detail. Detail view includes: institution, term, credit card amount, ACH amount, fees deducted. Line items link to further detail including credit card type and amounts.</p>
+          <p class="req-why"><strong>Why:</strong> NBS Finance needs to verify that every scheduled remittance was processed correctly and to audit fee deductions. This report is the internal control document for the remittance process.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Default Report (Finance).</strong> Cumulative report of all accounts in default at NBS across all institutions. Includes: institution, term, plan owner, student name, student ID, amount of default, time in default.</p>
+          <p class="req-why"><strong>Why:</strong> NBS Finance tracks the aggregate default exposure across the entire guarantee portfolio. This report drives reserve calculations, collections prioritization, and periodic program risk reviews.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Summary Report (Finance).</strong> High-level program metrics by institution and term: total agreements guaranteed (count and amount), total remitted on 1st and 2nd remittance (count and amount), total defaulted (count and amount). Also includes NBS fees: enrollment fees, returned payment fees, credit card fees. Not a detail report.</p>
+          <p class="req-why"><strong>Why:</strong> Program leadership and Finance need a single view of the guarantee program's performance — guarantee rate, remittance totals, and default exposure — to assess program health, identify underperforming institutions, and report to leadership.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Program Statistics.</strong> Higher-level summary than the Finance Summary Report. Provides: percentage of total agreements guaranteed, percentage not guaranteed, and percentage defaulted across the program.</p>
+          <p class="req-why"><strong>Why:</strong> NBS periodically reviews the guarantee program's aggregate performance to determine whether enrollment fee schedules and down payment requirements need adjustment based on changes to state regulations, default rates, or tuition rates. This report provides the aggregate input for those reviews.</p>
         </div>
       </div>
 
