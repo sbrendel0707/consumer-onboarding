@@ -354,7 +354,20 @@ body {
 .tag-if   { background: var(--hz-cloud); color: var(--hz-indigo); }
 .tag-erp  { background: var(--hz-teal-bg); color: var(--hz-teal); }
 .tag-inst { background: #F0EBF8; color: #6B35A8; }
-.tag-req  { background: var(--hz-bg); color: var(--hz-muted); border: 1px solid var(--hz-border); }
+.tag-req     { background: var(--hz-bg); color: var(--hz-muted); border: 1px solid var(--hz-border); }
+.tag-backend { background: #ecfdf5; color: #065f46; border: 1px solid #6ee7b7; font-weight: 700; }
+.tag-backend-pending { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; font-weight: 700; }
+.sophie-backend-btn {
+  display:none; font-size:10px; font-weight:600; color:var(--hz-muted);
+  background:none; border:1px solid var(--hz-border); border-radius:5px;
+  padding:2px 7px; cursor:pointer; margin-left:6px; vertical-align:middle;
+}
+.sophie-mode .req-item:hover .sophie-backend-btn { display:inline-flex; align-items:center; gap:3px; }
+.sophie-backend-btn.is-tagged { color:#065f46; border-color:#6ee7b7; background:#ecfdf5; display:inline-flex !important; }
+.sophie-backend-btn.is-pending { color:#92400e; border-color:#fcd34d; background:#fef3c7; display:inline-flex !important; }
+.backend-confirm-row { display:flex; align-items:center; gap:6px; margin-top:6px; }
+.backend-confirm-yes { font-size:11px; font-weight:700; color:white; background:#059669; border:none; border-radius:5px; padding:3px 10px; cursor:pointer; }
+.backend-confirm-no  { font-size:11px; font-weight:700; color:#dc2626; background:none; border:1px solid #fca5a5; border-radius:5px; padding:3px 10px; cursor:pointer; }
 
 /* ── Step headers ── */
 .step-header {
@@ -1653,6 +1666,12 @@ body {
         <h3 class="need-group-title">⚠️ Requirements Missing a "Why" (<span id="sophie-missing-count">0</span>)</h3>
         <p style="font-size:12px;color:var(--hz-muted);margin-bottom:12px">These req-items either have a Sophie flag or are missing a .req-why paragraph. Click "Go to section" to navigate and edit inline.</p>
         <div id="sophie-missing-why-content" class="sd-content"></div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">🔧 Backend Only — AI-tagged, needs your review (<span id="sophie-backend-count">0</span>)</h3>
+        <p style="font-size:12px;color:var(--hz-muted);margin-bottom:12px">Claude tagged these requirements as <strong>Backend Only</strong> — meaning UX has no work to do for them. Confirm ✓ to keep the tag, or Reject ✗ to remove it. You can also manually add Backend Only to any requirement in the document by hovering over it in Sophie mode and clicking the 🔧 button.</p>
+        <div id="sophie-backend-content" class="sd-content"></div>
       </div>
     </section>
 
@@ -7239,7 +7258,263 @@ function buildSophieDashboard() {
     }
   }
 
+  rebuildSophieBackendPanel();
   document.getElementById('sophie-dashboard').style.display = 'block';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BACKEND ONLY TAG SYSTEM
+// Claude suggests tags; Sophie reviews and confirms/rejects; Sophie can also
+// manually tag any requirement. Overrides persisted in localStorage.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Partial title matches for Claude-suggested Backend Only requirements.
+// Match against the text content of the first <strong> inside .req-text.
+// Update this list as new sections are added.
+var BACKEND_ONLY_HINTS = [
+  // ERP Integration — all requirements
+  'Tier 1 Certified Integrations',
+  'Tier 2 Partner Integrations',
+  'Charge & Balance Import',
+  'Enrollment Status Feed',
+  'Payment Write-Back',
+  // 3rd Party Integration — all requirements
+  'RESTful API with OpenAPI',
+  'Webhook Event System',
+  'External Collections Agency Handoff',
+  'Integration Certification Process',
+  // Payment Processing — backend-only subset
+  'Daily Settlement Reporting',
+  'Payment Application & ERP Write-back',
+  'Retry Configuration',
+  'Guarantee Plan Settlement Exclusion',
+  'International Payment Vendor Routing',
+  'Existing Institution Payment Processor Relationships',
+  // School Structure Setup — tenant isolation rules
+  'Single-Tenant Institution Isolation',
+  'Multi-System Institution Support',
+  'Campus-Level Configuration Inheritance',
+  // Access Management — NBS internal tooling
+  'NBS Support Access Model',
+  // Correspondence — compliance tracking (no UI output)
+  'TCPA Compliance for SMS',
+  'FDCPA-Compliant Collection Notices',
+  // Reporting — IT & Product (all are ops/monitoring/process, no consumer or admin UX)
+  'Datadog APM for Core Transactions',
+  'Datadog Monitors for SLA-Critical',
+  'Datadog Log Management for Audit',
+  'Atlas Performance Advisor Monitoring',
+  'Atlas Data Access Pattern Reporting',
+  'ADO Sprint Velocity',
+  'ADO Feature Delivery Tracking',
+  'Bug Escape Rate',
+  'North Star Metric',
+  'Horizon Health Score',
+  // Reporting — NBS backend data pipelines
+  'Revenue & Transaction Fee Reporting',
+  'PAS Processing Metrics',
+  // Reporting — Institution backend
+  'Audit Log Export',
+  // Solutions — Batch CC Refunds (card network rule enforcement)
+  'Card Network Compliance for Refunds',
+  // Solutions — In-Person (hardware/terminal integration)
+  'Card Terminal Integration',
+  // Solutions — ePay
+  'Multi-Vendor Support',
+];
+
+var BACKEND_OVERRIDES_KEY = 'hz_backend_overrides'; // {reqId: 'confirmed'|'rejected'|'sophie'}
+
+function loadBackendOverrides() {
+  try { return JSON.parse(localStorage.getItem(BACKEND_OVERRIDES_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveBackendOverrides(data) {
+  localStorage.setItem(BACKEND_OVERRIDES_KEY, JSON.stringify(data));
+}
+
+function getReqTitleText(reqItem) {
+  var strong = reqItem.querySelector('.req-text strong');
+  return strong ? strong.textContent.trim() : '';
+}
+
+function matchesBackendHint(reqItem) {
+  var title = getReqTitleText(reqItem);
+  if (!title) return false;
+  return BACKEND_ONLY_HINTS.some(function(hint) {
+    return title.indexOf(hint) !== -1 || hint.indexOf(title.slice(0,30)) !== -1;
+  });
+}
+
+function ensureReqTags(reqItem) {
+  var tags = reqItem.querySelector('.req-tags');
+  if (!tags) {
+    tags = document.createElement('div');
+    tags.className = 'req-tags';
+    reqItem.appendChild(tags);
+  }
+  return tags;
+}
+
+function applyBackendTag(reqItem, state) {
+  // state: 'pending' | 'confirmed' | 'sophie' | 'none'
+  // Remove any existing backend tag
+  reqItem.querySelectorAll('.tag-backend, .tag-backend-pending, .backend-confirm-row').forEach(function(el) { el.remove(); });
+
+  if (state === 'none') return;
+
+  var tags = ensureReqTags(reqItem);
+
+  if (state === 'pending') {
+    var tag = document.createElement('span');
+    tag.className = 'tag tag-backend-pending';
+    tag.innerHTML = '🔧 Backend Only <small style="font-weight:400;opacity:.75">(AI-suggested)</small>';
+    tag.title = 'Claude flagged this — Sophie review needed';
+    tags.appendChild(tag);
+  } else {
+    // confirmed or sophie
+    var tag = document.createElement('span');
+    tag.className = 'tag tag-backend';
+    tag.innerHTML = state === 'sophie' ? '🔧 Backend Only' : '🔧 Backend Only ✓';
+    tag.title = state === 'sophie' ? 'Tagged by Sophie' : 'Confirmed by Sophie';
+    tags.appendChild(tag);
+  }
+}
+
+function initBackendTags(isSophie) {
+  var overrides = loadBackendOverrides();
+  document.querySelectorAll('.req-item').forEach(function(item) {
+    var reqId = item.dataset.reqId || getReqId(item);
+    item.dataset.reqId = reqId;
+    var override = overrides[reqId];
+    var isHinted = matchesBackendHint(item);
+
+    if (override === 'rejected') {
+      applyBackendTag(item, 'none');
+    } else if (override === 'confirmed') {
+      applyBackendTag(item, 'confirmed');
+    } else if (override === 'sophie') {
+      applyBackendTag(item, 'sophie');
+    } else if (isHinted) {
+      applyBackendTag(item, 'pending');
+    }
+
+    // Sophie toggle button (Sophie mode only)
+    if (isSophie && !item.querySelector('.sophie-backend-btn')) {
+      var btn = document.createElement('button');
+      btn.className = 'sophie-backend-btn';
+      var hasSophieTag = override === 'sophie' || override === 'confirmed';
+      var hasPending = isHinted && !override;
+      btn.classList.toggle('is-tagged', hasSophieTag);
+      btn.classList.toggle('is-pending', hasPending);
+      btn.title = 'Toggle Backend Only tag';
+      btn.innerHTML = '🔧 Backend Only';
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        handleBackendToggle(item, reqId);
+      });
+      item.appendChild(btn);
+    }
+  });
+}
+
+function handleBackendToggle(item, reqId) {
+  var overrides = loadBackendOverrides();
+  var current = overrides[reqId];
+  var isHinted = matchesBackendHint(item);
+
+  // Remove any existing confirm row
+  item.querySelectorAll('.backend-confirm-row').forEach(function(r) { r.remove(); });
+  var btn = item.querySelector('.sophie-backend-btn');
+
+  if (current === 'confirmed' || current === 'sophie') {
+    // Already tagged — remove it
+    overrides[reqId] = isHinted ? 'rejected' : undefined;
+    if (!isHinted) delete overrides[reqId];
+    saveBackendOverrides(overrides);
+    applyBackendTag(item, 'none');
+    if (btn) { btn.classList.remove('is-tagged','is-pending'); }
+    rebuildSophieBackendPanel();
+  } else if (isHinted && !current) {
+    // Claude-pending — show confirm/reject row
+    var row = document.createElement('div');
+    row.className = 'backend-confirm-row';
+    row.innerHTML =
+      '<span style="font-size:11px;color:var(--hz-muted)">Claude thinks this is Backend Only. Confirm?</span>' +
+      '<button class="backend-confirm-yes" onclick="confirmBackendTag(\'' + reqId + '\',true,this)">✓ Confirm</button>' +
+      '<button class="backend-confirm-no"  onclick="confirmBackendTag(\'' + reqId + '\',false,this)">✗ Reject</button>';
+    item.appendChild(row);
+    if (btn) btn.classList.add('is-pending');
+  } else {
+    // No tag — Sophie manually adds
+    overrides[reqId] = 'sophie';
+    saveBackendOverrides(overrides);
+    applyBackendTag(item, 'sophie');
+    if (btn) { btn.classList.add('is-tagged'); btn.classList.remove('is-pending'); }
+    rebuildSophieBackendPanel();
+  }
+}
+
+function confirmBackendTag(reqId, yes, btn) {
+  var overrides = loadBackendOverrides();
+  overrides[reqId] = yes ? 'confirmed' : 'rejected';
+  saveBackendOverrides(overrides);
+  var item = btn.closest('.req-item');
+  item.querySelectorAll('.backend-confirm-row').forEach(function(r) { r.remove(); });
+  applyBackendTag(item, yes ? 'confirmed' : 'none');
+  var toggleBtn = item.querySelector('.sophie-backend-btn');
+  if (toggleBtn) {
+    toggleBtn.classList.toggle('is-tagged', yes);
+    toggleBtn.classList.remove('is-pending');
+  }
+  rebuildSophieBackendPanel();
+}
+
+function rebuildSophieBackendPanel() {
+  var overrides = loadBackendOverrides();
+  var pendingItems = [];
+  document.querySelectorAll('.req-item').forEach(function(item) {
+    var reqId = item.dataset.reqId || getReqId(item);
+    var override = overrides[reqId];
+    if (matchesBackendHint(item) && !override) {
+      pendingItems.push(item);
+    }
+  });
+  var countEl = document.getElementById('sophie-backend-count');
+  if (countEl) countEl.textContent = pendingItems.length;
+  var content = document.getElementById('sophie-backend-content');
+  if (!content) return;
+  content.innerHTML = '';
+
+  if (pendingItems.length === 0) {
+    content.innerHTML = '<p style="font-size:13px;color:#059669;padding:8px 0">✅ All Claude-suggested Backend Only tags have been reviewed.</p>';
+    return;
+  }
+  pendingItems.slice(0, 30).forEach(function(item) {
+    var section = item.closest('section[id]');
+    var sId = section ? section.id : '';
+    var sName = section ? (section.querySelector('.section-title')||{textContent:'Unknown'}).textContent : 'Unknown';
+    var reqId = item.dataset.reqId;
+    var wrap = document.createElement('div');
+    wrap.className = 'sd-item';
+    var src = document.createElement('div');
+    src.className = 'sd-item-source';
+    src.innerHTML =
+      '<span style="font-size:12px;color:var(--hz-muted)">' + _esc(sName) + '</span>' +
+      '<div style="display:flex;gap:6px;align-items:center">' +
+        '<button class="backend-confirm-yes" onclick="confirmBackendTag(\'' + reqId + '\',true,this)">✓ Confirm</button>' +
+        '<button class="backend-confirm-no"  onclick="confirmBackendTag(\'' + reqId + '\',false,this)">✗ Reject</button>' +
+        '<button class="sd-goto-btn" onclick="jumpToSection(\'' + sId + '\')">Go to section →</button>' +
+      '</div>';
+    var clone = item.cloneNode(true);
+    clone.querySelectorAll('.req-comment-btn,.req-comment-panel,.req-comment-thread,.sophie-backend-btn,.backend-confirm-row,button').forEach(function(b){b.remove();});
+    clone.style.margin = '0';
+    wrap.appendChild(src);
+    wrap.appendChild(clone);
+    content.appendChild(wrap);
+  });
+  if (pendingItems.length > 30) {
+    content.innerHTML += '<p style="font-size:12px;color:var(--hz-muted);padding:8px 0">…and ' + (pendingItems.length-30) + ' more pending. Scroll the document to find them (shown with amber "Backend Only" tags).</p>';
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -7329,6 +7604,9 @@ function openAsViewer(name) {
   // Init comments for all users
   initComments(name);
 
+  // Init backend-only tags (Sophie sees pending; others see confirmed only)
+  initBackendTags(name.toLowerCase() === 'sophie');
+
   // Build My Updates section
   buildMyUpdates(userData);
 }
@@ -7354,6 +7632,8 @@ function switchViewer() {
   var sd = document.getElementById('sophie-dashboard');
   if (sd) sd.style.display = 'none';
   document.querySelectorAll('.req-comment-btn,.req-comment-panel,.req-comment-thread').forEach(function(el){el.remove();});
+  document.querySelectorAll('.sophie-backend-btn,.backend-confirm-row').forEach(function(el){el.remove();});
+  document.querySelectorAll('.tag-backend-pending').forEach(function(el){el.remove();});
 }
 
 // ── Active nav highlight on scroll ──────────────────────────────────────────
