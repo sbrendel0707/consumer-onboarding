@@ -1628,13 +1628,17 @@ body {
 .sd-comment-text { font-size:12px; color:var(--hz-text); margin-top:4px; line-height:1.5; }
 
 /* ── Requirement comments ────────────────────────────────── */
+.req-comment-footer {
+  display:flex; justify-content:flex-end;
+  margin-top:8px; padding-top:6px;
+  border-top:1px solid var(--hz-border);
+}
 .req-comment-btn {
   display:inline-flex; align-items:center; gap:3px;
   font-size:11px; font-weight:600; color:var(--hz-muted);
   background:none; border:1px solid var(--hz-border);
   border-radius:6px; padding:2px 8px; cursor:pointer;
-  margin-top:8px; transition:all .12s;
-  float:right; clear:both;
+  transition:all .12s;
 }
 .req-comment-btn:hover, .req-comment-btn.has-comments { color:var(--hz-indigo); border-color:rgba(100,92,220,.35); background:rgba(100,92,220,.06); }
 .req-comment-panel { margin-top:10px; padding:10px; background:#f8f9ff; border:1px solid var(--hz-border); border-radius:8px; }
@@ -9404,7 +9408,10 @@ function initComments(currentUser) {
       e.stopPropagation();
       toggleCommentPanel(item, reqId);
     });
-    item.appendChild(btn);
+    var footer = document.createElement('div');
+    footer.className = 'req-comment-footer';
+    footer.appendChild(btn);
+    item.appendChild(footer);
 
     if (existing.length > 0) renderCommentThread(item, reqId, existing);
   });
