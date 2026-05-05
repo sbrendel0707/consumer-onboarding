@@ -365,6 +365,7 @@ body {
 .tag-status-it       { background: #ecfeff; color: #155e75; border: 1px solid #67e8f9; font-weight: 700; }
 .tag-status-inst     { background: #fff7ed; color: #9a3412; border: 1px solid #fb923c; font-weight: 700; }
 .tag-status-idea     { background: #fafafa; color: #52525b; border: 1px dashed #a1a1aa; font-weight: 700; }
+.tag-status-devdone  { background: #f0fdf4; color: #166534; border: 1px solid #86efac; font-weight: 700; }
 
 /* ── Status picker (Sophie mode) ─────────────────────── */
 .sophie-status-btn {
@@ -1544,6 +1545,7 @@ body {
     <div class="nav-group">
       <div class="nav-group-label">Solutions We Sell</div>
       <div class="nav-section-label">Pay Over Time Plans</div>
+      <a href="#sol-pot"             class="nav-link">Pay Over Time — Overview</a>
       <a href="#pp-standard"         class="nav-link">Standard Plans</a>
       <a href="#pp-pastdue"          class="nav-link">Past-Due Plans</a>
       <a href="#ltpp-overview"       class="nav-link">Long-Term Plans</a>
@@ -1566,7 +1568,7 @@ body {
       <a href="#guarantee-reports"   class="nav-link nav-sub-item">Guarantee · Reports</a>
       <a href="#pp-custom"           class="nav-link">Custom Plans</a>
       <div class="nav-section-label">Other Solutions</div>
-      <a href="#sol-epay"            class="nav-link">ePay</a>
+      <a href="#sol-epay"            class="nav-link">One Time Payments</a>
       <a href="#sol-billing"         class="nav-link">Billing</a>
       <a href="#sol-checkout"        class="nav-link">Checkout</a>
       <a href="#sol-notify"          class="nav-link">Notify</a>
@@ -1688,6 +1690,7 @@ body {
     <div class="nav-group">
       <div class="nav-group-label">Reporting Needs</div>
       <a href="#report-institution"  class="nav-link">Institution User Needs</a>
+      <a href="#report-urs"          class="nav-link">HE Reporting Suite (URS)</a>
       <a href="#report-nbs"          class="nav-link">NBS Needs</a>
       <a href="#report-it-product"   class="nav-link">IT &amp; Product Needs</a>
     </div>
@@ -3390,6 +3393,77 @@ body {
       </div>
     </section>
 
+
+    <!-- ════════════════════════════════════════
+         SOLUTIONS WE SELL — Pay Over Time Overview
+    ════════════════════════════════════════ -->
+    <section id="sol-pot" class="prd-section">
+      <div class="section-eyebrow">Solutions We Sell</div>
+      <h2 class="section-title">Pay Over Time — Solution Overview</h2>
+      <p class="section-subtitle">Pay Over Time is the next evolution of the Horizon Payment Platform, building on the foundation of One-Time Payments. It empowers institutions to offer flexible, scheduled payment options — seamlessly integrated with their existing systems to provide up-to-date account balance information and payment schedules. Students and their authorized parties can view outstanding balances, understand payment obligations, and enroll in a payment plan tailored to their individual needs, managing financial responsibilities with flexibility.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Plan Offer Configuration</h3>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Flexible Monthly Schedule Options.</strong> Institutions must be able to configure payment plan offers with flexible scheduling parameters: by completion date (plans end on a specified date regardless of enrollment date), by length of plan (fixed number of months), enrollment period (open and close dates for when students can enroll), and eligibility rules (minimum balance, enrollment status, student population segment). Multiple plan offers with different configurations can coexist for the same institution and term.</p>
+          <p class="req-why"><strong>Why:</strong> No two institutions structure their billing cycle or fiscal calendar identically. Configuration-driven plan offers let NBS serve diverse institutions without custom development for each client.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Return Policy Configuration.</strong> Each plan offer must include a configurable return policy defining: the number of returned payments allowed before the plan is terminated, whether a returned payment fee is assessed and the amount, and whether the student has an opportunity to resolve a return before plan termination is triggered. Return policy settings must be institution-configurable per plan offer type.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions have different risk tolerances for plan defaults. Some terminate after one return; others allow multiple retries. The return policy is the institution's primary lever for balancing student accommodation against financial risk.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Plan Notifications.</strong> The platform must send automated notifications for: upcoming installments (configurable lead time: 3, 5, 7 days before), courtesy notifications to the account owner (student) when an AP makes a payment, and return or problem notifications when a payment fails or a plan is at risk of termination. Notification channel (email, SMS, push) must be configurable per institution and per user preference.</p>
+          <p class="req-why"><strong>Why:</strong> Proactive notifications are the single highest-impact feature for reducing returned payments. A student who knows a payment is coming in 5 days can verify their bank balance; a student who doesn't know will have payments returned at a much higher rate.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Automatic Balance Sync.</strong> Active payment plan balances must automatically sync with the student's live account balance in the SIS/ERP. When the institution posts a new charge, removes a charge, or applies financial aid, the plan's remaining balance must recalculate according to the student's previously stated preference (extend duration vs. change installment amount). Sync must occur in real time, not on a nightly batch.</p>
+          <p class="req-why"><strong>Why:</strong> A plan that does not reflect the student's current account balance is not just incorrect — it creates the specific scenario where a student believes they owe less than they do, leading to collections for a "hidden" balance they didn't know about.</p>
+          <div class="req-tags"><span class="tag tag-erp">ERP / SSO</span></div>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Consumer Plan Management</h3>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Change Payment Method.</strong> Plan owners (student or authorized party) must be able to update their payment method on an active plan at any time before the next scheduled installment. The new method takes effect on the next installment. An attempt to update to an invalid or expired method must be rejected with a clear error. All payment method changes must be logged in the Agreement Change History.</p>
+          <p class="req-why"><strong>Why:</strong> Cards expire and bank accounts change. A plan owner who cannot update their payment method is a plan owner whose next installment will return — a situation entirely preventable with a simple self-service update.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Agreement Change History.</strong> Every change to a payment plan agreement — balance adjustments, payment method changes, installment reschedules, plan cancellations, return events — must be recorded in a timestamped change history visible to the plan owner in the consumer portal and to institution admins in the admin portal. Each entry must show: what changed, the actor (student, AP, institution admin, system), and the date/time.</p>
+          <p class="req-why"><strong>Why:</strong> When a student calls and says "my plan amount changed and I don't know why," the change history is the answer. Without it, every balance change generates a support escalation that requires manual investigation.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Agreement Terms &amp; Conditions.</strong> The plan owner must be able to access the full terms and conditions of their active agreement from the consumer portal at any time — not just at enrollment. The Ts&Cs displayed must be the exact version accepted at enrollment, stored immutably. If an institution updates its plan Ts&Cs, enrolled students continue to operate under the version they accepted.</p>
+          <p class="req-why"><strong>Why:</strong> Plan owners who need to reference their agreement terms must not have to call the bursar or search their email. On-demand access to the exact accepted version is a legal and trust requirement.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Consumer Plan Actions.</strong> Plan owners must be able to perform the following self-service actions directly from the portal: cancel their agreement (with confirmation and consequences disclosed), reschedule a single upcoming payment (within institution-configured rules), and initiate a request for NBS to refund or waive fees (routed as a service request to the appropriate institution or NBS contact). Payment Plan Invites (hidden plans, see Hidden Plans section) are initiated by the institution admin — not the student.</p>
+          <p class="req-why"><strong>Why:</strong> Self-service for routine plan actions eliminates the most common support contacts (rescheduling a payment, understanding fees) and gives plan owners a sense of control that increases plan completion rates.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Institution Plan Servicing</h3>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Cancel a Plan.</strong> Institution admins (and NBS Support Managers) must be able to cancel any active payment plan agreement. Cancellation immediately stops all scheduled future installments, updates the SIS flag to reflect plan termination, and triggers a notification to the plan owner. All cancellations are logged in the Agreement Change History with the acting user's identity, timestamp, and reason code.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions encounter scenarios that require plan cancellation independent of student action: enrollment cancellation, institutional error, hardship waiver. Admin-initiated cancellation must be a first-class supported workflow.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Reschedule an Installment.</strong> Institution staff (all CSR levels and above) must be able to reschedule any upcoming installment on an active plan to a different date, within institution-configured date constraints. Rescheduling a payment must recalculate the payment schedule and log the change. This action is available to all support roles because it is a routine service request that should not require manager escalation.</p>
+          <p class="req-why"><strong>Why:</strong> The most common plan-related support call is "can you move my payment date?" Restricting this to high-privilege roles would create an unnecessary bottleneck in the support queue and frustrate students with an easily resolvable request.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Duplicate a Plan Offer.</strong> Institution admins must be able to duplicate an existing plan offer configuration as the starting point for a new offer. The duplicated offer is saved as a draft and can be modified before publishing. This eliminates the need to reconfigure common settings (eligibility rules, installment count, return policy) from scratch when creating a similar plan for a new term.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions create similar plan configurations each term. A duplicate function reduces configuration time and the risk of misconfiguration from manual re-entry.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Past Due Arrangements — Additional Configuration.</strong> For past-due plan types, institution admins must be able to configure: weekly payment schedules (in addition to monthly), collection for institution-defined fee types (late fees, service fees specific to the institution's billing structure), balance amount type (how the past-due balance is calculated — outstanding balance only, or total account balance), and the ability to cancel a plan that has an invalid or expired payment method on file before the next payment attempt occurs.</p>
+          <p class="req-why"><strong>Why:</strong> Past-due arrangements involve students in more precarious financial situations. Weekly schedules and more granular balance configuration give institutions the flexibility to structure arrangements that the student can realistically honor — increasing recovery rates vs. a one-size-fits-all monthly plan.</p>
+        </div>
+      </div>
+    </section>
 
     <!-- ════════════════════════════════════════
          PAYMENT PLANS — STANDARD
@@ -5870,47 +5944,120 @@ body {
 
 
     <!-- ════════════════════════════════════════
-         SOLUTIONS WE SELL — ePay
+         SOLUTIONS WE SELL — One Time Payments
     ════════════════════════════════════════ -->
     <section id="sol-epay" class="prd-section">
       <div class="section-eyebrow">Solutions We Sell</div>
-      <h2 class="section-title">ePay</h2>
-      <p class="section-subtitle">ePay is the self-service online payment experience that allows students and authorized parties to make one-time payments against their student account balance via the Horizon consumer portal. It is the entry point for students who do not enroll in a payment plan and need to pay in full or make partial payments.</p>
+      <h2 class="section-title">One Time Payments</h2>
+      <p class="section-subtitle">One-Time Student Account Payments is the first deliverable of Project Horizon's Payment Platform. It connects institutions to their student information systems, presents real-time account balance data in a clear, actionable format, and enables students and their authorized parties to make payments and invite others to help meet their financial obligations. The core promise: students can always answer <em>what do I owe, why do I owe it, and when is it due</em> — and act on that answer without leaving the portal.</p>
       <hr class="section-divider"/>
 
       <div class="need-group">
-        <h3 class="need-group-title">Core Capability</h3>
-        <div class="req-item">
-          <p class="req-persona">As a student / authorized party</p>
-          <p class="req-text"><strong>One-Time Payment.</strong> Students and authorized parties must be able to make a one-time payment against their account balance from the Horizon consumer portal. Payment must be applicable to the full balance or to a specific charge type/amount (where institution configuration allows partial payment). Accepted methods: ACH/eCheck, credit/debit card. The student must receive a real-time confirmation with a payment reference number and confirmation email.</p>
-          <p class="req-why"><strong>Why:</strong> The majority of students who pay their balance in full do so with a single payment — not a plan. ePay is the highest-volume transaction type in the system. Any friction in the one-time payment flow directly translates into bursar call volume and delayed collections.</p>
+        <h3 class="need-group-title">Real-Time Balance Integration &amp; Account Presentment</h3>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Real-Time Account Balance Integration.</strong> Horizon must connect to the institution's Student Information System (SIS) or ERP via a certified integration (cloud connector) to retrieve the student's current account balance in real time at the point of portal access. The balance must reflect all charges, credits, financial aid applied, and anticipated aid — sourced directly from the institution's system, never cached or approximated.</p>
+          <p class="req-why"><strong>Why:</strong> Any lag between the institution's ledger and what the student sees in Horizon causes payment errors, double-payment disputes, and support calls. Real-time sourcing is the foundation of the trust model.</p>
         </div>
-        <div class="req-item">
-          <p class="req-persona">As a student / authorized party</p>
-          <p class="req-text"><strong>Saved Payment Methods.</strong> Students must be able to save one or more payment methods (bank account or card) for future use. Saved methods must be accessible across sessions and must be tokenized — no raw card numbers or account numbers stored in Horizon. Students must be able to add, delete, and set a default payment method from their account settings.</p>
-          <p class="req-why"><strong>Why:</strong> Forcing students to re-enter payment information on every visit is the primary driver of payment abandonment in self-service portals. Saved methods reduce friction to near-zero for repeat payments.</p>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Account Presentment.</strong> The student's account view must display a clear breakdown of: total charges by type and date, financial aid applied vs. anticipated, net balance due, due date(s), and any holds or flags on the account. The presentation must answer the three core questions — <em>what do I owe, why do I owe it, when is it due</em> — without requiring the student to navigate to a separate screen or download a statement.</p>
+          <p class="req-why"><strong>Why:</strong> The most common bursar support call is a student who cannot understand their bill. Presenting the balance in a clear, contextualized format directly reduces call volume and builds student confidence in their financial standing.</p>
         </div>
-        <div class="req-item">
-          <p class="req-persona">As an institution admin</p>
-          <p class="req-text"><strong>Partial Payment Configuration.</strong> Institutions must be able to configure whether students may make partial payments (amount less than the full balance due) or whether the portal requires payment in full. For institutions that allow partial payments, a minimum payment amount floor must be configurable. This setting should be configurable per Payment Space.</p>
-          <p class="req-why"><strong>Why:</strong> Institutions have different collection philosophies. Some require payment in full to prevent students from gaming the system with de minimis partial payments. Others prefer partial payments over no payment. Institution control over this setting is necessary to maintain their collection policy.</p>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Real-Time Transaction Posting to ERP.</strong> Every payment processed through Horizon must post back to the institution's ERP/SIS in real time via the cloud connector. The posting must update the student's ledger balance within the institution's system as soon as the payment is confirmed, not on a batch schedule. Posting failures must be flagged immediately with retry logic and alerts to institution admins.</p>
+          <p class="req-why"><strong>Why:</strong> If Horizon shows a payment as processed but the institution's system still shows a balance due, students face holds, registration blocks, or collections actions for balances they've already paid. Real-time posting is the difference between a trustworthy platform and a liability.</p>
+          <div class="req-tags"><span class="tag tag-erp">ERP / SSO</span></div>
         </div>
       </div>
 
       <div class="need-group">
-        <h3 class="need-group-title">Authorized Party Payments</h3>
-        <div class="req-item">
-          <p class="req-persona">As an authorized party (parent, guardian, employer)</p>
-          <p class="req-text"><strong>AP-Initiated Payment.</strong> Authorized parties with payment permission must be able to log in to the Horizon portal with their own credentials (not the student's) and make payments on the student's behalf. The AP experience must show the student's current balance (as permitted by the student's visibility grant), allow payment, and send confirmation to both the AP and the student.</p>
-          <p class="req-why"><strong>Why:</strong> A significant portion of higher education payments are made by parents and families, not students. Blocking APs from making payments without the student's active involvement creates real friction — many families want to pay bills directly without coordinating with their student for every transaction.</p>
+        <h3 class="need-group-title">Student &amp; Authorized Party Payments</h3>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Student One-Time Payment.</strong> Students must be able to make a one-time payment against their account balance via the Horizon consumer portal. Payment must be applicable to the full balance due or to specific charges (where institution configuration allows). Accepted methods: ACH/eCheck and credit/debit card. The student must receive a real-time confirmation screen with a payment reference number, a confirmation email/notification, and an immediate balance update in the portal.</p>
+          <p class="req-why"><strong>Why:</strong> One-time payment is the highest-volume transaction type on the platform. Any friction in the flow — extra steps, unclear balance data, confusing confirmation — directly translates into abandonment, increased support contacts, and delayed collections.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Authorized Party (AP) Access &amp; Payments.</strong> Authorized parties invited by a student must have their own Horizon portal credentials and their own dashboard showing the student's balance (per the student's visibility grant). APs must be able to make one-time payments on the student's behalf from their own account. Both the AP and the student must receive payment confirmation. The AP experience is distinct from the student's — APs do not see the student's full academic record, only the financial data the student has shared.</p>
+          <p class="req-why"><strong>Why:</strong> A significant proportion of higher education payments are made by parents and families, not students. APs need their own authenticated access — sharing student credentials is a security and privacy risk, and it is not a workflow that works for most families.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Student Management of Authorized Parties.</strong> Students must be able to invite, view, and revoke Authorized Parties from their portal at any time. When inviting an AP, the student sets the level of access (view balance only, or view + pay). Each invitation is sent to the AP's email address. Students can revoke AP access at any time; revocation takes effect immediately and removes the AP's ability to view or pay on the account.</p>
+          <p class="req-why"><strong>Why:</strong> FERPA places the student in control of who can see their financial information. The student-managed invite model ensures compliance while providing a self-service workflow that doesn't require institution admin involvement for every AP relationship.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>AP Management of Student Relationship.</strong> Authorized Parties must be able to manage their own account settings (email, notification preferences, payment methods) independently of the student. An AP who manages payments for multiple students (e.g., a parent paying for two children at the same institution) must have a single AP account showing all student accounts they have access to, with clear switching between student contexts.</p>
+          <p class="req-why"><strong>Why:</strong> An AP forced to create a separate account for each student they pay for is an AP who will call support. Multi-student AP access with a single login reduces friction for the most engaged payers on the platform.</p>
         </div>
       </div>
 
       <div class="need-group">
-        <h3 class="need-group-title">Guest Payment</h3>
-        <div class="req-item">
-          <p class="req-text"><strong>Guest / Anonymous Payment (Institution-Configurable).</strong> Institutions must be able to enable a guest payment path that allows someone to make a payment without creating or logging into a Horizon account — using only a student ID and institution-provided lookup key. Guest payments must be processed through the same payment rails as authenticated payments but must not create or modify any account data beyond recording the transaction. Guest payment is off by default.</p>
-          <p class="req-why"><strong>Why:</strong> Some institutions have payers (employers, third-party scholarship organizations) who need to make payments but will never create a student portal account. A guest path removes the barrier without compromising the portal's account security model.</p>
+        <h3 class="need-group-title">Guest Payments</h3>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Guest Payment Invite (Student-Initiated).</strong> Students must be able to generate a one-time guest payment link from their portal and share it with a third party (e.g., an employer, a scholarship organization, a grandparent) who does not have or want a Horizon account. The guest link is tied to the student's account, is valid for a configurable period, and may be limited to a specific payment amount. The guest payer does not need to create an account.</p>
+          <p class="req-why"><strong>Why:</strong> Not every third-party payer will create an account. A guest link provides a zero-friction path for ad-hoc payments from payers who have a specific need but will not become recurring users of the portal.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Guest Payer Experience.</strong> The guest payment flow accessed via the invite link must: clearly identify which student and institution the payment is for, display the amount requested (if specified) or allow the guest to enter a payment amount within institution-configured limits, accept card and ACH payment, send a confirmation receipt to the guest's email, and notify the student that the payment was made. The guest payment flow must not require account creation at any step.</p>
+          <p class="req-why"><strong>Why:</strong> A guest payer who encounters a sign-up wall will abandon the payment and the student will have to seek another method. The no-account-required constraint is non-negotiable for this flow to serve its purpose.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Payment Processing</h3>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Card &amp; Bank Payments.</strong> The platform must accept ACH/eCheck and credit/debit card payments (Visa, Mastercard, Discover, Amex) for all payment types: student one-time, AP one-time, guest, and plan installments. Payment method selection and entry must be available in a single step. Card numbers must be tokenized; no raw card data may be stored in Horizon systems. PCI DSS compliance is mandatory.</p>
+          <p class="req-why"><strong>Why:</strong> Card and bank payments are the universal expectation for consumer financial transactions. Limiting payment methods is a direct cause of abandonment and is not acceptable for a product competing in the higher education fintech space.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Returned Payment Handling.</strong> When a payment is returned (ACH return, card chargeback, insufficient funds), the platform must: immediately reverse the balance credit in the portal, notify the student and any relevant APs via the appropriate communication channel, apply any returned payment fee configured by the institution, and surface the returned payment prominently in the student's account view. Multiple returned payments by the same payer must trigger a configurable restriction on future ACH payments.</p>
+          <p class="req-why"><strong>Why:</strong> Returned payments that are not surfaced immediately create a window where the student believes their balance is paid but it is not — potentially leading to a registration hold that surprises them days later. Prompt, visible notification reduces that harm.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Statements &amp; Communication History</h3>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>On-Demand Statement.</strong> Students and authorized parties must be able to generate an on-demand account statement from the portal at any time. The statement must show the current account balance, all charges by type and date, all payments and credits applied, and the net amount due. The statement must be downloadable as a formatted PDF. On-demand statements are distinct from billed statements — they reflect the real-time account state at the moment of generation.</p>
+          <p class="req-why"><strong>Why:</strong> Students frequently need statements for scholarship applications, employer reimbursements, FAFSA verification, and appeals. An on-demand statement eliminates the need to contact the bursar's office for a document they can self-serve in under a minute.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Communication History.</strong> The platform must maintain and surface a complete communication history for each student account, including: payment confirmation receipts, refund receipts, returned payment notices, courtesy notifications to students and APs regarding payment activity, guest payer invite messages, and any institution-generated balance notifications. All communications must be timestamped and accessible in the portal for a minimum of 24 months.</p>
+          <p class="req-why"><strong>Why:</strong> Disputes ("I never received a notice," "I have a receipt") are the primary driver of compliance risk and bursar call volume. An immutable, accessible communication history is the platform's defense layer — both for the institution in an audit and for the student in a dispute.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Institution Admin &amp; Servicing</h3>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Institution User Access &amp; Assisted Payments.</strong> Institution staff with appropriate roles must be able to access any student's account, view their real-time balance and transaction history, and initiate payments on a student's behalf (assisted payment) when the student calls in or visits in person. Assisted payments must be logged with the acting staff member's identity. The institution admin portal must be distinct from the student portal but share the same underlying account data.</p>
+          <p class="req-why"><strong>Why:</strong> A significant portion of payments in higher education are still assisted — a student hands a card to a bursar staff member who processes it. The platform must support this workflow natively rather than requiring staff to use a separate legacy system for in-person transactions.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Servicing Actions — Refunds, Chargebacks, Notes.</strong> Institution admins must be able to perform standard payment servicing actions from the admin portal: issue refunds against posted transactions (per role-based permission rules), manage chargeback responses by providing transaction documentation, and add internal notes to student account records. Servicing notes must be timestamped, attributed to the acting user, and retained in the audit log.</p>
+          <p class="req-why"><strong>Why:</strong> Refunds and chargeback management are routine financial operations that must be handled within Horizon to maintain a complete transaction record. Forcing staff to use external systems for these actions creates reconciliation gaps.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Future Roadmap (Prioritized)</h3>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>International Payments — Flywire.</strong> Integration with Flywire to enable international students to pay in their home currency via Flywire's international payment network. The payment is converted to USD and posted to the student's account as a standard transaction. Students must be able to initiate an international payment from their Horizon portal and receive a confirmation referencing both the Flywire transaction and the Horizon record.</p>
+          <p class="req-why"><strong>Why:</strong> International students are a growing and high-value student population at most institutions. Without an integrated international payment path, these students face friction converting currency and lose confidence that their payments are being applied correctly.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>International Payments — Convera.</strong> Integration with Convera as an alternative international payment provider, providing an additional international payment option alongside Flywire for institutions that have existing Convera relationships or prefer its routing.</p>
+          <p class="req-why"><strong>Why:</strong> Institutional payment vendor relationships vary; offering two international payment integrations lets institutions work with their preferred provider without requiring platform switching.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Multiple Accounts per Student.</strong> Support for students who have multiple account balances at the same institution (e.g., undergraduate + continuing education, or housing account separate from tuition). Each account must be presentable independently with its own balance, charges, and payment history, while the student can switch between accounts in a single portal session.</p>
+          <p class="req-why"><strong>Why:</strong> Larger institutions often have distinct billing systems for different programs or departments. Students enrolled in multiple programs need a unified payment experience without being forced to manage separate logins or portals.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Student Choice Refunds Integration.</strong> Integration to support student-directed refund disbursement — students select their preferred method (bank transfer, prepaid card, check) for receiving credit balance refunds from the institution. The integration must support at least one Student Choice provider and must surface refund status in the Horizon portal.</p>
+          <p class="req-why"><strong>Why:</strong> Credit balance refunds (excess aid, overpayments) are a major student pain point when institutions default to check-by-mail. Student Choice integrations directly improve student financial wellness and satisfaction.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Additional Roadmap Items.</strong> The following capabilities are identified for future phases: Account Presentment &amp; Authorized Party Enhancements · Customization of On-Demand Statement · Bulk Credit Card Refunds · NBS Service Fee Servicing · Banner ERP Integration · Tuition Insurance · System Maintenance Window Configuration · SSO to Direct Authentication Migration · Activity Card on Person Dashboard · Future-Dated Payments.</p>
+          <p class="req-why"><strong>Why:</strong> Documenting roadmap items in the PRD ensures they are visible during architecture and API design decisions — building with future integrations in mind prevents costly refactoring when these features are scoped.</p>
         </div>
       </div>
     </section>
@@ -5921,34 +6068,50 @@ body {
     <section id="sol-billing" class="prd-section">
       <div class="section-eyebrow">Solutions We Sell</div>
       <h2 class="section-title">Billing</h2>
-      <p class="section-subtitle">Horizon Billing is the statement presentment and billing communication layer — the outbound notifications, digital statements, and balance visibility that drive students to take action on their account. Billing is distinct from payment processing: it creates the awareness that precedes the payment.</p>
+      <p class="section-subtitle">Billing is the process institutions use to deliver amounts owed to account holders and their authorized parties at defined intervals — monthly, by academic term, or event-driven. Its primary purpose is to inform users that a balance exists and action is required. Horizon Billing reinvents this for modern higher education: shifting from static PDFs, batch jobs, and fragile audit trails to a real-time, event-driven, compliant, durable billing platform. Every notification is immutable, linked to who was notified and when — the first truly audit-ready billing system in higher education.</p>
       <hr class="section-divider"/>
 
       <div class="need-group">
         <h3 class="need-group-title">Statement Presentment</h3>
-        <div class="req-item">
-          <p class="req-persona">As a student / authorized party</p>
-          <p class="req-text"><strong>Digital Statement Generation.</strong> The platform must generate a digital billing statement for each student each term showing: all charges assessed by type and date, all credits and payments applied, net balance due, due date, available payment options (link to portal, payment plan enrollment), and the institution's contact information for billing questions. Statements must be accessible in the consumer portal under account history and must be available for download as PDF.</p>
-          <p class="req-why"><strong>Why:</strong> Students who can see a clear, itemized statement are significantly less likely to call the bursar asking "what am I paying for." Statement clarity is one of the highest-impact consumer experience improvements an institution can make, and it does not require any change to their billing policy — only presentation.</p>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Digital Billing Statement Generation.</strong> The platform must generate a digital billing statement for each student each term. Each statement must include: all charges assessed by type and date, all credits and payments applied, net balance due, due date(s), available payment options (direct link to portal, payment plan enrollment), and the institution's billing contact information. Statements must be accessible in the consumer portal under account history and downloadable as formatted PDF. Statements are point-in-time snapshots — immutable once generated — and must be stored for the full retention period.</p>
+          <p class="req-why"><strong>Why:</strong> An immutable, point-in-time statement snapshot is far more defensible in audit, dispute, and collections scenarios than a regenerated PDF. Institutions facing regulatory scrutiny need evidence of what was communicated and when — not a best-effort reconstruction.</p>
         </div>
-        <div class="req-item">
-          <p class="req-persona">As a student / authorized party</p>
-          <p class="req-text"><strong>Statement Delivery Notification.</strong> When a new statement is generated, the platform must notify the student (and any authorized parties with balance visibility) via email. The notification must include a direct link to the portal and a summary of the amount due and due date. The notification must be delivered within 24 hours of statement generation and must comply with the institution's communication configuration.</p>
-          <p class="req-why"><strong>Why:</strong> Studies consistently show that email notification at bill generation drives earlier payment than waiting for students to check the portal proactively. The goal is zero students who miss a due date because they didn't know a bill was posted.</p>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>On-Demand Statement.</strong> Students and authorized parties must be able to generate an on-demand account statement reflecting the real-time account state at the moment of generation. On-demand statements are distinct from billed statements: they reflect current balance, not a billing-cycle snapshot. Downloadable as PDF. Students use these for scholarship applications, employer reimbursements, FAFSA verification, and financial aid appeals.</p>
+          <p class="req-why"><strong>Why:</strong> On-demand statements reduce billing office inquiries. Students who can self-serve their own statement documentation do not need to contact the bursar — a meaningful operational savings at scale across thousands of students.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Statement Delivery Notification.</strong> When a new billing statement is generated, the platform must notify the student and any authorized parties with balance visibility via their preferred channel (email, SMS, push). The notification must include: a direct link to the portal, the amount due, and the due date. Delivery must occur within 24 hours of statement generation. Delivery status and read receipt must be captured and stored as part of the communication history.</p>
+          <p class="req-why"><strong>Why:</strong> Notification-at-bill-generation drives earlier payment than waiting for students to check the portal proactively. Read tracking and delivery confirmation eliminate the "I never received a bill" dispute — institutions can prove notification was sent and opened.</p>
         </div>
       </div>
 
       <div class="need-group">
-        <h3 class="need-group-title">Bill Management &amp; Reminders</h3>
-        <div class="req-item">
-          <p class="req-persona">As an institution admin</p>
-          <p class="req-text"><strong>Bill Due Date Reminders.</strong> The platform must send configurable pre-due-date reminders to students with outstanding balances: N days before the due date (configurable: 7, 14, 30), on the due date, and N days after the due date if still unpaid (late notice). Reminder cadence and content must be configurable per institution. Reminders must be suppressed for students who are enrolled in a payment plan that covers their outstanding balance.</p>
-          <p class="req-why"><strong>Why:</strong> The suppression of reminders for students on plans is as important as sending them for students who aren't. Sending a "your balance is overdue" email to a student who is faithfully paying their monthly plan installment destroys trust and generates needless support contacts.</p>
+        <h3 class="need-group-title">Billing Communications &amp; Reminders</h3>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Configurable Due Date Reminders.</strong> The platform must send automated pre-due-date reminders to students with outstanding balances: configurable N days before the due date (options: 7, 14, 30 days), on the due date, and N days after if still unpaid. Reminder cadence, content, and channel must be configurable per institution. Reminders must be automatically suppressed for students enrolled in a payment plan that covers their outstanding balance — sending an overdue notice to a student making faithful plan payments is an error, not just an annoyance.</p>
+          <p class="req-why"><strong>Why:</strong> Intelligent suppression of reminders for plan-enrolled students is as important as sending them for non-enrolled students. Getting this wrong erodes student trust and generates avoidable support contacts.</p>
         </div>
-        <div class="req-item">
-          <p class="req-persona">As a student / authorized party</p>
-          <p class="req-text"><strong>Paperless Billing Enrollment.</strong> Students must be able to opt into paperless billing (digital-only statements) via the consumer portal. Institutions that have configured paper statement generation via a third-party mail house must suppress paper delivery for opted-in students. Paperless enrollment status must be available in the institution's admin reporting.</p>
-          <p class="req-why"><strong>Why:</strong> Paper statement costs are a significant line item for large institutions. Driving students to paperless billing is both a cost reduction for the institution and a consumer preference for the growing portion of students who have never expected paper mail as a primary communication channel.</p>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Communication History — Full Audit Record.</strong> Every billing communication — statement generation notifications, due date reminders, late notices, payment confirmations, refund receipts, returned payment notices — must be recorded in an immutable, timestamped communication history linked to the student's account. The history must record: communication type, delivery channel, delivery status, read status (where the channel supports it), and the content snapshot. This record must be accessible to institution admins and exportable for audit purposes.</p>
+          <p class="req-why"><strong>Why:</strong> Communication history is the platform's defense layer. When a student claims "I never received a notice" or a regulator asks "what did you communicate and when," the communication history is the answer. Immutability means it cannot be altered after the fact — which is what makes it defensible.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Paperless Billing Enrollment.</strong> Students must be able to opt into paperless billing (digital-only) via the consumer portal. For institutions with paper statement delivery via a third-party mail house, Horizon must suppress paper delivery for opted-in students. Paperless status must be recorded and available in institution reporting.</p>
+          <p class="req-why"><strong>Why:</strong> Paper statements are a significant cost center for large institutions and a friction point for students who expect digital-first communication. Driving paperless adoption is a direct cost reduction and a consumer experience improvement.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Billing Platform Architecture</h3>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Event-Driven Billing Architecture.</strong> The billing engine must be event-driven: billing statements are triggered by defined account events (charge posted, aid applied, due date set) rather than batch jobs on a fixed schedule. This enables support for any billing model — term-based, monthly, rolling, cohort-based — without architectural changes. The event model must be extensible so that new billing triggers can be added without rebuilding the notification service.</p>
+          <p class="req-why"><strong>Why:</strong> Batch-based billing systems break in non-standard calendar scenarios (rolling programs, accelerated terms, cohort-based pricing). An event-driven architecture is the foundation that supports the full spectrum of higher education billing models without special-casing each one.</p>
+        </div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Customizable Statement Template.</strong> Institutions must be able to configure the visual presentation of their billing statements: institution logo, header/footer content, contact information, color scheme, and which charge categories are shown as distinct line items vs. grouped. Template changes must take effect on the next billing cycle without requiring NBS engineering involvement.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions have different branding requirements and different conventions for how they present charges. A configurable template eliminates institution-specific development work and lets the institution control how their students experience billing.</p>
         </div>
       </div>
     </section>
@@ -6321,40 +6484,110 @@ body {
     <section id="plat-access-management" class="prd-section">
       <div class="section-eyebrow">Platform Requirements</div>
       <h2 class="section-title">Access Management</h2>
-      <p class="section-subtitle">Role-based access control across institution admin users, NBS staff, students, and authorized parties. Covers permissioning models, authentication requirements, and session management.</p>
+      <p class="section-subtitle">Role-based access control across institution admin users, NBS internal staff, students, and authorized parties. Defines the six institution role types, three NBS staff roles, ten permission-secured platform actions, and user provisioning requirements.</p>
       <hr class="section-divider"/>
 
       <div class="need-group">
         <h3 class="need-group-title">Institution Admin Roles</h3>
         <div class="req-item">
-          <p class="req-text"><strong>Role Hierarchy.</strong> The platform must support a configurable role hierarchy for institution admin users. At minimum: (1) Super Admin — full configuration, reporting, and user management access; (2) Finance Admin — payment processing, settlement, and reporting access; (3) Student Services Rep — view student accounts, process manual adjustments, create custom plans; (4) Read-Only — view access to student accounts and reports, no modification capability. Institutions must be able to create additional custom roles and assign specific permissions from a defined capability set.</p>
-          <p class="req-why"><strong>Why:</strong> Bursar offices, financial aid offices, and student services teams all need access to Horizon but with very different permission scopes. Overly broad access creates audit and compliance risk; overly narrow access creates operational friction and support escalations.</p>
+          <p class="req-text"><strong>Full Admin.</strong> The Full Admin role is the institution-level super-user. A Full Admin has unrestricted access to every feature within the institution's Horizon tenant: configuration (payment plan setup, fee rules, term windows), user management (add/deactivate/modify all institution users and roles), student account management (view, adjust, override), reporting (all reports including audit log export), and payment operations (process payments, issue refunds, cancel plans). At least one Full Admin must be designated per tenant at go-live. Full Admin can delegate any subset of their capabilities to lower roles.</p>
+          <p class="req-why"><strong>Why:</strong> Every institution needs a single owner-level account that can act on any situation without contacting NBS support. This is the role held by the Bursar Director or VP of Finance — the person who is ultimately accountable for the tenant's configuration and financial accuracy.</p>
         </div>
         <div class="req-item">
-          <p class="req-persona">As a Super Admin</p>
-          <p class="req-text"><strong>Admin User Provisioning.</strong> Super Admins must be able to add, deactivate, and modify admin user accounts within their institution tenant without requiring NBS involvement. Deactivation must be immediate and must terminate all active sessions for the deactivated user. The platform must maintain an audit log of all user provisioning actions, including who made the change and when.</p>
-          <p class="req-why"><strong>Why:</strong> Staff turnover at institutions is continuous. If deactivating a departed employee requires an NBS ticket, there is a window of unauthorized access between the employee leaving and NBS processing the request. Self-service deactivation closes that window and satisfies IT security requirements.</p>
+          <p class="req-text"><strong>Finance Admin.</strong> The Finance Admin role covers all payment and financial operations but excludes system configuration changes and user management. Finance Admins can: process and reverse payments, issue refunds, enroll and cancel payment plans on behalf of students, generate and export all financial reports (daily activity, plan enrollment, reconciliation, audit log), and view complete student account history. Finance Admins cannot: modify plan templates, change fee rules, add or deactivate other users, or change institution-level configuration settings.</p>
+          <p class="req-why"><strong>Why:</strong> At most institutions, the staff who process daily financial transactions are not the same people who configure the system. The Finance Admin role gives bursar cashiers and accounts receivable staff the operational access they need without exposing system configuration to change risk from high-turnover front-line staff.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Student Services Rep.</strong> The Student Services Rep role is scoped to student-account-level operations: view student balance and account history, view active and historical payment plans, make payments on behalf of a student (with student verification), create custom payment arrangements (subject to institutional policy configuration), and add notes to a student account. Student Services Reps cannot: generate financial reports, view aggregate institution-level data, issue refunds, cancel plans, or access system configuration. They have read access to the plan catalog to answer enrollment questions.</p>
+          <p class="req-why"><strong>Why:</strong> Student services front desks handle a high volume of student-facing inquiries. They need enough account visibility to answer questions and take action without the ability to accidentally trigger financial operations (refunds, cancellations) that require supervisory review. The restriction on aggregate reporting is also a FERPA risk mitigation — student services reps should not be able to export bulk student data.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Reporting &amp; Compliance Admin.</strong> The Reporting &amp; Compliance Admin role provides read-only access to all reports and audit logs, including the Financial Responsibility Agreement completion report, audit log export, outstanding balance report, and term reconciliation report. This role cannot view individual student account details beyond what appears in report exports, cannot initiate any transactions, and cannot access system configuration. Designed for internal audit, compliance, and institutional research staff who need data visibility without operational access.</p>
+          <p class="req-why"><strong>Why:</strong> Many institutions have compliance officers, internal auditors, or institutional research staff who need periodic access to Horizon data for audit, accreditation, or analysis purposes. Without a read-only reporting role, institutions are forced to either share Finance Admin credentials (a compliance violation) or route all data requests through bursar staff (an operational burden).</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Payment Plan Coordinator.</strong> The Payment Plan Coordinator role is a specialized operations role focused entirely on payment plan lifecycle management. Coordinators can: enroll students in payment plans, modify active plan schedules (within configured rules), cancel plans with required documentation, view and respond to plan-related student communications, and generate plan-specific reports (enrollment, delinquency, upcoming payment). They cannot: process non-plan payments, issue refunds, access billing/statement presentment, or modify plan configuration templates. This role is designed for institutions that have dedicated staff for payment plan operations separate from general accounts receivable.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions with high payment plan volume (typically those with a high percentage of first-generation or lower-income students) often have dedicated staff whose entire job is plan servicing. The Payment Plan Coordinator role lets NBS support those operational models without forcing coordinators to use overly broad Finance Admin access.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Read-Only Viewer.</strong> The Read-Only Viewer role provides view-only access to student accounts and active payment plans within the institution tenant. Viewers can see student balances, payment history, active plan details, and account notes. They cannot initiate any transactions, generate reports, access configuration, or view audit logs. This role is appropriate for enrollment management staff or financial aid advisors who need to verify a student's payment status before advising on financial aid or registration holds, but who have no operational function within Horizon.</p>
+          <p class="req-why"><strong>Why:</strong> Cross-departmental visibility into student account status is a common institutional need — financial aid needs to know if a student is on a plan before advising on enrollment, and academic advisors need to know if a hold is payment-related before directing a student to appeal. Read-Only satisfies this without introducing operational risk.</p>
         </div>
       </div>
 
       <div class="need-group">
-        <h3 class="need-group-title">NBS Staff Access</h3>
+        <h3 class="need-group-title">NBS Internal Roles</h3>
         <div class="req-item">
-          <p class="req-text"><strong>NBS Support Access Model.</strong> NBS staff (implementation, PAS support, technical support) must access institution tenants through a separate NBS-internal access path that is logged, time-bounded, and auditable. NBS access must be scoped to the purpose — an implementation engineer should not have the same access as a PAS support agent. All NBS-initiated actions on a student account must be visibly stamped in the audit log as NBS-sourced, not institution-sourced.</p>
-          <p class="req-why"><strong>Why:</strong> Institutions need confidence that NBS staff cannot arbitrarily access student records. Audit trails that distinguish NBS actions from institution actions protect both parties in any dispute or regulatory inquiry.</p>
+          <p class="req-text"><strong>NBS Implementation Engineer.</strong> The NBS Implementation Engineer role provides access to institution tenant configuration during the implementation phase. Implementation Engineers can create and modify payment plan templates, configure fee rules, set up ERP integration parameters, configure communication templates, and provision initial institution admin users. Implementation Engineer access to a tenant is time-bounded — it must be automatically restricted to read-only upon go-live, with Full Admin access requiring explicit re-authorization per incident. All Implementation Engineer actions must be stamped in the audit log as NBS-sourced with the specific NBS user's identity.</p>
+          <p class="req-why"><strong>Why:</strong> Ongoing broad configuration access for implementation engineers after go-live is a security and compliance risk — institutions have contractual and regulatory expectations that NBS cannot silently modify their configuration. Time-bounding implementation access enforces a clean handoff to institution ownership and reduces the blast radius of any accidental or unauthorized configuration change post-launch.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>NBS PAS Support Agent.</strong> The NBS PAS (Payment Administration Services) Support Agent role provides access to perform plan re-enrollment operations, process exceptions, and make manual adjustments on behalf of institutions that have contracted PAS services. PAS Agents can: view and enroll students in payment plans, process scheduled payments, handle NSF/return events, and add account notes. PAS Agents cannot: modify plan templates, issue refunds outside of returned payment reversals, access reporting, or modify institutional configuration. PAS Agent access is perpetual for institutions under a PAS contract but is institution-scoped — a PAS agent for Institution A cannot access Institution B.</p>
+          <p class="req-why"><strong>Why:</strong> PAS is a managed service where NBS staff perform operational work on behalf of the institution. The role must be carefully scoped to exactly what PAS operations require — broad access would expose institutions to risk and erode trust in the PAS model as a managed service rather than full admin outsourcing.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>NBS Technical Support.</strong> The NBS Technical Support role provides read-only access to student accounts and system logs for troubleshooting purposes. Technical Support cannot initiate transactions, modify configuration, or access audit log exports. Technical Support access to a tenant requires a logged support ticket reference — access must not be possible without a ticket number, and the ticket-access linkage must appear in the audit trail. This role is for diagnosing integration issues, payment processing failures, and data sync problems without operational capability.</p>
+          <p class="req-why"><strong>Why:</strong> Technical support staff need to reproduce and diagnose issues, which requires seeing account state. However, giving support staff operational access creates risk of accidental or unauthorized changes. The ticket-linkage requirement creates accountability — every technical support access event is traceable to a specific institutional request.</p>
         </div>
       </div>
 
       <div class="need-group">
-        <h3 class="need-group-title">Student &amp; Authorized Party Authentication</h3>
+        <h3 class="need-group-title">Secured Actions &amp; Permission Matrix</h3>
         <div class="req-item">
-          <p class="req-text"><strong>SSO Integration.</strong> Students must be able to authenticate to Horizon using their institution's existing single sign-on system (SAML 2.0 / OIDC). The SSO integration must support attribute passing from the IdP so that Horizon receives the student's institutional ID, enrollment status, and campus affiliation without requiring a separate registration step. Horizon must support multiple SSO providers per institution for multi-campus configurations.</p>
-          <p class="req-why"><strong>Why:</strong> Students experiencing a separate login and credential for Horizon will either forget the password or abandon the session. SSO drives adoption by removing authentication friction. Attribute passing eliminates the need for a separate enrollment sync to determine which students should have Horizon access.</p>
+          <p class="req-text"><strong>Cancel Active Payment Plan.</strong> Cancelling an active payment plan is a high-stakes irreversible action that immediately terminates scheduled payments, triggers cancellation communications, and may affect a student's registration hold status. This action requires: Finance Admin or Full Admin role (Student Services Rep and lower cannot cancel plans), a mandatory reason code selection from a configurable list, an optional free-text note, and a confirmation modal that surfaces the plan's remaining balance and the student's current hold status before execution. The cancel action must be logged in the audit trail with actor, timestamp, reason code, and the plan's state at time of cancellation.</p>
+          <p class="req-why"><strong>Why:</strong> Plan cancellation errors are one of the most common complaint types NBS receives from institutions — a cancelled plan that should have been modified, or a plan cancelled on the wrong student account, causes significant downstream consequences (hold reinstated, student can't register, angry calls to bursar). The confirmation step and reason code requirement create a friction-and-documentation layer that catches most errors before they are committed.</p>
         </div>
         <div class="req-item">
-          <p class="req-persona">As a student</p>
-          <p class="req-text"><strong>Authorized Party Account Access.</strong> Students must be able to grant authorized parties (parents, spouses, employers) access to their Horizon account. The student controls what the authorized party can see (balance only vs. full account) and do (view-only vs. make payments). Authorized party access must be revocable by the student at any time. Authorized parties must authenticate separately from the student and must not be able to use the student's credentials.</p>
-          <p class="req-why"><strong>Why:</strong> FERPA prohibits sharing student financial information with third parties without student consent. The authorized party framework operationalizes FERPA compliance while enabling the family payment patterns that institutions depend on for collections — many balances are paid by parents, not students.</p>
+          <p class="req-text"><strong>Process Manual Refund.</strong> Issuing a refund to a student's payment method is restricted to Finance Admin and Full Admin roles. The refund workflow must: (1) require selection of the original transaction being refunded (refunds cannot be issued without a linked source transaction); (2) enforce refund amount ≤ original transaction amount; (3) require a reason code and optional note; (4) surface a confirmation step showing the student's name, refund amount, destination payment method, and estimated processing time; (5) log the full refund record in the audit trail. Refunds on payments older than the configured lookback window (default: 180 days) must require Full Admin approval.</p>
+          <p class="req-why"><strong>Why:</strong> Refund fraud and error are high-frequency problems in student accounts receivable. Requiring transaction linkage prevents issuing refunds that don't correspond to real payments. The 180-day approval gate catches the edge case of a staff member trying to issue a refund on a payment that has already been reconciled and closed.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Student Account Impersonation / View As.</strong> NBS Technical Support and Implementation Engineers can activate a "View As" mode that renders the student-facing Horizon interface as it appears to a specific student, for troubleshooting and QA purposes. View As is strictly read-only — no transactions can be initiated while in View As mode. View As sessions must be logged with the NBS user's identity, the student account accessed, the ticket reference, and the session start and end timestamps. View As must not be available to any institution-side role at any permission level — institution staff must never be able to impersonate a student account.</p>
+          <p class="req-why"><strong>Why:</strong> View As is the primary debugging tool for student-reported UI/UX issues that are difficult to reproduce in a test environment. Restricting it to NBS-only access with mandatory logging addresses both the FERPA concern (accessing a student's account view) and the operational risk (institution staff using View As to verify student credentials or view information beyond their authorized scope).</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Batch Operations (Mass Enrollment, Mass Cancel, Mass Adjustment).</strong> Any operation that affects more than a single student account simultaneously — bulk plan enrollment from a file, mass plan cancellation for a term, or mass balance adjustment — is restricted to Full Admin role only and requires a two-step process: (1) upload and validate a batch file with a preview of affected accounts and a count of records; (2) explicit secondary confirmation acknowledging the scope of impact before execution. Batch operations must generate a results log downloadable after completion showing success/failure per record. Batch operations initiated outside of business hours require Full Admin authorization from a second Full Admin (four-eyes approval).</p>
+          <p class="req-why"><strong>Why:</strong> Batch operation errors are catastrophic at scale — a misformatted file that cancels 2,000 plans instead of 200 is not recoverable without contacting every affected student. The preview-then-confirm pattern and four-eyes approval for after-hours operations are standard controls for high-impact bulk actions in financial systems. The results log is required for reconciliation and for support when students contact the bursar about unexpected changes.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Configuration Changes (Plan Templates, Fee Rules, Term Windows).</strong> Modifying institution-level configuration — payment plan templates, application fees, enrollment windows, auto-debit settings, or communication trigger settings — is restricted to Full Admin role only. Configuration changes must: display a summary of what is being changed (before/after) in a confirmation step; require a mandatory notes field explaining the reason for the change; and be logged in the audit trail with a before/after snapshot. Configuration changes that affect active plans (e.g., changing a payment schedule on a template that has enrolled students) must surface a warning listing the number of affected active plans before the change can be saved.</p>
+          <p class="req-why"><strong>Why:</strong> Configuration changes have institution-wide impact and are a primary source of support escalations when they are made incorrectly or without understanding downstream effects. The before/after snapshot in the audit log is essential for troubleshooting — institutions that change something and see unexpected behavior need to be able to identify exactly what changed and when, without relying on NBS to reconstruct the configuration history.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>User Provisioning (Add, Deactivate, Modify Institution Users).</strong> Managing institution admin users — adding new users, deactivating departing staff, or changing a user's assigned role — is restricted to Full Admin. User deactivation must be immediate: all active sessions for the deactivated user must be terminated within 60 seconds of the deactivation action, regardless of which device or browser is in use. New user invitations expire after 72 hours; expired invitations require a Full Admin to re-send. Role changes take effect on the user's next login. The user provisioning log (who was added/changed/deactivated, by whom, and when) must be included in the audit log export.</p>
+          <p class="req-why"><strong>Why:</strong> Staff turnover at institutions is high and not always orderly — employees may leave without notice, and the window between departure and deactivation is a compliance and security risk. The 60-second session termination requirement means a Full Admin can immediately close access for a departed employee without waiting for a session timeout. The 72-hour invitation expiry prevents stale invitations accumulating for positions that were filled differently than anticipated.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>ERP Integration Credentials &amp; Sync Configuration.</strong> Access to view or modify ERP integration credentials, API keys, sync schedules, or field mapping configuration is restricted to Full Admin and NBS Implementation Engineer roles only. Credential values must be masked in the UI (show only last 4 characters); they cannot be retrieved in plaintext through any role, including Full Admin — only rotated. Any modification to sync configuration must require confirmation and must be logged in the audit trail. NBS Technical Support can view sync logs and error messages but cannot view credentials or modify sync configuration.</p>
+          <p class="req-why"><strong>Why:</strong> ERP integration credentials are high-value targets — access to an institution's SIS API credential could expose the entire student record database, not just Horizon data. Masking and rotation-only access is standard credential hygiene. The restriction means even a compromised Full Admin session cannot exfiltrate the integration credential itself.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Financial Reporting &amp; Data Export.</strong> Generating and exporting financial reports — particularly the audit log export, outstanding balance report, and term reconciliation report — requires at minimum Finance Admin or Reporting &amp; Compliance Admin role. Reports containing individual student PII (name, ID, balance, payment history) must be logged when exported: who exported, which report, date range filtered, and timestamp. Reports with more than 500 student records must require a secondary confirmation acknowledging the scope of data being exported. Bulk exports must not be available via any publicly accessible or unauthenticated endpoint.</p>
+          <p class="req-why"><strong>Why:</strong> FERPA requires institutions to track disclosures of student education records. A bulk export of student payment data is a FERPA disclosure event. Logging exports and requiring confirmation for large exports creates the documentation trail that institutions need to demonstrate FERPA compliance during audits and adds friction that deters casual over-exporting by staff who don't need bulk data for their role.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Financial Responsibility Agreement Version Management.</strong> Creating, publishing, and deprecating Financial Responsibility Agreement versions — including editing FRA content, setting effective dates, and configuring which student populations are required to complete the FRA before accessing Horizon — is restricted to Full Admin. FRA version changes require a before/after preview and mandatory confirmation. Once an FRA version has been signed by any student, it cannot be edited or deleted; a new version must be created. The FRA version history and signing records must be permanently retained (minimum 7 years) and must not be affected by tenant deactivation or data retention cleanup jobs.</p>
+          <p class="req-why"><strong>Why:</strong> The FRA is the legal foundation of the institution's right to collect and to impose the fees and practices described in this PRD. An FRA that has been altered after student signature is a document integrity failure that could invalidate the institution's legal position in a collections dispute. Immutable version history and long-term retention are not feature preferences — they are legal requirements.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Collections Agency Referral.</strong> Referring a student account to an outside collections agency — or removing a student from collections referral — is restricted to Finance Admin and Full Admin. The referral workflow must require: selection of the agency from the institution's configured agencies list; confirmation of the balance being referred; documentation of prior contact attempts (as required by FDCPA); and a final confirmation showing the student's name, balance, and the disclosure that will be sent to the student notifying them of the referral. The referral event must be logged in the audit trail and must suppress all standard Horizon communications to that student account until the referral is resolved.</p>
+          <p class="req-why"><strong>Why:</strong> Collections referral is a major escalation that has significant consequences for the student (credit impact, collection fees, potential legal action) and carries regulatory requirements for the institution. Restricting it to Finance Admin+ and requiring documentation of prior contact attempts is a FDCPA compliance requirement. The communication suppression after referral prevents the institution from inadvertently continuing to contact a student who has been referred, which has additional FDCPA implications.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">User Management &amp; Provisioning</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>Self-Service Institution User Management.</strong> Full Admins must be able to manage all institution user accounts — add, deactivate, modify role, reset password/invitation — without NBS involvement. The user management interface must show all active and inactive users, their assigned role, last login date, and any pending invitations. Bulk deactivation (multiple users at once) must be supported for use during term-end staff transitions. NBS must not be required for any routine user provisioning action, including initial setup beyond the first Full Admin account which NBS provisions during implementation.</p>
+          <p class="req-why"><strong>Why:</strong> If every user add/change/deactivate requires an NBS support ticket, institutions will stop maintaining user hygiene — they'll leave departed employees active because it's too much friction to deactivate them. Self-service is both a product quality requirement and a security requirement.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Session Management &amp; Security Policy.</strong> The platform must enforce configurable session timeout for all institution admin users (default: 30-minute idle timeout, Full Admin can configure from 15 to 120 minutes). All admin sessions must use secure, httpOnly cookies; session tokens must not be accessible via JavaScript. Concurrent session limits per user must be configurable (default: 3 simultaneous sessions). Failed login attempts must be rate-limited with lockout after a configurable number of failures (default: 5 attempts, 15-minute lockout). All session start, session end, and lockout events must appear in the audit log.</p>
+          <p class="req-why"><strong>Why:</strong> Session security is a baseline compliance requirement for any financial platform. Idle timeout protects against unattended workstations in shared offices (common in bursar environments). Concurrent session limits detect shared credentials (a compliance violation). The audit log requirement for session events supports both internal security monitoring and external audit response.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Multi-Factor Authentication.</strong> MFA must be required for all institution admin logins. Supported MFA methods must include: TOTP authenticator app (Google Authenticator, Authy, Microsoft Authenticator), email OTP, and SMS OTP. Institutions using SSO for admin authentication must configure MFA at the IdP level — Horizon must enforce that the SSO authentication includes an MFA claim before granting access. Full Admin accounts must require MFA; lower roles may have MFA configurable as optional or required at the institution's discretion. MFA bypass codes (for account recovery) must be single-use and must be logged.</p>
+          <p class="req-why"><strong>Why:</strong> Credential compromise is the most common attack vector for financial application breaches. MFA eliminates the risk from password reuse and phishing — both of which are common in higher education environments where staff use institutional email for personal communication. Requiring MFA for Full Admin accounts specifically addresses the highest-impact compromise scenario: an attacker with Full Admin credentials can modify configuration, export bulk student data, and issue refunds.</p>
         </div>
       </div>
     </section>
@@ -6526,6 +6759,92 @@ body {
           <p class="req-persona">As a compliance / student services admin</p>
           <p class="req-text"><strong>Financial Responsibility Agreement Completion Report.</strong> A report showing which students have and have not completed the FRA for the current term, with completion date, version signed, and delivery method. Required for institutions that condition registration on FRA completion. Must be filterable by enrollment status and term.</p>
           <p class="req-why"><strong>Why:</strong> The FRA is a legal document that establishes the institution's right to collect and to impose the fees and practices described in this PRD. Institutions need to verify and document FRA completion for risk management and potential litigation contexts.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         REPORTING NEEDS — URS (Unified Reporting Suite)
+    ════════════════════════════════════════ -->
+    <section id="report-urs" class="prd-section">
+      <div class="section-eyebrow">Reporting Needs</div>
+      <h2 class="section-title">Unified Reporting Suite (URS)</h2>
+      <p class="section-subtitle">The Unified Reporting Suite is Horizon's embedded reporting platform — eight named operational reports plus the technical architecture that powers them. URS is the primary data access layer for institution finance teams, NBS account managers, and compliance staff. Reports are delivered in-app with CSV/PDF export; the architecture is event-driven and audit-immutable.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Payments &amp; Transactions</h3>
+        <div class="req-item">
+          <p class="req-persona">As a bursar / finance admin</p>
+          <p class="req-text"><strong>Daily Payment Activity Report (URS-PAY-01).</strong> A real-time-updatable report of all payment transactions within a configurable date range. Required columns: student name, student ID, payment date, payment amount, payment method (ACH / card / check / cash), transaction status (settled / pending / returned / failed), plan name if plan payment, campus/school code, and GL account code mapping where configured. Filters: date range, payment method, transaction status, plan type, campus. Sort: date (default), amount, student name. Export: CSV and PDF. Availability SLA: all transactions from the prior business day must appear by 8am local institution time.</p>
+          <p class="req-why"><strong>Why:</strong> This is the bursar's daily reconciliation instrument. Every day, accounts receivable staff compare Horizon settlements to their GL. A missing transaction or misclassified payment method creates a reconciliation gap that cascades into the month-end close. The 8am SLA aligns with the start of the bursar's workday — if the report isn't ready when staff arrive, they start their day behind.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a bursar / finance admin</p>
+          <p class="req-text"><strong>Failed &amp; Returned Payments Report (URS-PAY-02).</strong> A targeted report covering all failed, returned (NSF), and reversed transactions within a configurable date range. Required columns: student name, student ID, original payment date, original amount, failure/return date, failure reason code (NSF, invalid account, card declined, stop payment, etc.), current account balance, whether the student is on an active plan, and next scheduled payment date if applicable. The report must support bulk re-notification — Finance Admins can select multiple records and trigger a communication to all selected students simultaneously. Filters: date range, failure reason, plan status. Recommended action column: "Schedule follow-up / Re-attempt / Refer to collections" based on failure count and account history.</p>
+          <p class="req-why"><strong>Why:</strong> Returned payments are the primary leading indicator of plan default and collections escalation. Institutions that identify and act on NSF events within 24–48 hours recover more accounts than those who let them age. The bulk re-notification capability is what makes the report operational rather than just informational — staff shouldn't have to manually contact 50 students one at a time from the report view.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a finance admin / NBS account manager</p>
+          <p class="req-text"><strong>Settlement &amp; Disbursement Summary Report (URS-PAY-03).</strong> A periodic (daily, weekly, monthly configurable) summary of net settlement activity: total payments collected, total refunds issued, total NSF reversals, net disbursement to institution, Horizon service fees withheld, and net amount remitted. For guarantee plan institutions: includes guarantee reserve balance and any guarantee claim amounts. Must reconcile to the institution's bank statement and to NBS revenue reporting. Exportable as CSV (for GL import) and PDF (for treasury/finance director review). Month-end version must include prior-period comparison column.</p>
+          <p class="req-why"><strong>Why:</strong> Settlement reconciliation is a required accounting control. Institutions need to verify that the amount hitting their bank account matches what Horizon reports as remitted. The fee-withheld column is important for GL allocation — service fees are a separate expense line from collected tuition. Guarantee reserve visibility is a specific requirement for guarantee plan clients who carry contingent liability on their books for the reserve balance.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Agreements &amp; Scheduled Activity</h3>
+        <div class="req-item">
+          <p class="req-persona">As a bursar / finance admin</p>
+          <p class="req-text"><strong>Payment Plan Enrollment &amp; Status Report (URS-AGR-01).</strong> A comprehensive view of all payment plans — active, completed, defaulted, and cancelled — within a configurable term and date range. Required columns: student name, student ID, plan type, plan start date, plan end date, original plan amount, total paid, total remaining, scheduled payment count, payments made, payments missed, next payment date, plan status, and campus. Status values: Active (current), In Jeopardy (1 missed payment), At Risk (2+ missed payments), Defaulted (plan terminated for non-payment), Cancelled (admin-cancelled), Completed (paid in full). Filters: term, plan type, status, campus, delinquency band. Export: CSV. Used for cash flow projection, proactive outreach, and term-end reconciliation.</p>
+          <p class="req-why"><strong>Why:</strong> Cash flow projection from payment plans is a primary financial planning input for institutions — many institutions fund operations partially on the assumption that enrolled plan balances will be collected over the term. A plan enrollment report that surfaces the at-risk cohort before they default allows proactive intervention that improves the projection's accuracy. The status taxonomy (In Jeopardy / At Risk / Defaulted) is a specific request from NBS account managers who found that clients using only "active/defaulted" couldn't identify deteriorating plans early enough to act.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a bursar / finance admin</p>
+          <p class="req-text"><strong>Upcoming Scheduled Payments Report (URS-AGR-02).</strong> A forward-looking report of all scheduled payment plan payments due within a configurable future window (7, 14, 30, 60 days). Required columns: student name, student ID, plan type, scheduled payment date, scheduled payment amount, payment method on file (ACH / card / last 4), whether a prior payment was returned for this student, and account standing. The report must flag accounts where the payment method on file has expired or is about to expire (card expiration within 30 days). Filters: date range, payment method type, campus. Used for pre-payment outreach and payment method health monitoring.</p>
+          <p class="req-why"><strong>Why:</strong> Expired payment methods are a preventable cause of returned payments and plan defaults. Institutions that proactively prompt students to update expiring cards 2–3 weeks before the scheduled payment have measurably lower NSF rates than those who only discover expired cards at time of charge. This report is the operational instrument for that proactive approach. It also supports staffing decisions — a bursar manager can see that a large cohort of payments is scheduled for a specific week and ensure adequate coverage.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a finance admin / compliance officer</p>
+          <p class="req-text"><strong>Financial Responsibility Agreement Completion Report (URS-AGR-03).</strong> A report of all students who have been presented with the institution's Financial Responsibility Agreement, their completion status, the FRA version they were presented, and the date/method of completion. Required columns: student name, student ID, enrollment term, FRA version, presentation date, completion date, completion method (digital signature / in-person / mail), and whether completion is required for registration. Students with outstanding FRA requirements who are also registered for upcoming classes must be flagged. Filters: term, FRA version, completion status, enrollment status. Export: CSV and PDF. Minimum retention: 7 years.</p>
+          <p class="req-why"><strong>Why:</strong> The FRA is the institution's legal basis for the fees, collection practices, and hold policies described in this PRD. An institution that cannot produce signed FRA records for a specific student in a collections dispute or regulatory inquiry is in an extremely weak legal position. This report provides the operational monitoring layer (who hasn't signed yet, before the registration deadline) and the long-term documentation layer (signed copies tied to specific versions).</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Billing &amp; Outstanding Balances</h3>
+        <div class="req-item">
+          <p class="req-persona">As a bursar / finance admin</p>
+          <p class="req-text"><strong>Outstanding Balance &amp; Aging Report (URS-BILL-01).</strong> A report of all student accounts with an outstanding balance above a configurable threshold (default: $1), organized by aging bucket: current (0–30 days), 31–60 days, 61–90 days, 91–180 days, 180+ days. Required columns: student name, student ID, total balance, balance by charge type, enrollment status, whether the student has an active payment plan, days since last payment, date of last contact attempt, and whether the account has been referred to collections. Filters: balance range, aging bucket, enrollment status, plan status, campus. Sort: balance descending (default), aging bucket, enrollment status. Export: CSV. This report feeds the collections escalation workflow.</p>
+          <p class="req-why"><strong>Why:</strong> Aging report visibility is the most requested reporting feature in every bursar conversation NBS has conducted. Without it, institutions are flying blind on their receivables position — they don't know whether their portfolio is getting better or worse until they do a manual GL extract, which is time-consuming and usually only happens at month-end. Real-time aging visibility enables daily prioritization of the accounts most at risk of aging past the collections referral threshold.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a finance admin</p>
+          <p class="req-text"><strong>Term Reconciliation &amp; Closing Report (URS-BILL-02).</strong> A term-close summary report for finance directors and controllers. Required metrics: total charges assessed in the term, total payments collected via Horizon, total enrolled in active plans, total plan payments received vs. scheduled, total plan defaults, total referred to collections, total written off, net remaining outstanding. All metrics must include prior-term comparison and percent change. Charge type breakdown (tuition / housing / fees / other). Payment method breakdown (ACH / card / cash / other). Plan type breakdown. GL account mapping summary for institutions using Horizon GL codes. Available by the 3rd business day after the institution's configured term close date. Export: PDF (for executive review) and CSV (for GL reconciliation import).</p>
+          <p class="req-why"><strong>Why:</strong> Term-close reconciliation is a required accounting process — auditors, controllers, and CFOs need a clean summary of the term's financial activity. Institutions that have to manually compile this from multiple Horizon report exports and ERP data are spending significant staff time on a report that Horizon should produce automatically. The GL mapping summary is specific to institutions that use Horizon's charge codes as a passthrough to their accounting system.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Technical Architecture</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>Event-Driven Report Data Pipeline.</strong> All URS report data must be powered by an event-driven data pipeline, not synchronous database queries against the operational database. Every financial event in Horizon — payment processed, plan enrolled, plan cancelled, NSF returned, refund issued, balance updated — must emit a structured event to the reporting pipeline with a full payload (event type, timestamp, actor, affected accounts, before/after state). The reporting layer materializes views from these events. This architecture ensures: (1) report generation does not impact operational system performance; (2) reports reflect the state of the system at any point in time (event replay); (3) the pipeline itself serves as the audit-immutable event log.</p>
+          <p class="req-why"><strong>Why:</strong> Running complex aggregation queries against the operational database at scale — especially at term-end when hundreds of institutions may be generating reports simultaneously — causes performance degradation that affects real-time student transactions. Event-driven architecture decouples reporting load from operational load. Event replay capability means URS can regenerate any historical report from the event log even if reporting tables are corrupted or reset — a critical disaster recovery capability for financial reporting.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Immutable Audit Trail.</strong> The event log powering URS must be write-once, append-only, and cryptographically tamper-evident. Once an event is written, it cannot be modified or deleted — corrections must be recorded as new compensating events (e.g., a refund that reverses a payment is a new event referencing the original, not a modification of the original payment record). The tamper-evidence mechanism must be verifiable by an external auditor without NBS involvement. Retention: minimum 7 years for all financial event types, minimum 10 years for FRA completion events.</p>
+          <p class="req-why"><strong>Why:</strong> Financial reporting integrity depends on the underlying event log being unalterable. A tamper-evident log is not just a security feature — it is the foundation of the institution's ability to defend its financial practices in litigation, regulatory inquiry, or audit. The distinction between immutable records and compensating events is the standard accounting principle of non-erasure: you don't erase a mistake, you record the correction. External verifiability means institutions can commission independent audits of Horizon data without waiting for NBS to produce certified exports.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Report Scheduling &amp; Delivery.</strong> All URS reports must support scheduled delivery: Finance Admins can configure any report to run automatically on a daily, weekly, or monthly schedule and deliver the result to one or more email recipients (institution users only — external addresses not permitted). Scheduled reports must include a run timestamp and a record count in the delivery email so recipients can confirm completeness before opening the export. Failed scheduled deliveries must generate an alert to the Full Admin and retry up to 3 times within a 4-hour window before generating a support ticket. Scheduled delivery configuration must be logged in the audit trail.</p>
+          <p class="req-why"><strong>Why:</strong> Many bursar workflows depend on having a fresh report at the start of each day or week — staff check their email for the daily payment activity report before opening Horizon. Without scheduled delivery, the report only provides value to staff who remember to generate it manually. Scheduled delivery converts URS from a passive lookup tool to an active part of the institution's daily financial operations workflow.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Cross-Institution Reporting for NBS (Portfolio View).</strong> NBS account managers and operations staff must have access to a cross-institution aggregated reporting layer that surfaces portfolio-level metrics without requiring access to individual institution tenants. Portfolio metrics must include: active plan count and enrolled amount by institution, payment success rate by institution (trailing 90 days), delinquency rate by institution, NSF rate by institution, plan default rate by institution, average plan enrollment amount by plan type, and institution-level trend data (current term vs. prior term). NBS-internal portfolio reporting must be completely isolated from institution-facing reporting — institution admins must never see data from other institutions.</p>
+          <p class="req-why"><strong>Why:</strong> NBS account managers need portfolio-level visibility to identify at-risk clients, prepare for QBRs, and benchmark client performance. Without this layer, AMs either have to log into each institution tenant individually (operationally unsustainable at scale) or wait for a data warehouse export (too slow for operational decisions). Isolation from institution-facing reporting is a contractual and regulatory requirement — institutions have confidentiality expectations about their operational data.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Data Export API.</strong> All URS reports must be accessible via an authenticated REST API in addition to the in-app UI. The export API must support: parameterized queries (date range, filters matching the UI filters), pagination for large result sets, JSON and CSV response formats, and OAuth 2.0 authentication scoped to the institution's credentials. The API enables institutions to build their own downstream integrations — GL import automation, custom dashboards, BI tools (Tableau, Power BI). API access must be logged (which report, which date range, which credential, timestamp) in the audit trail. Rate limiting: 100 requests/minute per institution credential; burst allowance for term-end peaks configurable by NBS.</p>
+          <p class="req-why"><strong>Why:</strong> Larger institutions have data engineering teams who want to pull Horizon data directly into their data warehouse or BI tools rather than manually downloading CSV exports. An export API is the path from URS being an isolated reporting tool to Horizon being a data platform integrated into the institution's broader analytics infrastructure. The rate limit with term-end burst allowance balances API availability against the risk of a runaway integration hammering the reporting layer during peak load.</p>
         </div>
       </div>
     </section>
@@ -6766,7 +7085,8 @@ var SECTION_TREE = [
     {id:'hs5',label:'5b · Past Due & Mixed Dates'},
     {id:'hs6',label:'6b · Active Plan + Outside Charges'},
   ]},
-  { id:'Solutions We Sell', label:'Solutions We Sell', first:'pp-standard', children:[
+  { id:'Solutions We Sell', label:'Solutions We Sell', first:'sol-pot', children:[
+    {id:'sol-pot',label:'Pay Over Time Overview'},
     {id:'pp-standard',label:'Standard Plans'},
     {id:'pp-pastdue',label:'Past-Due Plans'},
     {id:'ltpp-overview',label:'Long-Term Plans'},
@@ -6774,7 +7094,7 @@ var SECTION_TREE = [
     {id:'pp-hidden',label:'Hidden Plans'},
     {id:'guarantee-overview',label:'Guarantee Plans'},
     {id:'pp-custom',label:'Custom Plans'},
-    {id:'sol-epay',label:'ePay'},
+    {id:'sol-epay',label:'One Time Payments'},
     {id:'sol-billing',label:'Billing'},
     {id:'sol-checkout',label:'Checkout'},
     {id:'sol-notify',label:'Notify'},
@@ -6795,6 +7115,7 @@ var SECTION_TREE = [
   ]},
   { id:'Reporting Needs', label:'Reporting Needs', first:'report-institution', children:[
     {id:'report-institution',label:'Institution User Needs'},
+    {id:'report-urs',label:'Unified Reporting Suite (URS)'},
     {id:'report-nbs',label:'NBS Needs'},
     {id:'report-it-product',label:'IT & Product Needs'},
   ]},
@@ -6850,6 +7171,14 @@ var CHANGE_LOG = [
   {date:'2026-05-05',group:'Solutions We Sell',sectionId:'sol-batch-refunds',label:'Batch Credit Card Refunds',summary:'New section: batch refund file upload, card network compliance, results reporting'},
   {date:'2026-05-05',group:'Solutions We Sell',sectionId:'sol-inperson',label:'In-Person Tuition Payments',summary:'New section: teller account lookup, card terminal integration, receipt generation'},
   {date:'2026-05-05',group:'Solutions We Sell',sectionId:'sol-refunds',label:'Refunds (non-batch)',summary:'New section: admin-initiated refunds, student self-service refund requests, status tracking & communication'},
+  {date:'2026-05-05',group:'Solutions We Sell',sectionId:'sol-pot',label:'Pay Over Time Overview',summary:'New solution overview section: Pay Over Time product summary covering plan offer configuration, consumer plan management, and institution plan servicing (12 requirements)'},
+  {date:'2026-05-05',group:'Solutions We Sell',sectionId:'sol-epay',label:'One Time Payments',summary:'Renamed from ePay and expanded: real-time balance integration, student & AP payments, guest payments, payment processing, statements & communication history, institution servicing, future roadmap (17 requirements)'},
+  {date:'2026-05-05',group:'Solutions We Sell',sectionId:'sol-billing',label:'Billing',summary:'Expanded: event-driven statement presentment, billing communications with three messaging pillars, billing platform architecture with immutable audit trail (8 requirements)'},
+  {date:'2026-05-05',group:'Features · Pay Over Time',sectionId:'feat-pot-management',label:'Plan Management',summary:'Expanded: plan summary, plan owner attribution, update payment method, cancel with bursar contact, scheduled payment confirmation, pause capability (6 requirements)'},
+  {date:'2026-05-05',group:'Features · Pay Over Time',sectionId:'feat-pot-balance-change',label:'Balance Change Handling',summary:'Expanded: new charge alert card, dual balance view, balance adjustment preference, notification, credit removal auto-recalculation (5 requirements)'},
+  {date:'2026-05-05',group:'Solutions We Sell',sectionId:'pp-standard',label:'Standard Plans',summary:'Expanded: added post-enrollment modification rules, institution-initiated cancellation, plan completion confirmation (3 new requirements)'},
+  {date:'2026-05-05',group:'Platform Requirements',sectionId:'plat-access-management',label:'Access Management',summary:'Fully rebuilt: 6 institution roles (Full Admin, Finance Admin, Student Services Rep, Reporting & Compliance, Payment Plan Coordinator, Read-Only), 3 NBS roles, 10 secured actions with permission matrix, 3 user management & provisioning requirements'},
+  {date:'2026-05-05',group:'Reporting Needs',sectionId:'report-urs',label:'Unified Reporting Suite (URS)',summary:'New section: 8 named reports across Payments & Transactions (3), Agreements & Scheduled Activity (3), Billing & Outstanding Balances (2), plus technical architecture (5 requirements) covering event-driven pipeline, immutable audit trail, scheduling, portfolio view, and export API'},
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -7679,6 +8008,7 @@ var STATUS_TAG_DEFS = [
   { key:'it',       label:'⚙️ IT Review',          cls:'tag-status-it',       dot:'#67e8f9', filterLabel:'IT Review' },
   { key:'inst',     label:'🏫 Institution Review', cls:'tag-status-inst',     dot:'#fb923c', filterLabel:'Institution Review' },
   { key:'idea',     label:'💡 Idea State',         cls:'tag-status-idea',     dot:'#a1a1aa', filterLabel:'Idea State' },
+  { key:'devdone',  label:'✅ Dev Complete',        cls:'tag-status-devdone',  dot:'#86efac', filterLabel:'Dev Complete' },
 ];
 
 function loadStatusTags() {
@@ -7859,8 +8189,9 @@ var ALL_FILTER_DEFS = [
   { key:'inst',     label:'🏫 Institution Review', cls:'tag-status-inst'     },
   { key:'idea',     label:'💡 Idea State',         cls:'tag-status-idea'     },
   // Type tags
-  { key:'backend',  label:'🔧 Backend Only',  cls:'tag-backend' },
-  { key:'erp',      label:'From ERP',         cls:'tag-erp'     },
+  { key:'backend',  label:'🔧 Backend Only',  cls:'tag-backend'         },
+  { key:'erp',      label:'From ERP',         cls:'tag-erp'             },
+  { key:'devdone',  label:'✅ Dev Complete',   cls:'tag-status-devdone'  },
 ];
 
 function initTagFilter() {
