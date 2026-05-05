@@ -1700,7 +1700,7 @@ body {
     <header class="doc-header">
       <div class="doc-eyebrow">Nelnet · Horizon</div>
       <h1 class="doc-title">Consumer Onboarding — Product Requirements</h1>
-      <p class="doc-meta">Living document · updated alongside prototype iterations · Last updated May 1, 2026</p>
+      <p class="doc-meta">Living document · updated alongside prototype iterations · Last updated <span id="doc-last-updated">May 5, 2026</span></p>
       <div class="share-tip">
         🔗 <span>This page can be shared directly. It contains no links to prototype files — recipients will only see requirements.</span>
       </div>
@@ -3430,9 +3430,19 @@ body {
         <p class="req-why"><strong>Why:</strong> Multiple simultaneous plans for the same term balance create reconciliation complexity, confuse the student, and create financial reporting problems for the institution. The constraint is intentional and enforced by the system.</p>
       </div>
 
-      <div class="sophie-flag">
-        <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add additional standard plan requirements covering: plan modification after enrollment (what can change and what cannot), plan cancellation by the student vs. by the institution, what happens when a student's balance changes after enrollment (add/drop adjustments), payment method management (can the student change their payment method mid-plan?), plan completion confirmation, and any state-specific standard plan regulations that apply broadly.</span>
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>Plan Modification After Enrollment.</strong> After a student enrolls in a standard plan, only the payment method and (if institution-enabled) pausing can be changed by the student. Plan schedule, installment count, and end date cannot be modified by the student post-enrollment. If balance changes require plan recalculation, the system adjusts the installment amount or end date according to the student's previously selected balance-change preference (see Balance Change Handling).</p>
+        <p class="req-why"><strong>Why:</strong> Allowing arbitrary mid-plan changes creates reconciliation complexity and potential for abuse (e.g., reducing a payment right before it's due). Constraining changes to payment method and pausing keeps the plan predictable while still accommodating the most common legitimate need.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>Institution-Initiated Plan Cancellation.</strong> Institution admins can cancel any active plan on behalf of a student. On cancellation: auto-debit is immediately stopped, the student is notified with the remaining balance now due, and the original receivable is restored to the institution's SIS. Cancellation reason is logged and visible in the plan record.</p>
+        <p class="req-why"><strong>Why:</strong> Institutions occasionally need to cancel plans for non-payment-related reasons (enrollment cancellation, institutional error, hardship waiver). Admin-initiated cancellation must be available without requiring student action.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>Plan Completion Confirmation.</strong> When the final installment on a plan is successfully processed, the student receives a "Plan complete" notification showing: all installments paid, total amount paid, and a confirmation that the balance covered by this plan has been satisfied. The student portal updates to show no active plan for that term.</p>
+        <p class="req-why"><strong>Why:</strong> Completion is a moment worth acknowledging. Students who receive clear confirmation are less likely to contact support asking "is my account settled?" It also builds trust in the auto-debit process.</p>
       </div>
     </section>
 
@@ -4892,9 +4902,39 @@ body {
       <div class="section-eyebrow">Features · Pay Over Time</div>
       <h2 class="section-title">Plan Management</h2>
       <hr class="section-divider"/>
-      <div class="sophie-flag">
-        <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add feature requirements for ongoing plan management from the consumer portal: viewing plan details (schedule, remaining balance, upcoming payments, payment history), updating payment method, canceling a plan, and what the student sees when a scheduled payment is processed vs. fails. Use agile user story format.</span>
+
+      <div class="req-group">
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Plan Summary — Always visible on home screen.</strong> While a student has an active Pay Over Time plan, the home screen permanently displays: plan name, total remaining balance, current installment amount, next payment date, and payment method on file. A "View full schedule" link expands the complete payment schedule showing all past and future installments.</p>
+          <p class="req-why"><strong>Why:</strong> Students need a clear, persistent view of their plan so they are never surprised by a charge. Surfacing the next payment date prominently reduces support contacts driven by "I didn't know a payment was coming."</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Plan Owner Attribution.</strong> In multi-actor scenarios (e.g., a parent enrolled a student), the plan summary must display who the plan owner is. The label "Plan enrolled by [Name]" appears in the plan summary. Both the student and the plan owner can view the plan. Only the plan owner can modify the payment method or cancel the plan.</p>
+          <p class="req-why"><strong>Why:</strong> When a parent sets up a plan on behalf of a student, the student's portal should reflect that context — otherwise a student calling support doesn't understand why they can't edit the plan. Clear ownership attribution prevents confusion and reduces support escalations.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Update Payment Method.</strong> The plan owner can update the payment method on an active plan at any time before the next scheduled payment. The new payment method takes effect on the next scheduled installment. A confirmation is shown on screen and sent via the student's preferred notification channel.</p>
+          <p class="req-why"><strong>Why:</strong> Payment methods expire, cards get reissued, and bank accounts change. Restricting method updates leads to failed payments and plan defaults that could have been avoided.</p>
+          <div class="req-tags"><span class="tag tag-req">Required</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Cancel Plan — with Bursar escalation messaging.</strong> The plan owner can initiate plan cancellation from the portal. Before cancellation is confirmed, the student sees a safety screen that: (1) shows the full remaining balance that will become due immediately upon cancellation, (2) displays the Bursar's Office contact information (phone + email, sourced from institution configuration), and (3) requires an explicit "I understand" acknowledgment before confirming. Cancellation sends an immediate notification to both the student and the institution.</p>
+          <p class="req-why"><strong>Why:</strong> Plan cancellation is a high-stakes, often impulsive action. The safety screen surfaces the financial consequence (full balance immediately due) and gives the student a direct path to speak with the Bursar before they make an irreversible decision. Escalation contact is institution-specific because bursar office hours and channels vary.</p>
+          <div class="req-tags"><span class="tag tag-req">Required</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Scheduled Payment Confirmation.</strong> After each scheduled installment is successfully processed, the student receives a notification showing: amount charged, last 4 digits of the payment method, remaining balance on the plan, and next scheduled payment date.</p>
+          <p class="req-why"><strong>Why:</strong> Students enrolled in auto-pay plans have high anxiety about mystery charges on their bank statements. Proactive "your payment processed" notifications dramatically reduce "what was this charge?" support contacts.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Pause Plan (institution-configured).</strong> If the institution has enabled plan pausing, the plan owner can request a one-cycle pause from the portal. A paused plan skips the next installment and extends the plan end date by one period. The institution must explicitly enable this feature; it is off by default.</p>
+          <p class="req-why"><strong>Why:</strong> Some institutions use pausing as a retention tool — students facing a temporary hardship pause rather than cancel. Making it institution-controlled prevents it from being abused as a default payment avoidance mechanism.</p>
+        </div>
       </div>
     </section>
 
@@ -4903,11 +4943,37 @@ body {
       <h2 class="section-title">Balance Change Handling</h2>
       <hr class="section-divider"/>
       <div class="proto-links">
-        <a class="proto-link" href="./home-1b-balance-increase.html" target="_blank"><span class="proto-icon">⬡</span> See Prototype: 1b — Balance Increase on Plan</a>
+        <a class="proto-link" href="./UI_ Charges added after pay over time plan exists - student and student plan owner.html" target="_blank"><span class="proto-icon">⬡</span> See Prototype: Charges Added After Plan Exists</a>
       </div>
-      <div class="sophie-flag">
-        <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add feature requirements for how the consumer experience handles balance changes after plan enrollment: new charges added (the "open balance" state shown in scenario 1b), charges removed (add/drop), financial aid applied or reversed. What does the student see? What actions are available? What notifications are sent? Reference scenario 1b (home-1b-balance-increase.html) for the visual design direction.</span>
+
+      <div class="req-group">
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>New Charge Alert — Prominent "to-do" card.</strong> When a new charge is added to the student's account after an active Pay Over Time plan exists, and that charge is not covered by the plan, the student's home screen immediately displays a distinct informational card: "New charge added to your account — not covered by your plan." The card shows the charge description, amount, and a direct action button to pay it or manage it. This card persists until the charge is resolved.</p>
+          <p class="req-why"><strong>Why:</strong> Students on a plan assume all charges will be automatically handled. Without a prominent, proactive alert they will not discover the uncovered balance until it becomes delinquent. The card must be impossible to miss — not a buried notification.</p>
+          <div class="req-tags"><span class="tag tag-req">Required</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Dual Balance View — plan balance separate from open balance.</strong> When both an active plan and an uncovered open balance exist simultaneously, the student sees both clearly separated: (1) "On your payment plan: $X remaining, $Y/month" and (2) "Open balance not on plan: $Z — action required." The two balances are never merged or aggregated in a way that obscures what is and is not covered.</p>
+          <p class="req-why"><strong>Why:</strong> Merging balances creates confusion about what the scheduled payment covers. Dual-view gives the student full clarity: their plan is on track, but there is a separate item needing attention.</p>
+          <div class="req-tags"><span class="tag tag-req">Required</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Balance Adjustment Preference — student chooses how new charges affect the plan.</strong> When a new charge is added mid-plan and the student elects to add it to their existing plan (if the institution allows), they are presented with an explicit choice: (A) Keep current installment amount and extend the plan end date, or (B) Keep the same plan end date and increase the installment amount. The student must select one option before the plan is recalculated. A before/after comparison is shown for each option before confirmation.</p>
+          <p class="req-why"><strong>Why:</strong> This is a meaningful financial decision. Choosing for the student (defaulting to one option) creates resentment when the outcome surprises them. Showing both options with explicit numbers empowers the student and reduces disputes about why their monthly payment changed.</p>
+          <div class="req-tags"><span class="tag tag-req">Required</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>New Charge Notification.</strong> When a new charge is added to the account while a plan is active, the student receives an immediate notification (via preferred channel: email/SMS/push) containing: the charge description and amount, a link to view it in the portal, and a clear statement that the charge is not covered by the existing plan and requires action.</p>
+          <p class="req-why"><strong>Why:</strong> Students are not monitoring their portal daily. A push notification ensures they are made aware of the uncovered charge before it goes overdue, not after.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Credit / Charge Removal — automatic plan recalculation.</strong> When a charge is removed from the student's account (add/drop, institutional correction, financial aid applied) and that charge was included in the active plan, the plan balance is automatically reduced. The student sees a notification showing: the removed amount, the new remaining plan balance, and the updated installment amount or end date (per the student's previously stated preference). No student action is required for a reduction.</p>
+          <p class="req-why"><strong>Why:</strong> Students who drop a class expect their balance to decrease. If the plan amount stays the same after a credit, students will call support to dispute the "overcharge." Automatic recalculation with transparent notification prevents that confusion.</p>
+        </div>
       </div>
     </section>
 
@@ -7978,6 +8044,15 @@ function openAsViewer(name) {
     dashLink.classList.add('is-visible');
   }
 
+  // Load stored last-updated date and show in doc header
+  try {
+    var storedDate = localStorage.getItem('hz_prd_last_updated');
+    if (storedDate) {
+      var dateEl = document.getElementById('doc-last-updated');
+      if (dateEl) dateEl.textContent = storedDate;
+    }
+  } catch(e) {}
+
   // Build My Updates section
   buildMyUpdates(userData);
 }
@@ -8013,6 +8088,11 @@ function switchViewer() {
   // Hide personal dashboard nav link
   var dashLink = document.getElementById('nav-dashboard-link');
   if (dashLink) dashLink.classList.remove('is-visible');
+  // Remove Sophie beforeunload guard
+  if (window._sophieBeforeUnload) {
+    window.removeEventListener('beforeunload', window._sophieBeforeUnload);
+    window._sophieBeforeUnload = null;
+  }
 }
 
 // ── Active nav highlight on scroll ──────────────────────────────────────────
@@ -8427,16 +8507,34 @@ function toHTML(str) {
 // Clones the live DOM, strips Sophie-mode UI widgets, and downloads
 // prd.html — commit this file to make Sophie's edits visible to everyone.
 function downloadUpdatedHTML() {
+  // Stamp today's date into the live DOM and localStorage before cloning
+  var today = new Date();
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var dateStr = months[today.getMonth()] + ' ' + today.getDate() + ', ' + today.getFullYear();
+  var liveSpan = document.getElementById('doc-last-updated');
+  if (liveSpan) liveSpan.textContent = dateStr;
+  try { localStorage.setItem('hz_prd_last_updated', dateStr); } catch(e) {}
+
   var clone = document.documentElement.cloneNode(true);
+
+  // Stamp date into clone's static span
+  var cloneSpan = clone.querySelector('#doc-last-updated');
+  if (cloneSpan) cloneSpan.textContent = dateStr;
 
   // Strip Sophie edit UI from clone
   clone.querySelectorAll(
     '.sophie-edit-btn, .sophie-edited-tag, .sophie-controls,' +
-    ' .sophie-ta, .sophie-ta-why-label, .sophie-download-btn'
+    ' .sophie-ta, .sophie-ta-why-label, .sophie-download-btn,' +
+    ' .sophie-status-btn, .status-picker, .sophie-backend-btn,' +
+    ' .req-comment-btn, .req-comment-panel, .req-comment-thread,' +
+    ' .tag-filter-bar, #nav-dashboard-link'
   ).forEach(function (el) { el.remove(); });
 
-  // Remove Sophie-mode class
-  clone.querySelector('body').classList.remove('sophie-mode');
+  // Remove Sophie-mode class and visitor-bar display
+  var cloneBody = clone.querySelector('body');
+  cloneBody.classList.remove('sophie-mode');
+  var vbar = clone.querySelector('#visitor-bar');
+  if (vbar) vbar.style.display = 'none';
 
   // Keep name overlay — other viewers still need to identify themselves
 
@@ -8690,18 +8788,60 @@ function initSophieMode() {
   // 7. Add section-level "+ Add principle" buttons to every owner-authored section
   addVisionSectionButtons();
 
-  // 8. Add "Bake & download" button to visitor bar
+  // 8. Add "Update" button to visitor bar (Sophie only)
   var bar = document.getElementById('visitor-bar');
   if (bar && !bar.querySelector('.sophie-download-btn')) {
     var dlBtn = document.createElement('button');
     dlBtn.className = 'sophie-download-btn';
-    dlBtn.innerHTML = '⬇ Bake &amp; download';
+    dlBtn.innerHTML = '⬇ Update';
     dlBtn.title =
-      'Download prd.html with your edits written directly into the file.\n' +
+      'Download prd.html with your edits written into the file.\n' +
       'Commit the downloaded file to the repo so all viewers see your changes.';
     dlBtn.addEventListener('click', downloadUpdatedHTML);
     bar.appendChild(dlBtn);
   }
+
+  // 9. Warn Sophie before navigating away (browser nav, close, refresh)
+  window._sophieBeforeUnload = function(e) {
+    e.preventDefault();
+    e.returnValue = '';
+  };
+  window.addEventListener('beforeunload', window._sophieBeforeUnload);
+
+  // 10. Intercept in-page navigation links that would leave this page
+  document.querySelectorAll('a[href]:not([href^="#"])').forEach(function(link) {
+    if (link.dataset.sophieGuarded) return;
+    link.dataset.sophieGuarded = '1';
+    link.addEventListener('click', function(e) {
+      if (!document.body.classList.contains('sophie-mode')) return;
+      e.preventDefault();
+      var dest = link.href;
+      var modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(26,16,96,.55);backdrop-filter:blur(5px);z-index:9999;display:flex;align-items:center;justify-content:center';
+      modal.innerHTML =
+        '<div style="background:#fff;border-radius:16px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.18);text-align:center">' +
+          '<div style="font-size:24px;margin-bottom:12px">⬇</div>' +
+          '<h3 style="font-size:16px;font-weight:700;color:#1a1060;margin-bottom:8px">Download your changes first?</h3>' +
+          '<p style="font-size:13px;color:#57548d;margin-bottom:20px;line-height:1.5">You have unsaved edits in Sophie mode. Download the updated prd.html before leaving so your changes aren\'t lost.</p>' +
+          '<div style="display:flex;gap:10px;justify-content:center">' +
+            '<button id="sm-download-leave" style="background:#4f46e5;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">⬇ Download &amp; Leave</button>' +
+            '<button id="sm-leave-anyway" style="background:#fff;color:#57548d;border:1px solid #dde1f0;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">Leave anyway</button>' +
+            '<button id="sm-stay" style="background:#f1f5f9;color:#374151;border:1px solid #e2e8f0;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">Stay</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(modal);
+      document.getElementById('sm-download-leave').onclick = function() {
+        downloadUpdatedHTML();
+        setTimeout(function() { window.location.href = dest; }, 800);
+        modal.remove();
+      };
+      document.getElementById('sm-leave-anyway').onclick = function() {
+        window.location.href = dest;
+        modal.remove();
+      };
+      document.getElementById('sm-stay').onclick = function() { modal.remove(); };
+    });
+  });
 }
 </script>
 </body>
