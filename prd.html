@@ -343,7 +343,7 @@ body {
   border-top: 1px solid var(--hz-border);
 }
 .req-why strong { color: var(--hz-text); font-weight: 600; }
-.req-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.req-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; align-items: center; }
 .tag {
   font-size: 10px;
   font-weight: 600;
@@ -357,6 +357,63 @@ body {
 .tag-req     { background: var(--hz-bg); color: var(--hz-muted); border: 1px solid var(--hz-border); }
 .tag-backend { background: #ecfdf5; color: #065f46; border: 1px solid #6ee7b7; font-weight: 700; }
 .tag-backend-pending { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; font-weight: 700; }
+
+/* ── Status tags (manually applied by Sophie) ────────── */
+.tag-status-final    { background: #ecfdf5; color: #065f46; border: 1px solid #34d399; font-weight: 700; }
+.tag-status-product  { background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; font-weight: 700; }
+.tag-status-consumer { background: #f5f3ff; color: #5b21b6; border: 1px solid #c4b5fd; font-weight: 700; }
+.tag-status-it       { background: #ecfeff; color: #155e75; border: 1px solid #67e8f9; font-weight: 700; }
+.tag-status-inst     { background: #fff7ed; color: #9a3412; border: 1px solid #fb923c; font-weight: 700; }
+.tag-status-idea     { background: #fafafa; color: #52525b; border: 1px dashed #a1a1aa; font-weight: 700; }
+
+/* ── Status picker (Sophie mode) ─────────────────────── */
+.sophie-status-btn {
+  display: none; font-size: 10px; font-weight: 600; color: var(--hz-muted);
+  border: 1px solid var(--hz-border); border-radius: 5px; background: var(--hz-bg);
+  padding: 2px 7px; cursor: pointer; align-items: center; gap: 3px; white-space: nowrap;
+}
+.sophie-mode .req-item:hover .sophie-status-btn { display: inline-flex; }
+.sophie-status-btn.has-tags { color: #1d4ed8; border-color: #93c5fd; background: #eff6ff; display: inline-flex !important; }
+
+.status-picker {
+  position: absolute; z-index: 200; background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.13); padding: 10px;
+  min-width: 200px; top: calc(100% + 4px); left: 0;
+}
+.status-picker-title { font-size: 10px; font-weight: 700; color: var(--hz-muted); text-transform: uppercase;
+  letter-spacing: .5px; margin-bottom: 8px; }
+.status-picker-opt {
+  display: flex; align-items: center; gap: 7px; padding: 4px 6px; border-radius: 6px;
+  cursor: pointer; font-size: 12px; font-weight: 500; color: #1e293b;
+  transition: background .1s; margin-bottom: 2px;
+}
+.status-picker-opt:hover { background: #f1f5f9; }
+.status-picker-opt input[type=checkbox] { width: 13px; height: 13px; cursor: pointer; flex-shrink: 0; }
+.status-picker-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Tag filter bar ───────────────────────────────────── */
+.tag-filter-bar {
+  display: none; position: sticky; top: 0; z-index: 120; background: #fff;
+  border-bottom: 1px solid #e8eaf4; padding: 8px 20px; align-items: center;
+  gap: 8px; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+.tag-filter-bar.is-active { display: flex; }
+.tag-filter-label { font-size: 11px; font-weight: 700; color: var(--hz-muted);
+  text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+.tag-filter-btn {
+  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
+  border: 1px solid #dde1f0; background: #f8f9fc; color: #57548d;
+  cursor: pointer; transition: all .12s; white-space: nowrap;
+}
+.tag-filter-btn:hover { border-color: #a5b4fc; background: #eef2ff; }
+.tag-filter-btn.is-active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+.tag-filter-clear { font-size: 11px; font-weight: 600; color: #dc2626; background: none;
+  border: 1px solid #fca5a5; border-radius: 20px; padding: 3px 10px; cursor: pointer; }
+.tag-filter-clear:hover { background: #fef2f2; }
+.tag-filter-count { font-size: 11px; color: var(--hz-muted); margin-left: 4px; }
+
+/* When filter active, hide non-matching req-items */
+.req-item.filter-hidden { display: none !important; }
 .sophie-backend-btn {
   display:none; font-size:10px; font-weight:600; color:var(--hz-muted);
   background:none; border:1px solid var(--hz-border); border-radius:5px;
@@ -1638,6 +1695,14 @@ body {
     <!-- Change banner (shown after name entry when there are updates) -->
     <div id="change-banner" class="change-banner" role="alert"></div>
 
+    <!-- Tag filter bar (shown after login, all users) -->
+    <div id="tag-filter-bar" class="tag-filter-bar" role="toolbar" aria-label="Filter requirements by tag">
+      <span class="tag-filter-label">Filter</span>
+      <div id="tag-filter-btns" style="display:flex;flex-wrap:wrap;gap:5px"></div>
+      <button class="tag-filter-clear" id="tag-filter-clear" onclick="clearTagFilter()" style="display:none">✕ Clear</button>
+      <span class="tag-filter-count" id="tag-filter-count"></span>
+    </div>
+
     <!-- Changes-to-review panel (filtered by user preferences) -->
     <div id="ctr-panel" class="ctr-panel" style="display:none">
       <div class="ctr-header">
@@ -1672,6 +1737,12 @@ body {
         <h3 class="need-group-title">🔧 Backend Only — AI-tagged, needs your review (<span id="sophie-backend-count">0</span>)</h3>
         <p style="font-size:12px;color:var(--hz-muted);margin-bottom:12px">Claude tagged these requirements as <strong>Backend Only</strong> — meaning UX has no work to do for them. Confirm ✓ to keep the tag, or Reject ✗ to remove it. You can also manually add Backend Only to any requirement in the document by hovering over it in Sophie mode and clicking the 🔧 button.</p>
         <div id="sophie-backend-content" class="sd-content"></div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">🏷️ Untagged Requirements — needs a status (<span id="sophie-untagged-count">0</span>)</h3>
+        <p style="font-size:12px;color:var(--hz-muted);margin-bottom:12px">These requirements don't have a status tag yet. Add one by hovering the requirement in the document and clicking <strong>+ Status</strong>, or click the title below to scroll to it. Available tags: Final · Product Review · Consumer Review · IT Review · Institution Review · Idea State.</p>
+        <div id="sophie-untagged-content" class="sd-content"></div>
       </div>
     </section>
 
@@ -6770,13 +6841,9 @@ function initCollapsibleNav() {
     });
   });
 
-  // Auto-expand nav group containing active section (on scroll)
-  var io2 = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (!entry.isIntersecting) return;
-      var id = entry.target.id;
-      var link = document.querySelector('.nav-link[href="#' + id + '"]');
-      if (!link) return;
+  // When a nav link is clicked, ensure its parent group is open
+  document.querySelectorAll('.nav-link[href^="#"]').forEach(function(link) {
+    link.addEventListener('click', function() {
       var group = link.closest('.nav-group');
       if (group && !group.classList.contains('is-open')) {
         group.classList.add('is-open');
@@ -6785,8 +6852,7 @@ function initCollapsibleNav() {
         localStorage.setItem(NAV_STATE_KEY, JSON.stringify(savedState));
       }
     });
-  }, { rootMargin:'-10% 0px -80% 0px' });
-  document.querySelectorAll('section[id]').forEach(function(s) { io2.observe(s); });
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -7259,6 +7325,7 @@ function buildSophieDashboard() {
   }
 
   rebuildSophieBackendPanel();
+  rebuildSophieStatusPanel();
   document.getElementById('sophie-dashboard').style.display = 'block';
 }
 
@@ -7518,6 +7585,283 @@ function rebuildSophieBackendPanel() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// STATUS TAG SYSTEM
+// 6 manually-applied status tags (Sophie-only add/remove).
+// All users can see tags. Filter bar is visible to all users.
+// Items without a status tag appear in Sophie's "Untagged" dashboard panel.
+// ─────────────────────────────────────────────────────────────────────────────
+var STATUS_TAGS_KEY = 'hz_status_tags';
+
+var STATUS_TAG_DEFS = [
+  { key:'final',    label:'✅ Final',              cls:'tag-status-final',    dot:'#34d399', filterLabel:'Final' },
+  { key:'product',  label:'📋 Product Review',     cls:'tag-status-product',  dot:'#93c5fd', filterLabel:'Product Review' },
+  { key:'consumer', label:'👤 Consumer Review',    cls:'tag-status-consumer', dot:'#c4b5fd', filterLabel:'Consumer Review' },
+  { key:'it',       label:'⚙️ IT Review',          cls:'tag-status-it',       dot:'#67e8f9', filterLabel:'IT Review' },
+  { key:'inst',     label:'🏫 Institution Review', cls:'tag-status-inst',     dot:'#fb923c', filterLabel:'Institution Review' },
+  { key:'idea',     label:'💡 Idea State',         cls:'tag-status-idea',     dot:'#a1a1aa', filterLabel:'Idea State' },
+];
+
+function loadStatusTags() {
+  try { return JSON.parse(localStorage.getItem(STATUS_TAGS_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveStatusTags(data) {
+  localStorage.setItem(STATUS_TAGS_KEY, JSON.stringify(data));
+}
+
+// Render status tags on a req-item from stored data; optionally add Sophie picker
+function applyStatusTagsToItem(item, isSophie) {
+  var reqId = item.dataset.reqId || getReqId(item);
+  item.dataset.reqId = reqId;
+  var data = loadStatusTags();
+  var activeTags = data[reqId] || [];
+
+  // Remove existing status tags and picker btn
+  item.querySelectorAll('.tag-status-final,.tag-status-product,.tag-status-consumer,.tag-status-it,.tag-status-inst,.tag-status-idea').forEach(function(el){el.remove();});
+  item.querySelectorAll('.sophie-status-btn').forEach(function(el){el.remove();});
+
+  var tagsEl = ensureReqTags(item);
+
+  // Render active tags
+  activeTags.forEach(function(key) {
+    var def = STATUS_TAG_DEFS.find(function(d){return d.key===key;});
+    if (!def) return;
+    var tag = document.createElement('span');
+    tag.className = 'tag ' + def.cls;
+    tag.dataset.statusKey = key;
+    tag.textContent = def.label;
+    tagsEl.appendChild(tag);
+  });
+
+  // Sophie-only: add picker button
+  if (isSophie) {
+    var btn = document.createElement('button');
+    btn.className = 'sophie-status-btn' + (activeTags.length > 0 ? ' has-tags' : '');
+    btn.textContent = activeTags.length > 0 ? '🏷 Edit Status' : '+ Status';
+    btn.title = 'Set status tag for this requirement';
+    btn.style.position = 'relative';
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleStatusPicker(item, reqId, btn);
+    });
+    tagsEl.appendChild(btn);
+  }
+}
+
+function toggleStatusPicker(item, reqId, btn) {
+  // Close any open picker first
+  document.querySelectorAll('.status-picker').forEach(function(el){el.remove();});
+  if (btn._pickerOpen) { btn._pickerOpen = false; return; }
+
+  var data = loadStatusTags();
+  var activeTags = data[reqId] || [];
+
+  var picker = document.createElement('div');
+  picker.className = 'status-picker';
+  var title = document.createElement('div');
+  title.className = 'status-picker-title';
+  title.textContent = 'Set status tag';
+  picker.appendChild(title);
+
+  STATUS_TAG_DEFS.forEach(function(def) {
+    var opt = document.createElement('label');
+    opt.className = 'status-picker-opt';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = activeTags.indexOf(def.key) > -1;
+    var dot = document.createElement('span');
+    dot.className = 'status-picker-dot';
+    dot.style.background = def.dot;
+    var txt = document.createElement('span');
+    txt.textContent = def.label;
+    opt.appendChild(cb);
+    opt.appendChild(dot);
+    opt.appendChild(txt);
+    cb.addEventListener('change', function() {
+      var d = loadStatusTags();
+      var tags = d[reqId] || [];
+      if (cb.checked) {
+        if (tags.indexOf(def.key) === -1) tags.push(def.key);
+      } else {
+        tags = tags.filter(function(k){return k !== def.key;});
+      }
+      if (tags.length === 0) delete d[reqId]; else d[reqId] = tags;
+      saveStatusTags(d);
+      applyStatusTagsToItem(item, true);
+      rebuildSophieStatusPanel();
+      updateTagFilterCounts();
+    });
+    picker.appendChild(opt);
+  });
+
+  btn.appendChild(picker);
+  btn._pickerOpen = true;
+
+  // Close on outside click
+  setTimeout(function() {
+    document.addEventListener('click', function closePicker(ev) {
+      if (!picker.contains(ev.target) && ev.target !== btn) {
+        picker.remove();
+        btn._pickerOpen = false;
+        document.removeEventListener('click', closePicker);
+      }
+    });
+  }, 10);
+}
+
+function initStatusTags(isSophie) {
+  document.querySelectorAll('.req-item').forEach(function(item) {
+    applyStatusTagsToItem(item, isSophie);
+  });
+}
+
+function rebuildSophieStatusPanel() {
+  var data = loadStatusTags();
+  var allItems = document.querySelectorAll('.req-item');
+  var untagged = [];
+  allItems.forEach(function(item) {
+    var reqId = item.dataset.reqId;
+    if (!reqId) return;
+    var tags = data[reqId] || [];
+    if (tags.length === 0) untagged.push(item);
+  });
+
+  var countEl = document.getElementById('sophie-untagged-count');
+  if (countEl) countEl.textContent = untagged.length;
+
+  var content = document.getElementById('sophie-untagged-content');
+  if (!content) return;
+  content.innerHTML = '';
+
+  if (untagged.length === 0) {
+    content.innerHTML = '<p style="font-size:13px;color:#059669;padding:8px 0">✅ All requirements have a status tag.</p>';
+    return;
+  }
+
+  var shown = untagged.slice(0, 40);
+  shown.forEach(function(item) {
+    var section = item.closest('section[id]');
+    var sId = section ? section.id : '';
+    var sName = section ? (section.querySelector('.section-title')||{textContent:'Unknown'}).textContent : 'Unknown';
+    var reqId = item.dataset.reqId;
+    var wrap = document.createElement('div');
+    wrap.className = 'sd-item';
+    var src = document.createElement('div');
+    src.className = 'sd-item-source';
+    src.innerHTML =
+      '<span style="font-size:12px;color:var(--hz-muted)">' + _esc(sName) + '</span>' +
+      '<button class="sd-goto-btn" onclick="jumpToSection(\'' + sId + '\')">Go to section →</button>';
+    var textEl = item.querySelector('.req-text');
+    var preview = document.createElement('div');
+    preview.style.cssText = 'font-size:12px;color:#374151;padding:6px 0 0;';
+    preview.textContent = textEl ? textEl.textContent.slice(0, 120) + (textEl.textContent.length > 120 ? '…' : '') : '(no text)';
+    wrap.appendChild(src);
+    wrap.appendChild(preview);
+    content.appendChild(wrap);
+  });
+  if (untagged.length > 40) {
+    content.innerHTML += '<p style="font-size:12px;color:var(--hz-muted);padding:8px 0">…and ' + (untagged.length - 40) + ' more. Use the document to tag them.</p>';
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TAG FILTER BAR
+// Shows after login. All users can filter. Multi-select = OR logic.
+// Filters on all tag types: status tags + backend-only + existing type tags.
+// ─────────────────────────────────────────────────────────────────────────────
+var _activeFilters = [];
+
+var ALL_FILTER_DEFS = [
+  // Status tags
+  { key:'final',    label:'✅ Final',              cls:'tag-status-final'    },
+  { key:'product',  label:'📋 Product Review',     cls:'tag-status-product'  },
+  { key:'consumer', label:'👤 Consumer Review',    cls:'tag-status-consumer' },
+  { key:'it',       label:'⚙️ IT Review',          cls:'tag-status-it'       },
+  { key:'inst',     label:'🏫 Institution Review', cls:'tag-status-inst'     },
+  { key:'idea',     label:'💡 Idea State',         cls:'tag-status-idea'     },
+  // Type tags
+  { key:'backend',  label:'🔧 Backend Only',       cls:'tag-backend'         },
+  { key:'erp',      label:'ERP / SSO',             cls:'tag-erp'             },
+  { key:'req',      label:'Required',              cls:'tag-req'             },
+  { key:'inst-tag', label:'Institution',           cls:'tag-inst'            },
+];
+
+function initTagFilter() {
+  var bar = document.getElementById('tag-filter-bar');
+  var btnsEl = document.getElementById('tag-filter-btns');
+  if (!bar || !btnsEl) return;
+  btnsEl.innerHTML = '';
+
+  ALL_FILTER_DEFS.forEach(function(def) {
+    var btn = document.createElement('button');
+    btn.className = 'tag-filter-btn';
+    btn.dataset.filterKey = def.key;
+    btn.textContent = def.label;
+    btn.addEventListener('click', function() {
+      var idx = _activeFilters.indexOf(def.key);
+      if (idx > -1) {
+        _activeFilters.splice(idx, 1);
+        btn.classList.remove('is-active');
+      } else {
+        _activeFilters.push(def.key);
+        btn.classList.add('is-active');
+      }
+      applyTagFilter();
+    });
+    btnsEl.appendChild(btn);
+  });
+
+  bar.classList.add('is-active');
+}
+
+function applyTagFilter() {
+  var clearBtn = document.getElementById('tag-filter-clear');
+  var countEl = document.getElementById('tag-filter-count');
+  if (clearBtn) clearBtn.style.display = _activeFilters.length > 0 ? 'inline-block' : 'none';
+
+  var allItems = document.querySelectorAll('.req-item');
+  var visible = 0;
+
+  allItems.forEach(function(item) {
+    if (_activeFilters.length === 0) {
+      item.classList.remove('filter-hidden');
+      visible++;
+      return;
+    }
+    // Check if item has any of the active filter tags
+    var matches = _activeFilters.some(function(key) {
+      var def = ALL_FILTER_DEFS.find(function(d){return d.key===key;});
+      if (!def) return false;
+      return item.querySelector('.' + def.cls) !== null;
+    });
+    if (matches) {
+      item.classList.remove('filter-hidden');
+      visible++;
+    } else {
+      item.classList.add('filter-hidden');
+    }
+  });
+
+  if (countEl) {
+    countEl.textContent = _activeFilters.length > 0 ? visible + ' matching' : '';
+  }
+}
+
+function clearTagFilter() {
+  _activeFilters = [];
+  document.querySelectorAll('.tag-filter-btn.is-active').forEach(function(b){b.classList.remove('is-active');});
+  document.querySelectorAll('.req-item.filter-hidden').forEach(function(el){el.classList.remove('filter-hidden');});
+  var clearBtn = document.getElementById('tag-filter-clear');
+  if (clearBtn) clearBtn.style.display = 'none';
+  var countEl = document.getElementById('tag-filter-count');
+  if (countEl) countEl.textContent = '';
+}
+
+function updateTagFilterCounts() {
+  // Re-run filter if active
+  if (_activeFilters.length > 0) applyTagFilter();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // LOGIN FLOW
 // ─────────────────────────────────────────────────────────────────────────────
 document.getElementById('name-form').addEventListener('submit', function(e) {
@@ -7607,6 +7951,12 @@ function openAsViewer(name) {
   // Init backend-only tags (Sophie sees pending; others see confirmed only)
   initBackendTags(name.toLowerCase() === 'sophie');
 
+  // Init status tags (Sophie can edit; others can see)
+  initStatusTags(name.toLowerCase() === 'sophie');
+
+  // Init tag filter bar (all users)
+  initTagFilter();
+
   // Build My Updates section
   buildMyUpdates(userData);
 }
@@ -7634,6 +7984,11 @@ function switchViewer() {
   document.querySelectorAll('.req-comment-btn,.req-comment-panel,.req-comment-thread').forEach(function(el){el.remove();});
   document.querySelectorAll('.sophie-backend-btn,.backend-confirm-row').forEach(function(el){el.remove();});
   document.querySelectorAll('.tag-backend-pending').forEach(function(el){el.remove();});
+  document.querySelectorAll('.sophie-status-btn,.status-picker').forEach(function(el){el.remove();});
+  // Reset filter bar
+  clearTagFilter();
+  var bar = document.getElementById('tag-filter-bar');
+  if (bar) bar.classList.remove('is-active');
 }
 
 // ── Active nav highlight on scroll ──────────────────────────────────────────
