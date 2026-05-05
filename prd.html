@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Horizon Consumer — Product Requirements</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 :root {
   --hz-indigo:    #2D1FA3;
@@ -1165,6 +1166,109 @@ body {
   cursor: pointer;
 }
 
+/* ── Access Control ── */
+.auth-internal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #FEF3C7;
+  border: 1px solid #FCD34D;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #92400E;
+  letter-spacing: .3px;
+  margin-bottom: 14px;
+}
+.overlay-input + .overlay-input { margin-top: 10px; }
+.auth-error {
+  font-size: 12.5px;
+  color: var(--hz-danger);
+  background: #FFF0F0;
+  border: 1px solid rgba(226,75,74,.2);
+  border-radius: 7px;
+  padding: 8px 12px;
+  margin: 8px 0 4px;
+  text-align: center;
+  line-height: 1.45;
+}
+.otp-inputs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 20px 0 16px;
+}
+.otp-digit {
+  width: 46px;
+  height: 54px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  border: 2px solid rgba(100,92,220,.25);
+  border-radius: 10px;
+  color: var(--hz-text);
+  outline: none;
+  background: var(--hz-bg);
+  font-family: 'Plus Jakarta Sans', monospace;
+  transition: border-color .15s, box-shadow .15s;
+}
+.otp-digit:focus {
+  border-color: var(--hz-accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(100,92,220,.12);
+}
+.auth-success-msg {
+  font-size: 12.5px;
+  color: var(--hz-teal);
+  background: var(--hz-teal-bg);
+  border-radius: 7px;
+  padding: 8px 12px;
+  margin: 8px 0 4px;
+  text-align: center;
+}
+.auth-pending-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+/* Access request cards in Sophie dashboard */
+.access-req-card {
+  background: var(--hz-card);
+  border: 1px solid var(--hz-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.access-req-info { flex: 1; }
+.access-req-name { font-size: 13px; font-weight: 600; color: var(--hz-text); }
+.access-req-email { font-size: 11.5px; color: var(--hz-muted); margin-top: 2px; }
+.access-req-time  { font-size: 11px;   color: var(--hz-hint);  margin-top: 2px; }
+.access-req-status {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; padding: 2px 8px; border-radius: 5px;
+}
+.access-req-status.pending  { background: #FEF3C7; color: #92400E; }
+.access-req-status.approved { background: var(--hz-teal-bg); color: var(--hz-teal); }
+.access-req-status.rejected { background: #FFF0F0; color: var(--hz-danger); }
+.access-req-btn {
+  font-size: 12px; font-weight: 600; padding: 5px 12px;
+  border-radius: 7px; border: none; cursor: pointer; margin-left: 4px;
+}
+.access-req-approve { background: var(--hz-teal-bg); color: var(--hz-teal); }
+.access-req-approve:hover { background: #b7f3d8; }
+.access-req-reject  { background: #FFF0F0; color: var(--hz-danger); }
+.access-req-reject:hover  { background: #ffd5d5; }
+.emailjs-config-warning {
+  background: #FFF7ED;
+  border: 1px solid #FCD34D;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #92400E;
+  margin-bottom: 14px;
+  line-height: 1.55;
+}
+
 /* ── Problem statement ── */
 .problem-stmt {
   background: #FFF3F3;
@@ -1555,14 +1659,53 @@ body {
 <div id="name-overlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
   <div class="overlay-card">
     <div class="overlay-eyebrow">Horizon · Consumer Onboarding</div>
+    <div class="auth-internal-badge">🔒 Internal Use Only</div>
     <h1 class="overlay-title" id="overlay-title">Who's reviewing?</h1>
-    <p class="overlay-sub">Enter your name and we'll highlight any requirements that changed since you last opened this document—so you only need to read what's new.</p>
+    <p class="overlay-sub">This document contains confidential product requirements restricted to Nelnet employees. Enter your name and <strong>@nelnet.net</strong> email to continue.</p>
     <form id="name-form" novalidate>
       <input id="name-input" class="overlay-input" type="text" placeholder="Your full name"
         autocomplete="off" autocorrect="off" spellcheck="false" required/>
-      <button type="submit" class="overlay-btn">View Requirements</button>
+      <input id="email-input" class="overlay-input" type="email" placeholder="your.name@nelnet.net"
+        autocomplete="email" spellcheck="false" required/>
+      <p class="auth-error" id="auth-step1-error" style="display:none"></p>
+      <button type="submit" class="overlay-btn" id="auth-step1-btn">Continue</button>
     </form>
-    <p class="overlay-note">Your name is saved in your browser only — never sent anywhere.</p>
+    <p class="overlay-note">First-time access requires approval from Sophie Brendel. Known devices skip verification.</p>
+  </div>
+</div>
+
+<!-- OTP verification overlay -->
+<div id="auth-otp-overlay" class="overlay" style="display:none" role="dialog" aria-modal="true">
+  <div class="overlay-card">
+    <div class="overlay-eyebrow">Horizon · Consumer Onboarding</div>
+    <div class="auth-internal-badge">🔒 Internal Use Only</div>
+    <h1 class="overlay-title">Check your email</h1>
+    <p class="overlay-sub" id="otp-desc">We sent a 6-digit code to your Nelnet email. Enter it below to verify this device.</p>
+    <div class="otp-inputs" id="otp-inputs">
+      <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 1"/>
+      <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 2"/>
+      <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 3"/>
+      <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 4"/>
+      <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 5"/>
+      <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 6"/>
+    </div>
+    <p class="auth-error" id="otp-error" style="display:none"></p>
+    <button class="overlay-btn" onclick="verifyOTPSubmit()" id="otp-verify-btn">Verify Device</button>
+    <p class="overlay-note" style="margin-top:12px">
+      <a href="#" onclick="resendOTP(event)">Resend code</a> &nbsp;·&nbsp;
+      <a href="#" onclick="authGoBack(event)">Use a different email</a>
+    </p>
+  </div>
+</div>
+
+<!-- Access pending overlay -->
+<div id="auth-pending-overlay" class="overlay" style="display:none" role="dialog" aria-modal="true">
+  <div class="overlay-card" style="text-align:center">
+    <div class="overlay-eyebrow">Horizon · Consumer Onboarding</div>
+    <span class="auth-pending-icon">📬</span>
+    <h1 class="overlay-title">Access Requested</h1>
+    <p class="overlay-sub">Your request has been sent to <strong>Sophie Brendel</strong> for review. You'll receive an email at <strong id="pending-email-display"></strong> once your access is approved.</p>
+    <p class="overlay-note" style="margin-top:16px">This document contains confidential internal requirements. Access is granted on a need-to-know basis. Questions? <a href="mailto:sophie.brendel@nelnet.net">sophie.brendel@nelnet.net</a></p>
   </div>
 </div>
 
@@ -1862,6 +2005,15 @@ body {
       <h2 class="section-title">📋 Requirements Review Dashboard</h2>
       <p class="section-subtitle">All requirements that need your attention: items with comments from other viewers, items missing a "Why", and items with Sophie review flags. Updates automatically as you edit.</p>
       <hr class="section-divider"/>
+
+      <div class="need-group" id="access-requests-group">
+        <h3 class="need-group-title">🔐 Access Requests (<span id="access-requests-count">0</span>)</h3>
+        <p style="font-size:12px;color:var(--hz-muted);margin-bottom:12px">People requesting access to this PRD. Approve to grant access; they'll receive an email and can log in immediately. Reject to deny.</p>
+        <div id="emailjs-config-warning" class="emailjs-config-warning" style="display:none">
+          ⚠️ <strong>EmailJS not configured.</strong> Email notifications won't send until you add credentials. <a href="https://www.emailjs.com" target="_blank">Set up EmailJS →</a> then update <code>AUTH_CONFIG</code> in the script.
+        </div>
+        <div id="access-requests-content"><p style="font-size:12.5px;color:var(--hz-hint)">Loading…</p></div>
+      </div>
 
       <div class="need-group">
         <h3 class="need-group-title">💬 Requirements with Comments (<span id="sophie-comments-count">0</span>)</h3>
@@ -9330,6 +9482,9 @@ function resolveComment(reqId, idx, btn) {
 // SOPHIE DASHBOARD
 // ─────────────────────────────────────────────────────────────────────────────
 function buildSophieDashboard() {
+  // Load access requests panel (async, updates independently)
+  if (typeof buildAccessRequestsPanel === 'function') buildAccessRequestsPanel();
+
   var all = loadComments();
   var withComments = [];
   var missingWhy = [];
@@ -9949,23 +10104,11 @@ function updateTagFilterCounts() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// LOGIN FLOW
+// LOGIN FLOW — gated by access control (see ACCESS CONTROL section below)
 // ─────────────────────────────────────────────────────────────────────────────
 document.getElementById('name-form').addEventListener('submit', function(e) {
   e.preventDefault();
-  var name = document.getElementById('name-input').value.trim();
-  if (!name) return;
-  _pendingUserName = name;
-
-  if (isReturningUser(name)) {
-    // Returning user — skip preferences, go straight to viewing
-    document.getElementById('name-overlay').style.display = 'none';
-    openAsViewer(name);
-  } else {
-    // New user — show preferences step
-    document.getElementById('name-overlay').style.display = 'none';
-    openPrefOverlay(false);
-  }
+  authStep1Submit();
 });
 
 function updateNavWithChanges() {
@@ -11029,8 +11172,422 @@ function ghShowControls() {
 // ── Initial pull on page load — hydrate localStorage from GitHub ──
 // Runs early so applySophieEdits() (called later in openAsViewer) gets fresh data
 document.addEventListener('DOMContentLoaded', async function() {
-  await Promise.all([ghPullComments(), ghPullEdits()]);
+  await Promise.all([ghPullComments(), ghPullEdits(), authLoadData()]);
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACCESS CONTROL
+// Enforces @nelnet.net domain, Sophie-approval gating, OTP device verification,
+// and device remembering. All auth data lives in auth/ in the GitHub repo.
+//
+// EMAILJS SETUP (one-time, ~10 min):
+//   1. emailjs.com → create free account
+//   2. Email Services → Add Service (connect Gmail/Outlook) → copy Service ID
+//   3. Email Templates → create 4 templates (see comments below) → copy Template IDs
+//   4. Account → API Keys → copy Public Key
+//   5. Fill in AUTH_CONFIG below, commit, deploy
+//   6. In EmailJS dashboard → Account → Allowed Origins → add your GitHub Pages URL
+// ─────────────────────────────────────────────────────────────────────────────
+var AUTH_CONFIG = {
+  // ── EmailJS credentials ── fill these in after EmailJS setup ──
+  publicKey:        'YOUR_EMAILJS_PUBLIC_KEY',
+  serviceId:        'YOUR_EMAILJS_SERVICE_ID',
+  // Template: to={{to_email}}, subject="Your Horizon PRD code", body includes {{otp_code}} and {{to_name}}
+  templateOtp:      'YOUR_OTP_TEMPLATE_ID',
+  // Template: to=sophie.brendel@nelnet.net, subject="PRD Access Request", body includes {{requester_name}}, {{requester_email}}, {{requested_at}}
+  templateRequest:  'YOUR_REQUEST_TEMPLATE_ID',
+  // Template: to={{to_email}}, subject="Your PRD access is approved", body includes {{to_name}}, {{prd_url}}
+  templateApproved: 'YOUR_APPROVED_TEMPLATE_ID',
+  // Template: to={{to_email}}, subject="PRD access request update", body includes {{to_name}}
+  templateRejected: 'YOUR_REJECTED_TEMPLATE_ID',
+
+  approverEmail:  'sophie.brendel@nelnet.net',
+  domain:         '@nelnet.net',
+  otpExpiryMs:    10 * 60 * 1000,   // 10 min
+};
+
+// GitHub paths for auth data
+var GH_APPROVED_USERS_PATH   = 'auth/approved-users.json';
+var GH_APPROVED_DEVICES_PATH = 'auth/approved-devices.json';
+var GH_PENDING_ACCESS_PATH   = 'auth/pending-access.json';
+var DEVICE_TOKEN_KEY = 'hz_device_token';
+var OTP_SESSION_KEY  = 'hz_otp_session';
+
+// Always-approved — bypasses access-request flow (Sophie herself)
+var AUTH_ALWAYS_APPROVED = ['sophie.brendel@nelnet.net'];
+
+// In-memory auth data (loaded from GitHub on page load)
+var _authApprovedUsers   = null;
+var _authApprovedDevices = null;
+var _authEmail = '';
+var _authName  = '';
+var _authOTP   = '';
+var _authOTPExpiry = 0;
+
+// ── Device token (stable UUID per browser, persists in localStorage) ──
+function authDeviceToken() {
+  var k = DEVICE_TOKEN_KEY;
+  var t = '';
+  try { t = localStorage.getItem(k) || ''; } catch(e) {}
+  if (!t) {
+    t = 'dt_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    try { localStorage.setItem(k, t); } catch(e) {}
+  }
+  return t;
+}
+
+// ── Load approved-users + approved-devices from GitHub ──
+async function authLoadData() {
+  var results = await Promise.all([
+    ghReadFile(GH_APPROVED_USERS_PATH),
+    ghReadFile(GH_APPROVED_DEVICES_PATH)
+  ]);
+  _authApprovedUsers   = results[0] || {};
+  _authApprovedDevices = results[1] || {};
+}
+
+function authIsApproved(email) {
+  var e = email.toLowerCase();
+  if (AUTH_ALWAYS_APPROVED.indexOf(e) !== -1) return true;
+  return !!(_authApprovedUsers && _authApprovedUsers[e]);
+}
+
+function authIsKnownDevice(email) {
+  var e = email.toLowerCase();
+  if (AUTH_ALWAYS_APPROVED.indexOf(e) !== -1) return true;
+  var devices = _authApprovedDevices && _authApprovedDevices[e];
+  return !!(devices && devices.indexOf(authDeviceToken()) !== -1);
+}
+
+async function authRegisterDevice(email) {
+  var e = email.toLowerCase();
+  if (!_authApprovedDevices) _authApprovedDevices = {};
+  if (!_authApprovedDevices[e]) _authApprovedDevices[e] = [];
+  var token = authDeviceToken();
+  if (_authApprovedDevices[e].indexOf(token) === -1) {
+    _authApprovedDevices[e].push(token);
+    await ghWriteFile(GH_APPROVED_DEVICES_PATH, _authApprovedDevices, 'Register device for ' + e);
+  }
+}
+
+// ── EmailJS helper ──
+function authEmailJSReady() {
+  return window.emailjs && !AUTH_CONFIG.publicKey.startsWith('YOUR_');
+}
+
+async function authSendEmail(templateId, params) {
+  if (!authEmailJSReady()) {
+    console.warn('[Auth] EmailJS not configured — skipping:', templateId, params);
+    return false;
+  }
+  try {
+    emailjs.init(AUTH_CONFIG.publicKey);
+    await emailjs.send(AUTH_CONFIG.serviceId, templateId, params);
+    return true;
+  } catch(e) {
+    console.error('[Auth] EmailJS send failed:', e);
+    return false;
+  }
+}
+
+// ── OTP ──
+function authGenerateOTP() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+async function authSendOTP(email, name) {
+  var code = authGenerateOTP();
+  _authOTP = code;
+  _authOTPExpiry = Date.now() + AUTH_CONFIG.otpExpiryMs;
+  try {
+    sessionStorage.setItem(OTP_SESSION_KEY, JSON.stringify({
+      code: code, email: email, expiry: _authOTPExpiry
+    }));
+  } catch(e) {}
+  if (authEmailJSReady()) {
+    await authSendEmail(AUTH_CONFIG.templateOtp, {
+      to_email: email, to_name: name, otp_code: code, expiry_min: '10'
+    });
+  } else {
+    // EmailJS not configured — show code directly so flow isn't completely blocked
+    setTimeout(function() {
+      var el = document.getElementById('otp-desc');
+      if (el) el.innerHTML = 'EmailJS is not yet configured, so email delivery is unavailable. ' +
+        'Your temporary code is: <strong style="font-size:18px;letter-spacing:3px">' + code + '</strong>';
+    }, 100);
+  }
+}
+
+// ── Access request ──
+async function authSendAccessRequest(name, email) {
+  // Email Sophie
+  await authSendEmail(AUTH_CONFIG.templateRequest, {
+    requester_name:  name,
+    requester_email: email,
+    to_email:        AUTH_CONFIG.approverEmail,
+    requested_at:    new Date().toLocaleString()
+  });
+  // Write to pending-access.json if token available (for Sophie's dashboard)
+  try {
+    var existing = await ghReadFile(GH_PENDING_ACCESS_PATH) || [];
+    var alreadyPending = existing.some(function(r) {
+      return r.email === email.toLowerCase() && r.status === 'pending';
+    });
+    if (!alreadyPending) {
+      existing.push({ name: name, email: email.toLowerCase(), requestedAt: new Date().toISOString(), status: 'pending' });
+      await ghWriteFile(GH_PENDING_ACCESS_PATH, existing, 'Access request: ' + email);
+    }
+  } catch(e) {}
+}
+
+// ── Step 1: name + email form submit ──
+async function authStep1Submit() {
+  var name  = (document.getElementById('name-input').value  || '').trim();
+  var email = (document.getElementById('email-input').value || '').trim().toLowerCase();
+  var errEl = document.getElementById('auth-step1-error');
+  var btn   = document.getElementById('auth-step1-btn');
+
+  function showErr(msg) {
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Continue';
+  }
+
+  errEl.style.display = 'none';
+  if (!name)  return showErr('Please enter your full name.');
+  if (!email) return showErr('Please enter your @nelnet.net email address.');
+  if (!email.endsWith(AUTH_CONFIG.domain)) {
+    return showErr('Access is restricted to Nelnet employees. Please use your @nelnet.net email address.');
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
+
+  // Make sure auth data is loaded
+  if (!_authApprovedUsers) await authLoadData();
+
+  _authEmail = email;
+  _authName  = name;
+
+  if (!authIsApproved(email)) {
+    // Send access request and show pending screen
+    await authSendAccessRequest(name, email);
+    document.getElementById('pending-email-display').textContent = email;
+    document.getElementById('name-overlay').style.display = 'none';
+    document.getElementById('auth-pending-overlay').style.display = 'flex';
+    btn.disabled = false;
+    btn.textContent = 'Continue';
+    return;
+  }
+
+  if (authIsKnownDevice(email)) {
+    // Approved + known device → skip OTP, go straight in
+    btn.disabled = false;
+    btn.textContent = 'Continue';
+    authComplete();
+    return;
+  }
+
+  // Approved + new device → send OTP
+  btn.textContent = 'Sending code…';
+  await authSendOTP(email, name);
+  document.getElementById('otp-desc').innerHTML =
+    'We sent a 6-digit code to <strong>' + email + '</strong>. Enter it below to verify this device.';
+  document.getElementById('name-overlay').style.display = 'none';
+  document.getElementById('auth-otp-overlay').style.display = 'flex';
+  setTimeout(function() {
+    var first = document.querySelector('.otp-digit');
+    if (first) first.focus();
+  }, 80);
+  btn.disabled = false;
+  btn.textContent = 'Continue';
+}
+
+function authGoBack(e) {
+  if (e) e.preventDefault();
+  document.getElementById('auth-otp-overlay').style.display    = 'none';
+  document.getElementById('auth-pending-overlay').style.display = 'none';
+  document.getElementById('name-overlay').style.display = 'flex';
+}
+
+async function resendOTP(e) {
+  if (e) e.preventDefault();
+  if (!_authEmail || !_authName) return;
+  await authSendOTP(_authEmail, _authName);
+  var errEl = document.getElementById('otp-error');
+  errEl.className = 'auth-success-msg';
+  errEl.textContent = '✓ New code sent!';
+  errEl.style.display = 'block';
+  setTimeout(function() { errEl.style.display = 'none'; errEl.className = 'auth-error'; }, 3000);
+}
+
+async function verifyOTPSubmit() {
+  var digits  = Array.from(document.querySelectorAll('.otp-digit')).map(function(i) { return i.value; });
+  var entered = digits.join('');
+  var errEl   = document.getElementById('otp-error');
+  var btn     = document.getElementById('otp-verify-btn');
+
+  errEl.style.display = 'none';
+  if (entered.length < 6) {
+    errEl.textContent = 'Please enter all 6 digits.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  // Restore OTP from sessionStorage if page was refreshed mid-flow
+  if (!_authOTP) {
+    try {
+      var stored = JSON.parse(sessionStorage.getItem(OTP_SESSION_KEY) || 'null');
+      if (stored && stored.email === _authEmail) {
+        _authOTP = stored.code;
+        _authOTPExpiry = stored.expiry;
+      }
+    } catch(e) {}
+  }
+
+  if (!_authOTP || Date.now() > _authOTPExpiry) {
+    errEl.textContent = 'This code has expired. Click "Resend code" to get a new one.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  if (entered !== _authOTP) {
+    errEl.textContent = 'Incorrect code — please try again.';
+    errEl.style.display = 'block';
+    document.querySelector('.otp-digit').focus();
+    return;
+  }
+
+  // Correct — register device and proceed
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Verified ✓';
+  try { sessionStorage.removeItem(OTP_SESSION_KEY); } catch(e) {}
+  await authRegisterDevice(_authEmail);
+  authComplete();
+}
+
+function authComplete() {
+  document.getElementById('name-overlay').style.display = 'none';
+  document.getElementById('auth-otp-overlay').style.display    = 'none';
+  document.getElementById('auth-pending-overlay').style.display = 'none';
+  _pendingUserName = _authName;
+  if (isReturningUser(_authName)) {
+    openAsViewer(_authName);
+  } else {
+    openPrefOverlay(false);
+  }
+}
+
+// ── OTP digit-box keyboard behavior ──
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.otp-digit').forEach(function(input, idx, all) {
+    input.addEventListener('input', function() {
+      var v = input.value.replace(/\D/g, '');
+      input.value = v.slice(-1);
+      if (v && idx < all.length - 1) all[idx + 1].focus();
+      if (idx === all.length - 1 && v) verifyOTPSubmit();
+    });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace' && !input.value && idx > 0) all[idx - 1].focus();
+    });
+    input.addEventListener('paste', function(e) {
+      var text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      if (!text) return;
+      e.preventDefault();
+      all.forEach(function(d, i) { d.value = text[i] || ''; });
+      all[Math.min(text.length, all.length) - 1].focus();
+      if (text.length === 6) setTimeout(verifyOTPSubmit, 100);
+    });
+  });
+});
+
+// ── Sophie: load and render access requests ──
+async function buildAccessRequestsPanel() {
+  var content  = document.getElementById('access-requests-content');
+  var countEl  = document.getElementById('access-requests-count');
+  var warnEl   = document.getElementById('emailjs-config-warning');
+  if (!content) return;
+
+  if (!authEmailJSReady() && warnEl) warnEl.style.display = 'block';
+
+  var pending = await ghReadFile(GH_PENDING_ACCESS_PATH) || [];
+  var open = pending.filter(function(r) { return r.status === 'pending'; });
+  if (countEl) countEl.textContent = open.length;
+
+  if (pending.length === 0) {
+    content.innerHTML = '<p style="font-size:12.5px;color:var(--hz-hint)">No access requests yet.</p>';
+    return;
+  }
+
+  content.innerHTML = '';
+  pending.slice().reverse().forEach(function(req) {
+    var card = document.createElement('div');
+    card.className = 'access-req-card';
+    var dt = req.requestedAt ? new Date(req.requestedAt).toLocaleString() : '';
+    card.innerHTML =
+      '<div class="access-req-info">' +
+        '<div class="access-req-name">' + _esc(req.name) + '</div>' +
+        '<div class="access-req-email">' + _esc(req.email) + '</div>' +
+        '<div class="access-req-time">' + dt + '</div>' +
+      '</div>' +
+      '<span class="access-req-status ' + req.status + '">' + req.status + '</span>';
+    if (req.status === 'pending') {
+      var btnApprove = document.createElement('button');
+      btnApprove.className = 'access-req-btn access-req-approve';
+      btnApprove.textContent = '✓ Approve';
+      btnApprove.onclick = async function() {
+        btnApprove.disabled = true;
+        btnApprove.textContent = 'Approving…';
+        await authApproveRequest(req.name, req.email);
+        buildAccessRequestsPanel();
+      };
+      var btnReject = document.createElement('button');
+      btnReject.className = 'access-req-btn access-req-reject';
+      btnReject.textContent = '✕ Reject';
+      btnReject.onclick = async function() {
+        btnReject.disabled = true;
+        btnReject.textContent = 'Rejecting…';
+        await authRejectRequest(req.name, req.email);
+        buildAccessRequestsPanel();
+      };
+      card.appendChild(btnApprove);
+      card.appendChild(btnReject);
+    }
+    content.appendChild(card);
+  });
+}
+
+async function authApproveRequest(name, email) {
+  if (!_authApprovedUsers) _authApprovedUsers = {};
+  _authApprovedUsers[email.toLowerCase()] = {
+    name: name,
+    approvedAt: new Date().toISOString().slice(0,10),
+    approvedBy: AUTH_CONFIG.approverEmail
+  };
+  await ghWriteFile(GH_APPROVED_USERS_PATH, _authApprovedUsers, 'Approve access: ' + email);
+  // Update pending list
+  var pending = await ghReadFile(GH_PENDING_ACCESS_PATH) || [];
+  pending = pending.map(function(r) {
+    return r.email === email.toLowerCase() ? Object.assign({}, r, {status:'approved'}) : r;
+  });
+  await ghWriteFile(GH_PENDING_ACCESS_PATH, pending, 'Mark approved: ' + email);
+  // Notify user
+  await authSendEmail(AUTH_CONFIG.templateApproved, {
+    to_email: email, to_name: name,
+    prd_url: window.location.origin + window.location.pathname
+  });
+}
+
+async function authRejectRequest(name, email) {
+  var pending = await ghReadFile(GH_PENDING_ACCESS_PATH) || [];
+  pending = pending.map(function(r) {
+    return r.email === email.toLowerCase() ? Object.assign({}, r, {status:'rejected'}) : r;
+  });
+  await ghWriteFile(GH_PENDING_ACCESS_PATH, pending, 'Mark rejected: ' + email);
+  await authSendEmail(AUTH_CONFIG.templateRejected, { to_email: email, to_name: name });
+}
 </script>
 
 <!-- ════════════════════════════════════════
