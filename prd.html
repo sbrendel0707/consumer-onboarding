@@ -1738,7 +1738,7 @@ body {
      VISITOR BAR
 ════════════════════════════════════════ -->
 <div id="visitor-bar" class="visitor-bar" role="status">
-  <a id="home-link" href="https://sbrendel0707.github.io/nelnet-prototypes/" style="display:none;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--hz-indigo);text-decoration:none;background:var(--hz-cloud);border:1px solid rgba(100,92,220,.2);border-radius:7px;padding:3px 10px;" aria-label="Back to prototypes">← Prototypes</a>
+  <a id="home-link" href="https://sbrendel0707.github.io/nelnet-prototypes/" target="_top" style="display:none;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--hz-indigo);text-decoration:none;background:var(--hz-cloud);border:1px solid rgba(100,92,220,.2);border-radius:7px;padding:3px 10px;" aria-label="Back to prototypes">← Prototypes</a>
   <span>Viewing as <span id="visitor-name" class="visitor-name"></span></span>
   <span id="visitor-change-pill" class="visitor-change-pill"></span>
   <button class="manage-prefs-btn" onclick="openPrefOverlay(true)" style="display:none" id="manage-prefs-btn">⚙ Preferences</button>
@@ -11376,7 +11376,8 @@ function authMakeToken() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 function authActionURL(action, email, token) {
-  var base = window.location.origin + window.location.pathname;
+  // Always use the GitHub Pages URL so email links work regardless of where the request was made
+  var base = 'https://sbrendel0707.github.io/consumer-onboarding/prd.html';
   return base + '?prd_action=' + action + '&prd_email=' + encodeURIComponent(email) + '&prd_tok=' + token;
 }
 
