@@ -10160,7 +10160,11 @@ function openAsViewer(name) {
 
   // Sophie mode
   if (name.toLowerCase() === 'sophie') {
-    document.getElementById('home-link').style.display = 'flex';
+    var hl = document.getElementById('home-link');
+    hl.href = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:3000'
+      : 'https://sbrendel0707.github.io/nelnet-prototypes/';
+    hl.style.display = 'flex';
     initSophieMode();
     buildSophieDashboard();
     // Process any approve/reject URL action from email link
