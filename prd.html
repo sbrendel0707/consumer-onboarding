@@ -1151,6 +1151,138 @@ body {
   margin-top: 10px;
 }
 .process-callout strong { color: var(--hz-indigo); }
+
+/* ── Collapsible nav ─────────────────────────────────────── */
+.nav-group-label {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-collapse-icon {
+  font-size: 8px;
+  opacity: 0.5;
+  transition: transform 0.18s;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+.nav-group.is-open .nav-collapse-icon { transform: rotate(90deg); }
+.nav-group-body { display: none; }
+.nav-group.is-open .nav-group-body { display: block; }
+
+/* ── Prototype / diagram links ───────────────────────────── */
+.proto-links { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; }
+.proto-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--hz-indigo);
+  background: rgba(100,92,220,.07);
+  border: 1px solid rgba(100,92,220,.22);
+  border-radius: 6px;
+  padding: 4px 10px;
+  text-decoration: none;
+  transition: background .12s;
+}
+.proto-link:hover { background: rgba(100,92,220,.14); }
+.proto-link .proto-icon { font-size: 12px; }
+.diagram-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0a7a55;
+  background: rgba(10,122,85,.07);
+  border: 1px solid rgba(10,122,85,.22);
+  border-radius: 6px;
+  padding: 4px 10px;
+  text-decoration: none;
+  transition: background .12s;
+}
+.diagram-link:hover { background: rgba(10,122,85,.14); }
+
+/* ── Preferences modal ───────────────────────────────────── */
+.pref-overlay {
+  position: fixed; inset: 0; z-index: 900;
+  background: rgba(15,14,40,.72);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.pref-card {
+  background: var(--hz-surface);
+  border: 1px solid var(--hz-border);
+  border-radius: 18px;
+  padding: 28px 32px 24px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  box-shadow: 0 24px 64px rgba(0,0,0,.22);
+}
+.pref-title { font-size: 18px; font-weight: 700; color: var(--hz-text); margin: 0 0 6px; }
+.pref-sub { font-size: 13px; color: var(--hz-muted); margin: 0 0 16px; line-height: 1.5; }
+.pref-scroll { overflow-y: auto; flex: 1; margin: 0 -4px; padding: 0 4px; }
+.pref-group { margin-bottom: 4px; border: 1px solid var(--hz-border); border-radius: 10px; overflow: hidden; }
+.pref-group-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px;
+  background: var(--hz-cloud);
+  cursor: pointer;
+  user-select: none;
+}
+.pref-group-header:hover { background: rgba(100,92,220,.07); }
+.pref-group-label { font-size: 12px; font-weight: 700; color: var(--hz-text); flex: 1; }
+.pref-group-check { width: 16px; height: 16px; accent-color: var(--hz-indigo); flex-shrink: 0; cursor: pointer; }
+.pref-expand-btn { font-size: 9px; color: var(--hz-muted); cursor: pointer; padding: 2px 4px; border: none; background: none; }
+.pref-group-children { display: none; padding: 6px 12px 8px 36px; border-top: 1px solid var(--hz-border); }
+.pref-group.pref-open .pref-group-children { display: block; }
+.pref-child { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.pref-child-label { font-size: 11.5px; color: var(--hz-muted); }
+.pref-all-row { display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin-bottom: 8px; background: var(--hz-cloud); border-radius: 8px; }
+.pref-all-label { font-size: 12px; font-weight: 700; color: var(--hz-indigo); flex: 1; }
+.pref-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--hz-border); gap: 10px; }
+.pref-save-btn { background: var(--hz-indigo); color: #fff; border: none; border-radius: 10px; padding: 10px 22px; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity .12s; }
+.pref-save-btn:hover { opacity: .88; }
+.pref-skip-btn { font-size: 12px; color: var(--hz-muted); background: none; border: none; cursor: pointer; text-decoration: underline; }
+
+/* ── Changes-to-review panel ─────────────────────────────── */
+.ctr-panel {
+  background: #fffbe8;
+  border: 1px solid #e8c84a;
+  border-left: 4px solid #d4a800;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.ctr-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  background: #fff8d6;
+  border-bottom: 1px solid #e8c84a;
+}
+.ctr-title { font-size: 13px; font-weight: 700; color: #7a5c00; }
+.ctr-dismiss { font-size: 11px; color: #7a5c00; background: none; border: none; cursor: pointer; opacity: .7; }
+.ctr-dismiss:hover { opacity: 1; }
+.ctr-list { padding: 8px 16px 12px; display: flex; flex-direction: column; gap: 6px; }
+.ctr-item { display: flex; align-items: flex-start; gap: 10px; }
+.ctr-item-dot { width: 7px; height: 7px; border-radius: 50%; background: #d4a800; flex-shrink: 0; margin-top: 5px; }
+.ctr-item-body { font-size: 12px; color: #5a4400; line-height: 1.5; }
+.ctr-item-link { font-weight: 600; color: #7a5c00; text-decoration: underline; cursor: pointer; }
+.ctr-item-summary { color: #7a5c00; opacity: .85; margin-left: 4px; }
+.manage-prefs-btn {
+  font-size: 11px; font-weight: 600; color: var(--hz-indigo);
+  background: rgba(100,92,220,.08); border: 1px solid rgba(100,92,220,.2);
+  border-radius: 7px; padding: 3px 10px; cursor: pointer;
+  text-decoration: none;
+}
+.manage-prefs-btn:hover { background: rgba(100,92,220,.15); }
 </style>
 </head>
 <body>
@@ -1173,12 +1305,34 @@ body {
 </div>
 
 <!-- ════════════════════════════════════════
+     PREFERENCES OVERLAY
+════════════════════════════════════════ -->
+<div id="pref-overlay" class="pref-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="pref-title">
+  <div class="pref-card">
+    <p class="pref-title" id="pref-title">Which sections do you want updates on?</p>
+    <p class="pref-sub">When you return, we'll show you only the changes in sections you care about. You can always manage this later.</p>
+    <div class="pref-all-row">
+      <input type="checkbox" id="pref-all-check" class="pref-group-check" onchange="toggleAllPrefs(this.checked)"/>
+      <label for="pref-all-check" class="pref-all-label" style="cursor:pointer">All sections — notify me about everything</label>
+    </div>
+    <div class="pref-scroll" id="pref-section-list">
+      <!-- Built by JS -->
+    </div>
+    <div class="pref-footer">
+      <button class="pref-skip-btn" onclick="savePrefAndOpen(false)">Skip — show all changes</button>
+      <button class="pref-save-btn" onclick="savePrefAndOpen(true)">Save preferences</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
      VISITOR BAR
 ════════════════════════════════════════ -->
 <div id="visitor-bar" class="visitor-bar" role="status">
   <a id="home-link" href="index.html" style="display:none;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--hz-indigo);text-decoration:none;background:var(--hz-cloud);border:1px solid rgba(100,92,220,.2);border-radius:7px;padding:3px 10px;" aria-label="Back to prototypes">← Prototypes</a>
   <span>Viewing as <span id="visitor-name" class="visitor-name"></span></span>
   <span id="visitor-change-pill" class="visitor-change-pill"></span>
+  <button class="manage-prefs-btn" onclick="openPrefOverlay(true)" style="display:none" id="manage-prefs-btn">⚙ Preferences</button>
   <button class="visitor-switch" onclick="switchViewer()">Not you?</button>
 </div>
 
@@ -1378,6 +1532,15 @@ body {
 
     <!-- Change banner (shown after name entry when there are updates) -->
     <div id="change-banner" class="change-banner" role="alert"></div>
+
+    <!-- Changes-to-review panel (filtered by user preferences) -->
+    <div id="ctr-panel" class="ctr-panel" style="display:none">
+      <div class="ctr-header">
+        <span class="ctr-title" id="ctr-title">0 changes to review</span>
+        <button class="ctr-dismiss" onclick="document.getElementById('ctr-panel').style.display='none'">Dismiss ✕</button>
+      </div>
+      <div class="ctr-list" id="ctr-list"></div>
+    </div>
 
 
     <!-- ════════════════════════════════════════
@@ -3154,6 +3317,10 @@ body {
         </div>
       </div>
 
+      <div class="proto-links">
+        <a class="proto-link" href="./index.html" target="_blank"><span class="proto-icon">⬡</span> Prototype: Onboarding — Full Flow</a>
+      </div>
+
       <!-- Auth & data -->
       <div class="subsection">
         <div class="subsection-label">Authentication &amp; Data Pre-population</div>
@@ -3668,6 +3835,9 @@ body {
       <hr class="section-divider"/>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:12px;"><strong>Prototype:</strong> <code>home-1b-balance-increase.html</code> · Student: Alex · Balance state: <code>on-plan-open</code></p>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;"><strong>Setup:</strong> Alex is on an active pay over time plan ($4,680 remaining, $517/month, next May 10). A new lab fee of $350 was added to the account after enrollment. The $350 is not covered by the plan — it shows as an open balance alongside the on-plan amount.</p>
+      <div class="proto-links">
+        <a class="proto-link" href="./home-1b-balance-increase.html" target="_blank"><span class="proto-icon">⬡</span> Prototype: 1b — Balance Increase</a>
+      </div>
 
       <div class="req-item">
         <p class="req-persona">As a student payer</p>
@@ -3694,6 +3864,9 @@ body {
       <hr class="section-divider"/>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:12px;"><strong>Prototype:</strong> <code>home-2b-no-plan.html</code> · Student: Emily · Balance state: <code>open</code></p>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;"><strong>Setup:</strong> Emily has an $8,750 balance due September 15 with no payment plan and no saved payment method. She has not completed onboarding. The home screen shows the balance due to-do, and provides the option to pay in full or set up a plan.</p>
+      <div class="proto-links">
+        <a class="proto-link" href="./home-2b-no-plan.html" target="_blank"><span class="proto-icon">⬡</span> Prototype: 2b — Simple Balance No Plan</a>
+      </div>
 
       <div class="req-item">
         <p class="req-persona">As a student payer</p>
@@ -3714,6 +3887,9 @@ body {
       <hr class="section-divider"/>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:12px;"><strong>Prototype:</strong> <code>home-3b-credit-balance.html</code> · Student: David · Balance state: <code>credit</code></p>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;"><strong>Setup:</strong> David has a $2,150 credit balance (overpayment from excess aid). A refund of $2,150 is pending, expected October 1. A partial refund of $1,500 has already been issued by check. The home screen shows the upcoming refund in the upcoming payments section with no open balance to-dos.</p>
+      <div class="proto-links">
+        <a class="proto-link" href="./home-3b-credit-balance.html" target="_blank"><span class="proto-icon">⬡</span> Prototype: 3b — Credit Balance &amp; Refund</a>
+      </div>
 
       <div class="req-item">
         <p class="req-persona">As a student payer</p>
@@ -3734,6 +3910,9 @@ body {
       <hr class="section-divider"/>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:12px;"><strong>Prototype:</strong> <code>home-4b-defaulted-plan.html</code> · Student: Nicole · Balance state: <code>defaulted</code></p>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;"><strong>Setup:</strong> Nicole's pay over time plan has defaulted. $7,400 past-due is immediately due. She also has $6,500 due December 15 for the current term. A registration hold is active. Her saved payment method is on file. Total balance: $11,275.</p>
+      <div class="proto-links">
+        <a class="proto-link" href="./home-4b-defaulted-plan.html" target="_blank"><span class="proto-icon">⬡</span> Prototype: 4b — Defaulted Plan</a>
+      </div>
 
       <div class="req-item">
         <p class="req-persona">As a student payer</p>
@@ -3754,6 +3933,9 @@ body {
       <hr class="section-divider"/>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:12px;"><strong>Prototype:</strong> <code>home-5b-past-due-mixed.html</code> · Student: James · Balance state: <code>past-due</code></p>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;"><strong>Setup:</strong> James has a $2,500 past-due balance from Summer 2025 (overdue), a $9,500 current-term balance due September 15, a $50 returned payment fee due immediately, and a $1,000 balance with no due date. Total: $12,450. No active plan. No registration hold.</p>
+      <div class="proto-links">
+        <a class="proto-link" href="./home-5b-past-due-mixed.html" target="_blank"><span class="proto-icon">⬡</span> Prototype: 5b — Past Due &amp; Mixed Dates</a>
+      </div>
 
       <div class="req-item">
         <p class="req-persona">As a student payer</p>
@@ -3774,6 +3956,9 @@ body {
       <hr class="section-divider"/>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:12px;"><strong>Prototype:</strong> <code>home-6b-outside-plan-charges.html</code> · Student: Marcus · Balance state: <code>outside-plan</code></p>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;"><strong>Setup:</strong> Marcus has an active pay over time plan ($6,000 remaining, $1,500/month). A meal plan charge and an enrollment fee totaling $1,550 are due September 15 but are NOT included in his pay over time plan. Total account balance: $9,200.</p>
+      <div class="proto-links">
+        <a class="proto-link" href="./home-6b-outside-plan-charges.html" target="_blank"><span class="proto-icon">⬡</span> Prototype: 6b — Active Plan + Outside Charges</a>
+      </div>
 
       <div class="req-item">
         <p class="req-persona">As a student payer</p>
@@ -4469,6 +4654,9 @@ body {
       <div class="section-eyebrow">Features · Pay Over Time</div>
       <h2 class="section-title">Balance Change Handling</h2>
       <hr class="section-divider"/>
+      <div class="proto-links">
+        <a class="proto-link" href="./home-1b-balance-increase.html" target="_blank"><span class="proto-icon">⬡</span> See Prototype: 1b — Balance Increase on Plan</a>
+      </div>
       <div class="sophie-flag">
         <span class="sophie-flag-label">Sophie review needed</span>
         <span>Add feature requirements for how the consumer experience handles balance changes after plan enrollment: new charges added (the "open balance" state shown in scenario 1b), charges removed (add/drop), financial aid applied or reversed. What does the student see? What actions are available? What notifications are sent? Reference scenario 1b (home-1b-balance-increase.html) for the visual design direction.</span>
@@ -4479,6 +4667,9 @@ body {
       <div class="section-eyebrow">Features · Pay Over Time</div>
       <h2 class="section-title">Default &amp; Recovery</h2>
       <hr class="section-divider"/>
+      <div class="proto-links">
+        <a class="proto-link" href="./home-4b-defaulted-plan.html" target="_blank"><span class="proto-icon">⬡</span> See Prototype: 4b — Defaulted Plan</a>
+      </div>
       <div class="sophie-flag">
         <span class="sophie-flag-label">Sophie review needed</span>
         <span>Add feature requirements for what the student sees when a plan payment fails: returned payment notification, retry options, plan default state (as shown in scenario 4b, home-4b-defaulted-plan.html), re-enrollment path, and collections escalation messaging. What actions can the student take? What is locked? Reference scenario 4b for the visual design direction.</span>
@@ -5467,119 +5658,518 @@ body {
 
 
 <script>
-const DOC_DATE = '2026-05-01';
+// ─────────────────────────────────────────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────────────────────────────────────────
+const DOC_DATE        = '2026-05-05';
+const USER_KEY_PFX    = 'hz_prd_user_';
+const NAV_STATE_KEY   = 'hz_prd_nav';
 
-function storageKey(name) {
-  return 'hz_prd_seen_' + name.toLowerCase().replace(/\s+/g, '_');
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION TREE — used for preferences UI and change filtering
+// Each group: { id, label, firstSection, children: [{id, label}] }
+// ─────────────────────────────────────────────────────────────────────────────
+var SECTION_TREE = [
+  { id:'Foundation', label:'Foundation', first:'he-market', children:[
+    {id:'he-market',label:'HE Market Context'},
+    {id:'perspective-shift',label:'Perspective Shift'},
+    {id:'vision',label:'Product Vision'},
+    {id:'onboarding-vision',label:'Onboarding Vision'},
+    {id:'comms-vision',label:'Communications Vision'},
+    {id:'pot-vision',label:'Pay Over Time Vision'},
+    {id:'support-vision',label:'In-App Support Vision'},
+    {id:'inst-vision',label:'Institution Vision'},
+  ]},
+  { id:'Problems & Needs', label:'Problems & Needs', first:'inst-problems', children:[
+    {id:'inst-problems',label:'Institution Problems & Needs'},
+    {id:'consumer-problems',label:'Consumer Problems & Needs'},
+  ]},
+  { id:'Institution Process Flow', label:'Institution Process Flow', first:'inst-flow-hl', children:[
+    {id:'inst-flow-hl',label:'High-Level End-to-End'},
+    {id:'inst-flow-contract',label:'Contract & System Setup'},
+    {id:'inst-flow-billing',label:'Term Billing & Setup'},
+    {id:'inst-flow-access',label:'Student Account Access'},
+    {id:'inst-flow-payments',label:'Payment Processing'},
+    {id:'inst-flow-midterm',label:'Mid-Term Account Changes'},
+    {id:'inst-flow-disbursements',label:'Disbursements & Refunds'},
+    {id:'inst-flow-collections',label:'Collections Escalation'},
+  ]},
+  { id:'NBS Process Flow', label:'NBS Process Flow', first:'nbs-flow-hl', children:[
+    {id:'nbs-flow-hl',label:'High-Level End-to-End'},
+    {id:'nbs-selling',label:'Selling & Pricing'},
+    {id:'nbs-implementation',label:'Implementation'},
+    {id:'nbs-pot-reenrollment',label:'Pay Over Time Re-enrollment'},
+    {id:'nbs-tech-support',label:'Technical Support'},
+    {id:'nbs-pas-support',label:'PAS Support'},
+  ]},
+  { id:'Institution Config', label:'Institution Config', first:'inst-config', children:[
+    {id:'inst-config',label:'Overview & Scope'},
+    {id:'inst-payment-methods',label:'Payment Methods'},
+    {id:'inst-pay-over-time',label:'Pay Over Time'},
+    {id:'inst-insurance',label:'Tuition Insurance'},
+    {id:'inst-auth-parties',label:'Authorized Parties'},
+    {id:'inst-disclosures',label:'Disclosures'},
+    {id:'inst-communications',label:'Communications'},
+  ]},
+  { id:'Features · Onboarding', label:'Features · Onboarding', first:'feat-auth', children:[
+    {id:'feat-auth',label:'Authentication'},
+    {id:'feat-balance-overview',label:'Balance Overview'},
+    {id:'feat-tuition-insurance',label:'Tuition Insurance'},
+    {id:'feat-how-to-pay',label:'How to Pay'},
+    {id:'feat-authorized-parties',label:'Authorized Parties'},
+    {id:'feat-communications',label:'Communications'},
+    {id:'feat-disclosures',label:'Disclosures'},
+  ]},
+  { id:'Features · Home Screen', label:'Features · Home Screen', first:'feat-account-settings', children:[
+    {id:'feat-account-settings',label:'Account Settings'},
+    {id:'feat-todos',label:'To-dos'},
+    {id:'feat-recent-activity',label:'Recent Activity'},
+    {id:'feat-upcoming',label:'Upcoming Payments'},
+    {id:'feat-account-presentment',label:'Account Presentment'},
+    {id:'feat-quick-actions',label:'Quick Actions'},
+  ]},
+  { id:'Features · Pay Over Time', label:'Features · Pay Over Time', first:'feat-pot', children:[
+    {id:'feat-pot',label:'Overview'},
+    {id:'feat-pot-enrollment',label:'Plan Enrollment Flow'},
+    {id:'feat-pot-confirmation',label:'Confirmation & Agreement'},
+    {id:'feat-pot-management',label:'Plan Management'},
+    {id:'feat-pot-balance-change',label:'Balance Change Handling'},
+    {id:'feat-pot-default',label:'Default & Recovery'},
+  ]},
+  { id:'Scenarios — Onboarding', label:'Scenarios — Onboarding', first:'s1', children:[
+    {id:'s1',label:'1 · First Time Student'},
+    {id:'s2',label:'2 · Returning Student'},
+    {id:'s3',label:'3 · New AP — Single Payer'},
+    {id:'s4',label:'4 · New AP — Multi Payer'},
+    {id:'s5',label:'5 · AP — Non-Payer'},
+    {id:'s6',label:'6 · Returning AP'},
+  ]},
+  { id:'Scenarios — Home Screen', label:'Scenarios — Home Screen', first:'hs-intro', children:[
+    {id:'hs1',label:'1b · Balance Increase on Plan'},
+    {id:'hs2',label:'2b · Simple Balance, No Plan'},
+    {id:'hs3',label:'3b · Credit Balance & Refund'},
+    {id:'hs4',label:'4b · Defaulted Plan'},
+    {id:'hs5',label:'5b · Past Due & Mixed Dates'},
+    {id:'hs6',label:'6b · Active Plan + Outside Charges'},
+  ]},
+  { id:'Pay Over Time', label:'Pay Over Time', first:'pp-standard', children:[
+    {id:'pp-standard',label:'Standard Plans'},
+    {id:'pp-pastdue',label:'Past-Due Plans'},
+    {id:'ltpp-overview',label:'Long-Term Plans'},
+    {id:'intl-overview',label:'International Plans'},
+    {id:'pp-hidden',label:'Hidden Plans'},
+    {id:'guarantee-overview',label:'Guarantee Plans'},
+    {id:'pp-custom',label:'Custom Plans'},
+  ]},
+  { id:'Platform Requirements', label:'Platform Requirements', first:'plat-account-payments', children:[
+    {id:'plat-account-payments',label:'Account Payments'},
+    {id:'plat-payment-plans',label:'Pay Over Time'},
+    {id:'plat-billing',label:'Billing'},
+  ]},
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHANGE LOG — entries for all new/modified content since initial release
+// ─────────────────────────────────────────────────────────────────────────────
+var CHANGE_LOG = [
+  {date:'2026-05-05',group:'Foundation',sectionId:'he-market',label:'HE Market Context',summary:'New section: full HE market briefing — enrollment trends, SIS migration wave, competitive landscape, NCC implications (March 2026 data)'},
+  {date:'2026-05-05',group:'Institution Process Flow',sectionId:'inst-flow-contract',label:'Contract & System Setup — Detail',summary:'New detail section: Phase 1 deep-dive with Sophie flags for implementation team input'},
+  {date:'2026-05-05',group:'Institution Process Flow',sectionId:'inst-flow-billing',label:'Term Billing & Setup — Detail',summary:'New detail section: Phase 2 deep-dive'},
+  {date:'2026-05-05',group:'Institution Process Flow',sectionId:'inst-flow-access',label:'Student Account Access — Detail',summary:'New detail section: Phase 3 deep-dive'},
+  {date:'2026-05-05',group:'Institution Process Flow',sectionId:'inst-flow-payments',label:'Payment Processing — Detail',summary:'New detail section: Phase 4 deep-dive'},
+  {date:'2026-05-05',group:'Institution Process Flow',sectionId:'inst-flow-midterm',label:'Mid-Term Account Changes — Detail',summary:'New detail section: Phase 5 deep-dive'},
+  {date:'2026-05-05',group:'Institution Process Flow',sectionId:'inst-flow-disbursements',label:'Disbursements & Refunds — Detail',summary:'New detail section: Phase 6 deep-dive'},
+  {date:'2026-05-05',group:'Institution Process Flow',sectionId:'inst-flow-collections',label:'Collections Escalation — Detail',summary:'New detail section: Phase 7 deep-dive'},
+  {date:'2026-05-05',group:'NBS Process Flow',sectionId:'nbs-flow-hl',label:'NBS High-Level End-to-End',summary:'New section: NBS process flow overview with Sophie flags for process mapping'},
+  {date:'2026-05-05',group:'NBS Process Flow',sectionId:'nbs-selling',label:'NBS — Selling & Pricing',summary:'New section: sales and pricing process scaffold'},
+  {date:'2026-05-05',group:'NBS Process Flow',sectionId:'nbs-implementation',label:'NBS — Implementation',summary:'New section: implementation process scaffold'},
+  {date:'2026-05-05',group:'NBS Process Flow',sectionId:'nbs-pot-reenrollment',label:'NBS — Pay Over Time Re-enrollment',summary:'New section: recurring term re-enrollment operations scaffold'},
+  {date:'2026-05-05',group:'NBS Process Flow',sectionId:'nbs-tech-support',label:'NBS — Technical Support',summary:'New section: technical support process scaffold'},
+  {date:'2026-05-05',group:'NBS Process Flow',sectionId:'nbs-pas-support',label:'NBS — PAS Support',summary:'New section: PAS operations process scaffold'},
+  {date:'2026-05-05',group:'Pay Over Time',sectionId:'pp-standard',label:'Standard Plans',summary:'New section: standard plan requirements — enrollment window, auto-debit, schedule options, eligibility'},
+  {date:'2026-05-05',group:'Pay Over Time',sectionId:'pp-pastdue',label:'Past-Due Plans',summary:'New section: past-due plan requirements bridging standard plans and LTPP'},
+  {date:'2026-05-05',group:'Pay Over Time',sectionId:'pp-hidden',label:'Hidden Plans',summary:'New section: admin invite-only plan requirements'},
+  {date:'2026-05-05',group:'Pay Over Time',sectionId:'pp-custom',label:'Custom Plans',summary:'New section: fully bespoke per-student plan requirements'},
+  {date:'2026-05-05',group:'Pay Over Time',sectionId:'ltpp-overview',label:'Long-Term Plans (LTPP)',summary:'New section: LTPP requirements — past-due recovery, auto-debit, original receivable mechanics, comms'},
+  {date:'2026-05-05',group:'Pay Over Time',sectionId:'intl-overview',label:'International Plans',summary:'New section: international plan requirements — invoice-based, vendor integration, currency'},
+  {date:'2026-05-05',group:'Pay Over Time',sectionId:'guarantee-overview',label:'Guarantee Plans',summary:'New section: state-regulated guarantee plan requirements'},
+  {date:'2026-05-05',group:'Features · Pay Over Time',sectionId:'feat-pot',label:'Pay Over Time Features',summary:'New section group: Plan Enrollment Flow, Confirmation, Management, Balance Change, Default & Recovery'},
+  {date:'2026-05-05',group:'Scenarios — Home Screen',sectionId:'hs1',label:'1b · Balance Increase on Plan',summary:'New scenario: on-plan-open state with agile user story requirements'},
+  {date:'2026-05-05',group:'Scenarios — Home Screen',sectionId:'hs2',label:'2b · Simple Balance, No Plan',summary:'New scenario: open balance state'},
+  {date:'2026-05-05',group:'Scenarios — Home Screen',sectionId:'hs3',label:'3b · Credit Balance & Refund',summary:'New scenario: credit balance / refund pending state'},
+  {date:'2026-05-05',group:'Scenarios — Home Screen',sectionId:'hs4',label:'4b · Defaulted Plan',summary:'New scenario: defaulted plan + registration hold state'},
+  {date:'2026-05-05',group:'Scenarios — Home Screen',sectionId:'hs5',label:'5b · Past Due & Mixed Dates',summary:'New scenario: past-due + multiple due date state'},
+  {date:'2026-05-05',group:'Scenarios — Home Screen',sectionId:'hs6',label:'6b · Active Plan + Outside Charges',summary:'New scenario: on-plan with outside-plan charges state'},
+  {date:'2026-05-04',group:'Problems & Needs',sectionId:'inst-problems',label:'Institution Problems & Needs',summary:'Added institution problems, needs, and consumer needs sections with process flow'},
+  {date:'2026-05-04',group:'Pay Over Time',sectionId:'guarantee-overview',label:'Guarantee Plans',summary:'Full Guarantee Plans requirements section added'},
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USER DATA HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+function userKey(name) {
+  return USER_KEY_PFX + name.trim().toLowerCase().replace(/\s+/g,'_');
+}
+function loadUser(name) {
+  try { return JSON.parse(localStorage.getItem(userKey(name)) || 'null'); } catch(e) { return null; }
+}
+function saveUser(name, data) {
+  localStorage.setItem(userKey(name), JSON.stringify(data));
+}
+function isReturningUser(name) {
+  return loadUser(name) !== null;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// COLLAPSIBLE NAV
+// ─────────────────────────────────────────────────────────────────────────────
+function initCollapsibleNav() {
+  var savedState = {};
+  try { savedState = JSON.parse(localStorage.getItem(NAV_STATE_KEY) || '{}'); } catch(e) {}
+
+  document.querySelectorAll('.nav-group').forEach(function(group) {
+    var label = group.querySelector('.nav-group-label');
+    if (!label) return;
+
+    // Get or create group ID from label text
+    var groupId = label.textContent.trim();
+
+    // Wrap all children (nav-links, nav-section-labels) in a body div
+    var body = document.createElement('div');
+    body.className = 'nav-group-body';
+    var children = Array.from(group.children).filter(function(c) {
+      return c !== label;
+    });
+    children.forEach(function(c) { body.appendChild(c); });
+    group.appendChild(body);
+
+    // Add collapse icon to label
+    var icon = document.createElement('span');
+    icon.className = 'nav-collapse-icon';
+    icon.textContent = '▶';
+    label.appendChild(icon);
+
+    // Restore saved state (default: collapsed unless it's the active section)
+    var isOpen = savedState[groupId] === true;
+    if (isOpen) group.classList.add('is-open');
+
+    label.addEventListener('click', function() {
+      var opening = !group.classList.contains('is-open');
+      group.classList.toggle('is-open');
+
+      // Navigate to first section in group when opening
+      if (opening) {
+        var firstLink = body.querySelector('a.nav-link:not(.soon)');
+        if (firstLink) {
+          var targetId = firstLink.getAttribute('href').slice(1);
+          var target = document.getElementById(targetId);
+          if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
+        }
+      }
+
+      // Save state
+      savedState[groupId] = group.classList.contains('is-open');
+      localStorage.setItem(NAV_STATE_KEY, JSON.stringify(savedState));
+    });
+  });
+
+  // Auto-expand nav group containing active section (on scroll)
+  var io2 = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (!entry.isIntersecting) return;
+      var id = entry.target.id;
+      var link = document.querySelector('.nav-link[href="#' + id + '"]');
+      if (!link) return;
+      var group = link.closest('.nav-group');
+      if (group && !group.classList.contains('is-open')) {
+        group.classList.add('is-open');
+        var groupId = group.querySelector('.nav-group-label').textContent.trim();
+        savedState[groupId] = true;
+        localStorage.setItem(NAV_STATE_KEY, JSON.stringify(savedState));
+      }
+    });
+  }, { rootMargin:'-10% 0px -80% 0px' });
+  document.querySelectorAll('section[id]').forEach(function(s) { io2.observe(s); });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PREFERENCES UI
+// ─────────────────────────────────────────────────────────────────────────────
+var _pendingUserName = '';
+
+function buildPrefUI() {
+  var list = document.getElementById('pref-section-list');
+  list.innerHTML = '';
+  SECTION_TREE.forEach(function(group) {
+    var grpEl = document.createElement('div');
+    grpEl.className = 'pref-group';
+    grpEl.dataset.groupId = group.id;
+
+    var hdr = document.createElement('div');
+    hdr.className = 'pref-group-header';
+    hdr.innerHTML =
+      '<input type="checkbox" class="pref-group-check" id="pg_' + group.id.replace(/\W/g,'_') + '" onchange="onGroupCheckChange(this)"/>' +
+      '<label for="pg_' + group.id.replace(/\W/g,'_') + '" class="pref-group-label" style="cursor:pointer">' + group.label + '</label>' +
+      '<button class="pref-expand-btn" onclick="togglePrefGroup(this.closest(\'.pref-group\'))" type="button">▶</button>';
+    grpEl.appendChild(hdr);
+
+    var kids = document.createElement('div');
+    kids.className = 'pref-group-children';
+    group.children.forEach(function(child) {
+      var row = document.createElement('div');
+      row.className = 'pref-child';
+      var childId = 'pc_' + child.id;
+      row.innerHTML =
+        '<input type="checkbox" class="pref-group-check pref-child-check" id="' + childId + '" data-group="' + group.id + '" data-section="' + child.id + '"/>' +
+        '<label for="' + childId + '" class="pref-child-label" style="cursor:pointer">' + child.label + '</label>';
+      kids.appendChild(row);
+    });
+    grpEl.appendChild(kids);
+    list.appendChild(grpEl);
+  });
+}
+
+function togglePrefGroup(grpEl) {
+  grpEl.classList.toggle('pref-open');
+  var btn = grpEl.querySelector('.pref-expand-btn');
+  if (btn) btn.textContent = grpEl.classList.contains('pref-open') ? '▼' : '▶';
+}
+
+function onGroupCheckChange(cb) {
+  var grpEl = cb.closest('.pref-group');
+  var checked = cb.checked;
+  // Check/uncheck all children
+  grpEl.querySelectorAll('.pref-child-check').forEach(function(c) { c.checked = checked; });
+  syncAllCheck();
+}
+
+function toggleAllPrefs(checked) {
+  document.querySelectorAll('#pref-section-list .pref-group-check').forEach(function(c) {
+    c.checked = checked;
+  });
+}
+
+function syncAllCheck() {
+  var all = document.querySelectorAll('#pref-section-list .pref-group-check:not(.pref-child-check)');
+  var allChecked = Array.from(all).every(function(c) { return c.checked; });
+  document.getElementById('pref-all-check').checked = allChecked;
+}
+
+function gatherPrefs() {
+  // Returns {groups:[], sections:[]} based on checkbox state
+  var groups = [];
+  var sections = [];
+  document.querySelectorAll('#pref-section-list .pref-group').forEach(function(grpEl) {
+    var groupId = grpEl.dataset.groupId;
+    var groupCb = grpEl.querySelector(':not(.pref-child-check).pref-group-check');
+    var childCbs = Array.from(grpEl.querySelectorAll('.pref-child-check'));
+    if (groupCb && groupCb.checked) {
+      groups.push(groupId);
+    } else {
+      childCbs.forEach(function(c) { if (c.checked) sections.push(c.dataset.section); });
+    }
+  });
+  return {groups:groups, sections:sections};
+}
+
+function openPrefOverlay(isManage) {
+  buildPrefUI();
+  // Pre-fill from saved prefs if managing
+  if (isManage) {
+    var userData = loadUser(_pendingUserName || document.getElementById('visitor-name').textContent);
+    if (userData && userData.prefs) {
+      var prefs = userData.prefs;
+      if (prefs.watchAll) {
+        document.getElementById('pref-all-check').checked = true;
+        toggleAllPrefs(true);
+      } else {
+        (prefs.groups||[]).forEach(function(g) {
+          var cb = document.querySelector('#pref-section-list .pref-group[data-group-id="' + g + '"] :not(.pref-child-check).pref-group-check');
+          if (cb) { cb.checked = true; onGroupCheckChange(cb); }
+        });
+        (prefs.sections||[]).forEach(function(s) {
+          var cb = document.querySelector('#pref-section-list .pref-child-check[data-section="' + s + '"]');
+          if (cb) cb.checked = true;
+        });
+      }
+    }
+  }
+  document.getElementById('pref-overlay').style.display = 'flex';
+}
+
+function savePrefAndOpen(usePrefs) {
+  var name = _pendingUserName;
+  var prefs;
+  if (usePrefs) {
+    var allCheck = document.getElementById('pref-all-check');
+    if (allCheck && allCheck.checked) {
+      prefs = {watchAll: true, groups:[], sections:[]};
+    } else {
+      prefs = gatherPrefs();
+    }
+  } else {
+    prefs = {watchAll: true, groups:[], sections:[]};
+  }
+  // Save user with prefs
+  var existingUser = loadUser(name) || {};
+  existingUser.prefs = prefs;
+  if (!existingUser.firstSeen) existingUser.firstSeen = DOC_DATE;
+  saveUser(name, existingUser);
+
+  document.getElementById('pref-overlay').style.display = 'none';
+  openAsViewer(name);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHANGES-TO-REVIEW PANEL
+// ─────────────────────────────────────────────────────────────────────────────
+function buildCTRPanel(userData) {
+  var lastVisit = userData.lastVisit || '2000-01-01';
+  var prefs = userData.prefs || {watchAll:true};
+
+  // Filter change log to watched sections newer than last visit
+  var relevant = CHANGE_LOG.filter(function(entry) {
+    if (entry.date <= lastVisit) return false;
+    if (prefs.watchAll) return true;
+    if ((prefs.groups||[]).indexOf(entry.group) !== -1) return true;
+    if ((prefs.sections||[]).indexOf(entry.sectionId) !== -1) return true;
+    return false;
+  });
+
+  if (relevant.length === 0) return;
+
+  var panel = document.getElementById('ctr-panel');
+  var title = document.getElementById('ctr-title');
+  var list  = document.getElementById('ctr-list');
+
+  title.textContent = relevant.length + ' change' + (relevant.length !== 1 ? 's' : '') + ' to review';
+  list.innerHTML = '';
+
+  relevant.forEach(function(entry) {
+    var item = document.createElement('div');
+    item.className = 'ctr-item';
+    item.innerHTML =
+      '<div class="ctr-item-dot"></div>' +
+      '<div class="ctr-item-body">' +
+        '<span class="ctr-item-link" onclick="jumpToSection(\'' + entry.sectionId + '\')">' + entry.label + '</span>' +
+        '<span class="ctr-item-summary"> — ' + entry.summary + '</span>' +
+      '</div>';
+    list.appendChild(item);
+  });
+
+  panel.style.display = 'block';
+}
+
+function jumpToSection(id) {
+  var el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LOGIN FLOW
+// ─────────────────────────────────────────────────────────────────────────────
 document.getElementById('name-form').addEventListener('submit', function(e) {
   e.preventDefault();
-  const name = document.getElementById('name-input').value.trim();
+  var name = document.getElementById('name-input').value.trim();
   if (!name) return;
-  openAsViewer(name);
+  _pendingUserName = name;
+
+  if (isReturningUser(name)) {
+    // Returning user — skip preferences, go straight to viewing
+    document.getElementById('name-overlay').style.display = 'none';
+    openAsViewer(name);
+  } else {
+    // New user — show preferences step
+    document.getElementById('name-overlay').style.display = 'none';
+    openPrefOverlay(false);
+  }
 });
 
 function updateNavWithChanges() {
-  // Remove any stale badges first
   document.querySelectorAll('.nav-update-badge').forEach(function(b) { b.remove(); });
-
-  // For each nav link that points to an anchor, check how many changed items are inside that section
   document.querySelectorAll('.nav-link[href^="#"]').forEach(function(link) {
     var targetId = link.getAttribute('href').slice(1);
     var section  = document.getElementById(targetId);
     if (!section) return;
-
-    // Count .changed items scoped to this section only (not nested sections)
-    // Use a temporary approach: count direct-descendant changed items
     var changed = section.querySelectorAll('.changed');
-    // Subtract those that belong to a nested section with its own nav link
-    var nested = section.querySelectorAll('section[id] .changed');
-    var ownCount = changed.length - nested.length;
-    if (ownCount <= 0) return;
-
+    var nested  = section.querySelectorAll('section[id] .changed');
+    var own     = changed.length - nested.length;
+    if (own <= 0) return;
     var badge = document.createElement('span');
     badge.className = 'nav-update-badge';
-    badge.textContent = ownCount;
-    // Prepend so it floats right before text renders
+    badge.textContent = own;
     link.insertBefore(badge, link.firstChild);
   });
 }
 
 function openAsViewer(name) {
-  const key      = storageKey(name);
-  const lastSeen = localStorage.getItem(key) || '2000-01-01';
+  var userData = loadUser(name) || {};
+  var lastVisit = userData.lastVisit || '2000-01-01';
 
-  // Highlight every element with a data-modified date newer than last visit
-  const items = document.querySelectorAll('[data-modified]');
-  let count = 0;
+  // Highlight changed items
+  var items = document.querySelectorAll('[data-modified]');
+  var count = 0;
   items.forEach(function(el) {
-    if (el.dataset.modified > lastSeen) {
-      el.classList.add('changed');
-      count++;
-    }
+    if (el.dataset.modified > lastVisit) { el.classList.add('changed'); count++; }
   });
 
-  // Record today as their new last-seen date
-  localStorage.setItem(key, DOC_DATE);
+  // Update last visit date
+  userData.lastVisit = DOC_DATE;
+  if (!userData.firstSeen) userData.firstSeen = DOC_DATE;
+  saveUser(name, userData);
 
-  // Dismiss overlay
-  document.getElementById('name-overlay').style.display = 'none';
-
-  // Show visitor bar
-  document.getElementById('visitor-name').textContent = name;
+  // Hide name overlay, show visitor bar
+  document.getElementById('name-overlay').style.display  = 'none';
+  document.getElementById('visitor-name').textContent     = name;
   var bar = document.getElementById('visitor-bar');
   bar.style.display = 'flex';
+  document.getElementById('manage-prefs-btn').style.display = 'inline-block';
 
-  // Show prototype home link only for Sophie; activate edit mode
+  // Sophie mode
   if (name.toLowerCase() === 'sophie') {
     document.getElementById('home-link').style.display = 'flex';
     initSophieMode();
   }
 
-  // Show change pill + banner if there are updates
+  // Show change pill + banner
   if (count > 0) {
     var pill = document.getElementById('visitor-change-pill');
     pill.textContent = count + ' updated';
     pill.style.display = 'inline-block';
-
     var banner = document.getElementById('change-banner');
-    banner.innerHTML =
-      '<strong>' + count + ' requirement' + (count !== 1 ? 's' : '') +
-      ' updated since your last visit.</strong> Items are highlighted in amber throughout the document — scroll through or jump to a section from the left nav.';
+    banner.innerHTML = '<strong>' + count + ' requirement' + (count!==1?'s':'') +
+      ' updated since your last visit.</strong> Items highlighted in amber throughout the document.';
     banner.style.display = 'block';
-
-    // Annotate nav links with per-section counts
     updateNavWithChanges();
+  }
+
+  // Build changes-to-review panel if user has preferences set
+  if (userData.prefs) {
+    buildCTRPanel(userData);
   }
 }
 
 function switchViewer() {
-  // Clear highlights
-  document.querySelectorAll('.changed').forEach(function(el) {
-    el.classList.remove('changed');
-  });
-  // Clear nav badges
+  document.querySelectorAll('.changed').forEach(function(el) { el.classList.remove('changed'); });
   document.querySelectorAll('.nav-update-badge').forEach(function(b) { b.remove(); });
-  document.getElementById('visitor-bar').style.display  = 'none';
-  document.getElementById('change-banner').style.display = 'none';
-  document.getElementById('visitor-change-pill').style.display = 'none';
-  document.getElementById('home-link').style.display = 'none';
+  document.getElementById('visitor-bar').style.display           = 'none';
+  document.getElementById('change-banner').style.display         = 'none';
+  document.getElementById('ctr-panel').style.display             = 'none';
+  document.getElementById('visitor-change-pill').style.display   = 'none';
+  document.getElementById('home-link').style.display             = 'none';
+  document.getElementById('manage-prefs-btn').style.display      = 'none';
   document.getElementById('name-input').value = '';
+  _pendingUserName = '';
   document.getElementById('name-overlay').style.display = 'flex';
-
-  // Tear down Sophie edit mode
   document.body.classList.remove('sophie-mode');
   var dlBtn = document.querySelector('.sophie-download-btn');
   if (dlBtn) dlBtn.remove();
-  // Cancel any open edit (abort gracefully)
   document.querySelectorAll('.req-item[data-editing]').forEach(abortEdit);
 }
 
-// ── Active nav highlight on scroll ──
-var sections  = document.querySelectorAll('section[id]');
-var navLinks  = document.querySelectorAll('.nav-link[href^="#"]');
-
+// ── Active nav highlight on scroll ──────────────────────────────────────────
+var sections = document.querySelectorAll('section[id]');
+var navLinks = document.querySelectorAll('.nav-link[href^="#"]');
 var io = new IntersectionObserver(function(entries) {
   entries.forEach(function(entry) {
     if (entry.isIntersecting) {
@@ -5588,10 +6178,21 @@ var io = new IntersectionObserver(function(entries) {
       if (match) match.classList.add('active');
     }
   });
-}, { rootMargin: '-20% 0px -72% 0px' });
-
+}, { rootMargin:'-20% 0px -72% 0px' });
 sections.forEach(function(s) { io.observe(s); });
 
+// ── Init collapsible nav on load ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  initCollapsibleNav();
+});
+// Also run now if DOM already loaded
+if (document.readyState !== 'loading') { initCollapsibleNav(); }
+
+</script>
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// SOPHIE MODE — unchanged from original
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ══════════════════════════════════════════════════════════════
 // SOPHIE INLINE EDIT MODE
