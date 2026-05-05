@@ -10957,18 +10957,7 @@ function initSophieMode() {
   // 7. Add section-level "+ Add principle" buttons to every owner-authored section
   addVisionSectionButtons();
 
-  // 8. Add "Update" button to visitor bar (Sophie only)
-  var bar = document.getElementById('visitor-bar');
-  if (bar && !bar.querySelector('.sophie-download-btn')) {
-    var dlBtn = document.createElement('button');
-    dlBtn.className = 'sophie-download-btn';
-    dlBtn.innerHTML = '⬇ Update';
-    dlBtn.title =
-      'Download prd.html with your edits written into the file.\n' +
-      'Commit the downloaded file to the repo so all viewers see your changes.';
-    dlBtn.addEventListener('click', downloadUpdatedHTML);
-    bar.appendChild(dlBtn);
-  }
+  // Update button removed — GitHub sync handles saves directly
 
   // 9. Warn Sophie before navigating away (browser nav, close, refresh)
   window._sophieBeforeUnload = function(e) {
