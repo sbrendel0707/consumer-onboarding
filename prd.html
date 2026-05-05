@@ -2007,8 +2007,8 @@ body {
       <hr class="section-divider"/>
 
       <div class="need-group" id="access-requests-group">
-        <h3 class="need-group-title">🔐 Access Requests (<span id="access-requests-count">0</span>)</h3>
-        <p style="font-size:12px;color:var(--hz-muted);margin-bottom:12px">People requesting access to this PRD. Approve to grant access; they'll receive an email and can log in immediately. Reject to deny.</p>
+        <h3 class="need-group-title">🔐 Access Requests (<span id="access-requests-count">0</span>) <a href="#" onclick="openGhSettings();return false;" style="font-size:11px;font-weight:400;color:var(--hz-hint);margin-left:10px;text-decoration:underline dotted">Update GitHub token</a></h3>
+        <p style="font-size:12px;color:var(--hz-muted);margin-bottom:12px">People requesting access to this PRD. Approve to grant access; they'll reach out via Teams. Reject to deny.</p>
         <div id="emailjs-config-warning" class="emailjs-config-warning" style="display:none">
           ⚠️ <strong>EmailJS not configured.</strong> Email notifications won't send until you add credentials. <a href="https://www.emailjs.com" target="_blank">Set up EmailJS →</a> then update <code>AUTH_CONFIG</code> in the script.
         </div>
@@ -11164,11 +11164,17 @@ function clearGhToken() {
 }
 
 // ── Show GitHub controls in visitor bar after login ──
+// Sync button: Sophie only. Token button: Sophie only, and only if no token is saved.
 function ghShowControls() {
-  var syncBtn = document.getElementById('gh-sync-btn');
+  var isSophie = (_currentUser || '').toLowerCase() === 'sophie' ||
+                 (_authEmail   || '').toLowerCase() === 'sophie.brendel@nelnet.net';
+  if (!isSophie) return;
+
+  var syncBtn     = document.getElementById('gh-sync-btn');
   var settingsBtn = document.getElementById('gh-settings-btn');
-  if (syncBtn)    syncBtn.style.display    = 'inline-flex';
-  if (settingsBtn) settingsBtn.style.display = 'inline-flex';
+  if (syncBtn)     syncBtn.style.display = 'inline-flex';
+  // Only show token button if no token is saved yet
+  if (settingsBtn) settingsBtn.style.display = ghGetToken() ? 'none' : 'inline-flex';
 }
 
 // ── Initial pull on page load — hydrate localStorage from GitHub ──
