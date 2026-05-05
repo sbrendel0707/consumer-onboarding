@@ -10829,45 +10829,6 @@ function initSophieMode() {
   };
   window.addEventListener('beforeunload', window._sophieBeforeUnload);
 
-  // 10. Intercept in-page navigation links that would leave this page
-  document.querySelectorAll('a[href]:not([href^="#"])').forEach(function(link) {
-    if (link.dataset.sophieGuarded) return;
-    link.dataset.sophieGuarded = '1';
-    link.addEventListener('click', function(e) {
-      if (!document.body.classList.contains('sophie-mode')) return;
-      e.preventDefault();
-      var dest = link.href;
-      var modal = document.createElement('div');
-      modal.style.cssText = 'position:fixed;inset:0;background:rgba(26,16,96,.55);backdrop-filter:blur(5px);z-index:9999;display:flex;align-items:center;justify-content:center';
-      modal.innerHTML =
-        '<div style="background:#fff;border-radius:16px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.18);text-align:center">' +
-          '<div style="font-size:24px;margin-bottom:12px">⬇</div>' +
-          '<h3 style="font-size:16px;font-weight:700;color:#1a1060;margin-bottom:8px">Download your changes first?</h3>' +
-          '<p style="font-size:13px;color:#57548d;margin-bottom:20px;line-height:1.5">You have edits in Sophie mode. If GitHub sync is configured, your changes are already saved to the repo. Download only if you want a local backup copy.</p>' +
-          '<div style="display:flex;gap:10px;justify-content:center">' +
-            '<button id="sm-download-leave" style="background:#4f46e5;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">⬇ Download &amp; Leave</button>' +
-            '<button id="sm-leave-anyway" style="background:#fff;color:#57548d;border:1px solid #dde1f0;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">Leave anyway</button>' +
-            '<button id="sm-stay" style="background:#f1f5f9;color:#374151;border:1px solid #e2e8f0;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">Stay</button>' +
-          '</div>' +
-        '</div>';
-      document.body.appendChild(modal);
-      document.getElementById('sm-download-leave').onclick = function() {
-        downloadUpdatedHTML();
-        setTimeout(function() { window.location.href = dest; }, 800);
-        modal.remove();
-      };
-      document.getElementById('sm-download-leave').onclick = function() {
-        downloadUpdatedHTML();
-        setTimeout(function() { window.location.href = dest; }, 800);
-        modal.remove();
-      };
-      document.getElementById('sm-leave-anyway').onclick = function() {
-        window.location.href = dest;
-        modal.remove();
-      };
-      document.getElementById('sm-stay').onclick = function() { modal.remove(); };
-    });
-  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
