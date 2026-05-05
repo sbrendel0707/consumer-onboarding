@@ -10156,6 +10156,8 @@ function openAsViewer(name) {
     document.getElementById('home-link').style.display = 'flex';
     initSophieMode();
     buildSophieDashboard();
+    // Process any approve/reject URL action from email link
+    if (typeof authProcessURLAction === 'function') authProcessURLAction();
   }
 
   // Show change pill + banner
@@ -11189,17 +11191,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 //   6. In EmailJS dashboard → Account → Allowed Origins → add your GitHub Pages URL
 // ─────────────────────────────────────────────────────────────────────────────
 var AUTH_CONFIG = {
-  // ── EmailJS credentials ── fill these in after EmailJS setup ──
-  publicKey:        'YOUR_EMAILJS_PUBLIC_KEY',
-  serviceId:        'YOUR_EMAILJS_SERVICE_ID',
-  // Template: to={{to_email}}, subject="Your Horizon PRD code", body includes {{otp_code}} and {{to_name}}
-  templateOtp:      'YOUR_OTP_TEMPLATE_ID',
-  // Template: to=sophie.brendel@nelnet.net, subject="PRD Access Request", body includes {{requester_name}}, {{requester_email}}, {{requested_at}}
-  templateRequest:  'YOUR_REQUEST_TEMPLATE_ID',
-  // Template: to={{to_email}}, subject="Your PRD access is approved", body includes {{to_name}}, {{prd_url}}
-  templateApproved: 'YOUR_APPROVED_TEMPLATE_ID',
-  // Template: to={{to_email}}, subject="PRD access request update", body includes {{to_name}}
-  templateRejected: 'YOUR_REJECTED_TEMPLATE_ID',
+  // ── EmailJS credentials ──
+  publicKey:        'YOUR_EMAILJS_PUBLIC_KEY',   // Account → API Keys
+  serviceId:        'service_3a5ktdv',
+  templateOtp:      'template_84lgh0l',          // OTP code email
+  templateRequest:  'YOUR_REQUEST_TEMPLATE_ID',  // Access request → Sophie (with approve/reject buttons)
+  templateApproved: 'YOUR_APPROVED_TEMPLATE_ID', // Notify user: approved
+  templateRejected: 'YOUR_REJECTED_TEMPLATE_ID', // Notify user: rejected
 
   approverEmail:  'sophie.brendel@nelnet.net',
   domain:         '@nelnet.net',
@@ -11318,26 +11316,52 @@ async function authSendOTP(email, name) {
   }
 }
 
+// ── Token generator for approve/reject links ──
+function authMakeToken() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+function authActionURL(action, email, token) {
+  var base = window.location.origin + window.location.pathname;
+  return base + '?prd_action=' + action + '&prd_email=' + encodeURIComponent(email) + '&prd_tok=' + token;
+}
+
 // ── Access request ──
 async function authSendAccessRequest(name, email) {
-  // Email Sophie
-  await authSendEmail(AUTH_CONFIG.templateRequest, {
-    requester_name:  name,
-    requester_email: email,
-    to_email:        AUTH_CONFIG.approverEmail,
-    requested_at:    new Date().toLocaleString()
-  });
-  // Write to pending-access.json if token available (for Sophie's dashboard)
+  var approveToken = authMakeToken();
+  var rejectToken  = authMakeToken();
+
+  // Write to pending-access.json first so tokens are stored before email is sent
   try {
     var existing = await ghReadFile(GH_PENDING_ACCESS_PATH) || [];
     var alreadyPending = existing.some(function(r) {
       return r.email === email.toLowerCase() && r.status === 'pending';
     });
     if (!alreadyPending) {
-      existing.push({ name: name, email: email.toLowerCase(), requestedAt: new Date().toISOString(), status: 'pending' });
+      existing.push({
+        name: name,
+        email: email.toLowerCase(),
+        requestedAt:  new Date().toISOString(),
+        status:       'pending',
+        approveToken: approveToken,
+        rejectToken:  rejectToken
+      });
       await ghWriteFile(GH_PENDING_ACCESS_PATH, existing, 'Access request: ' + email);
+    } else {
+      // Already pending — reuse existing tokens for the email
+      var existing_req = existing.find(function(r) { return r.email === email.toLowerCase(); });
+      if (existing_req) { approveToken = existing_req.approveToken; rejectToken = existing_req.rejectToken; }
     }
   } catch(e) {}
+
+  // Email Sophie with approve/reject buttons
+  await authSendEmail(AUTH_CONFIG.templateRequest, {
+    requester_name:  name,
+    requester_email: email,
+    to_email:        AUTH_CONFIG.approverEmail,
+    requested_at:    new Date().toLocaleString(),
+    approve_url:     authActionURL('approve', email, approveToken),
+    reject_url:      authActionURL('reject',  email, rejectToken)
+  });
 }
 
 // ── Step 1: name + email form submit ──
@@ -11502,6 +11526,56 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+// ── Process approve/reject URL params (called after Sophie logs in) ──
+async function authProcessURLAction() {
+  var params = new URLSearchParams(window.location.search);
+  var action = params.get('prd_action');
+  var email  = params.get('prd_email');
+  var tok    = params.get('prd_tok');
+  if (!action || !email || !tok) return;
+
+  // Clean URL so it doesn't re-trigger on refresh
+  var cleanURL = window.location.origin + window.location.pathname;
+  window.history.replaceState({}, '', cleanURL);
+
+  // Find matching request
+  var pending = await ghReadFile(GH_PENDING_ACCESS_PATH) || [];
+  var req = pending.find(function(r) { return r.email === email.toLowerCase(); });
+  if (!req) { authShowActionBanner('error', 'Request not found for ' + email); return; }
+  if (req.status !== 'pending') {
+    authShowActionBanner('info', email + ' was already ' + req.status + '.'); return;
+  }
+
+  var expectedTok = action === 'approve' ? req.approveToken : req.rejectToken;
+  if (tok !== expectedTok) { authShowActionBanner('error', 'Invalid or expired link.'); return; }
+
+  if (action === 'approve') {
+    await authApproveRequest(req.name, req.email);
+    authShowActionBanner('success', '✓ Access approved for ' + req.name + ' (' + req.email + '). They\'ve been notified.');
+  } else {
+    await authRejectRequest(req.name, req.email);
+    authShowActionBanner('info', 'Access rejected for ' + req.name + ' (' + req.email + '). They\'ve been notified.');
+  }
+  if (typeof buildAccessRequestsPanel === 'function') buildAccessRequestsPanel();
+}
+
+function authShowActionBanner(type, msg) {
+  var colors = {
+    success: { bg:'#E1F5EE', border:'#0D7A55', text:'#0D7A55' },
+    info:    { bg:'#EEF0FF', border:'#645CDC', text:'#2D1FA3' },
+    error:   { bg:'#FFF0F0', border:'#E24B4A', text:'#E24B4A' }
+  };
+  var c = colors[type] || colors.info;
+  var banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9999;' +
+    'background:' + c.bg + ';border:1.5px solid ' + c.border + ';color:' + c.text + ';' +
+    'border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.12);' +
+    'max-width:480px;text-align:center;';
+  banner.textContent = msg;
+  document.body.appendChild(banner);
+  setTimeout(function() { banner.remove(); }, 7000);
+}
 
 // ── Sophie: load and render access requests ──
 async function buildAccessRequestsPanel() {
