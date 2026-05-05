@@ -393,27 +393,38 @@ body {
 
 /* ── Tag filter bar ───────────────────────────────────── */
 .tag-filter-bar {
-  display: none; position: sticky; top: 0; z-index: 120; background: #fff;
-  border-bottom: 1px solid #e8eaf4; padding: 8px 20px; align-items: center;
-  gap: 8px; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  display: none; position: sticky; top: 37px; z-index: 98; background: #f8f9fc;
+  border-bottom: 1px solid #e8eaf4; padding: 5px 24px; align-items: center;
+  gap: 6px; flex-wrap: wrap; box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
 .tag-filter-bar.is-active { display: flex; }
-.tag-filter-label { font-size: 11px; font-weight: 700; color: var(--hz-muted);
+.tag-filter-label { font-size: 10px; font-weight: 700; color: var(--hz-muted);
   text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
 .tag-filter-btn {
-  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
-  border: 1px solid #dde1f0; background: #f8f9fc; color: #57548d;
+  font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+  border: 1px solid #dde1f0; background: #fff; color: #57548d;
   cursor: pointer; transition: all .12s; white-space: nowrap;
 }
 .tag-filter-btn:hover { border-color: #a5b4fc; background: #eef2ff; }
 .tag-filter-btn.is-active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
-.tag-filter-clear { font-size: 11px; font-weight: 600; color: #dc2626; background: none;
-  border: 1px solid #fca5a5; border-radius: 20px; padding: 3px 10px; cursor: pointer; }
+.tag-filter-clear { font-size: 10px; font-weight: 600; color: #dc2626; background: none;
+  border: 1px solid #fca5a5; border-radius: 20px; padding: 2px 8px; cursor: pointer; }
 .tag-filter-clear:hover { background: #fef2f2; }
-.tag-filter-count { font-size: 11px; color: var(--hz-muted); margin-left: 4px; }
+.tag-filter-count { font-size: 10px; color: var(--hz-muted); margin-left: 2px; }
 
 /* When filter active, hide non-matching req-items */
 .req-item.filter-hidden { display: none !important; }
+
+/* ── Personal dashboard nav link ────────────────────── */
+.nav-dashboard-link {
+  display: none; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
+  color: var(--hz-indigo); background: rgba(100,92,220,.08);
+  border: 1px solid rgba(100,92,220,.2); border-radius: 8px;
+  padding: 6px 10px; margin: 0 0 16px; text-decoration: none;
+  transition: background .12s;
+}
+.nav-dashboard-link:hover { background: rgba(100,92,220,.14); }
+.nav-dashboard-link.is-visible { display: flex; }
 .sophie-backend-btn {
   display:none; font-size:10px; font-weight:600; color:var(--hz-muted);
   background:none; border:1px solid var(--hz-border); border-radius:5px;
@@ -1473,6 +1484,9 @@ body {
   <!-- Sidebar nav -->
   <nav class="sidebar" aria-label="Document sections">
     <div class="nav-logo">Horizon PRD</div>
+
+    <!-- Personal dashboard shortcut — shown after login by JS -->
+    <a id="nav-dashboard-link" class="nav-dashboard-link" href="#my-updates">📋 My Dashboard</a>
 
     <div class="nav-group">
       <div class="nav-group-label">Foundation</div>
@@ -6590,7 +6604,7 @@ body {
 // ─────────────────────────────────────────────────────────────────────────────
 const DOC_DATE        = '2026-05-05';
 const USER_KEY_PFX    = 'hz_prd_user_';
-const NAV_STATE_KEY   = 'hz_prd_nav';
+const NAV_STATE_KEY   = 'hz_prd_nav_v2'; // v2: default-collapsed behavior
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SECTION TREE — used for preferences UI and change filtering
@@ -7779,10 +7793,8 @@ var ALL_FILTER_DEFS = [
   { key:'inst',     label:'🏫 Institution Review', cls:'tag-status-inst'     },
   { key:'idea',     label:'💡 Idea State',         cls:'tag-status-idea'     },
   // Type tags
-  { key:'backend',  label:'🔧 Backend Only',       cls:'tag-backend'         },
-  { key:'erp',      label:'ERP / SSO',             cls:'tag-erp'             },
-  { key:'req',      label:'Required',              cls:'tag-req'             },
-  { key:'inst-tag', label:'Institution',           cls:'tag-inst'            },
+  { key:'backend',  label:'🔧 Backend Only',  cls:'tag-backend' },
+  { key:'erp',      label:'From ERP',         cls:'tag-erp'     },
 ];
 
 function initTagFilter() {
@@ -7957,6 +7969,15 @@ function openAsViewer(name) {
   // Init tag filter bar (all users)
   initTagFilter();
 
+  // Show personal dashboard nav link; Sophie gets Sophie dashboard, others get My Updates
+  var dashLink = document.getElementById('nav-dashboard-link');
+  if (dashLink) {
+    var isSophie = name.toLowerCase() === 'sophie';
+    dashLink.href = isSophie ? '#sophie-dashboard' : '#my-updates';
+    dashLink.textContent = isSophie ? '📋 Sophie\'s Dashboard' : '📋 My Dashboard';
+    dashLink.classList.add('is-visible');
+  }
+
   // Build My Updates section
   buildMyUpdates(userData);
 }
@@ -7989,6 +8010,9 @@ function switchViewer() {
   clearTagFilter();
   var bar = document.getElementById('tag-filter-bar');
   if (bar) bar.classList.remove('is-active');
+  // Hide personal dashboard nav link
+  var dashLink = document.getElementById('nav-dashboard-link');
+  if (dashLink) dashLink.classList.remove('is-visible');
 }
 
 // ── Active nav highlight on scroll ──────────────────────────────────────────
