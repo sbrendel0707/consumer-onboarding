@@ -1619,6 +1619,14 @@ body {
     </div>
 
     <div class="nav-group">
+      <div class="nav-group-label">Features · Account</div>
+      <a href="#feat-comm-history"   class="nav-link nav-sub-item">Communication History</a>
+      <a href="#feat-guest-pay"      class="nav-link nav-sub-item">Guest Payments</a>
+      <a href="#feat-assisted-pay"   class="nav-link nav-sub-item">Assisted Payments</a>
+      <a href="#feat-ap-management"  class="nav-link nav-sub-item">AP Management</a>
+    </div>
+
+    <div class="nav-group">
       <div class="nav-group-label">Scenarios — Onboarding</div>
       <a href="#s1" class="nav-link">
         1 · First Time Student
@@ -1676,9 +1684,12 @@ body {
 
     <div class="nav-group">
       <div class="nav-group-label">Platform Requirements</div>
-      <a href="#plat-account-payments"  class="nav-link">Account Payments</a>
-      <a href="#plat-payment-plans"     class="nav-link">Pay Over Time</a>
-      <a href="#plat-billing"           class="nav-link">Billing</a>
+      <a href="#plat-account-payments"   class="nav-link">Account Payments</a>
+      <a href="#plat-payment-plans"      class="nav-link">Pay Over Time</a>
+      <a href="#plat-balance-compare"    class="nav-link">Balance Compare &amp; Rebalance</a>
+      <a href="#plat-payment-allocation" class="nav-link">Payment Allocation</a>
+      <a href="#plat-plan-offers"        class="nav-link">Plan Offer Configuration</a>
+      <a href="#plat-billing"            class="nav-link">Billing</a>
       <a href="#plat-payment-processing" class="nav-link">Payment Processing</a>
       <a href="#plat-school-structure"  class="nav-link">School Structure Setup</a>
       <a href="#plat-access-management" class="nav-link">Access Management</a>
@@ -3618,6 +3629,294 @@ body {
       </div>
     </section>
 
+
+    <!-- ════════════════════════════════════════
+         FEATURES · ACCOUNT — Communication History
+    ════════════════════════════════════════ -->
+    <section id="feat-comm-history" class="prd-section">
+      <div class="section-eyebrow">Features · Account</div>
+      <h2 class="section-title">Communication History</h2>
+      <p class="section-subtitle">Every person interacting with a student account — the account holder, authorized parties, and institution staff — needs a clear, appropriately scoped view of communications. This section defines what each persona can see, what institution users can action, and the technical contract that governs message visibility and resendability across all outbound correspondence.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Consumer View — Student (Account Holder)</h3>
+        <div class="req-item">
+          <p class="req-persona">As a student</p>
+          <p class="req-text"><strong>Full Account Communication History.</strong> The student must be able to view all communications associated with their account, including communications sent to authorized parties about their account. Each entry must display the communication type, recipient, sent timestamp, delivery status (delivered, failed, or pending), and a message preview when the communication is marked viewable.</p>
+          <p class="req-why"><strong>Why:</strong> Students are the account holders of record and need full visibility into all outbound correspondence touching their account — including messages sent to parties acting on their behalf — so they can verify accuracy, follow up on failed deliveries, and maintain awareness of their account activity.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a student</p>
+          <p class="req-text"><strong>Rendered Message Preview.</strong> For any communication where <code>isViewable</code> is true, the student must be able to open a full preview rendering the message body as it was delivered, including any visible links or action buttons. For communications where <code>isViewable</code> is false, a placeholder reading "Content not viewable" must be shown in place of the message body; no partial body content may be exposed.</p>
+          <p class="req-why"><strong>Why:</strong> Viewing the actual message body helps students confirm what was communicated on their behalf. Concealing sensitive one-time content (verification codes, invite tokens) prevents replay attacks and protects account security after those messages have served their purpose.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a student</p>
+          <p class="req-text"><strong>Communication History Filtering.</strong> The student must be able to filter their communication history by communication type (e.g., payment confirmation, invite, statement), date range, and delivery status. Filters must be combinable and must update the displayed list in real time without a full page reload.</p>
+          <p class="req-why"><strong>Why:</strong> Students with long account histories or multiple authorized parties may have dozens of communications. Filtering by type, date, and status lets them quickly locate a specific message rather than scrolling through an unorganized list.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Consumer View — Authorized Party</h3>
+        <div class="req-item">
+          <p class="req-persona">As an authorized party</p>
+          <p class="req-text"><strong>Scoped Communication History.</strong> An authorized party must only be able to view communications sent directly to their own email address. Communications sent to the student or to other APs about the student's account must not appear in the AP's communication history view. The same <code>isViewable</code> rendering rules that apply to students must apply to the AP's scoped view.</p>
+          <p class="req-why"><strong>Why:</strong> APs may have limited or role-restricted access to account data. Surfacing communications addressed to other parties — including the student — could expose information the AP is not authorized to see, violating the access boundaries the student established when granting AP access.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As an authorized party</p>
+          <p class="req-text"><strong>Delivery Status Visibility for AP Communications.</strong> The AP must be able to see the delivery status (delivered, failed, pending) for each communication in their scoped history. Where <code>isViewable</code> is true, the full rendered message body must be accessible. Failed delivery status must be displayed clearly so the AP understands that action may be needed.</p>
+          <p class="req-why"><strong>Why:</strong> APs taking financial action on a student's account need confidence that time-sensitive communications they expected to receive were actually delivered. Failed delivery visibility helps them escalate to the institution or the student promptly.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Institution User View &amp; Resend</h3>
+        <div class="req-item">
+          <p class="req-persona">As an institution user (CSR)</p>
+          <p class="req-text"><strong>Full Communication History for Serviced Accounts.</strong> An institution user must be able to view the complete communication history for any student account they are servicing, including all communications sent to the student and to any authorized parties associated with that account. The same display format — type, recipient, timestamp, delivery status, and conditional message preview — must be present in the institution user view.</p>
+          <p class="req-why"><strong>Why:</strong> CSRs handling support inquiries need to see the full communication record to answer questions like "Did we send the payment receipt?" or "Was the AP invite delivered?" Without a unified view across all recipients tied to the account, CSRs must piece together history from disconnected sources, increasing handle time and error risk.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As an institution user (CSR)</p>
+          <p class="req-text"><strong>Resend Eligible Communications.</strong> For any communication where <code>isResendable</code> is true, the institution user must be presented with a resend action. Activating the resend action must deliver the communication to the original recipient's email address on file at the time of resend. Resending to a new or alternate email address is not supported. The system must log the resend event, including the institution user's identity and the timestamp of the resend action.</p>
+          <p class="req-why"><strong>Why:</strong> Resend capability reduces the burden on students and APs who did not receive important but non-sensitive communications, such as payment confirmations. Restricting resend to the original address on file prevents misuse of the resend feature to redirect communications to unverified addresses.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Message Flags &amp; Compliance</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>isViewable Flag Enforcement.</strong> Every communication record must carry an <code>isViewable</code> boolean flag set by the originating service at send time. When false, the system must substitute the message body with the placeholder "Content not viewable" for all roles — including institution users. No role may bypass this restriction. Communications subject to this rule include: verification codes, one-time passwords, time-sensitive authentication tokens, and registration invite links. The <code>isViewable</code> flag defaults to true if not explicitly set; it is the originating service's responsibility to set it to false for sensitive message types.</p>
+          <p class="req-why"><strong>Why:</strong> Exposing one-time or time-sensitive security credentials after their use window creates a meaningful attack surface. Enforcing the flag at the display layer — regardless of role — ensures that even well-intentioned CSR access cannot inadvertently reveal credentials that could be replayed or misused.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>isResendable Flag Enforcement.</strong> Every communication record must also carry an <code>isResendable</code> boolean flag. When false, no resend action may be surfaced in any UI role, and the resend API endpoint must reject requests for those records. Communications where <code>isResendable</code> must be false include: AP and guest payment invites (resend means create a new invite), password reset messages, recovery codes, and any communication containing an expiring link or token. The flag defaults to true; originating services set false for non-resendable types. This flag is not backfilled on prior emails — only new sends carry it.</p>
+          <p class="req-why"><strong>Why:</strong> Resending an expired invite or a used password reset link would either fail silently or create user confusion. For invite-type communications, the correct workflow is to generate a new invite rather than resend an old one. Enforcing this at the system level prevents workarounds that could produce inconsistent behavior.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Technical Architecture</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>Required Identifiers on All Correspondence Events.</strong> Every service that sends email through the correspondence service must include the following identifiers with each send event: <code>userId</code> (the Passport user ID of the intended recipient), <code>accountId</code> (the account balance ID associated with the communication), and <code>externalId</code> (the institution's student ID). These identifiers are the keys the correspondence service uses to scope communication history records to the correct person and account. Incomplete events must be rejected and logged as errors in the originating service. Passport-related communications (password reset, account verification) are out of scope for the initial release and will be integrated in a subsequent phase.</p>
+          <p class="req-why"><strong>Why:</strong> The student and AP communication history views depend entirely on the ability to scope records by recipient identity and account. Without consistent required identifiers on every event, the correspondence service cannot reliably attribute records to the correct person, making history retrieval inaccurate or incomplete.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         FEATURES · ACCOUNT — Guest Payments
+    ════════════════════════════════════════ -->
+    <section id="feat-guest-pay" class="prd-section">
+      <div class="section-eyebrow">Features · Account</div>
+      <h2 class="section-title">Guest Payments</h2>
+      <p class="section-subtitle">Guest payments allow authenticated account holders and institution staff to invite a third party — someone without a Horizon account — to make a one-time payment toward a student's balance. This section defines the invite workflow, the guest payer experience, validation boundaries, institution user capabilities, and the configuration and audit requirements that govern the feature.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Invite Workflow</h3>
+        <div class="req-item">
+          <p class="req-persona">As a student or authorized party</p>
+          <p class="req-text"><strong>Guest Payment Invite Form.</strong> An authenticated student or authorized party must be able to initiate a guest payment invite by providing the recipient's email address and an optional personalized message. The invite form must display the invite's expiration date to the sender before submission so they understand the window within which the guest must act. The system must generate a unique, time-limited invite link and deliver it to the specified recipient email. The invite must appear in the student's communication history as isResendable=false — if a new invite is needed (e.g., after expiration), the student must create a new one rather than resending the old record.</p>
+          <p class="req-why"><strong>Why:</strong> Students and APs often coordinate payments with family members or sponsors who are not account holders. Providing an invite form with clear expiration information ensures the sender can set appropriate expectations with the guest payer and take action if a new invite is needed after expiration.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a guest payer</p>
+          <p class="req-text"><strong>Guest Invite Email Content.</strong> The invite email must include: the optional custom message from the sender, institution branding consistent with the payment space configuration, the invite expiration date and time, and a prominent call-to-action link that routes the guest directly to the guest payment flow. No Horizon account creation prompt may appear in the invite email.</p>
+          <p class="req-why"><strong>Why:</strong> Guest payers are typically unfamiliar with Horizon. A well-branded, clearly worded email with expiration context and a direct payment link reduces friction and drop-off, and sets accurate expectations about the payment window without creating confusion about account registration.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Guest Payment Experience</h3>
+        <div class="req-item">
+          <p class="req-persona">As a guest payer</p>
+          <p class="req-text"><strong>Account-Free Payment Flow.</strong> A guest payer must be able to complete a payment by following the invite link without creating a Horizon account or authenticating. The guest payment flow must present: (1) entry of a payment amount within the allowed range; (2) entry of a new payment method — card or ACH only (Apple Pay and third-party wallets are not supported for guest payments); (3) a confirmation screen summarizing amount and payment method; and (4) a receipt delivered to the guest's email address after successful submission.</p>
+          <p class="req-why"><strong>Why:</strong> Requiring account creation introduces significant friction for a one-time use case and drives payment abandonment. The guest flow must be optimized for a single session with no persistent identity, while the receipt provides proof of payment without needing account access.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a student</p>
+          <p class="req-text"><strong>Student Notification on Guest Payment Completion.</strong> When a guest payer successfully completes a payment, the student associated with the account must receive a notification confirming the guest payment, including the payment amount and date. Guest payer identity is tracked by the absence of a person ID in the transaction record — guests have no person ID, distinguishing them from student and AP payments in transaction history.</p>
+          <p class="req-why"><strong>Why:</strong> The student is the account holder of record and needs to be aware of all payments applied to their balance — including those initiated by third parties — to maintain an accurate picture of their account status and detect any unexpected transactions.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Validation &amp; Error Handling</h3>
+        <div class="req-item">
+          <p class="req-persona">As a guest payer</p>
+          <p class="req-text"><strong>Payment Amount Validation.</strong> The guest payment flow must enforce a minimum and maximum payment amount. The maximum must be hard-capped at the current account balance; a guest payer must not be able to submit a payment that exceeds the outstanding balance. If the entered amount exceeds the balance, the system must display a clear inline validation error specifying the maximum allowable amount. The minimum payment amount must reflect any configuration set at the payment space level.</p>
+          <p class="req-why"><strong>Why:</strong> Overpayments create reconciliation complexity and refund overhead. Enforcing a hard stop at the account balance with a clear, actionable error message prevents this problem class without requiring manual correction after the fact.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a guest payer</p>
+          <p class="req-text"><strong>Expired or Invalid Invite Link Handling.</strong> When a guest payer follows an invite link that has expired, already been used, or is otherwise invalid, the system must display a clear error message explaining that the link is no longer valid and instructing the guest to contact the person who sent the invite for a new one. The expired link error page must not expose any account details, student name, or balance information.</p>
+          <p class="req-why"><strong>Why:</strong> Expired links are a predictable failure case, especially when guests delay acting on an invite. A clear, privacy-preserving error page prevents confusion, protects student account information from unauthenticated viewers, and directs the guest toward the correct resolution path.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Institution User Capabilities</h3>
+        <div class="req-item">
+          <p class="req-persona">As an institution user</p>
+          <p class="req-text"><strong>Send Guest Payment Invite on Behalf of Student.</strong> An institution user must be able to initiate a guest payment invite on behalf of a student directly from the student's account view in the person dashboard. The invite form must include the same fields available to the student: recipient email and optional custom message. The expiration date must be displayed before sending. All invites sent by institution users must be logged with the institution user's identity in the audit trail. The invite must appear in the student's communication history, enabling the institution user to verify delivery.</p>
+          <p class="req-why"><strong>Why:</strong> Students may request in-person or phone assistance when setting up a guest payment. Enabling institution users to send invites on the student's behalf extends the feature's utility to assisted service scenarios without requiring the student to be present at a terminal.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Configuration &amp; Audit</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>Payment Space Configuration Gate.</strong> Guest payment functionality must be controlled by a payment space configuration toggle. When the feature is disabled for a payment space, the invite initiation UI must not be visible to any role — including students, APs, and institution users — for accounts within that space. The feature must be disabled by default and require explicit activation.</p>
+          <p class="req-why"><strong>Why:</strong> Not all institutions will want to allow guest payments, and some may have compliance or policy constraints that prohibit third-party payments on student accounts. An opt-in configuration gate prevents unintended enablement across all payment spaces.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         FEATURES · ACCOUNT — Assisted Payments
+    ════════════════════════════════════════ -->
+    <section id="feat-assisted-pay" class="prd-section">
+      <div class="section-eyebrow">Features · Account</div>
+      <h2 class="section-title">Assisted Payments</h2>
+      <p class="section-subtitle">Assisted payments enable institution users to process payments on behalf of students and authorized parties — over the phone or in person — within a controlled, compliant workflow. This section defines supported payment methods, the authorization and disclosure requirements that must precede every transaction, receipt and notification behavior, and the audit, permissions, and configuration model that governs the feature.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Payment Methods &amp; Scope</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>Supported Payment Methods by Channel.</strong> For in-person assisted payments, the only supported payment method is a physical card processed via a SRED swipe device. For phone-assisted payments, the institution user may accept either a card via a SRED device or a bank account (ACH). Apple Pay and third-party digital wallets must not be available in the assisted payment flow regardless of channel. The UI must only present payment method options valid for the active channel.</p>
+          <p class="req-why"><strong>Why:</strong> SRED device card capture protects cardholder data by encrypting it at the point of swipe, ensuring the institution user never handles raw card numbers. Phone and in-person channels have distinct physical constraints that determine which methods are operable, and limiting the UI to valid options prevents errors and unsupported payment attempts.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>No Saved Payment Methods and No Pay Over Time.</strong> Institution users must not be able to select or use a payer's saved payment methods during an assisted payment. Saved payment methods must not appear in the assisted payment UI, and no save option may be offered at any point. Additionally, Pay Over Time and payment plan enrollment options must be hidden from the institution user's view when in the assisted payment context — the workflow is scoped to one-time payment processing only. Institution users cannot enroll students or APs in payment plans on their behalf.</p>
+          <p class="req-why"><strong>Why:</strong> Allowing institution users to access stored payment credentials raises security and consent concerns. Blocking plan enrollment during assisted payments preserves the integrity of the consent-driven plan enrollment process — enrolling a payer in a plan requires their informed agreement to plan terms, which is not operationalizable in the assisted payment workflow without additional legal scaffolding.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Scope Limited to Authenticated Students and Authorized Parties.</strong> Assisted payments may only be processed on behalf of authenticated students or APs with an established account relationship. Processing a payment on behalf of a guest payer is explicitly out of scope. The payer's person ID must be present in the payment session; if it is absent (as it would be for a guest), the system must block the assisted payment flow.</p>
+          <p class="req-why"><strong>Why:</strong> The assisted payment workflow depends on a verified person identity to attribute the transaction correctly, generate a receipt, and notify the appropriate parties. Guest payers have no person ID, making it impossible to fulfill the audit and notification requirements of the feature.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Workflow &amp; Authorization Confirmation</h3>
+        <div class="req-item">
+          <p class="req-persona">As an institution user</p>
+          <p class="req-text"><strong>Required Disclosure and Authorization Confirmation.</strong> Before an assisted payment can be submitted, the institution user must be presented with the required compliance disclosure and authorization script applicable to the institution. The institution user must explicitly confirm — via a required checkbox or acknowledgment action — that verbal or written authorization was obtained from the payer before the submit action becomes available. The system must block payment submission if the authorization confirmation has not been completed.</p>
+          <p class="req-why"><strong>Why:</strong> Processing a payment on behalf of someone else without documented confirmation of their authorization creates legal and compliance exposure for the institution. Requiring an explicit acknowledgment at the point of submission creates a consistent, auditable compliance gate that holds regardless of how the institution user was trained.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Receipt &amp; Notification</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>Payer Receipt Delivery.</strong> Upon successful completion, a receipt must be sent to the payer — the student or AP on whose behalf the payment was made — at their email address on file. The receipt must include: payment amount, payment method type (masked), transaction timestamp, and a reference number. The receipt must not include the institution user's name or identity.</p>
+          <p class="req-why"><strong>Why:</strong> The payer needs a record of the transaction for their own financial records regardless of who executed it. Omitting the institution user's identity from the receipt keeps the payer-facing communication clean and avoids confusion about transaction attribution.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Student Notification When AP Is the Assisted Payer.</strong> If the assisted payment is processed on behalf of an authorized party, the student must receive a payment notification in addition to the AP receiving their receipt. The notification must include the payment amount and date. It must not expose the AP's identity or payment method details to the student.</p>
+          <p class="req-why"><strong>Why:</strong> The student is the account holder and must be informed of all payment activity on their account, including payments processed by authorized parties through an assisted channel.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Audit, Permissions &amp; Configuration</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>Institution User Identity Logged on Every Assisted Transaction.</strong> Every assisted payment must be recorded in the audit log with: institution user identity, person ID of the student or AP assisted, payment amount, channel (in-person or phone), and the timestamp of the authorization confirmation. Transaction records must use the payer's person ID — not the institution user's — so the payment appears correctly in the payer's transaction history. The institution user's identity lives in the audit record only.</p>
+          <p class="req-why"><strong>Why:</strong> Assisted payments create a situation where one party's credentials are used to act on another's behalf. A complete, tamper-proof audit trail protects the institution from disputes and enables compliance reviews to confirm every assisted transaction had documented authorization and a traceable operator identity.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Payment Space &amp; Role-Based Access Control.</strong> The assisted payment option must only be visible when: (1) the assisted payment feature is enabled in the payment space configuration, AND (2) the institution user's assigned role has been explicitly granted assisted payment permissions. When either condition is not met, the assisted payment entry point must not be visible. The feature must be disabled by default and require deliberate activation at the payment space level.</p>
+          <p class="req-why"><strong>Why:</strong> Not all payment spaces will support assisted payments, and not all institution staff are trained or authorized to take payments on behalf of payers. A two-condition gate (payment space + role) ensures only designated, trained staff at appropriately configured institutions can access the feature.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         FEATURES · ACCOUNT — AP Management
+    ════════════════════════════════════════ -->
+    <section id="feat-ap-management" class="prd-section">
+      <div class="section-eyebrow">Features · Account</div>
+      <h2 class="section-title">Authorized Party Management</h2>
+      <p class="section-subtitle">Authorized parties (APs) are trusted individuals — typically family members or sponsors — whom a student designates to view account information and make payments on their behalf. This section defines the full lifecycle of an AP relationship: invitation and registration, status progression, role-based access control, the actions available to both the student and AP to manage the relationship, and the notification and audit requirements that accompany every change.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Invite &amp; Registration</h3>
+        <div class="req-item">
+          <p class="req-persona">As a student</p>
+          <p class="req-text"><strong>AP Invite Form.</strong> A student must be able to invite an authorized party by submitting an invite form that captures the recipient's email address and the access role to be granted. Upon submission, an invite email must be sent to the specified address and the AP must appear in the student's AP list with a status of "Invitation Sent." The student can see the invite's pending status at any time before the AP completes registration.</p>
+          <p class="req-why"><strong>Why:</strong> Providing clear confirmation that an invite was sent — and persistent visibility of its pending status — ensures students can track which invites are outstanding and take action (resend or delete) when needed, without having to contact support to determine whether their invite was delivered.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As an authorized party</p>
+          <p class="req-text"><strong>Knowledge-Based Verification at Registration.</strong> During AP registration, the prospective authorized party must correctly answer a knowledge-based verification challenge — such as providing the last four digits of the student's phone number on file — before registration can be completed. If the AP fails verification, registration must be blocked and an appropriate error must be displayed. The specific verification question is determined by the institution's configuration.</p>
+          <p class="req-why"><strong>Why:</strong> An AP invitation email could be forwarded or accessed by an unintended party. Knowledge-based verification ensures only someone with genuine knowledge of the student's account can complete registration, providing a second layer of identity assurance beyond possession of the invite link.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Status Management</h3>
+        <div class="req-item">
+          <p class="req-persona">As a student</p>
+          <p class="req-text"><strong>AP List with Status Display.</strong> The student's AP management view must display all associated authorized parties with their current status clearly labeled: "Invitation Sent" (invite delivered, registration not yet completed), "Active" (AP has registered and has current access), and "Access Removed" (student has revoked AP access). Each entry must show the AP's name or email, their assigned role, and the date of the most recent status change.</p>
+          <p class="req-why"><strong>Why:</strong> Students need a clear, at-a-glance view of who has access to their account and in what state. Surfacing status and role for each AP reduces the risk of students unknowingly leaving active access in place for parties they intended to remove.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a student</p>
+          <p class="req-text"><strong>Resend and Delete Actions for Pending or Expired Invites.</strong> For an AP with a status of "Invitation Sent" where the invite is pending or has expired, the student must have two actions: resend the invite (delivers a new invite email to the same address with a refreshed expiration) and delete the invite (removes the AP entry from the list entirely). Delete must only be available while no AP account has been created — once the AP has registered, access management occurs through the remove and restore workflow instead.</p>
+          <p class="req-why"><strong>Why:</strong> Pending invites represent a potential access grant the student may need to cancel or reissue. Providing both options in context — while making delete unavailable once an account exists — prevents accidental removal of an active AP relationship through the wrong action path.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Access Control &amp; Role-Based Visibility</h3>
+        <div class="req-item">
+          <p class="req-persona">As an authorized party</p>
+          <p class="req-text"><strong>Role-Governed Account Visibility.</strong> The account features and data visible to an AP after login must be determined by the access role assigned by the student at the time of invitation. Depending on role, an AP may have access to: account balance summary, payment history, upcoming payment schedule, and the ability to make payments. Role assignment must be enforced at the API level, not solely in the UI, so no AP can access data beyond their role's scope through direct API calls.</p>
+          <p class="req-why"><strong>Why:</strong> Students have varying levels of trust in different APs — a parent paying tuition may warrant broader access than an employer reimbursing a specific charge. API-level enforcement ensures scope restrictions cannot be circumvented by technically sophisticated users.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As an authorized party</p>
+          <p class="req-text"><strong>AP Cannot View Student's Saved Payment Methods.</strong> An authorized party must never be able to view, select, or manage the student's saved payment methods, regardless of their assigned access role. Payment method details must be restricted to the account holder who saved them. This restriction must be enforced at the data access layer and must not be overridable by any role configuration.</p>
+          <p class="req-why"><strong>Why:</strong> Saved payment methods carry sensitive financial credentials the student entered for their own use. Exposing them to APs — even trusted ones — creates a vector for unauthorized use and conflicts with standard cardholder data protection expectations.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Relationship Lifecycle — Remove, Restore &amp; Disconnect</h3>
+        <div class="req-item">
+          <p class="req-persona">As a student</p>
+          <p class="req-text"><strong>Remove AP Access.</strong> A student must be able to remove access for any active AP. Upon removal, the AP's status changes to "Access Removed" and the AP immediately loses the ability to access account activity and payment options. The AP retains access to their own transaction history, their own communications, and their own saved payment methods — these are personal records belonging to the AP's identity, not the student's account. The access removal must take effect within one authentication cycle.</p>
+          <p class="req-why"><strong>Why:</strong> Students may need to revoke access promptly due to a change in relationship or financial circumstances. Preserving the AP's own transaction history ensures the AP can still reference records of payments they made after removal, protecting against disputes about past transactions.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a student</p>
+          <p class="req-text"><strong>Restore AP Access (Grant Access).</strong> For an AP with status "Access Removed," the student must be able to restore access using a "Grant Access" action. Upon restoration, the AP's status returns to "Active" and the AP regains the account access defined by their original role assignment. No new invite is required for restoration — the existing AP account relationship is reactivated. The restore action must be logged in the audit trail.</p>
+          <p class="req-why"><strong>Why:</strong> Relationships change over time, and a student may wish to reinstate access for a previously removed AP without requiring the AP to go through the full registration flow again. Supporting restore preserves the AP's role assignment and historical records.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As an authorized party</p>
+          <p class="req-text"><strong>AP Self-Disconnect from Student Account.</strong> An authorized party must be able to voluntarily disconnect from a student account provided they have no active payment plans associated with that account. Upon disconnection, the AP loses access to the student's account activity and payment options but retains access to their own transaction history and communications. If an active payment plan exists, the disconnection must be blocked and the AP must be shown a message explaining they must resolve or complete the active plan before disconnecting.</p>
+          <p class="req-why"><strong>Why:</strong> APs should have agency over their own account relationships. Blocking disconnection when an active plan exists protects the integrity of the payment plan — which may have scheduled future payments — and prevents the AP from abandoning a financial obligation mid-term.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Notifications &amp; Audit</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>Student Notification on AP or Guest Payment.</strong> When an authorized party or guest payer successfully completes a payment on a student's account, the student must receive a notification confirming the payment. The notification must include the payment amount, date, and payer type (authorized party or guest). It must not expose the payer's payment method details. Notification is delivered to the student's email address on file.</p>
+          <p class="req-why"><strong>Why:</strong> The student is the ultimate owner of the account balance and must be aware of all credits applied to their account regardless of who made the payment. Real-time notification supports account transparency and allows the student to detect any unexpected or incorrect payments promptly.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Audit Trail for All Relationship Changes.</strong> Every AP relationship event — invite sent, invite resent, invite deleted, registration completed, access removed, access restored, AP self-disconnect — must be recorded in an immutable audit log. Each entry must capture: actor (student or AP), action performed, affected AP identity, and timestamp. The audit log must be accessible to institution users with appropriate permissions and must not be editable by any user-facing role.</p>
+          <p class="req-why"><strong>Why:</strong> AP relationship changes affect who has access to sensitive financial account information. A complete, tamper-proof audit trail provides the evidence base needed to resolve disputes about access history, support compliance reviews, and investigate unexpected access changes.</p>
+        </div>
+      </div>
+    </section>
 
     <!-- ════════════════════════════════════════
          SCENARIO 1: FIRST TIME STUDENT
@@ -5940,6 +6239,39 @@ body {
           <p class="req-why"><strong>Why:</strong> Regulatory requirements and consumer protection best practices require clear disclosure of exchange rate risk. A student who sets up a "24-payment plan of $300/month" but doesn't realize their actual monthly cost in INR or CNY will vary significantly is likely to stop paying when rates move against them. Clear disclosure at enrollment reduces this risk.</p>
         </div>
       </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Flywire Integration &amp; Status Synchronization</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>Flywire as Primary Integration.</strong> The initial international payment integration must support Flywire as the primary vendor. Flywire integration must: (1) accept the student's payment amount, due date, student ID, institution ID, and payer contact information from Horizon to generate a payment session; (2) redirect the consumer to the Flywire-hosted payment interface; (3) receive real-time status events from Flywire for each stage of payment progression; (4) surface payment status in Account Activity and My Transactions for both consumers and institution users. Future vendors (Convera, Western Union Education, etc.) must be addable via the same extensible architecture without structural changes to the enrollment flow.</p>
+          <p class="req-why"><strong>Why:</strong> Flywire is the most widely adopted international payment provider among NCC's existing client base. Delivering Flywire integration first maximizes immediate utility while the extensible architecture protects NCC's ability to serve institutions that use or prefer other vendors.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Real-Time Payment Status Tracking.</strong> International payments progress through multiple discrete stages before funds reach the institution. Horizon must track and display each status stage to consumers and institution users: Initiated (payer started the process at Flywire), In Progress (payment is being processed), Pending Delivery (funds received by Flywire, pending disbursement to institution), Delivered (funds received by institution — triggers ERP posting), Cancelled (payment cancelled by payer or timed out), and Failed (processing error). Status updates must be reflected in Account Activity and My Transactions within the sync interval configured for the integration. Consumers must see a plain-language status description — not raw status codes.</p>
+          <p class="req-why"><strong>Why:</strong> International payments can take 1–5 business days to settle. Without transparent status tracking, students and parents make panicked calls to the bursar asking whether their payment arrived — a high-cost support interaction that the status display is designed to prevent. Institution users need accurate status to answer those calls when they do come.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Confirmation Notification on Delivery.</strong> When an international payment reaches Delivered status — indicating funds have been received by the institution — a confirmation notification must be sent to the student (account holder). If the payment was initiated by an Authorized Party or guest payer, both the AP/guest and the student must receive confirmation. The notification must include: amount delivered in USD, date of delivery, and any remaining balance on the student's account. Delivery status is also the trigger for ERP posting (the payment is automatically posted back to the institution's ERP when it reaches Delivered).</p>
+          <p class="req-why"><strong>Why:</strong> Students and families making international payments are often anxious about delivery timing — they've made a payment and don't know when it will clear. The delivery notification closes that anxiety loop. ERP auto-posting at delivery ensures the institution's books reflect the payment accurately without requiring manual intervention from the bursar.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Refunds on International Payments</h3>
+        <div class="req-item">
+          <p class="req-persona">As a Finance Admin</p>
+          <p class="req-text"><strong>Institution-Initiated Refunds.</strong> Institution users (Finance Admin and Full Admin) must be able to initiate refunds on international payments that have reached Delivered status — fully or partially. The refund workflow must: (1) only be available after a payment reaches Delivered (refunds cannot be initiated on in-progress or pending payments); (2) enforce that the refund amount does not exceed the delivered amount; (3) route the refund through the same Flywire integration that processed the original payment, so the student receives the refund in their original payment method; (4) log the refund initiation and completion in the audit trail; (5) update the student's account balance to reflect the refund. Flywire-side refund event confirmations must be received and recorded to confirm successful processing.</p>
+          <p class="req-why"><strong>Why:</strong> International payment refunds are operationally complex — refunding to a foreign payment method through a third-party vendor requires precise integration. Limiting refunds to Delivered-status payments only prevents institutions from attempting to reverse payments that are still in-flight, which Flywire cannot process. Routing refunds back through Flywire ensures the student receives funds in a way that clears cross-border banking requirements.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">ERP Posting &amp; Reconciliation</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>Automatic ERP Posting on Delivery.</strong> When a Flywire international payment reaches Delivered status, the payment must be automatically posted back to the institution's ERP via the existing payment write-back integration. The ERP posting must use USD amounts (not local currency). The post must include the transaction ID, student ID, amount, posting date, and payment method type (International — Flywire). Auto-posting on delivery is the default behavior; future phases will add institution-configurable control over posting timing, but this is not included in the initial delivery.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions need delivered payments reflected in their SIS/ERP to update the student's account balance and release any registration holds. Manual ERP posting for international payments would require bursar staff to match each Flywire delivery confirmation to a student account and manually enter the payment — a high-effort, error-prone process that would erode the value of the integration.</p>
+        </div>
+      </div>
     </section>
 
 
@@ -6320,6 +6652,295 @@ body {
         <div class="sophie-flag">
           <span class="sophie-flag-label">Sophie: insert glossary here</span>
           <span>Add the glossary from the original Payment Plans discovery document. Review against the terminology definitions already present in the Guarantee Plans section and reconcile any conflicting definitions.</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="plat-balance-compare" class="prd-section">
+      <div class="section-eyebrow">Platform Requirements</div>
+      <h2 class="section-title">Balance Compare &amp; Rebalance</h2>
+      <p class="section-subtitle">Defines how the platform keeps a student's Pay Over Time plan aligned with their current institutional balance — spanning the initial comparison that drives enrollment decisions, parallel-agreement scenarios when multiple plans coexist, and the nightly rebalance engine that redistributes remaining installments after balance changes.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Configuration Philosophy</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / NBS Implementation Engineer</p>
+          <p class="req-text"><strong>Single Source of Balance Truth.</strong> The platform must treat the institutional ERP ledger as the authoritative source for a student's current balance. All balance compare calculations, rebalance triggers, and plan amount adjustments must derive from the ERP-posted balance, not from a cached or stale snapshot. Institutions must be able to configure how frequently the ERP feed reconciles (minimum: daily; recommended: real-time webhook on charge or credit posting).</p>
+          <p class="req-why"><strong>Why:</strong> Plans built on stale balances create reconciliation failures, student confusion, and institution write-offs. A contract-based integration with a definitive refresh cadence gives the institution confidence that plan amounts track the actual receivable.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Balance Compare Tolerance Band.</strong> Institutions must be able to configure an acceptable tolerance (default: $0; max: institution-defined dollar amount or percentage) below which a balance increase does not trigger a rebalance notification or plan adjustment. This prevents micro-adjustments from minor late-fee postings disrupting consumer experience while still surfacing material balance changes.</p>
+          <p class="req-why"><strong>Why:</strong> A $0.50 rounding difference should not generate a balance-change alert card and force a consumer decision. Configurable tolerance lets the institution tune sensitivity to their fee-posting patterns.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Phase 1 — Standard Balance Compare</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Eligible Balance Displayed at Enrollment.</strong> During plan enrollment the system must display the student's full current eligible balance (charges within the configured enrollment window; excluded charge types removed per institution config). The displayed amount must match the ERP ledger balance at the moment the consumer reaches the enrollment step, and the plan must be built on that amount. If the balance changes between page load and plan submission, the system must refresh and present the updated amount before allowing confirmation.</p>
+          <p class="req-why"><strong>Why:</strong> TILA disclosure accuracy requires the plan amount at confirmation to reflect the actual balance being financed. A stale amount at confirmation invalidates the disclosure.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP / Institution Finance Admin</p>
+          <p class="req-text"><strong>Post-Enrollment Balance Change Detection.</strong> After a plan is active, the system must detect changes to the student's institutional balance (new charges, financial aid credits, corrections) and compare them against the plan's covered amount. Changes exceeding the configured tolerance band must surface as a balance-change alert on the consumer's home screen within one business day of the ERP posting. The alert must show the prior plan amount, the new balance, and the difference.</p>
+          <p class="req-why"><strong>Why:</strong> Consumers need to understand when their plan no longer covers their full balance so they can decide to adjust, make an additional payment, or contact the bursar — before late fees accumulate on uncovered charges.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Consumer Adjustment Preference.</strong> When a balance increase is detected, the system must present the consumer with a choice: (a) Increase plan to cover the new balance — remaining installments are recalculated evenly; (b) Leave plan as-is and be prompted to pay the difference separately; (c) Contact the bursar. The consumer's selection must be recorded and surfaced to institution users in the plan management view.</p>
+          <p class="req-why"><strong>Why:</strong> Not all balance increases represent charges the student agrees with. Forcing automatic plan expansion would enroll the student in a larger obligation without consent, creating regulatory and trust risk.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Phase 2 — Parallel Agreements</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Parallel Agreement Enablement.</strong> Institutions must be able to configure whether a student may hold more than one active plan simultaneously (e.g., a Fall Standard plan and a Spring Standard plan co-existing). When parallel agreements are enabled, the system must track each plan's covered balance, installment schedule, and payment method independently. Balance compare must run independently against each plan's covered charges rather than aggregating all plans against the total balance.</p>
+          <p class="req-why"><strong>Why:</strong> Multi-term enrollment is common; students who set up a Fall plan in August should not be required to cancel it when enrolling a Spring plan. Parallel agreements eliminate the friction of sequential plan management.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Multi-Plan Home Screen View.</strong> When a student has two or more active plans, the home screen must display each plan as a separate card with its own next payment date, amount, remaining installments, and covered term label. The combined total of next scheduled payments across all plans must be surfaced prominently so the consumer understands total upcoming auto-debit exposure.</p>
+          <p class="req-why"><strong>Why:</strong> A student with two plans for two terms may owe two auto-debits in the same week. Surfacing the aggregate exposure prevents surprise NSF situations and builds consumer trust.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Start Date Configuration for Future-Term Plans.</strong> When parallel agreements are enabled, institutions must be able to configure a plan start date offset (e.g., "plan begins 30 days before term start") so that future-term plans are created but no payments process until the configured start date. Consumers enrolling in a future plan must see the first payment date clearly in the confirmation and TILA disclosure.</p>
+          <p class="req-why"><strong>Why:</strong> Charging a student for a Spring semester plan in October before any Spring charges are due creates consumer dissatisfaction and potential refund requests. Start date configuration aligns first payments with actual charge due dates.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Phase 3 — Financial Responsibility Model</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / NBS Implementation Engineer</p>
+          <p class="req-text"><strong>Financial Responsibility Agreement Linkage.</strong> In Phase 3, institutions must be able to configure the platform to require acceptance of an updated Financial Responsibility Agreement (FRA) when a student's plan amount increases by more than a configured threshold. The FRA acceptance must be recorded with a timestamp, the accepted document version, and the student's authentication state at time of acceptance. The signed FRA must be retrievable via the correspondence history and the reporting API.</p>
+          <p class="req-why"><strong>Why:</strong> Consumer protection law and institutional policy increasingly require that students formally re-acknowledge financial obligations when those obligations increase materially. Embedding FRA acceptance in the balance-increase flow ensures compliance at the moment of consent.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Finance Admin / NBS PAS Support Agent</p>
+          <p class="req-text"><strong>Financial Responsibility Audit Trail.</strong> The platform must maintain a tamper-evident, append-only audit record for every FRA acceptance event: student identifier, document version hash, acceptance timestamp, IP address, device fingerprint, and authentication method used. This record must be exportable in the Plan Agreement report (see Report URS) and retained for a minimum of 7 years or the institution's configured retention period, whichever is longer.</p>
+          <p class="req-why"><strong>Why:</strong> If a student disputes a charge or challenges their legal obligation, the institution needs incontrovertible proof of what was agreed to, when, and by whom. A cryptographically tamper-evident log meets the evidentiary standard for collections and legal proceedings.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Rebalance Rules &amp; Eligibility</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Nightly Automatic Rebalance.</strong> The platform must run a nightly rebalance job that evaluates every active plan against the student's current ERP balance. Where the ERP balance has changed and the consumer has elected to keep the plan covering their full balance (or the institution has auto-rebalance enabled), the remaining installments must be redistributed evenly across the remaining payment dates. The first rebalanced installment amount is effective the following business day.</p>
+          <p class="req-why"><strong>Why:</strong> Nightly rebalance keeps plan amounts current without requiring consumer action for every minor charge change, reducing service calls and improving reconciliation accuracy.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>10-Day Proximity Rule.</strong> The nightly rebalance engine must not increase the amount of any installment whose scheduled date is within 10 calendar days of the rebalance run date. If a rebalance would require increasing a near-term installment, that amount must roll forward to the next eligible installment (more than 10 days out) and the near-term installment remains at its previously scheduled amount. If no future installment exists beyond the 10-day window, the increase must be surfaced as an uncovered balance alert rather than processed automatically.</p>
+          <p class="req-why"><strong>Why:</strong> Increasing an installment 2 days before it processes gives the consumer no time to ensure funds are available, leading to NSF fees, returned payments, and plan cancellation. The 10-day rule protects the consumer and reduces failed payment rates.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Decrease Rebalance Always Applies.</strong> The 10-day proximity protection applies only to increases. If a credit posts (financial aid disbursement, scholarship, fee waiver) that reduces the covered balance, the rebalance engine must apply the decrease to the next installment regardless of proximity, never holding a consumer to a higher payment than their actual balance requires.</p>
+          <p class="req-why"><strong>Why:</strong> Holding a consumer to an elevated payment after aid is posted — even temporarily — creates an overpayment situation and negative consumer sentiment. Decreases should always benefit the consumer immediately.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Finance Admin</p>
+          <p class="req-text"><strong>Rebalance On Login.</strong> In addition to nightly rebalance, the platform must trigger a real-time balance compare whenever a student or AP authenticates. If the ERP balance has changed since the last comparison and the delta exceeds the configured tolerance, the home screen must show the balance-change alert card immediately on that session. This supplements the nightly job to catch same-day charge postings.</p>
+          <p class="req-why"><strong>Why:</strong> A student who logs in to make a payment shouldn't see a plan amount that doesn't match their balance. On-login compare closes the gap between nightly runs and real-time activity.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="plat-payment-allocation" class="prd-section">
+      <div class="section-eyebrow">Platform Requirements</div>
+      <h2 class="section-title">Payment Allocation</h2>
+      <p class="section-subtitle">Defines the rules by which incoming payments are applied to a student's outstanding charges — covering default priority ordering, consumer choices, CSR override authority, guarantee plan specifics, and institution-level configuration options. Allocation rules affect downstream ERP write-back, reconciliation accuracy, and consumer trust.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Default Allocation Priority</h3>
+        <div class="req-item">
+          <p class="req-persona">Platform / Institution Finance Admin</p>
+          <p class="req-text"><strong>Past-Due First Allocation.</strong> The platform default must apply incoming payments to the oldest past-due charges first (earliest due date, ascending). Within the same due date, the platform must apply to the highest-dollar charge first. This ordering must apply to all payment types — one-time payments, plan installments, and guest payments — unless overridden by institution configuration or consumer election.</p>
+          <p class="req-why"><strong>Why:</strong> Past-due balances accrue late fees and trigger registration holds first. Applying payments to them first reduces the consumer's ongoing financial penalty and aligns with common institutional collections policy.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Platform / Institution Finance Admin</p>
+          <p class="req-text"><strong>Secondary Allocation for Remaining Funds.</strong> After past-due charges are satisfied, remaining payment funds must be applied to current-term charges in due-date ascending order. Where current-term charges share a due date (e.g., tuition and housing both due the same day), funds must be distributed proportionally across charge types unless the institution configures a charge-type priority sequence.</p>
+          <p class="req-why"><strong>Why:</strong> Proportional allocation within the same due date avoids arbitrarily leaving one charge type unpaid when funds are sufficient to cover most but not all of the due date's total, which would create partial holds and student confusion.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Finance Admin</p>
+          <p class="req-text"><strong>Charge-Type Priority Configuration.</strong> Institution admins must be able to configure a ranked charge-type priority list (e.g., 1. Tuition, 2. Housing, 3. Fees, 4. Other) that overrides proportional distribution within the same due date. This configuration must be term-agnostic (applies to all terms) and must take effect within one business day of being saved.</p>
+          <p class="req-why"><strong>Why:</strong> Some institutions have regulatory or policy requirements to satisfy tuition obligations before housing or vice versa. Configurable priority respects institutional policy without requiring custom code.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Consumer-Driven Allocation</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Consumer Allocation Election for One-Time Payments.</strong> When the institution has enabled consumer allocation choice (off by default), a student or AP making a one-time payment must be presented with an allocation selector showing all eligible outstanding charge buckets (e.g., Fall 2025 Tuition $3,200, Spring 2026 Housing $2,400). The consumer may either accept the default allocation or drag-rank or enter amounts per bucket. The elected allocation must persist in the payment receipt and ERP write-back.</p>
+          <p class="req-why"><strong>Why:</strong> Some consumers have strategic reasons to pay specific charges (e.g., paying housing to avoid eviction while deferring tuition under a payment plan). Enabling allocation choice for those institutions reduces escalation calls and consumer dissatisfaction.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Plan Installment Allocation is Fixed.</strong> Plan installments must always allocate according to the platform default (past-due first, then pro-rated current charges) regardless of the consumer allocation election setting. Consumers may not redirect plan installments to specific charge types. This is a non-configurable rule because the plan agreement specifies a covered balance, and allowing redirection would break the covered-balance guarantee.</p>
+          <p class="req-why"><strong>Why:</strong> The plan agreement is a TILA-covered contract. Permitting consumers to redirect installment allocation post-agreement would create a mismatch between what was disclosed and what was applied, creating legal risk.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">CSR Override Capabilities</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Finance Admin / NBS PAS Support Agent</p>
+          <p class="req-text"><strong>Manual Allocation Override.</strong> Authorized institution users (Finance Admin and above) and NBS PAS Support Agents must be able to manually re-allocate a recently processed payment (within 5 business days of processing) to different charge buckets. The override must require a written reason, must be recorded in the payment audit trail, and must trigger an updated payment confirmation to the consumer and institution admin. The ERP write-back must reflect the corrected allocation.</p>
+          <p class="req-why"><strong>Why:</strong> Payment posting errors occur — financial aid disbursements land on wrong terms, charges are miscoded. CSRs need a correction path that doesn't require payment reversal when only the allocation was wrong.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">NBS PAS Support Agent</p>
+          <p class="req-text"><strong>Allocation Override Audit Trail.</strong> Every manual allocation override must generate an immutable audit record containing: the original allocation, the corrected allocation, the authorizing user identifier, the timestamp, the stated reason, and the ERP write-back status. This record must be visible in the plan/payment management view to all users with Finance Admin access or higher and to NBS PAS Support Agents.</p>
+          <p class="req-why"><strong>Why:</strong> Allocation overrides touch financial records. A tamper-evident audit trail is required for compliance, dispute resolution, and external audit.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Guarantee Plan Allocation</h3>
+        <div class="req-item">
+          <p class="req-persona">Platform / Institution Finance Admin</p>
+          <p class="req-text"><strong>Guarantee Plan — State-Defined Allocation.</strong> For Guarantee Plans (regulated in states with guarantee plan statutes), the platform must apply the allocation sequence mandated by the applicable state regulation, which may differ from the platform default. The system must maintain a configuration table mapping state codes to their required allocation sequences and must apply the correct sequence based on the institution's state of domicile and the student's state of residence where relevant.</p>
+          <p class="req-why"><strong>Why:</strong> Guarantee plan statutes in states like California (TICAS) define specific allocation requirements. Deviating from these is a regulatory violation. A configuration table is more maintainable than hardcoded logic as regulations evolve.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Finance Admin</p>
+          <p class="req-text"><strong>Guarantee Plan — Non-Redistributable Allocation.</strong> For Guarantee Plans, once an installment is applied to a specific charge, the allocation must not be subject to consumer election or CSR manual override. Corrections must go through a formal reversal and re-posting workflow that creates a complete audit trail and notifies the relevant state authority if required by the applicable statute.</p>
+          <p class="req-why"><strong>Why:</strong> Guarantee plan statutes typically prohibit informal reallocation because the guarantee is tied to specific covered charges. Breaking the allocation chain invalidates the guarantee.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Overpayment &amp; Edge Cases</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Overpayment Handling.</strong> If an incoming payment exceeds the student's total outstanding balance, the system must automatically create a credit balance on the student's account. The institution must be able to configure the default disposition of credit balances: (a) hold for future charges, (b) automatically initiate a refund request after X days, or (c) apply to the next term's charges if available. The consumer must be notified of the credit balance via their preferred contact method within one business day of the overpayment being detected.</p>
+          <p class="req-why"><strong>Why:</strong> Overpayments happen when financial aid arrives while a payment is in transit. Automatic credit handling and consumer notification prevents the consumer from unknowingly having funds tied up at the institution.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Finance Admin</p>
+          <p class="req-text"><strong>Partial Payment Minimum Threshold.</strong> Institutions must be able to configure a minimum one-time payment amount (default: $1.00). Payments below the configured minimum must be rejected at the payment step with a clear error message showing the minimum. This configuration does not apply to plan installments (which are system-calculated) but does apply to consumer-initiated one-time payments and guest payments.</p>
+          <p class="req-why"><strong>Why:</strong> Processing fees on sub-threshold payments often exceed the payment amount itself, creating net-negative transactions. A configurable minimum protects the institution's payment processing economics.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Institution Configuration</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / NBS Implementation Engineer</p>
+          <p class="req-text"><strong>Allocation Rule Versioning.</strong> Any change to an institution's allocation configuration (charge-type priority, consumer election toggle, credit balance disposition, minimum threshold) must create a new versioned configuration record with an effective date. The system must apply the allocation rules that were active at the time the payment was initiated, not the current configuration. Historic allocation records must reference the configuration version that governed them.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions change allocation rules between terms. A payment from October processed under October rules should not be retroactively re-evaluated under January rules. Version-locked configuration ensures consistent, auditable allocation history.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="plat-plan-offers" class="prd-section">
+      <div class="section-eyebrow">Platform Requirements</div>
+      <h2 class="section-title">Plan Offer Configuration</h2>
+      <p class="section-subtitle">Defines how institutions configure the plan offers presented to consumers during Pay Over Time enrollment — covering plan type selection, eligibility and enrollment windows, schedule and payment settings, how offers are surfaced to consumers, fee rules, and access rules for students and authorized parties.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Plan Type &amp; Identity</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / NBS Implementation Engineer</p>
+          <p class="req-text"><strong>Plan Offer Creation.</strong> Institution admins must be able to create named plan offers within their account. Each offer must have: a unique internal identifier (system-generated), a consumer-facing display name (institution-defined, e.g., "Fall 2025 Standard Payment Plan"), a plan type (Standard, Past Due, Long-Term, International, Guarantee, Hidden, Custom), a term association (or "rolling" for non-term plans), and an active/inactive status. Inactive offers are not shown to consumers but retain historical enrollment records.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions run multiple plan offers simultaneously — different plans for different student populations, terms, or charge types. A named, typed, term-associated offer model supports this complexity without requiring separate system configurations per plan.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Plan Type Constraints.</strong> The system must enforce plan type combination rules at the offer-configuration level: (a) Standard plans and Guarantee plans cannot be offered simultaneously for the same term (mutually exclusive families); (b) Hidden plans are always type Standard family but require an explicit "invite-only" flag; (c) Custom plans must define all schedule parameters at enrollment time rather than inheriting defaults. The UI must surface conflict warnings when an admin attempts to create a combination that violates these rules.</p>
+          <p class="req-why"><strong>Why:</strong> Misconfigured plan combinations confuse consumers and create billing errors. Enforcing type constraints at configuration time prevents downstream enrollment problems.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Eligibility &amp; Enrollment Windows</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Enrollment Window Configuration.</strong> Each plan offer must have a configurable enrollment window defined by an open date and a close date (or "close X days before term start"). The window governs when consumers can initiate enrollment. Outside the window, the plan offer must not appear in the consumer enrollment flow (not hidden after close — simply unavailable). Admins must be able to extend or close a window manually regardless of the configured dates.</p>
+          <p class="req-why"><strong>Why:</strong> Enrollment windows protect the institution's billing cycle — allowing late plan enrollment after billing has run creates reconciliation complexity. Configurable windows let institutions align plan availability with their operational calendar.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Eligibility Rule Configuration.</strong> Institutions must be able to configure eligibility rules for each plan offer. Supported rule types must include: minimum balance required, maximum balance allowed, enrollment status (active enrollment required, not required, or past-due-only), student standing (good standing, any standing, financial hold students excluded), and program/campus filter. Students who do not meet all eligibility rules must not be shown the plan offer, with a configurable reason message displayed instead.</p>
+          <p class="req-why"><strong>Why:</strong> Not all plans are appropriate for all students. A past-due recovery plan should not be offered to a student in good standing with a current-term balance. Eligibility rules ensure the right offer reaches the right student population.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Maximum Enrollment Cap.</strong> Institution admins must be able to set a maximum enrollment count per plan offer. When the cap is reached, the plan offer must automatically become unavailable to new enrollees. The admin must receive a notification when enrollment reaches 80% and 100% of the cap. The cap must be editable at any time; increasing the cap immediately re-opens enrollment if the offer is within its enrollment window.</p>
+          <p class="req-why"><strong>Why:</strong> Some institutions limit enrollment in specialized plans (e.g., a small pilot program) for operational reasons. An enrollment cap with proactive notification lets admins manage capacity without manual monitoring.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Schedule &amp; Payment Settings</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Installment Count Options.</strong> For Standard and Guarantee plan offers, institutions must be able to configure which installment count options are presented to consumers (e.g., 3, 4, 5, 6 installments). At least one option must be selected; a maximum of 6 options may be offered simultaneously. The default option (pre-selected in the Quick Pick UI) must be designatable by the admin. For Long-Term (LTPP) plans, the configurable range is 3–24 months.</p>
+          <p class="req-why"><strong>Why:</strong> Installment options drive both consumer affordability perception and institution cash-flow planning. Configurable options let institutions balance consumer choice against operational complexity.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Payment Day Configuration.</strong> Institutions must be able to configure the day of month on which plan installments process (e.g., always the 1st, always the 15th, or consumer-selectable from a configured list of days). Where consumer selection is enabled, the consumer must choose their preferred payment day during enrollment. The first installment date must respect the plan's start date and the selected payment day, and must be surfaced clearly in the TILA pre-disclosure before confirmation.</p>
+          <p class="req-why"><strong>Why:</strong> Consumers are more likely to maintain sufficient funds on a payment date they chose that aligns with their pay cycle. Consumer-selectable payment days reduce NSF rates.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Required Full Eligible Balance Enrollment.</strong> Institutions must be able to configure whether consumers may enroll in a plan for a partial balance (amount less than eligible balance) or whether the plan must cover the full eligible balance. When "full balance required" is enabled, the enrollment flow must not allow the consumer to modify the plan amount downward from the calculated eligible balance. When partial balance is allowed, a minimum plan amount (dollar or percentage of eligible balance) must be configurable.</p>
+          <p class="req-why"><strong>Why:</strong> Some institutions require full-balance plans to prevent students from using a small plan to obtain enrollment clearance while leaving most of their balance unpaid. Full-balance enforcement is a collections risk management tool.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Consumer Offer Presentation</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Quick Pick Offer Surface.</strong> When exactly one plan offer is available to a consumer, or when an institution has designated a "featured" offer, the enrollment flow must present a Quick Pick card showing: the plan name, number of installments, first payment date, installment amount, and total plan amount. The consumer may confirm the Quick Pick directly (one click) or tap "Customize" to adjust installment count or payment day within the configured allowed options.</p>
+          <p class="req-why"><strong>Why:</strong> Research shows that presenting a clear, low-friction default dramatically increases plan enrollment conversion. Quick Pick reduces cognitive load for the most common case while preserving consumer control.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Multi-Offer Selection.</strong> When more than one plan offer is available to a consumer, the enrollment flow must display all eligible offers as selectable cards, each showing plan type, installment count options, first payment estimate, and any applicable enrollment fee. The consumer must select exactly one offer before proceeding. Offers must be sorted by the institution-configured display order (default: alphabetical by plan name).</p>
+          <p class="req-why"><strong>Why:</strong> Presenting multiple offers simultaneously with a clear comparison surface lets the consumer make an informed choice without requiring them to navigate back and forth between offer detail pages.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Fees &amp; Completion Rules</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Enrollment Fee Configuration.</strong> Institutions must be able to configure an enrollment fee per plan offer (flat dollar amount, 0 to institution-defined max). The fee must be: disclosed in the Quick Pick card and the TILA pre-disclosure, charged at the time of enrollment confirmation (not included in installments), non-refundable unless the institution configures a refund window, and written back to the ERP as a separate fee line item distinct from the covered balance installments.</p>
+          <p class="req-why"><strong>Why:</strong> Enrollment fees are a common institution revenue source that offset payment plan administration costs. Keeping the fee separate from installments preserves allocation transparency and simplifies TILA disclosure math.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Plan Completion Notification.</strong> When all installments on a plan have successfully processed and the covered balance reaches zero, the system must automatically send a plan completion notification to the consumer (email and optionally SMS) and update the student's account status in the ERP to reflect the plan as complete. Institution admins must be able to configure the completion notification template and toggle the ERP status update on or off.</p>
+          <p class="req-why"><strong>Why:</strong> Plan completion is a significant positive milestone for the student. A confirmation notification reinforces trust and provides a receipt artifact for the student's records. The ERP status update enables downstream processes (registration clearance, diploma release) that depend on financial standing.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Plan Accessibility — Student &amp; AP</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>AP Enrollment Authority.</strong> Institution admins must be able to configure whether Authorized Parties may enroll in a plan on behalf of a student (default: allowed for plan owners, not allowed for view-only APs). When AP enrollment is allowed, the plan owner designation must be set at enrollment time: (a) student is plan owner and AP is listed as authorized payer, or (b) AP is plan owner with autopay drawn from AP's payment method. The plan detail view must clearly identify the plan owner and the payment method owner.</p>
+          <p class="req-why"><strong>Why:</strong> Parents frequently set up payment plans for their children. Enabling AP-initiated enrollment with clear ownership attribution reduces service calls and ensures the correct party's payment method is charged.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Hidden Plan Invite Distribution.</strong> For plan offers configured as Hidden (invite-only), institution admins must be able to distribute invites via: (a) bulk upload of student ID list (CSV), (b) individual student lookup and invite, or (c) rule-based auto-invite (e.g., all students with a past-due balance over $500). Invited students must receive an email containing a direct enrollment link that bypasses the standard plan-selection step and routes directly to the specific hidden plan's enrollment flow. Invite links must expire after the configured enrollment window closes.</p>
+          <p class="req-why"><strong>Why:</strong> Hidden plans are used for targeted populations — past-due recovery cohorts, scholarship recipients, pilot groups. Bulk invite and rule-based distribution eliminates manual individual outreach while the expiring link ensures the offer is time-bounded.</p>
         </div>
       </div>
     </section>
@@ -6847,6 +7468,84 @@ body {
           <p class="req-why"><strong>Why:</strong> Larger institutions have data engineering teams who want to pull Horizon data directly into their data warehouse or BI tools rather than manually downloading CSV exports. An export API is the path from URS being an isolated reporting tool to Horizon being a data platform integrated into the institution's broader analytics infrastructure. The rate limit with term-end burst allowance balances API availability against the risk of a runaway integration hammering the reporting layer during peak load.</p>
         </div>
       </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Unified Transaction &amp; Remittance Reports</h3>
+        <div class="req-item">
+          <p class="req-persona">As a bursar / finance admin</p>
+          <p class="req-text"><strong>Unified Transaction Report (URS-TXN-01).</strong> A single consolidated view of all financial transactions across all payment types and methods — card, ACH, international, manual, scheduled, refunds, and returns. Required columns: Transaction ID, timestamp, transaction type, provider, status, amount, posting date and time, return code and message (where applicable), payer identity (Student / AP / Guest), payment method details, Agreement ID if the transaction is plan-related, institution, tenant, and term. Filters: date range, transaction type, status, institution, provider. UX flow: landing page → report → table → row click → detail view → export. This report supersedes the need to access multiple system-specific exports for daily reconciliation — all transactions appear in one place.</p>
+          <p class="req-why"><strong>Why:</strong> Today institutions rely on disconnected system exports from Payment Platform, Enterprise, QuickPay, and Refunds — each with different formats. Daily reconciliation requires stitching these together manually. A single unified transaction report eliminates that workflow and is the highest-priority URS report for reducing reconciliation support tickets.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a bursar / finance admin</p>
+          <p class="req-text"><strong>Remittance Report (URS-REM-01).</strong> A reconciliation report that matches posted transactions to disbursements sent to the institution. Required columns: Transaction ID, Batch ID, amount processed, amount disbursed, settlement status (Matched / Variance / Pending), provider reference, and bank confirmation reference. Drilldown must show: the variance amount and reason when settlement status is Variance, and the source transactions contributing to the settlement batch. Filters: date range, settlement status, institution. The remittance report is the primary instrument for identifying cases where the amount hitting the institution's bank account does not match the sum of processed transactions.</p>
+          <p class="req-why"><strong>Why:</strong> Remittance mismatches currently require engineering support to investigate — there is no self-service path for institutions to identify why their bank deposit differs from their transaction total. Every institution experiences occasional variances due to fee withholding timing, returned payment clawbacks, and batch processing cutoffs. A self-service remittance report eliminates the engineering escalation path and gives finance teams the tool to investigate and resolve mismatches independently.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Billing, Insurance &amp; Refund Reports</h3>
+        <div class="req-item">
+          <p class="req-persona">As a billing administrator</p>
+          <p class="req-text"><strong>Billing Generation Summary (URS-BILL-03).</strong> A report supporting institutions and NBS internal billing operations teams in verifying invoice generation and billing totals for each billing cycle. Required columns: Invoice ID, billing period, invoice amount, fees, tax, status (Generated / Sent / Paid), aging bucket, and institution. Filters: billing period, institution. The billing generation summary surfaces discrepancies between expected invoice totals and generated actuals before invoices are sent to students, giving billing operations a quality-check step in the workflow.</p>
+          <p class="req-why"><strong>Why:</strong> Billing data is currently fragmented across systems, making it difficult for billing administrators to verify that the correct students received invoices for the correct amounts in any given billing cycle. Errors found after invoices are sent require corrections that erode student trust. The pre-send quality-check enabled by this report reduces billing errors and the volume of student inquiries about incorrect invoices.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As an institution admin / compliance officer</p>
+          <p class="req-text"><strong>Tuition Insurance Report (URS-INS-01).</strong> A report providing institutions with visibility into which students are enrolled in tuition insurance and relevant policy and coverage details. Required columns: Student ID, student name, coverage amount, insurance fee or premium paid, enrollment status, and any refunds or cancellations processed on the insurance policy. The report supports compliance use cases (verifying insurance enrollment for students in coverage-required programs), refund validation (confirming insurance premiums were correctly reversed on withdrawal), and policy auditing (validating that coverage amounts align with tuition charges).</p>
+          <p class="req-why"><strong>Why:</strong> Tuition insurance administration requires accurate enrollment records — an institution that cannot verify which students have coverage and at what amount cannot fulfill its disclosure obligations to students or its contractual obligations to the insurance carrier. Institutions have also requested this report specifically for refund audits, where they need to confirm that insurance premium reversals were processed correctly when students withdrew.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">As a bursar / NBS operations</p>
+          <p class="req-text"><strong>Bulk Refund Status Report (URS-REF-01).</strong> A report giving institutions and NBS operations teams visibility into the status of bulk refund file executions. Required columns: Refund Batch ID, total refund requests in the batch, successful count, failed count, pending count, failure reasons by count, and affected transaction IDs. Row-level drilldown must show individual refund detail within a batch — student ID, refund amount, status, and failure reason if failed. Filters: date range, batch status, institution. The report must be available immediately after a batch file is processed, not on a nightly delay.</p>
+          <p class="req-why"><strong>Why:</strong> Bulk refund file execution currently lacks transparency — institutions submit a refund file and then wait for NBS support to tell them how many succeeded and why some failed. Failed refunds that go unaddressed result in student complaints, registration hold disputes, and potential regulatory exposure if refund obligations are not met within required timeframes. Real-time visibility into bulk refund status enables institutions to take immediate corrective action on failures.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Student &amp; Authorized Party Relationship Report</h3>
+        <div class="req-item">
+          <p class="req-persona">As a bursar / institution admin</p>
+          <p class="req-text"><strong>Student–AP Relationship Report (URS-AP-01).</strong> An exportable, authoritative record of all Student–Authorized Party relationships within the institution's tenant. Student columns: Student ID, student name, institution, term. Authorized Party columns: AP ID, name, email, phone, account status (Invited / Created / Logged In), last login timestamp. Relationship columns: creation date, access level granted, relationship initiator (student / AP / admin). Engagement indicator columns: whether the AP has a payment plan (yes/no and count), whether the AP has ever made a payment (yes/no and last payment date). Filters: student, AP, has-logged-in status, has-payment-plan status. Export: CSV for SIS/ERP sync. Primary use case: institutions that manage AP contact lists in their SIS need to sync this data without manual extraction.</p>
+          <p class="req-why"><strong>Why:</strong> AP relationship data currently lives only inside the platform with no institutional export path. Institutions that want to verify AP contact information, audit relationship changes, or sync AP data to their SIS are forced to screen-scrape or contact NBS support. This report solves that data portability gap. The engagement indicators (has made a payment, last login) are specifically useful for identifying APs who were invited but never activated — a cohort institutions want to target with re-engagement outreach.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Power BI Delivery &amp; Report UX</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>Power BI Embedded in Existing Framework.</strong> URS reports must be delivered as Power BI dashboards embedded within Horizon's existing reporting framework — not as separate external links or standalone tools. Each of the eight MVP reports must appear on a URS landing page organized into three categories: (A) Payments &amp; Transactions — Unified Transaction Report, Remittance Report, Bulk Refund Status Report; (B) Agreements &amp; Scheduled Activity — Payment Plan Agreement Report, Scheduled Payment Volume Report, Student &amp; Authorized Party Relationship Report; (C) Billing, Insurance — Billing Generation Summary, Tuition Insurance Report. Clicking any report tile opens the dedicated Power BI page for that report.</p>
+          <p class="req-why"><strong>Why:</strong> Embedding within the existing framework avoids sending users to a separate tool they need to authenticate into independently. The three-category landing page structure mirrors how bursar and finance teams mentally organize their work — transaction-level, agreement-level, and billing-level — which reduces cognitive load and time to the right report.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Report UX Standards.</strong> Every URS report must follow a consistent UX pattern: filters at the top (matching the filter options specified per-report), primary data table as the main view, optional summary metrics section (counts, totals, rates) above the table where applicable, row-level drillthrough to detail view for reports that support it (Payment Plan Agreement, Remittance, Bulk Refund, Student-AP Relationship), and Export to CSV on all reports. Column naming must be standardized and consistent across reports where the same field appears in multiple reports (e.g., "Student ID" must mean the same field in all reports). Breadcrumb navigation must allow users to return to the URS landing page from any report without using the browser back button.</p>
+          <p class="req-why"><strong>Why:</strong> Inconsistent UX across reports — different filter placements, different column names for the same concept — creates retraining burden and erodes trust in the data. Bursar staff who use multiple URS reports daily will make fewer errors and find answers faster when the interaction model is predictable. The breadcrumb requirement addresses a common complaint with embedded BI tools: the browser back button navigates out of the Horizon app instead of back to the report landing page.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Performance Requirements.</strong> All URS reports must load within 3 seconds for result sets up to 50,000 rows. CSV export must complete within 15 seconds for any date range that returns data. Reports that commonly return large result sets (Unified Transaction Report, Plan Agreement Report) must use server-side pagination and must not require the full dataset to load before the first page of results is shown. Power BI dataset refresh cadence: hourly for MVP; near-real-time (under 5 minutes) is a future phase target and not required for MVP delivery.</p>
+          <p class="req-why"><strong>Why:</strong> A report that takes 30+ seconds to load will not be used for daily reconciliation — bursar staff will revert to ERP exports or spreadsheets, defeating URS's purpose. The 3-second target is aggressive but achievable with proper dataset materialization and server-side pagination. Hourly refresh is an acceptable MVP tradeoff that enables launch while the near-real-time architecture is built out in subsequent phases.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>Row-Level Security.</strong> Power BI row-level security must ensure that institution users can only see data from their own institution tenant. NBS-internal users accessing the cross-institution portfolio view must be on a separate report surface with a distinct permission scope. An institution finance admin must not be able to see data from any other institution — even accidentally, such as if an RLS misconfiguration allows cross-tenant filter manipulation. RLS configuration must be validated as part of every URS release deployment, not just at initial setup.</p>
+          <p class="req-why"><strong>Why:</strong> Cross-tenant data leakage in a reporting tool would be a critical privacy and contractual violation. Institutions share sensitive student financial data with NBS with an expectation of strict confidentiality. Mandatory RLS validation at every release closes the gap where a passing release could introduce an RLS regression that goes undetected until a user accidentally sees another institution's data.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">URS Scope, Non-Goals &amp; Success Metrics</h3>
+        <div class="req-item">
+          <p class="req-text"><strong>MVP Explicit Non-Goals.</strong> The following capabilities are explicitly NOT included in the URS MVP and must not be committed to clients or designed into initial architecture in ways that would need to be undone: dashboards requiring Notify or engagement data; cross-product analytics across Enterprise or QuickPay; fraud or exception dashboards; executive KPI summaries; custom report builder; real-time refresh under 5 minutes; forecasting, projections, or AI predictions; visual-heavy dashboards (MVP is table-forward with simple summary metrics only). These are future phase targets, not deferrals of MVP scope.</p>
+          <p class="req-why"><strong>Why:</strong> Explicit non-goals prevent scope creep during implementation and prevent sales from over-committing to clients. Each item in the non-goals list was discussed and deliberately deferred — documenting them explicitly prevents them from being re-introduced as "quick adds" during development sprints. The table-forward approach for MVP is a deliberate choice: bursar operations require precise data, not dashboards; deliver accuracy first, visualization second.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>URS Success Metrics.</strong> URS MVP success is measured against five quantitative targets: (1) 95% adoption of the Transaction, Agreement, and Remittance reports within the first 90 days post-launch for all institutions on URS; (2) 30% reduction in reconciliation-related support tickets compared to the 90-day pre-launch baseline; (3) 40% reduction in NBS internal billing operations manual data pulls; (4) 99% export success rate across all report types and date ranges; (5) average Power BI report load time under 3 seconds measured at p95. These metrics must be instrumented at launch — report usage, export attempts, and load time must be captured by the telemetry layer so actuals can be compared to targets at the 90-day mark.</p>
+          <p class="req-why"><strong>Why:</strong> Success metrics without instrumentation are aspirational statements, not measurable targets. The 30% support ticket reduction is particularly important — it is the primary business case for URS investment. If support tickets do not decline, it suggests either that the reports are not being used, or that they are being used but not solving the reconciliation problems institutions are calling about. Either failure mode needs to be identified quickly so it can be addressed before renewal conversations.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-text"><strong>URS Phased Delivery Sequencing.</strong> URS must be delivered in three sequential phases: Phase 1 (8–10 weeks) covers data lake ingestion for all MVP fields plus four reports — Unified Transaction Report, Payment Plan Agreement Report, Scheduled Payment Volume Report, and Student &amp; Authorized Party Relationship Report. Phase 2 (6–8 weeks) adds the Remittance Report and Bulk Refund Status Report. Phase 3 (6–8 weeks) completes the MVP with the Billing Generation Summary and Tuition Insurance Report plus landing page category UI polish. Future phases address Notify and engagement analytics, fraud dashboards, executive KPIs, custom report builder, dashboard personalization, multi-product unified dashboards, and predictive insights. Phase sequencing is based on operational impact and data availability — the Phase 1 reports serve the highest daily-use cases for bursar teams.</p>
+          <p class="req-why"><strong>Why:</strong> Phased delivery serves three purposes: it allows NBS to deliver immediate value while longer data ingestion pipelines are built; it allows institution users to adopt a smaller surface before the full suite launches (reducing training burden); and it creates defined checkpoints for NBS to validate that Phase 1 reports meet quality and performance standards before extending the architecture to additional report types. The Phase 1 prioritization reflects direct feedback from bursar users that transaction visibility and plan agreement status are the most urgent daily needs.</p>
+        </div>
+      </div>
     </section>
 
     <!-- ════════════════════════════════════════
@@ -7069,6 +7768,12 @@ var SECTION_TREE = [
     {id:'feat-pot-balance-change',label:'Balance Change Handling'},
     {id:'feat-pot-default',label:'Default & Recovery'},
   ]},
+  { id:'Features · Account', label:'Features · Account', first:'feat-comm-history', children:[
+    {id:'feat-comm-history',label:'Communication History'},
+    {id:'feat-guest-pay',label:'Guest Payments'},
+    {id:'feat-assisted-pay',label:'Assisted Payments'},
+    {id:'feat-ap-management',label:'AP Management'},
+  ]},
   { id:'Scenarios — Onboarding', label:'Scenarios — Onboarding', first:'s1', children:[
     {id:'s1',label:'1 · First Time Student'},
     {id:'s2',label:'2 · Returning Student'},
@@ -7105,6 +7810,9 @@ var SECTION_TREE = [
   { id:'Platform Requirements', label:'Platform Requirements', first:'plat-account-payments', children:[
     {id:'plat-account-payments',label:'Account Payments'},
     {id:'plat-payment-plans',label:'Pay Over Time'},
+    {id:'plat-balance-compare',label:'Balance Compare & Rebalance'},
+    {id:'plat-payment-allocation',label:'Payment Allocation'},
+    {id:'plat-plan-offers',label:'Plan Offer Configuration'},
     {id:'plat-billing',label:'Billing'},
     {id:'plat-payment-processing',label:'Payment Processing'},
     {id:'plat-school-structure',label:'School Structure Setup'},
@@ -7179,6 +7887,15 @@ var CHANGE_LOG = [
   {date:'2026-05-05',group:'Solutions We Sell',sectionId:'pp-standard',label:'Standard Plans',summary:'Expanded: added post-enrollment modification rules, institution-initiated cancellation, plan completion confirmation (3 new requirements)'},
   {date:'2026-05-05',group:'Platform Requirements',sectionId:'plat-access-management',label:'Access Management',summary:'Fully rebuilt: 6 institution roles (Full Admin, Finance Admin, Student Services Rep, Reporting & Compliance, Payment Plan Coordinator, Read-Only), 3 NBS roles, 10 secured actions with permission matrix, 3 user management & provisioning requirements'},
   {date:'2026-05-05',group:'Reporting Needs',sectionId:'report-urs',label:'Unified Reporting Suite (URS)',summary:'New section: 8 named reports across Payments & Transactions (3), Agreements & Scheduled Activity (3), Billing & Outstanding Balances (2), plus technical architecture (5 requirements) covering event-driven pipeline, immutable audit trail, scheduling, portfolio view, and export API'},
+  {date:'2026-05-05',group:'Features · Account',sectionId:'feat-comm-history',label:'Communication History',summary:'New section: student and AP communication history views, institution user resend capability, isViewable/isResendable flags, TCPA/FDCPA compliance, correspondence service architecture'},
+  {date:'2026-05-05',group:'Features · Account',sectionId:'feat-guest-pay',label:'Guest Payments',summary:'New section: guest invite workflow, guest payment experience with validation, institution user guest payment capabilities, configuration and audit trail requirements'},
+  {date:'2026-05-05',group:'Features · Account',sectionId:'feat-assisted-pay',label:'Assisted Payments',summary:'New section: SRED device-based in-person payment capture, no saved method requirement, auth confirmation workflow, receipt/notification, audit permissions and configuration'},
+  {date:'2026-05-05',group:'Features · Account',sectionId:'feat-ap-management',label:'AP Management',summary:'New section: AP invite and registration, status management, access control and role-based visibility, remove/restore/self-disconnect lifecycle, notifications and audit trail'},
+  {date:'2026-05-05',group:'Pay Over Time',sectionId:'intl-overview',label:'International Plans',summary:'Expanded: added Flywire integration and status synchronization (3 requirements), refunds on international payments, ERP posting and reconciliation on Delivered status'},
+  {date:'2026-05-05',group:'Reporting Needs',sectionId:'report-urs',label:'Unified Reporting Suite (URS)',summary:'Expanded: added 6 URS PRD reports (URS-TXN-01, URS-REM-01, URS-BILL-03, URS-INS-01, URS-REF-01, URS-AP-01), Power BI delivery and report UX requirements, non-goals and success metrics, phased delivery sequencing'},
+  {date:'2026-05-05',group:'Platform Requirements',sectionId:'plat-balance-compare',label:'Balance Compare & Rebalance',summary:'New section: configuration philosophy, Phase 1 standard balance compare (3 requirements), Phase 2 parallel agreements (3 requirements), Phase 3 financial responsibility model (2 requirements), rebalance rules with 10-day proximity protection and on-login trigger (4 requirements)'},
+  {date:'2026-05-05',group:'Platform Requirements',sectionId:'plat-payment-allocation',label:'Payment Allocation',summary:'New section: past-due first default priority, charge-type priority configuration, consumer allocation election, plan installment allocation lock, CSR manual override with audit trail, guarantee plan state-defined allocation, overpayment handling, minimum threshold, allocation rule versioning'},
+  {date:'2026-05-05',group:'Platform Requirements',sectionId:'plat-plan-offers',label:'Plan Offer Configuration',summary:'New section: plan offer creation and type constraints, enrollment windows, eligibility rules, enrollment cap, installment count options, payment day configuration, full-balance requirement toggle, Quick Pick and multi-offer presentation, enrollment fees, completion notification, AP enrollment authority, hidden plan invite distribution'},
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
