@@ -1549,23 +1549,9 @@ body {
       <a href="#pp-standard"         class="nav-link">Standard Plans</a>
       <a href="#pp-pastdue"          class="nav-link">Past-Due Plans</a>
       <a href="#ltpp-overview"       class="nav-link">Long-Term Plans</a>
-      <a href="#ltpp-config"         class="nav-link nav-sub-item">LTPP · Configuration</a>
-      <a href="#ltpp-enrollment"     class="nav-link nav-sub-item">LTPP · Enrollment</a>
-      <a href="#ltpp-payments"       class="nav-link nav-sub-item">LTPP · Payment Processing</a>
-      <a href="#ltpp-comms"          class="nav-link nav-sub-item">LTPP · Communications</a>
-      <a href="#ltpp-termination"    class="nav-link nav-sub-item">LTPP · Termination</a>
       <a href="#intl-overview"       class="nav-link">International Plans</a>
-      <a href="#intl-enrollment"     class="nav-link nav-sub-item">Intl · Enrollment &amp; Selection</a>
-      <a href="#intl-invoicing"      class="nav-link nav-sub-item">Intl · Invoicing</a>
-      <a href="#intl-vendors"        class="nav-link nav-sub-item">Intl · Vendor Integration</a>
-      <a href="#intl-currency"       class="nav-link nav-sub-item">Intl · Currency</a>
       <a href="#pp-hidden"           class="nav-link">Hidden Plans</a>
       <a href="#guarantee-overview"  class="nav-link">Guarantee Plans</a>
-      <a href="#guarantee-config"    class="nav-link nav-sub-item">Guarantee · Configuration</a>
-      <a href="#guarantee-enrollment" class="nav-link nav-sub-item">Guarantee · Enrollment</a>
-      <a href="#guarantee-maintenance" class="nav-link nav-sub-item">Guarantee · Maintenance</a>
-      <a href="#guarantee-process"   class="nav-link nav-sub-item">Guarantee · Process</a>
-      <a href="#guarantee-reports"   class="nav-link nav-sub-item">Guarantee · Reports</a>
       <a href="#pp-custom"           class="nav-link">Custom Plans</a>
       <div class="nav-section-label">Other Solutions</div>
       <a href="#sol-epay"            class="nav-link">One Time Payments</a>
@@ -1575,6 +1561,7 @@ body {
       <a href="#sol-batch-refunds"   class="nav-link">Batch Credit Card Refunds</a>
       <a href="#sol-inperson"        class="nav-link">In-Person Tuition Payments</a>
       <a href="#sol-refunds"         class="nav-link">Refunds (non-batch)</a>
+      <a href="#feat-paypal-venmo"   class="nav-link">PayPal &amp; Venmo</a>
     </div>
 
     <div class="nav-group">
@@ -1616,6 +1603,8 @@ body {
       <a href="#feat-pot-management"    class="nav-link nav-sub-item">Plan Management</a>
       <a href="#feat-pot-balance-change" class="nav-link nav-sub-item">Balance Change Handling</a>
       <a href="#feat-pot-default"       class="nav-link nav-sub-item">Default &amp; Recovery</a>
+      <a href="#feat-pot-installments"  class="nav-link nav-sub-item">Scheduled Payments</a>
+      <a href="#feat-pot-servicing"     class="nav-link nav-sub-item">CSR Servicing</a>
     </div>
 
     <div class="nav-group">
@@ -5254,20 +5243,230 @@ body {
     <section id="feat-pot-enrollment" class="prd-section">
       <div class="section-eyebrow">Features · Pay Over Time</div>
       <h2 class="section-title">Plan Enrollment Flow</h2>
+      <p class="section-subtitle">Consumer-facing requirements for how a student or authorized party enrolls in a Pay Over Time plan — from seeing available plan offers through TILA disclosure acceptance and payment method entry.</p>
       <hr class="section-divider"/>
-      <div class="sophie-flag">
-        <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add consumer-facing feature requirements for the plan enrollment flow: plan type selection (how standard vs. international vs. guarantee plans are presented), schedule picker (installment count selection, down payment display), enrollment fee disclosure, agreement acceptance (TILA/Reg Z disclosures, auto-debit authorization), and payment method entry. Use agile user story format: "As a [student/consumer], I need to be able to...".</span>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Offer Display &amp; Eligibility</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Quick Pick Single Offer.</strong> When exactly one plan is available for the student's current balance and term, the platform presents a Quick Pick card that pre-selects that plan and advances directly to the Schedule Selection step — no grid selection required.</p>
+          <p class="req-why"><strong>Why:</strong> Reduces friction for the majority of students who have only one eligible plan, minimizing drop-off on the most common enrollment path.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Multi-Offer Selection Grid.</strong> When two or more plans are available, the platform displays a card grid with one card per plan showing plan name, number of installments, estimated installment amount, enrollment fee, and total amount financed. The student must explicitly select a card before proceeding.</p>
+          <p class="req-why"><strong>Why:</strong> Allows students to compare offers side-by-side and make an informed choice — a Reg Z best practice and a requirement when institutions offer tiered plan structures.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>No-Plan-Available State.</strong> When no plan is available (balance outside eligible range, term enrollment window closed, student already on an active plan, etc.), the platform displays an explanatory message stating the specific reason and provides a contact path to the bursar office. The message must not use generic error language.</p>
+          <p class="req-why"><strong>Why:</strong> Students who cannot enroll deserve a clear explanation rather than a dead end, reducing unnecessary bursar contact volume for cases where the reason can be stated automatically.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Eligibility Window Enforcement.</strong> The enrollment offer is only surfaced during the institution-configured enrollment window for the term. Outside that window, the Pay Over Time entry point is hidden or shows an informational message indicating when enrollment opens or closed.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions must control when plans can be created to align with their billing and ERP processing cycles; surfacing the option outside the window creates support burden and invalid enrollments.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Existing Active Plan Guard.</strong> A student with an existing active plan for the current term cannot enroll in a second plan for the same term unless parallel agreements are enabled. The offer display step detects this state and presents a message linking the student to their existing plan rather than offering a new enrollment path.</p>
+          <p class="req-why"><strong>Why:</strong> Prevents duplicate plan creation which would create accounting reconciliation issues with the institution's ERP and potential double-charging.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Minimum Balance Eligibility Messaging.</strong> When a student's eligible balance falls below the institution-configured minimum, the platform informs the student that their balance is below the minimum required for a Pay Over Time plan and displays the minimum threshold.</p>
+          <p class="req-why"><strong>Why:</strong> Transparent eligibility messaging prevents confusion and reduces support tickets from students who attempted to enroll on a low remaining balance.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Schedule Selection</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Installment Count Picker.</strong> For plans that offer multiple installment count options (e.g., 3, 4, or 5 payments), the schedule selection step presents each option as a selectable tile showing count, per-installment amount, and total financed. Quick Pick defaults to the institution-configured default count (typically the highest count available).</p>
+          <p class="req-why"><strong>Why:</strong> Giving students control over installment count improves plan completion rates, as students can choose a cadence that fits their cash flow.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Payment Day Selection.</strong> When the institution enables payment day selection, the student may choose their preferred day of month (from institution-configured options) during schedule selection. The platform recalculates projected installment dates in real time as the selection changes and displays the resulting first payment date.</p>
+          <p class="req-why"><strong>Why:</strong> Aligning installment dates to student payroll or financial aid disbursement dates reduces failed payment rates and improves plan completion.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Full Eligible Balance Requirement.</strong> Pay Over Time plans must cover the student's full eligible balance — partial enrollment (covering only a portion of the eligible balance) is not permitted. The balance amount used for plan calculations is fetched from the institution's SIS/ERP at the time of enrollment and is not editable by the consumer.</p>
+          <p class="req-why"><strong>Why:</strong> Partial enrollment creates reconciliation complexity with institutional billing systems and may leave an unpaid balance that triggers separate collection activity.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Balance Amount Display with Pre-Disclosure Math.</strong> The schedule selection screen displays: the total plan amount (balance + enrollment fee), the number of payments, the per-installment amount, and the first installment date. All figures must match the TILA disclosure that will be shown in the next step.</p>
+          <p class="req-why"><strong>Why:</strong> Presenting the math before the disclosure reduces the cognitive load of the TILA screen and ensures consumers have already processed the key numbers before legally accepting them.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Rounding Transparency.</strong> When installment amounts do not divide evenly, the platform applies the institution-configured rounding rule and displays a note on the schedule screen explaining that one installment may differ by a small amount due to rounding.</p>
+          <p class="req-why"><strong>Why:</strong> Unexplained installment amount variance is a top consumer support contact reason; proactive disclosure eliminates that confusion.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">TILA &amp; Reg Z Pre-Disclosure</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Required TILA Disclosure Fields.</strong> Before a consumer can confirm enrollment, the platform must display all of the following in a TILA-formatted disclosure block: (1) Total Amount Financed, (2) Number of Payments, (3) Amount of Each Scheduled Payment, (4) Enrollment Fee, (5) First Payment Date, (6) APR (0.00% for standard non-interest-bearing plans), (7) Finance Charge ($0.00 for standard plans), and (8) Total of Payments.</p>
+          <p class="req-why"><strong>Why:</strong> Federal Regulation Z requires these disclosures to be provided before a consumer is bound to a credit-like repayment agreement; omission creates regulatory exposure for the institution.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Auto-Debit Authorization Language.</strong> The TILA disclosure must include the institution-configured auto-debit authorization statement, which must identify: the plan name, the payment method to be charged, the recurring installment amount, and the consumer's right to revoke authorization. The statement text is configurable per institution but must include all four elements.</p>
+          <p class="req-why"><strong>Why:</strong> NACHA rules and most state consumer protection statutes require explicit, written auto-debit authorization that names the payee, amount, and revocation rights.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Right-to-Cancel Period Disclosure.</strong> If the institution configures a right-to-cancel period (e.g., 3 business days after enrollment), the disclosure must state the cancellation deadline date and the method for exercising cancellation. Plans without a cancellation period must still display a statement indicating the enrollment is binding upon confirmation.</p>
+          <p class="req-why"><strong>Why:</strong> Several states require a cooling-off period for installment payment agreements; institutions in those states require this to be visible in the enrollment flow.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Disclosure Version Persistence.</strong> The exact text of the TILA disclosure shown to the consumer at enrollment is stored in immutable form tied to the plan record. The stored version, disclosure timestamp, and consumer IP address are accessible in the plan's change history for compliance audit purposes.</p>
+          <p class="req-why"><strong>Why:</strong> If a consumer disputes the terms they agreed to, the institution must be able to produce the exact disclosure text and evidence that the consumer viewed and accepted it.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Scroll-to-Unlock Acceptance.</strong> The "Continue to Payment Method" button on the TILA disclosure screen is disabled until the consumer has scrolled to the bottom of the disclosure content or explicitly checked an acknowledgment checkbox. The mechanism used is configured per institution.</p>
+          <p class="req-why"><strong>Why:</strong> Documented evidence that the consumer accessed the full disclosure strengthens the institution's position in any dispute and aligns with best practices for electronic consent.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Payment Method Entry at Enrollment</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>New Card or ACH Entry.</strong> A consumer with no saved payment methods is presented with an inline card entry form (card number, expiration, CVV, billing zip) or an ACH entry form (routing number, account number, account type). The form is embedded in the enrollment flow — the consumer does not navigate to a separate payment settings page.</p>
+          <p class="req-why"><strong>Why:</strong> Requiring navigation away from the enrollment flow to add a payment method is a primary abandonment point; inline entry removes that friction.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Saved Method Selection.</strong> A consumer with one or more saved payment methods sees a list of those methods (card brand + last 4, or bank name + last 4) and can select one for the plan. A "Use a different method" option allows entry of a new method without removing existing saved methods.</p>
+          <p class="req-why"><strong>Why:</strong> Re-entering payment details is a friction point for returning users; saved method selection accelerates re-enrollment between terms.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Service Fee Disclosure at Method Selection.</strong> When a consumer selects or enters a credit card, the platform immediately displays the applicable service fee rate (e.g., "A 2.75% service fee applies to credit card payments. This fee is charged per installment in addition to the installment amount.") before the consumer proceeds. ACH methods must display a $0 service fee confirmation.</p>
+          <p class="req-why"><strong>Why:</strong> Surprise fees at confirmation are the leading cause of plan abandonment; disclosing the fee at the point of method selection gives consumers the opportunity to switch to ACH before committing.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Payment Method Validation.</strong> Card entries are validated via Luhn check client-side and authorization attempt server-side before enrollment confirmation. ACH entries are validated via routing number lookup (ABA check). Invalid entries display inline field-level error messages identifying the specific issue.</p>
+          <p class="req-why"><strong>Why:</strong> Pre-validating the payment method before plan creation prevents the partial enrollment state that results when a plan is created but the initial charge fails due to an invalid method.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Confirmation &amp; Enrollment Email</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Confirmation Screen Contents.</strong> The post-enrollment confirmation screen must display: plan name, term, total plan amount, number of installments, per-installment amount, enrollment fee charged, first payment date, payment method (card brand + last 4 or bank name + last 4), and a plan reference number. A "Return to home" button is the primary CTA.</p>
+          <p class="req-why"><strong>Why:</strong> A complete confirmation screen reduces immediate post-enrollment contact volume by giving the consumer all the information they need to verify their enrollment was successful.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Enrollment Confirmation Email.</strong> An enrollment confirmation email is sent to the consumer's institution email address (and secondary email if configured) within 5 minutes of successful enrollment. The email includes all fields shown on the confirmation screen plus a link to the consumer portal and the institution's bursar contact information.</p>
+          <p class="req-why"><strong>Why:</strong> Email confirmation provides the consumer with a durable record of their enrollment details that they can reference without logging into the portal, reducing repeat logins and confusion at payment time.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Home Screen Plan Card Immediate.</strong> Immediately upon successful enrollment, the consumer's home screen displays an active plan card on next page load showing: plan name, next payment date, next payment amount, and remaining balance. The active plan card replaces any "Enroll in Pay Over Time" CTA for the same term.</p>
+          <p class="req-why"><strong>Why:</strong> Immediate home screen visibility confirms the enrollment succeeded and transitions the consumer into plan management mode, reducing duplicate enrollment attempts.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / ERP</p>
+          <p class="req-text"><strong>ERP Enrollment Notification.</strong> The institution's ERP or SIS receives an enrollment notification event within the institution-configured sync window (default: within 15 minutes, maximum: next nightly batch). The notification payload includes: student ID, plan ID, term, total plan amount, installment schedule, enrollment date, and enrollment fee amount.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions must reflect the plan enrollment in their student accounts receivable records to update the student's balance status and prevent duplicate billing activity on the covered balance.</p>
+        </div>
       </div>
     </section>
 
     <section id="feat-pot-confirmation" class="prd-section">
       <div class="section-eyebrow">Features · Pay Over Time</div>
       <h2 class="section-title">Confirmation &amp; Agreement</h2>
+      <p class="section-subtitle">Requirements for the plan confirmation screen, the binding agreement acceptance step, and what happens in the immediate post-enrollment state.</p>
       <hr class="section-divider"/>
-      <div class="sophie-flag">
-        <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add feature requirements for the confirmation screen and agreement acceptance step: what must be shown (plan summary, total due today, schedule preview, auto-debit authorization language), what the student must explicitly accept, confirmation email/notification, and the success state. Also cover what happens if the down payment fails at enrollment.</span>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Pre-Confirmation Summary Screen</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Complete Plan Summary Before Confirmation.</strong> The pre-confirmation screen must display all of the following before the "Confirm enrollment" button appears: plan name, term, covered balance, number of installments, per-installment amount, enrollment fee (labeled "charged today"), total amount to be paid, first payment date, and payment method (last 4 digits only, with card brand or bank name).</p>
+          <p class="req-why"><strong>Why:</strong> Consumers must have a complete, scannable summary of their commitment before they take the binding action; an incomplete summary is grounds for dispute that the institution cannot defend.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Edit Path from Summary.</strong> Each major section of the summary (plan selection, schedule, payment method) has an associated "Change" link that navigates the consumer back to that step without resetting subsequent selections. The consumer returns to the summary screen after making a change.</p>
+          <p class="req-why"><strong>Why:</strong> Without a clear edit path, consumers who notice an error at the summary step may abandon enrollment entirely rather than starting over.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Projected Installment Schedule Table.</strong> The confirmation summary includes a collapsible table showing all projected installment dates and amounts. For plans where service fees apply per installment, the table shows both the principal installment amount and the service fee for each row.</p>
+          <p class="req-why"><strong>Why:</strong> Consumers who can see the full schedule at confirmation have lower rates of surprise-related contacts when charges process — they have already reviewed what to expect and when.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Agreement Acceptance</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Explicit Multi-Element Acceptance.</strong> The consumer must take an explicit acceptance action for each of the following before enrollment is processed: (1) TILA / Reg Z disclosure, (2) auto-debit authorization, and (3) financial responsibility statement. Acceptance is captured via individual checkboxes or a combined explicit button with clear label text. Pre-checked checkboxes are not permitted.</p>
+          <p class="req-why"><strong>Why:</strong> Bundling all acceptance into a single implicit action does not satisfy Reg Z requirements for documented consumer consent to each distinct legal obligation.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Agreement Timestamp and Document Version Storage.</strong> Upon enrollment confirmation, the platform stores: the UTC timestamp of the consumer's agreement action, the version identifier of the TILA disclosure template used, the exact disclosure text rendered to the consumer, and the consumer's session IP address. This record is immutable and retained for a minimum of 7 years.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions are subject to audit and must be able to produce evidence of consumer agreement, including the exact terms presented, for any plan within the retention window.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Financial Responsibility Statement.</strong> The financial responsibility statement — configurable per institution — must acknowledge that: the balance underlying the plan represents a real obligation to the institution, failure to complete plan payments may result in the balance returning to collections or a hold on records, and enrollment in the plan does not constitute a waiver of the underlying debt.</p>
+          <p class="req-why"><strong>Why:</strong> Without explicit acknowledgment, some consumers assume the plan replaces the underlying balance obligation rather than structuring its payment, creating disputes after plan default.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Enrollment Fee Processing</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Fee Charged at Confirmation.</strong> The enrollment fee is processed as a payment transaction at the moment the consumer confirms enrollment — not deferred to the first installment date. The plan is not created in an active state until the enrollment fee transaction is confirmed as successfully authorized by the payment processor.</p>
+          <p class="req-why"><strong>Why:</strong> Deferred fee collection creates a class of "zero-cost" plan starts where the consumer benefits from the plan without paying the setup cost, creating revenue leakage for the institution.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Fee Payment Failure Behavior.</strong> If the enrollment fee charge is declined or returns an error, the plan is not created. The consumer sees a clear, specific error message and is returned to the payment method selection step with their previously entered method details pre-populated for correction.</p>
+          <p class="req-why"><strong>Why:</strong> Creating a plan in an active state before the enrollment fee is collected forces the institution into a manual recovery process; blocking plan creation on fee failure is cleaner operationally.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>No Partial Enrollment State.</strong> The system must operate as an atomic enrollment transaction: either all of the following succeed together — agreement stored, enrollment fee charged, plan record created — or none of them are committed. A partial state is a system fault condition and must be surfaced for operational review.</p>
+          <p class="req-why"><strong>Why:</strong> Partial enrollment states create both financial reconciliation problems and consumer confusion (consumer believes they are enrolled when they are not, or vice versa).</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Retry with Different Method.</strong> After an enrollment fee failure, the consumer may enter an entirely different payment method and retry. The retry does not require restarting the enrollment flow from the plan selection step; the previously accepted TILA disclosure and agreement are preserved for the retry attempt.</p>
+          <p class="req-why"><strong>Why:</strong> Requiring a full restart after a payment failure dramatically increases abandonment; preserving the agreement state through a method change keeps the consumer in the funnel.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Post-Enrollment State</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Plan in Communication History.</strong> The enrollment event — confirmation email sent, TILA acceptance recorded, enrollment fee receipt — appears as the earliest entries in the plan's communication history tab within the consumer portal. Communication history entries are timestamped, labeled by event type, and linked to any associated receipt or document.</p>
+          <p class="req-why"><strong>Why:</strong> A complete communication history starting from enrollment gives the consumer a single in-app audit trail and reduces the need for consumers to search their email inbox for plan records.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Admin Enrollment Visibility.</strong> Finance Admin and CSR roles see the newly enrolled plan in the admin plan management view within 5 minutes of enrollment. The plan is marked as "Active" and shows the full schedule, payment method last 4, and enrollment timestamp. Admin view does not require a page refresh or manual sync action.</p>
+          <p class="req-why"><strong>Why:</strong> Finance staff frequently receive student calls immediately after enrollment; near-real-time admin visibility allows staff to confirm enrollment and answer questions without delays.</p>
+        </div>
       </div>
     </section>
 
@@ -5307,6 +5506,83 @@ body {
         <div class="req-item" data-modified="2026-05-05">
           <p class="req-text"><strong>Pause Plan (institution-configured).</strong> If the institution has enabled plan pausing, the plan owner can request a one-cycle pause from the portal. A paused plan skips the next installment and extends the plan end date by one period. The institution must explicitly enable this feature; it is off by default.</p>
           <p class="req-why"><strong>Why:</strong> Some institutions use pausing as a retention tool — students facing a temporary hardship pause rather than cancel. Making it institution-controlled prevents it from being abused as a default payment avoidance mechanism.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Installment Schedule View</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Full Installment Schedule Display.</strong> The consumer can access a full installment schedule view from the home screen plan card that lists every installment in the plan — past and future — with each row showing: installment number, scheduled date, amount, and status (Processed, Upcoming, Failed, Skipped, or Cancelled).</p>
+          <p class="req-why"><strong>Why:</strong> A full schedule view is the most common thing a consumer checks when they want to understand their plan status; without it, they contact the bursar for information the platform could provide.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Schedule Accessible from Home Plan Card.</strong> The installment schedule view is reachable in two taps from the home screen: one tap on the plan card to open the plan detail, and one tap on "View full schedule" to open the schedule list. The route does not require navigating into account settings or a separate menu.</p>
+          <p class="req-why"><strong>Why:</strong> Schedule access buried in menus is a primary driver of "where do I see my payments?" support contacts; a prominent path from the plan card is the standard consumer expectation.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>PDF / Print Export of Schedule.</strong> From the installment schedule view, the consumer can export or print a PDF version of the full schedule. The PDF includes: institution name, plan name, student name, plan ID, enrollment date, and all schedule rows with the same fields shown in the on-screen view. The export is generated on-demand and does not require a CSR to produce it.</p>
+          <p class="req-why"><strong>Why:</strong> Students frequently need a printed or saved copy of their installment schedule for personal financial records, scholarship offices, or employer tuition reimbursement submissions.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Remaining Balance Display.</strong> The schedule view prominently displays the current remaining plan balance (total plan amount minus all processed principal installments). The remaining balance updates after each processed installment and after any ad-hoc payment. The remaining balance figure is clearly labeled and differentiated from the per-installment amount.</p>
+          <p class="req-why"><strong>Why:</strong> Consumers frequently confuse the per-installment amount with the remaining balance; explicit display of both eliminates the most common plan math confusion.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Privacy Rules Between Student and AP</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / Authorized Party</p>
+          <p class="req-text"><strong>Plan Owner Full Access.</strong> The plan owner (the student on whose account the plan was created) can view all plan details including: full installment schedule, payment method card brand and last 4, all receipt and communication history events, and plan management actions (update method, cancel, make ad-hoc payment).</p>
+          <p class="req-why"><strong>Why:</strong> The student is the financially responsible party and must have complete visibility into the plan that covers their balance.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Authorized Party (View-Only)</p>
+          <p class="req-text"><strong>AP View-Only Access Scope.</strong> An Authorized Party granted view-only access may see: plan name, plan status (Active / Defaulted / Cancelled), next payment date, next payment amount, and remaining balance. An AP with view-only access must NOT see: the payment method card number (even last 4), full payment history details, or any management actions.</p>
+          <p class="req-why"><strong>Why:</strong> Authorized Parties are often parents or guardians who need high-level plan visibility but should not have access to the student's payment instrument details, which may belong to the student personally.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Authorized Party (Paying AP)</p>
+          <p class="req-text"><strong>Paying AP Access Scope.</strong> An Authorized Party granted paying access may view the payment method, update the payment method, make ad-hoc payments, and view receipts — but cannot cancel the plan or change plan structure. The distinction between paying AP and plan owner is displayed in the plan detail header.</p>
+          <p class="req-why"><strong>Why:</strong> Families where a parent is the paying party need full payment method visibility and management capability; restricting this forces students to act as intermediaries for payment operations.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP / Institution Admin</p>
+          <p class="req-text"><strong>Privacy Rules Enforced at API Level.</strong> Access scope restrictions on payment method visibility and plan management actions are enforced server-side in the API authorization layer — not only in the UI. A request from a view-only AP token to retrieve payment method details must return a 403 response regardless of the client making the request.</p>
+          <p class="req-why"><strong>Why:</strong> UI-only privacy enforcement can be bypassed by direct API calls; server-side enforcement is the only defensible control for sensitive financial data.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Ad-Hoc / Early Payment on Plan</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Ad-Hoc Payment Availability.</strong> A consumer with an active plan can initiate an additional payment against the plan balance at any time — not only on a scheduled installment date. The "Make a payment" option is accessible from the plan detail screen and from the plan card on the home screen. Ad-hoc payments are available for plans in Active status only; defaulted or cancelled plans do not offer this option.</p>
+          <p class="req-why"><strong>Why:</strong> Students who receive financial aid, scholarships, or gift money mid-term want to reduce their plan balance proactively; blocking this forces them to wait for scheduled installments and pay more in fees over time.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Ad-Hoc Payment Amount.</strong> The consumer can enter any payment amount between a platform minimum ($10.00) and the full remaining plan balance. The entry field displays the current remaining balance as a reference. A payment equal to the remaining balance pays off the plan in full.</p>
+          <p class="req-why"><strong>Why:</strong> Constraining ad-hoc payments to specific amounts reduces their utility; open-amount entry matches consumer expectations for online bill payment.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Ad-Hoc Payment Balance Reduction Modes.</strong> The institution configures how an ad-hoc payment affects the remaining installment schedule. Three modes are supported: (a) Proportional Reduction — future installments are recalculated proportionally; (b) Skip Next — the next scheduled installment is eliminated and the remaining balance continues on the existing schedule; (c) Shorten Plan — the end date is moved earlier by eliminating trailing installments. The configured mode applies to all ad-hoc payments on plans at that institution.</p>
+          <p class="req-why"><strong>Why:</strong> Different institutions have different ERP allocation models; a configurable mode allows each institution to select the approach that aligns with their accounts receivable system.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Immediate Ad-Hoc Processing.</strong> Ad-hoc payments are processed in real time (not batched with the nightly installment run). The consumer sees a processing confirmation screen immediately after submission and a receipt in communication history within 5 minutes of successful processing. The remaining balance on the plan card updates within the same session.</p>
+          <p class="req-why"><strong>Why:</strong> Real-time processing with immediate balance update confirms to the consumer that their payment was received and applied, preventing duplicate payment attempts.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Ad-Hoc Payment Receipt.</strong> The consumer receives an email receipt for each ad-hoc payment showing: payment amount, payment method used, date and time processed, new remaining plan balance, and the revised next installment amount (if the configured mode changes future installment amounts). The receipt is also logged in the plan's communication history.</p>
+          <p class="req-why"><strong>Why:</strong> A receipt that includes the updated schedule impact gives the consumer immediate visibility into how their extra payment changed their plan, reinforcing the value of making additional payments.</p>
         </div>
       </div>
     </section>
@@ -5353,13 +5629,319 @@ body {
     <section id="feat-pot-default" class="prd-section">
       <div class="section-eyebrow">Features · Pay Over Time</div>
       <h2 class="section-title">Default &amp; Recovery</h2>
+      <p class="section-subtitle">Requirements for how the platform handles failed installment payments — from first notification through escalation, plan cancellation, and the state the consumer encounters after default.</p>
       <hr class="section-divider"/>
       <div class="proto-links">
         <a class="proto-link" href="./home-4b-defaulted-plan.html" target="_blank"><span class="proto-icon">⬡</span> See Prototype: 4b — Defaulted Plan</a>
       </div>
-      <div class="sophie-flag">
-        <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add feature requirements for what the student sees when a plan payment fails: returned payment notification, retry options, plan default state (as shown in scenario 4b, home-4b-defaulted-plan.html), re-enrollment path, and collections escalation messaging. What actions can the student take? What is locked? Reference scenario 4b for the visual design direction.</span>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Credit / Debit Card Decline Handling</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Immediate Decline Notification.</strong> When a scheduled installment charge is declined by the card processor, the consumer receives a notification (email + in-app) within 30 minutes of the attempted charge. The notification specifies the amount that was attempted, the card last 4 that was charged, and a direct link to update their payment method.</p>
+          <p class="req-why"><strong>Why:</strong> Prompt notification gives the consumer the maximum time to resolve the payment method issue before the retry window closes or the plan enters default.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Configurable Retry Logic.</strong> The institution configures the retry schedule for declined card charges from three options: (a) Retry same day after a 4-hour delay; (b) Retry after a configured number of days (1–7); (c) No auto-retry (consumer must manually update method and trigger retry). The configured retry behavior is applied consistently to all plans at the institution.</p>
+          <p class="req-why"><strong>Why:</strong> Retry timing preferences vary significantly between institutions; some prefer aggressive same-day retry while others prefer to give students time to resolve the issue without additional declines that may affect their credit standing.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Consumer Notification Per Retry Attempt.</strong> Each automatic retry attempt — whether successful or declined — generates a consumer notification. Failed retry notifications include the retry count, how many attempts remain before escalation, and a method update link.</p>
+          <p class="req-why"><strong>Why:</strong> Consumers who do not know retries are occurring may be surprised by a charge that processes on a retry; transparency about each attempt prevents confusion about unexpected charges.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Decline Code Logging.</strong> Every decline event records the processor decline code in the plan's payment audit trail. Decline codes are visible to Finance Admin in the CSR plan detail view and are included in the plan failure reporting export.</p>
+          <p class="req-why"><strong>Why:</strong> Decline codes are necessary for diagnosing whether failures are systemic (invalid card) vs. transient (insufficient funds) and for making informed decisions about retry strategy.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Bank Return (ACH) Handling</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Return Code-Specific Consumer Messaging.</strong> ACH return messages are tailored by return code category: R01/R09 (insufficient funds) — "Your bank returned this payment due to insufficient funds. Please update your payment method or ensure sufficient funds are available for retry."; R02/R04 (account closed/invalid) — "Your bank returned this payment because the account is no longer valid. Please update your payment method to a current account."; R07/R10 (authorization revoked) — "Your bank has indicated that payment authorization was revoked. Please contact your bank or update your payment method." Generic return messages are not permitted.</p>
+          <p class="req-why"><strong>Why:</strong> Return code-specific messaging allows the consumer to take the correct corrective action immediately rather than contacting support to understand what happened.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Returned Payment Fee Assessment.</strong> The institution configures a returned payment fee amount (or $0 to disable). When an ACH return is received, the platform assesses the configured fee against the student's account as a separate charge transaction.</p>
+          <p class="req-why"><strong>Why:</strong> Returned payment fees are a standard institutional policy that must be enforced consistently; manual fee assessment is error-prone and creates staff workload.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Method Update Requirement Before Plan Continues.</strong> After an ACH return, the plan's scheduled installments are paused until the consumer updates their payment method to a valid account. The paused state is clearly indicated on the plan card and detail screen. The plan does not automatically retry against the returned account number.</p>
+          <p class="req-why"><strong>Why:</strong> Retrying an ACH payment against a closed or invalid account generates additional return fees from the processor and may violate NACHA rules around re-presentment limits.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Reschedule After Recovery</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>New Date Confirmation After Method Update.</strong> When a consumer updates their payment method following a failed installment, the platform immediately sends a notification confirming: (1) the payment method has been updated, (2) the next installment will be retried on a specific date, and (3) the amount to be charged.</p>
+          <p class="req-why"><strong>Why:</strong> Consumers who update their payment method need explicit confirmation that the retry is scheduled and when to expect the charge, so they can ensure funds are available.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Rescheduled Installment in Schedule View.</strong> After a reschedule event, the installment schedule view reflects the updated date for the affected installment. The schedule view distinguishes rescheduled installments from originally-scheduled installments with a label (e.g., "Rescheduled from [original date]").</p>
+          <p class="req-why"><strong>Why:</strong> Showing both the original and rescheduled date gives the consumer (and admin) a clear picture of the plan's history and prevents confusion about why the charge date differs from the original schedule.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Plan Default &amp; Cancellation State</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Default Threshold Configuration.</strong> The institution configures the number of consecutive failed installment attempts that triggers plan default. The minimum configurable value is 1 (default on first failure after retries exhausted); the maximum is 3. Upon reaching the threshold, the plan status transitions to "Defaulted" and no further installment processing occurs.</p>
+          <p class="req-why"><strong>Why:</strong> Default thresholds are a risk tolerance decision that varies by institution; a configurable threshold avoids one-size-fits-all defaults that may not match the institution's student population or collection policies.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Defaulted Plan Card on Home Screen.</strong> A defaulted plan is displayed on the consumer's home screen with a distinct "Defaulted" status badge. The card shows the full remaining balance now due, a summary of the failure event, and a CTA to contact the bursar. The plan card is not removed from the home screen upon default.</p>
+          <p class="req-why"><strong>Why:</strong> Hiding defaulted plan information leaves consumers unaware of their outstanding balance obligation; visible status with remaining balance due provides the necessary urgency to prompt resolution.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>ERP Cancelled Plan Status Notification.</strong> Within the institution-configured sync window after default, the ERP/SIS receives a plan cancellation event with: student ID, plan ID, cancellation reason code (system-initiated default), remaining balance at time of default, and cancellation timestamp. The ERP must re-activate the full remaining balance as a standard accounts receivable balance.</p>
+          <p class="req-why"><strong>Why:</strong> When a plan defaults, the institution must restore the full balance to their AR system for standard collection follow-up; automated ERP notification prevents manual re-entry and timing gaps.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Consumer Default Notification.</strong> At the time the plan enters default status, the consumer receives an email and in-app notification that clearly states: the plan has been cancelled due to non-payment, the remaining balance is now the full amount due to the institution, and the consumer should contact the bursar to discuss resolution options.</p>
+          <p class="req-why"><strong>Why:</strong> Consumers must be explicitly informed that the plan structure no longer applies and the full balance is due — unclear communication at default creates disputes and delays resolution.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Consumer Recovery Path</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Bursar Contact Path from Defaulted State.</strong> The defaulted plan card and the default notification email both present a direct link or contact button for the institution's bursar office. This path is available without requiring the consumer to navigate menus.</p>
+          <p class="req-why"><strong>Why:</strong> The most important recovery action after default is direct bursar contact; surfacing the contact path prominently from the default state reduces time-to-resolution.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Re-Enrollment After Default Configuration.</strong> The institution configures whether a student who has defaulted on a plan is eligible to enroll in a new plan for the same or a future term, and the mandatory waiting period before re-enrollment is permitted (options: no waiting period, 30 days, 60 days, or never). This configuration is enforced at the offer display step.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions have divergent policies on re-enrollment after default; some use re-enrollment as a recovery tool, others restrict it to limit risk. Configurable control allows each institution to apply their own policy.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>One-Time Payment from Defaulted State.</strong> A consumer with a defaulted plan can make a one-time payment toward their remaining balance directly from the defaulted plan card — without needing to re-enroll in a plan. The one-time payment flow collects payment method and amount, processes the payment in real time, and updates the remaining balance displayed on the card.</p>
+          <p class="req-why"><strong>Why:</strong> Students who cannot or do not want to re-enroll should still be able to make partial or full payments toward their balance through the portal; removing this path forces all post-default payments through the bursar.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="feat-pot-installments" class="prd-section">
+      <div class="section-eyebrow">Features · Pay Over Time</div>
+      <h2 class="section-title">Scheduled Payment Processing</h2>
+      <p class="section-subtitle">Requirements for how the platform's installment engine runs, processes, and communicates scheduled plan payments — covering the processing schedule, advance notifications, fee handling, and receipt presentation.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Installment Engine Execution</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Nightly Processing Run.</strong> The installment engine runs once nightly and processes all active plan installments whose scheduled date matches the current processing date. The processing date uses the institution's configured timezone — not UTC — to determine which installments are due. Plans at institutions in different timezones are processed in the appropriate local-date context.</p>
+          <p class="req-why"><strong>Why:</strong> Timezone-aware processing prevents installments from being triggered a day early or late for institutions on the east or west coast, which creates reconciliation mismatches with the institution's end-of-day accounting.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Processing Window Completion Requirement.</strong> The nightly installment processing run must complete — with all transactions submitted to the payment processor and results received — before 8:00 AM institution local time. If the run has not completed by 7:30 AM, the platform generates an operational alert to NBS support. The processing SLA is tracked and reported monthly.</p>
+          <p class="req-why"><strong>Why:</strong> Finance staff begin their day processing student account activity; installment results must be available before the business day starts to allow timely response to failures and student inquiries.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Processing Results Available by 9 AM.</strong> A processing results report is available in the admin dashboard by 9:00 AM institution local time showing: total installments processed, total dollar amount, count and amount of successful payments, count and amount of failed payments, and list of failed plans requiring attention. The report is filterable by plan type, term, and failure reason.</p>
+          <p class="req-why"><strong>Why:</strong> Finance staff need a daily operational summary to prioritize follow-up on failed payments; a report available at the start of the business day enables same-day resolution outreach.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Installment Skip on Non-Business Days.</strong> When a scheduled installment date falls on a weekend or institution-configured holiday, the installment is automatically rescheduled to the next business day. The reschedule is applied during the nightly run prior to the original date and a consumer notification is sent informing them of the adjusted date. The platform uses the institution's holiday calendar for this determination.</p>
+          <p class="req-why"><strong>Why:</strong> ACH transactions submitted on non-processing days are rejected or delayed by the banking network; proactive rescheduling prevents processing failures caused by calendar timing.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Advance Payment Notifications</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Configurable Advance Notice Period.</strong> The institution configures the advance notice period for installment notifications — default is 3 business days before the scheduled installment date. The minimum configurable period is 1 business day; the maximum is 7 business days. The advance notice is sent even if the installment amount has not changed since the previous notification.</p>
+          <p class="req-why"><strong>Why:</strong> Consumers need sufficient advance notice to ensure their payment method has adequate funds; the default 3-day period aligns with ACH processing timing and allows a business day to resolve issues before the charge date.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Advance Notification Required Fields.</strong> The advance payment notification must contain: the exact amount to be charged, the last 4 of the payment method to be charged (with card brand or bank name), the scheduled charge date, a link to update the payment method, and the plan name and term. Advance notifications are sent to all email addresses associated with the account (student + any configured APs with notification access).</p>
+          <p class="req-why"><strong>Why:</strong> All five fields are necessary for the consumer to take action — without the amount, date, or method, the notification does not give them enough information to prepare or to identify which plan and method is affected.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Service Fee Pre-Disclosure in Advance Notice.</strong> For plans where a service fee applies to each installment (credit card plans), the advance notification separately discloses: the principal installment amount, the service fee amount, and the total to be charged including the service fee rate (e.g., "2.75% of $X = $Y service fee").</p>
+          <p class="req-why"><strong>Why:</strong> Service fees that appear without advance notice are the second most common reason for installment disputes; proactive per-installment disclosure reduces disputes and establishes a clear paper trail.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Service Fee Handling on Installments</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Per-Installment Fee Calculation.</strong> For plans on a credit card payment method, the service fee is calculated per installment as: (installment principal amount) × (institution-configured service fee rate). The fee is recalculated for each installment — it is not fixed at enrollment. If the installment amount changes due to rounding or a prior ad-hoc payment, the fee is recalculated accordingly.</p>
+          <p class="req-why"><strong>Why:</strong> Dynamic fee calculation ensures the fee is always proportional to the actual installment amount; a fixed fee based on the enrollment-time amount becomes incorrect if installment amounts change mid-plan.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Fee as Separate Transaction.</strong> The service fee is charged as a separate payment transaction concurrent with the principal installment — not bundled into a single inflated installment amount. The two transactions are linked by a common installment event ID in the payment audit trail.</p>
+          <p class="req-why"><strong>Why:</strong> Separate transactions allow the institution to account for fee revenue separately from plan principal revenue, and give consumers transparent visibility into exactly how much they are paying in fees.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Fee Not Charged on Failed Installment.</strong> If the principal installment charge fails (declined or returned), the service fee transaction is not submitted. The fee is only charged when the associated principal installment is successfully processed. On a subsequent retry that succeeds, both the principal and fee are charged together at that time.</p>
+          <p class="req-why"><strong>Why:</strong> Charging the fee on a failed installment — where the institution receives no payment — creates an unjustified consumer charge and complicates refund processing.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Fee Receipt in Same Communication History Event.</strong> After a successful installment with a service fee, the communication history shows a single combined receipt event — not two separate entries for principal and fee. The receipt event expands to show the itemized breakdown (principal amount, fee amount, total), but the top-level list shows one line per installment event.</p>
+          <p class="req-why"><strong>Why:</strong> Two separate communication history entries per installment doubles the visual noise in the consumer's history view and causes confusion about whether separate charges represent separate problems.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Combined Receipt View</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Single Receipt Event Per Installment.</strong> After each installment processes, the consumer receives one receipt notification (email + in-app communication history entry) containing: installment principal amount, service fee amount (if any), total amount charged, payment method last 4, processing date, remaining plan balance, next installment date, and projected next installment amount.</p>
+          <p class="req-why"><strong>Why:</strong> A single, comprehensive receipt gives consumers all the information they need to reconcile the charge on their bank statement and understand their plan's remaining trajectory.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Downloadable PDF Receipt.</strong> Each installment receipt in the communication history view has a "Download PDF" option that generates a formatted receipt document. The PDF includes: institution name and logo, student name and ID, plan name, installment number (e.g., "Payment 2 of 4"), all receipt fields, and a footer with the institution's contact information.</p>
+          <p class="req-why"><strong>Why:</strong> Students frequently need proof-of-payment receipts for scholarship reimbursements, employer tuition assistance programs, or personal records; on-demand PDF generation eliminates the need to contact the bursar for receipt copies.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Failed Processing &amp; Retry Queue</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Retry Queue Entry on Failure.</strong> When an installment fails processing, the failed installment enters an institution-configured retry queue with the scheduled retry date calculated per the institution's retry logic. The retry queue entry records: original scheduled date, failure reason, failure code, retry count, and next scheduled retry date. The queue is visible in the admin dashboard under the plan's detail view.</p>
+          <p class="req-why"><strong>Why:</strong> A visible retry queue gives Finance staff clarity on what will happen next without requiring them to manually track retry timing; it also prevents staff from manually re-triggering payments that are already in the automated retry path.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Retry Attempts Logged in Audit Trail.</strong> Each retry attempt — whether successful or failed — is recorded as a distinct entry in the plan's payment audit trail with: attempt timestamp, amount attempted, payment method used, result (success/failure), and processor response code. The audit trail is immutable and accessible to Finance Admin and NBS PAS roles.</p>
+          <p class="req-why"><strong>Why:</strong> A complete retry history is necessary for dispute resolution, compliance auditing, and diagnosing systemic payment failure patterns across a portfolio of plans.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution / Finance Admin</p>
+          <p class="req-text"><strong>Manual Retry Trigger by Admin.</strong> A Finance Admin or NBS PAS agent can manually trigger a retry attempt on a failed installment from the CSR plan detail view, regardless of the scheduled automatic retry date. Manual retry requires a written reason and is logged in the change history.</p>
+          <p class="req-why"><strong>Why:</strong> When a student calls the bursar to report they have updated their payment method, staff need the ability to immediately trigger a retry rather than waiting for the next scheduled automatic attempt.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="feat-pot-servicing" class="prd-section">
+      <div class="section-eyebrow">Features · Pay Over Time</div>
+      <h2 class="section-title">Plan Servicing by CSR</h2>
+      <p class="section-subtitle">Requirements for how institution finance admins and NBS PAS Support Agents view and service active Pay Over Time plans on behalf of students — including cancellation, installment rescheduling, payment cancellation, and change history.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">CSR Plan Detail View</h3>
+        <div class="req-item">
+          <p class="req-persona">Finance Admin / CSR / NBS PAS Agent</p>
+          <p class="req-text"><strong>Full Plan Detail View Contents.</strong> Authorized users can access a full plan detail view from the student account screen showing: plan summary (name, term, status, enrollment date, total amount, remaining balance), complete installment schedule (all past and future installments with status), payment method last 4 and type, plan owner name and student ID, all associated APs, and enrollment date.</p>
+          <p class="req-why"><strong>Why:</strong> CSR staff answering student calls need all plan information in a single view; requiring navigation across multiple screens to piece together plan status increases handle time and error risk.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Finance Admin / CSR / NBS PAS Agent</p>
+          <p class="req-text"><strong>Communication History in Plan Detail.</strong> The plan detail view includes a communication history tab showing every notification sent to the consumer (advance notices, receipts, failure notifications, admin action notifications) in reverse-chronological order, with: event type, send date/time, recipient email address, delivery status (sent/bounced/opened if available), and a link to view the message content.</p>
+          <p class="req-why"><strong>Why:</strong> When a student claims they never received a notification, CSR staff need to verify delivery status from the plan record without contacting the email service provider separately.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student Services Rep</p>
+          <p class="req-text"><strong>Read-Only for Student Services Rep Role.</strong> Users with the Student Services Rep role see the full plan detail view including all informational fields but have no management action buttons (cancel, reschedule, override). The read-only restriction is enforced at the API level — Student Services Rep tokens cannot submit POST/PATCH requests on plan resources.</p>
+          <p class="req-why"><strong>Why:</strong> Front-line advisors need plan visibility to answer student questions but should not be able to modify plans, reducing the risk of unauthorized changes and maintaining a clear segregation of duties.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Finance Admin / NBS PAS Agent</p>
+          <p class="req-text"><strong>Payment Audit Trail Access.</strong> From the plan detail view, Finance Admin and NBS PAS agents can access the full payment audit trail: every payment transaction (authorization, capture, failure, retry, refund) with processor transaction IDs, timestamps, amounts, payment method last 4, response codes, and the installment event each transaction belongs to. The audit trail is exportable to CSV.</p>
+          <p class="req-why"><strong>Why:</strong> Payment disputes and chargeback responses require access to the complete transaction-level record; without this in the plan view, staff must query the payment processor directly, which is slower and less auditable.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Cancel Plan (Admin-Initiated)</h3>
+        <div class="req-item">
+          <p class="req-persona">Finance Admin / NBS PAS Agent</p>
+          <p class="req-text"><strong>Cancellation Requires Written Reason.</strong> When a Finance Admin or NBS PAS agent initiates a plan cancellation, they must select a cancellation reason from a configured list (e.g., Student request, Student withdrew, Billing adjustment, Error correction) and optionally enter a free-text note. Cancellation cannot be submitted without a reason selection. The reason and note are stored in the change history.</p>
+          <p class="req-why"><strong>Why:</strong> Cancellation reason data is required for reporting on plan attrition drivers and for audit purposes; mandatory capture prevents the change history from having unexplained administrative actions.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Consumer Cancellation Notification.</strong> Within 30 minutes of admin-initiated plan cancellation, the consumer receives an email notification stating: the plan has been cancelled, the remaining balance is now the full amount due to the institution, and the consumer should contact the bursar for questions.</p>
+          <p class="req-why"><strong>Why:</strong> Consumers must be promptly notified of admin-initiated cancellations so they can plan for the restored balance obligation and take timely action.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Finance Admin / NBS PAS Agent</p>
+          <p class="req-text"><strong>Cancellation Logged in Change History.</strong> The admin cancellation action creates an immutable change history entry recording: action type (Plan Cancelled), authorizing user ID and display name, role, timestamp, reason code, free-text note, and the plan's remaining balance at the time of cancellation.</p>
+          <p class="req-why"><strong>Why:</strong> A tamper-evident record of who cancelled a plan and why is required for internal governance, audit, and for resolving consumer disputes about unauthorized cancellations.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Reschedule Installment</h3>
+        <div class="req-item">
+          <p class="req-persona">Finance Admin / NBS PAS Agent</p>
+          <p class="req-text"><strong>Single Future Installment Reschedule.</strong> An authorized CSR can change the scheduled date of a single future installment (one that has not yet been submitted for processing). The rescheduled date must fall within the same calendar month as the original scheduled date unless the institution configures a broader window. A reschedule requires a mandatory reason selection and is logged in the change history with the original and new dates.</p>
+          <p class="req-why"><strong>Why:</strong> Single-installment reschedule covers the primary use case (student requests a specific month's payment be moved to align with a paycheck) without creating the complexity and audit risk of bulk schedule modifications.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Consumer Notified of Reschedule.</strong> Within 30 minutes of a CSR reschedule action, the consumer receives a notification stating: the original date, the new date, the amount to be charged, and which plan and installment number was affected.</p>
+          <p class="req-why"><strong>Why:</strong> Consumers must know about any changes to their expected charge dates so they can ensure funds are available; undisclosed date changes are a source of NSF fees and consumer complaints.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Cancel Individual Payment</h3>
+        <div class="req-item">
+          <p class="req-persona">Finance Admin / NBS PAS Agent</p>
+          <p class="req-text"><strong>Cancel Future Installment Without Cancelling Plan.</strong> An authorized CSR can cancel a specific future installment that has not yet been processed without cancelling the entire plan. The cancelled installment's amount must be redistributed per the institution's configured redistribution rule: (a) spread proportionally across remaining installments, (b) added to the final installment, or (c) removed from the plan balance entirely (requires Finance Admin role).</p>
+          <p class="req-why"><strong>Why:</strong> Individual installment cancellation is needed when a student receives a financial aid disbursement that partially offsets their balance; cancelling the full plan is not appropriate when only one payment needs to be eliminated.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / AP</p>
+          <p class="req-text"><strong>Consumer Notified of Cancelled Payment.</strong> Within 30 minutes of a CSR cancelling an individual installment, the consumer receives a notification stating: which installment was cancelled, the original amount, the redistribution method applied, and the updated amounts for affected future installments. A revised schedule summary is included in the notification.</p>
+          <p class="req-why"><strong>Why:</strong> Changes to the installment schedule — even favorable ones like a cancelled payment — must be communicated to the consumer so they have accurate expectations about future charges.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Change History View</h3>
+        <div class="req-item">
+          <p class="req-persona">Finance Admin / NBS PAS Agent</p>
+          <p class="req-text"><strong>Tamper-Evident Change History.</strong> Every administrative action on a plan — CSR cancel, installment reschedule, individual installment cancellation, payment method override, allocation rule change, status override — is recorded as an immutable entry in the change history. Entries cannot be deleted or modified by any user or role. The change history is stored with cryptographic integrity protection.</p>
+          <p class="req-why"><strong>Why:</strong> Tamper-evidence is required for regulatory compliance and legal defensibility; a change history that can be altered after the fact does not satisfy audit requirements.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Finance Admin / NBS PAS Agent</p>
+          <p class="req-text"><strong>Change History Entry Required Fields.</strong> Each entry must contain: action type (from a controlled vocabulary), authorizing user display name and user ID, role at the time of the action, timestamp (UTC and institution local time), stated reason (reason code + optional free-text note), and before/after values for all fields affected by the action.</p>
+          <p class="req-why"><strong>Why:</strong> Before/after values are critical for reconstructing the state of a plan at any point in its history; without them, the change history only confirms that an action occurred, not what specifically changed.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Finance Admin / NBS PAS Agent</p>
+          <p class="req-text"><strong>System-Generated Events in Change History.</strong> In addition to admin-initiated actions, the change history includes system-generated events: plan creation (enrollment), each installment processed, each retry attempt, each status transition (Active → Defaulted, Paused → Active), and each ERP sync event. System events are labeled with a "System" actor identifier and are visually distinguished from admin-initiated entries.</p>
+          <p class="req-why"><strong>Why:</strong> A complete change history — not just human-initiated actions — provides a full audit trail of the plan's lifecycle, enabling root cause analysis and complete reconstruction of the plan's history from a single view.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Finance Admin / NBS PAS Agent</p>
+          <p class="req-text"><strong>Change History Export.</strong> The complete change history for a plan can be exported to PDF or CSV from the plan detail view. The export is watermarked with the exporting user's name, role, and export timestamp to support chain-of-custody for compliance submissions.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions responding to external audits or regulatory inquiries need to produce the change history as a document; an in-platform export eliminates the need to request data extracts from NBS support.</p>
+        </div>
       </div>
     </section>
 
@@ -6272,6 +6854,44 @@ body {
           <p class="req-why"><strong>Why:</strong> Institutions need delivered payments reflected in their SIS/ERP to update the student's account balance and release any registration holds. Manual ERP posting for international payments would require bursar staff to match each Flywire delivery confirmation to a student account and manually enter the payment — a high-effort, error-prone process that would erode the value of the integration.</p>
         </div>
       </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Convera International Payments</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Convera as a Configurable International Payment Vendor.</strong> Convera is available as a second international payment vendor alongside Flywire. Institution admins can enable Flywire, Convera, or both. When both vendors are enabled, the institution configures a preference order that determines which vendor is presented first to a consumer for countries supported by both. If only one vendor supports the consumer's country, that vendor is presented without preference logic.</p>
+          <p class="req-why"><strong>Why:</strong> Different institutions have existing commercial relationships or preferred currency corridors with one vendor over the other; supporting both vendors and an institution-configurable preference order avoids locking institutions into a single vendor relationship.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / Consumer</p>
+          <p class="req-text"><strong>Convera Payment Lifecycle.</strong> Convera payments follow the same five-status normalized lifecycle as Flywire: Initiated → Guaranteed → Completed/Delivered → Cancelled → Expired. At Guaranteed status, a fee-only Service ID 2 transaction is applied to the student's account representing the Convera service charge to the institution, consistent with Flywire Guaranteed behavior. At Delivered status, ERP auto-posting triggers to write back the full payment amount to the student's ledger.</p>
+          <p class="req-why"><strong>Why:</strong> Consistent lifecycle handling across vendors ensures that downstream processes — ERP posting, notifications, and reporting — operate on a single normalized model regardless of which vendor processed the payment.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>Convera Payment Detail Storage.</strong> For each Convera payment, the platform stores and displays in the student's communication history: the original currency, the amount in original currency, the exchange rate applied, and the USD equivalent. These details are visible to institution admins in the student's payment history view.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions must be able to reconcile international payments against their ledger in USD; storing the currency conversion details provides the audit record needed for both institutional reconciliation and potential student disputes.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">International Payment Vendor Status Normalization</h3>
+        <div class="req-item">
+          <p class="req-persona">Platform / Engineering</p>
+          <p class="req-text"><strong>Normalized Status Model at Ingest.</strong> The platform maintains a single normalized status model for all international payment vendors. Vendor-specific status codes are mapped to the five standard lifecycle statuses (Initiated, Guaranteed, Completed/Delivered, Cancelled, Expired) at the point of ingest. Institutions and consumers always see the normalized status; vendor-specific codes are never surfaced in the institution or consumer UI.</p>
+          <p class="req-why"><strong>Why:</strong> Exposing vendor-specific status codes to institutions would require institutions to maintain separate workflows per vendor; normalization ensures that institution configuration, reporting, and consumer communication are vendor-agnostic.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Platform / NBS Technical Support</p>
+          <p class="req-text"><strong>Configurable Normalization Mapping Without Code Deployment.</strong> The normalization mapping between vendor-specific status codes and the platform's standard lifecycle statuses is configurable by NBS Technical Support without requiring a code deployment. New vendors can be onboarded and their status codes mapped through a configuration change alone.</p>
+          <p class="req-why"><strong>Why:</strong> Requiring a code deployment for each new vendor or each vendor status code change creates an unacceptable onboarding lead time; configuration-driven mapping allows NBS to respond to vendor API changes or new vendor additions with operational rather than engineering effort.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Platform / Engineering</p>
+          <p class="req-text"><strong>Vendor-Agnostic Downstream Trigger Behavior.</strong> Status change webhooks from any configured international payment vendor trigger the same downstream actions — consumer and institution notifications, ERP posting, and reporting pipeline events — regardless of which vendor originated the webhook. The consumer-facing communication history displays the normalized status and the vendor name (e.g., "Payment via Convera — Delivered").</p>
+          <p class="req-why"><strong>Why:</strong> Vendor-specific webhook handling paths would duplicate downstream logic and create divergent behavior over time; a single normalized trigger ensures feature parity across vendors and reduces the regression surface when either vendor's API changes.</p>
+        </div>
+      </div>
     </section>
 
 
@@ -6536,6 +7156,25 @@ body {
           <p class="req-why"><strong>Why:</strong> Without a comprehensive results report, the finance team cannot identify which students' refunds failed and need to be re-processed through an alternative method. Failures not caught promptly result in students missing expected refunds — a high-sensitivity issue, especially when the refund is tied to financial aid.</p>
         </div>
       </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Admin Bulk Refund Tool</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>In-Portal Multi-Student Refund Selection.</strong> Institution Finance Admins can initiate a bulk refund for up to 100 students at a time directly within the portal without uploading a file. Admins search and select students from a filtered list view that surfaces only students with credit balances. For each selected student, the admin sees: student name, student ID, credit balance amount, original payment method(s), and a suggested refund amount pre-populated from the credit balance.</p>
+          <p class="req-why"><strong>Why:</strong> The file-upload batch workflow is appropriate for large-scale end-of-term refund runs but creates unnecessary overhead for routine smaller batches; an in-portal tool reduces processing time and eliminates file preparation errors for Finance Admins handling day-to-day credit balance resolution.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>Per-Student Amount Override and Batch Confirmation.</strong> Before processing, the admin can override the suggested refund amount for any individual student in the batch. After all amounts are set, the admin must review and explicitly confirm the total batch refund amount before processing begins. Confirmation is a required step and cannot be bypassed.</p>
+          <p class="req-why"><strong>Why:</strong> Suggested amounts may not account for partial credits, holds, or manual adjustments; per-student override capability ensures accuracy; a mandatory batch total confirmation step creates a deliberate checkpoint that prevents accidental processing of incorrect totals.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>Real-Time Processing Status and ERP Integration.</strong> As the bulk refund processes, the admin sees real-time status for each student's refund. Failed refunds are highlighted with a human-readable failure reason. Bulk refund results — including both successful and failed items — are included in the ERP Transmission Report (URS-ERP-01) and are distinguishable from file-upload batch refunds by a source indicator ("admin-portal-bulk") in the audit trail.</p>
+          <p class="req-why"><strong>Why:</strong> Real-time status allows the admin to act on failures immediately; ERP report inclusion ensures bulk portal refunds are part of the same reconciliation workflow as all other refund types; the source indicator preserves auditability of which tool originated each refund batch.</p>
+        </div>
+      </div>
     </section>
 
     <!-- ════════════════════════════════════════
@@ -6590,6 +7229,83 @@ body {
           <p class="req-persona">As a finance admin</p>
           <p class="req-text"><strong>Refund Status Tracking &amp; Communication.</strong> Every refund — whether admin-initiated or student-requested — must have a visible status lifecycle: Pending → Processing → Sent → Completed (or Failed). Students must be notified at each status transition via the platform's correspondence system. The admin must have a real-time refund status view in the admin interface. Failed refunds must be immediately surfaced with the failure reason and a clear remediation path.</p>
           <p class="req-why"><strong>Why:</strong> "Where is my refund?" is one of the highest-volume student service inquiries at any institution. A visible status lifecycle with proactive student communication eliminates the majority of these inquiries without requiring any staff involvement — converting a high-touch support interaction into a self-service information lookup.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="feat-paypal-venmo" class="prd-section">
+      <div class="section-eyebrow">Solutions We Sell</div>
+      <h2 class="section-title">PayPal &amp; Venmo Payments</h2>
+      <p class="section-subtitle">PayPal and Venmo as consumer payment methods for one-time balance payments. A contractual commitment to Big Ten and Big 12 member institutions and a meaningful revenue opportunity given the high adoption of these wallets among the 18–25 demographic.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Acceptance &amp; Method Selection</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Institution-Configurable Wallet Enablement.</strong> Institution admins can independently enable or disable PayPal and Venmo as accepted payment methods. Each wallet can be toggled separately; enabling one does not require enabling the other.</p>
+          <p class="req-why"><strong>Why:</strong> Not all institutions will have the same contractual or compliance posture toward each wallet; independent control avoids forcing institutions to accept both as a bundle.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / Consumer</p>
+          <p class="req-text"><strong>Wallet Selection and Authorization Redirect.</strong> When one or both wallets are enabled, PayPal and Venmo appear as payment method options alongside ACH and card in the one-time payment flow. The consumer selects their preferred wallet and is redirected to the respective PayPal or Venmo authorization UI. After the consumer authorizes the payment, they are returned to the Horizon payment confirmation screen. The full payment amount and institution context are preserved through the redirect so the consumer is not required to re-enter any information upon return.</p>
+          <p class="req-why"><strong>Why:</strong> The redirect-and-return pattern is the standard PayPal/Venmo integration model; preserving payment context through the redirect removes friction that would otherwise cause consumers to abandon the flow upon return.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Service Fee Handling</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Institution-Configured PayPal/Venmo Service Fee.</strong> Institution admins configure the service fee rate for PayPal and Venmo payments, typically set to the same rate as the credit card service fee. Institutions can also configure whether ACH-funded PayPal transactions qualify for a lower fee rate and, if so, what that rate is.</p>
+          <p class="req-why"><strong>Why:</strong> PayPal transaction costs to the institution vary based on the funding source; allowing institutions to pass through a differentiated rate for ACH-funded PayPal transactions avoids charging consumers a card-equivalent fee for a lower-cost transaction.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / Consumer</p>
+          <p class="req-text"><strong>Pre-Authorization Fee Disclosure and Receipt Line Item.</strong> The service fee is disclosed to the consumer before they authorize the payment in the PayPal or Venmo UI. On the payment receipt, the service fee is shown as a separate line item distinct from the balance payment amount.</p>
+          <p class="req-why"><strong>Why:</strong> Pre-authorization disclosure is required for regulatory compliance and consumer trust; a separate receipt line item ensures consumers can distinguish the service fee from the payment applied to their balance.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Settlement &amp; Reconciliation</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>PayPal Merchant Settlement API and ERP Trigger.</strong> PayPal and Venmo settlements are received via PayPal's merchant settlement API. ERP write-back triggers on settlement confirmation — not on consumer authorization — consistent with the platform's settlement-based posting model. Settlement timing for PayPal/Venmo is typically T+1 compared to T+2 for card; the platform handles both settlement cadences within the same ERP posting pipeline.</p>
+          <p class="req-why"><strong>Why:</strong> Triggering ERP posting on authorization rather than settlement would result in postings for payments that may not ultimately fund; settlement-based posting ensures the ledger reflects confirmed funds.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>ERP Transmission Report Inclusion.</strong> PayPal and Venmo settlements are included in the ERP Transmission Report (URS-ERP-01) with a payment method type value of "PayPal" or "Venmo" respectively, enabling institution finance teams to identify and reconcile wallet-funded payments distinctly from card and ACH settlements.</p>
+          <p class="req-why"><strong>Why:</strong> Finance teams need to reconcile wallet settlements against PayPal's merchant settlement statements; a distinct payment method type in the ERP report provides the necessary identifier for that reconciliation.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Refunds via PayPal / Venmo</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>PayPal API Refund Processing.</strong> Refunds for PayPal and Venmo payments are processed back through the PayPal merchant API to the consumer's PayPal or Venmo balance. Institution admins initiate PayPal/Venmo refunds from the same refund workflow used for card refunds; no separate refund interface is required. The PayPal merchant refund window is 180 days from the original transaction date.</p>
+          <p class="req-why"><strong>Why:</strong> Routing refunds back through PayPal ensures the consumer receives funds in the same wallet they used to pay; a unified refund workflow reduces training overhead for Finance Admins.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>Out-of-Window Refund Handling.</strong> Refund requests for PayPal or Venmo payments more than 180 days after the original transaction date cannot be processed through the PayPal API. The platform surfaces a clear message to the admin identifying the out-of-window condition and indicating that the refund must be processed via a manual off-platform method.</p>
+          <p class="req-why"><strong>Why:</strong> Attempting to submit an out-of-window refund through the API will fail; surfacing a clear message at initiation prevents failed API calls and ensures the admin knows immediately that a manual process is required.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Institutional Eligibility</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / NBS Sales</p>
+          <p class="req-text"><strong>Horizon Contract Requirement and Initial Cohort Rollout.</strong> PayPal and Venmo are available only to institutions on the Horizon payment platform contract that have enabled the feature. Initial rollout is limited to Big Ten and Big 12 member institutions pursuant to contractual commitment. General availability to other eligible institutions follows after the initial cohort has been validated in production.</p>
+          <p class="req-why"><strong>Why:</strong> Contractual obligations to the Big Ten and Big 12 require that these institutions receive the capability at launch; limiting initial rollout to the committed cohort allows the platform to validate the integration at scale before broader release.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Product</p>
+          <p class="req-text"><strong>Pay Over Time Exclusion in Initial Release.</strong> PayPal and Venmo may not be used for Pay Over Time plan installment payments in the initial release. The wallets are available exclusively for one-time balance payments. Installment payment support via PayPal/Venmo is a deferred capability, not in scope for the initial contractual commitment.</p>
+          <p class="req-why"><strong>Why:</strong> Pay Over Time installments involve recurring payment authorization patterns that require additional PayPal API capabilities beyond the one-time payment authorization model; deferring installment support scopes the initial release to a technically and contractually achievable scope.</p>
         </div>
       </div>
     </section>
@@ -6943,6 +7659,29 @@ body {
           <p class="req-why"><strong>Why:</strong> Hidden plans are used for targeted populations — past-due recovery cohorts, scholarship recipients, pilot groups. Bulk invite and rule-based distribution eliminates manual individual outreach while the expiring link ensures the offer is time-bounded.</p>
         </div>
       </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Balance Amount Plan Parameters</h3>
+        <div class="sophie-flag">
+          <span class="sophie-flag-label">Deferred Feature</span>
+          <span>Not in scope for initial launch. Flagged for future roadmap prioritization. These requirements define the configuration model for balance-tier-based plan parameters; schedule for review after Phase 1 URS and Plan Offer Configuration are validated in production.</span>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>Balance Tier Threshold Configuration.</strong> Institution admins can define balance tier thresholds and assign a distinct installment count range and enrollment fee to each tier (e.g., balances under $500 → max 3 installments; $500–$2,000 → max 6; $2,000+ → max 12). Each tier's minimum and maximum installment count and enrollment fee are independently configurable.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions need to manage financial risk and servicing cost proportional to balance size; applying the same plan parameters to a $200 balance and a $5,000 balance creates unnecessary exposure at the low end and inadequate flexibility at the high end.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / Consumer</p>
+          <p class="req-text"><strong>Automatic Tier Selection at Enrollment.</strong> At the time a student initiates plan enrollment, the system evaluates the student's current eligible balance and automatically applies the parameter set associated with the matching tier. The student is never required to select a tier manually.</p>
+          <p class="req-why"><strong>Why:</strong> Manual tier selection introduces friction and creates support burden; automatic selection ensures accurate plan configuration without requiring the consumer to understand institution-internal rules.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>Tier Configuration Version Control.</strong> Changes to tier thresholds, installment count ranges, or enrollment fees are effective on a future date specified by the admin. Changes do not apply retroactively to plans already enrolled under the prior configuration. The system retains a history of all tier configuration versions with effective dates and the identity of the admin who made each change.</p>
+          <p class="req-why"><strong>Why:</strong> Retroactive parameter changes would invalidate enrollment agreements already accepted by students; versioning protects both the institution's contractual obligations and the student's plan terms as agreed at enrollment.</p>
+        </div>
+      </div>
     </section>
 
     <section id="plat-billing" class="prd-section">
@@ -7211,6 +7950,30 @@ body {
           <p class="req-why"><strong>Why:</strong> Credential compromise is the most common attack vector for financial application breaches. MFA eliminates the risk from password reuse and phishing — both of which are common in higher education environments where staff use institutional email for personal communication. Requiring MFA for Full Admin accounts specifically addresses the highest-impact compromise scenario: an attacker with Full Admin credentials can modify configuration, export bulk student data, and issue refunds.</p>
         </div>
       </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Direct Authentication for SSO Accounts</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Institution-Configurable Direct Auth Fallback.</strong> For institutions using SAML SSO, institution admins can configure whether direct authentication is enabled as a fallback when SSO is unavailable for a student (default: enabled). When enabled, students whose SSO authentication fails are presented with a "Can't access your institution account?" option that initiates the direct auth flow.</p>
+          <p class="req-why"><strong>Why:</strong> Students who have graduated, taken leaves of absence, or whose institutional accounts have been deactivated lose SSO access while active payment obligations remain; without a fallback, these students cannot manage their accounts or make payments without calling support.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / Consumer</p>
+          <p class="req-text"><strong>Knowledge-Based Direct Authentication.</strong> Direct auth requires the student to provide their email address on file plus one knowledge-based verification factor. The institution configures which factor is required: date of birth or last 4 digits of SSN. The student cannot choose between factors; the institution's configured factor is the only option presented.</p>
+          <p class="req-why"><strong>Why:</strong> A two-factor verification (email + knowledge factor) provides a proportionate identity assurance level for read and payment-method update access; limiting to the institution-configured factor ensures consistency with the institution's student identity verification policy.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / Consumer</p>
+          <p class="req-text"><strong>Restricted Direct Auth Session Scope.</strong> A session initiated via direct authentication provides read-only access to the student's balance and active plans, the ability to update their payment method, and access to their communication history. Direct auth sessions cannot be used to change account settings or enroll in new Pay Over Time plans. Sessions are time-limited to 24 hours and are not renewable within the same direct auth event.</p>
+          <p class="req-why"><strong>Why:</strong> Limiting direct auth scope to payment management reduces the blast radius of a compromised direct auth session; enrollment restriction prevents new financial commitments from being made outside the institution's standard identity verification channel.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Compliance</p>
+          <p class="req-text"><strong>Direct Auth Audit Logging and Threshold Alerting.</strong> All direct auth sessions are logged in the access audit trail with a distinct session type marker differentiating them from SSO-authenticated sessions. When a student uses direct auth more than N times within a rolling 30-day window, the institution receives an automated notification. Institution admins configure N; the default threshold is 3.</p>
+          <p class="req-why"><strong>Why:</strong> Repeated direct auth usage may indicate a student whose SSO account is permanently inaccessible and who needs proactive outreach, or may signal an account-takeover pattern that warrants investigation; the threshold alert surfaces either case without requiring manual audit log review.</p>
+        </div>
+      </div>
     </section>
 
     <!-- ════════════════════════════════════════
@@ -7256,6 +8019,25 @@ body {
         <div class="req-item">
           <p class="req-text"><strong>FDCPA-Compliant Collection Notices.</strong> Correspondence related to past-due balances that are being or may be referred to collections must comply with FDCPA requirements, including the 30-day validation notice, cessation of collection contact upon dispute, and identifying Horizon or NBS as the entity communicating on behalf of the creditor institution. The legal review process for collection-adjacent templates must involve compliance and legal, not just product.</p>
           <p class="req-why"><strong>Why:</strong> Higher education debt collection is under increasing regulatory scrutiny from the CFPB. Correspondence that violates FDCPA — even when sent by a software platform on behalf of an institution — can expose NBS to third-party collector liability if regulators determine Horizon is acting as a debt collector rather than a service provider.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Deep Links in Communications</h3>
+        <div class="req-item">
+          <p class="req-persona">Student / Consumer</p>
+          <p class="req-text"><strong>Context-Specific Deep Link Routing.</strong> Every automated email and SMS notification sent by the platform must include a deep link routing the consumer directly to the relevant context in the portal rather than to the portal home screen. Required deep link destinations include: the specific plan detail view (plan confirmation email), the balance-change alert card (new charge alert), the update-payment-method flow for the affected plan (failed payment notification), and the upcoming installment detail for the affected plan (advance payment reminder).</p>
+          <p class="req-why"><strong>Why:</strong> Routing consumers to the portal home screen forces unnecessary navigation at moments of urgency — a failed payment or new charge — increasing abandonment and support call volume. A direct deep link converts the notification from an alert into an actionable entry point.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Student / Consumer</p>
+          <p class="req-text"><strong>Signed Token Authentication for Deep Links.</strong> Deep links carry a short-lived signed token that expires 72 hours after the notification is sent. For consumers who are already authenticated, the token auto-authenticates the session and navigates directly to the destination. For consumers who are not authenticated, the token routes them to an identity verification step (last 4 SSN or date of birth, per institution configuration) before activating the deep link destination.</p>
+          <p class="req-why"><strong>Why:</strong> A signed, time-limited token prevents unauthorized access via forwarded or guessed links while removing login friction for consumers who click promptly; identity verification provides a proportionate fallback for unauthenticated access.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin</p>
+          <p class="req-text"><strong>Per-Template Deep Link Configuration.</strong> Institution admins can configure whether deep links are included for each individual notification template. An institution may disable deep links in specific templates (e.g., for compliance or accessibility tooling reasons) without affecting other templates.</p>
+          <p class="req-why"><strong>Why:</strong> Some institutions have legal or accessibility requirements governing external links in student communications; per-template control allows targeted compliance without disabling the feature globally.</p>
         </div>
       </div>
     </section>
@@ -7546,6 +8328,44 @@ body {
           <p class="req-why"><strong>Why:</strong> Phased delivery serves three purposes: it allows NBS to deliver immediate value while longer data ingestion pipelines are built; it allows institution users to adopt a smaller surface before the full suite launches (reducing training burden); and it creates defined checkpoints for NBS to validate that Phase 1 reports meet quality and performance standards before extending the architecture to additional report types. The Phase 1 prioritization reflects direct feedback from bursar users that transaction visibility and plan agreement status are the most urgent daily needs.</p>
         </div>
       </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Plan Reports &amp; ERP Transmission</h3>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>Agreement Report (URS-AGREE-01).</strong> Institution users can generate a report of all Pay Over Time plan agreements for a specified term. Each row shows: student ID, plan type, enrolled date, covered balance, total installments, and enrollment status (active, cancelled, completed, defaulted). The report is available in CSV and PDF formats and is filterable by plan type, enrollment date range, and enrollment status.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions need a term-level reconciliation artifact for audits, accreditation reporting, and internal finance review; the agreement report is the authoritative record of plan commitments made in a given period.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>Future Scheduled Payments Report (URS-SCHED-01).</strong> Institution users can generate a report of all upcoming installment payments not yet processed across all active plans for their institution. Each row shows: student ID, plan name, installment date, installment amount, and payment method type (card or ACH). The lookout window is configurable by the user at run time (7, 14, 30, 60, or 90 days).</p>
+          <p class="req-why"><strong>Why:</strong> Cash-flow forecasting requires institutions to know the expected inflow from plan installments in a forward-looking window; this report gives treasury teams the inputs needed to manage daily and weekly cash positions.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>ERP Transmission Report (URS-ERP-01).</strong> Institution users can access an audit log of all ERP write-back attempts, including: payment amount, charge type, student ID, ERP posting date and time, posting status (success, error, or pending), and ERP transaction reference. Failed postings are visually highlighted. Institution Finance Admins can initiate a retry of failed postings directly from the report UI without requiring NBS support intervention.</p>
+          <p class="req-why"><strong>Why:</strong> ERP posting failures create student account discrepancies that directly impact collections and financial aid eligibility; a self-service retry capability reduces resolution time and removes NBS as a bottleneck for routine reconciliation.</p>
+        </div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">Plan Reporting Technical Architecture</h3>
+        <div class="req-item">
+          <p class="req-persona">Platform / Engineering</p>
+          <p class="req-text"><strong>Event-Driven Pipeline with 15-Minute Lag SLA.</strong> Plan reports (URS-AGREE-01, URS-SCHED-01, URS-ERP-01) are generated from the same event-driven, append-only data pipeline used for all other URS reports. Agreement and schedule reports must reflect a data state no older than 15 minutes from the operational system at the time of report generation.</p>
+          <p class="req-why"><strong>Why:</strong> Architectural consistency with the existing URS pipeline avoids a parallel data infrastructure and ensures plan data is subject to the same data-quality controls as all other institutional reporting.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Platform / Engineering</p>
+          <p class="req-text"><strong>Row-Level Security and Same-Day ERP Availability.</strong> All plan reports enforce row-level security so each institution can only access data for their own students. The ERP Transmission Report (URS-ERP-01) must be available and current on the same calendar day that payments process, ensuring it is usable as the primary reconciliation tool for institution finance teams on payment processing days.</p>
+          <p class="req-why"><strong>Why:</strong> Multi-tenancy requires strict data isolation; same-day ERP report availability is required to support institution close-of-business reconciliation workflows that cannot wait until the following day.</p>
+        </div>
+        <div class="req-item">
+          <p class="req-persona">Institution Admin / Finance Admin</p>
+          <p class="req-text"><strong>Access via Power BI and Export API.</strong> All plan reports are accessible through the URS Power BI embedded interface and via the URS export API in both CSV and JSON formats, consistent with all other URS report delivery mechanisms.</p>
+          <p class="req-why"><strong>Why:</strong> Institutions that have built downstream workflows against the URS export API expect plan data to be accessible through the same interface; requiring a separate access path would fragment the institutional data integration model.</p>
+        </div>
+      </div>
     </section>
 
     <!-- ════════════════════════════════════════
@@ -7767,6 +8587,8 @@ var SECTION_TREE = [
     {id:'feat-pot-management',label:'Plan Management'},
     {id:'feat-pot-balance-change',label:'Balance Change Handling'},
     {id:'feat-pot-default',label:'Default & Recovery'},
+    {id:'feat-pot-installments',label:'Scheduled Payments'},
+    {id:'feat-pot-servicing',label:'CSR Servicing'},
   ]},
   { id:'Features · Account', label:'Features · Account', first:'feat-comm-history', children:[
     {id:'feat-comm-history',label:'Communication History'},
@@ -7806,6 +8628,7 @@ var SECTION_TREE = [
     {id:'sol-batch-refunds',label:'Batch Credit Card Refunds'},
     {id:'sol-inperson',label:'In-Person Tuition Payments'},
     {id:'sol-refunds',label:'Refunds (non-batch)'},
+    {id:'feat-paypal-venmo',label:'PayPal & Venmo'},
   ]},
   { id:'Platform Requirements', label:'Platform Requirements', first:'plat-account-payments', children:[
     {id:'plat-account-payments',label:'Account Payments'},
@@ -7896,6 +8719,19 @@ var CHANGE_LOG = [
   {date:'2026-05-05',group:'Platform Requirements',sectionId:'plat-balance-compare',label:'Balance Compare & Rebalance',summary:'New section: configuration philosophy, Phase 1 standard balance compare (3 requirements), Phase 2 parallel agreements (3 requirements), Phase 3 financial responsibility model (2 requirements), rebalance rules with 10-day proximity protection and on-login trigger (4 requirements)'},
   {date:'2026-05-05',group:'Platform Requirements',sectionId:'plat-payment-allocation',label:'Payment Allocation',summary:'New section: past-due first default priority, charge-type priority configuration, consumer allocation election, plan installment allocation lock, CSR manual override with audit trail, guarantee plan state-defined allocation, overpayment handling, minimum threshold, allocation rule versioning'},
   {date:'2026-05-05',group:'Platform Requirements',sectionId:'plat-plan-offers',label:'Plan Offer Configuration',summary:'New section: plan offer creation and type constraints, enrollment windows, eligibility rules, enrollment cap, installment count options, payment day configuration, full-balance requirement toggle, Quick Pick and multi-offer presentation, enrollment fees, completion notification, AP enrollment authority, hidden plan invite distribution'},
+  {date:'2026-05-05',group:'Features · Pay Over Time',sectionId:'feat-pot-enrollment',label:'Plan Enrollment Flow',summary:'Rebuilt from stub: offer display and eligibility, schedule selection with full-balance requirement, TILA/Reg Z pre-disclosure with scroll-to-unlock, payment method entry with service fee disclosure, confirmation and enrollment email (16 requirements)'},
+  {date:'2026-05-05',group:'Features · Pay Over Time',sectionId:'feat-pot-confirmation',label:'Confirmation & Agreement',summary:'Rebuilt from stub: pre-confirmation summary screen with projected installment table, multi-element explicit agreement acceptance (no pre-checked boxes), immutable agreement version storage, enrollment fee processing as atomic transaction, post-enrollment state (13 requirements)'},
+  {date:'2026-05-05',group:'Features · Pay Over Time',sectionId:'feat-pot-management',label:'Plan Management',summary:'Expanded: added installment schedule view with PDF export and remaining balance, privacy rules between student and authorized party (owner/view-only/paying-AP scopes with API enforcement), ad-hoc early payment with three balance reduction modes (proportional/skip-next/shorten plan) (9 new requirements)'},
+  {date:'2026-05-05',group:'Features · Pay Over Time',sectionId:'feat-pot-default',label:'Default & Recovery',summary:'Rebuilt from stub: credit/debit card decline handling with configurable retry and decline code logging, bank return (ACH) handling with return-code-specific messaging (R01/R02/R04/R07/R10), reschedule after recovery, plan default and cancellation state with ERP notification, consumer recovery path with re-enrollment config (17 requirements)'},
+  {date:'2026-05-05',group:'Features · Pay Over Time',sectionId:'feat-pot-installments',label:'Scheduled Payments Processing',summary:'New section: installment engine execution (nightly run, 8AM SLA, timezone-aware, non-business-day skip), advance payment notifications (1–7 day configurable with deep link), service fee handling per installment, combined receipt view with downloadable PDF, failed processing and retry queue with manual admin trigger (16 requirements)'},
+  {date:'2026-05-05',group:'Features · Pay Over Time',sectionId:'feat-pot-servicing',label:'Pay Over Time Plan Servicing by CSR',summary:'New section: CSR plan detail view with communication history tab and read-only API enforcement for Student Services Rep role, cancel plan admin-initiated with reason and ERP notification, reschedule installment within calendar month, cancel individual payment with redistribution modes, tamper-evident change history view with cryptographic integrity and export watermark (18 requirements)'},
+  {date:'2026-05-05',group:'Solutions We Sell',sectionId:'feat-paypal-venmo',label:'PayPal & Venmo',summary:'New section: independent wallet enable/disable, redirect-and-return flow, ACH-funded lower rate configuration, settlement-based ERP trigger at T+1, 180-day refund window, institutional eligibility with Horizon contract requirement (15 requirements)'},
+  {date:'2026-05-05',group:'Platform Requirements',sectionId:'plat-plan-offers',label:'Plan Offer Configuration',summary:'Expanded: added Balance Amount Plan Parameters need-group (deferred feature — future dynamic fee-schedule and partial enrollment capability, marked with Sophie flag)'},
+  {date:'2026-05-05',group:'Platform Requirements',sectionId:'plat-correspondence',label:'Correspondence',summary:'Expanded: added Deep Links in Communications — context-specific routing, signed token with 72-hour expiry, per-template configuration (3 requirements)'},
+  {date:'2026-05-05',group:'Reporting Needs',sectionId:'report-urs',label:'Unified Reporting Suite (URS)',summary:'Expanded: added Plan Reports & ERP Transmission (URS-AGREE-01 agreement report, URS-SCHED-01 future scheduled payments, URS-ERP-01 ERP transmission with self-service retry) and Plan Reporting Technical Architecture (15-minute lag SLA, row-level security, same-day ERP availability) — 8 requirements'},
+  {date:'2026-05-05',group:'Platform Requirements',sectionId:'plat-access-management',label:'Access Management',summary:'Expanded: added Direct Authentication for SSO Accounts — institution-configurable, knowledge-based verification (email + DOB or last-4 SSN), restricted-scope 24-hour session, audit logging with threshold alerting at N=3 failed attempts (4 requirements)'},
+  {date:'2026-05-05',group:'Solutions We Sell',sectionId:'sol-batch-refunds',label:'Batch Credit Card Refunds',summary:'Expanded: added Admin Bulk Refund Tool — up to 100 students per batch, per-student override, real-time status tracking, admin-portal-bulk source indicator in audit trail (4 requirements)'},
+  {date:'2026-05-05',group:'Solutions We Sell',sectionId:'intl-overview',label:'International Plans',summary:'Expanded: added Convera as second international vendor (same 5-status lifecycle, Service ID 2 at Guaranteed, ERP at Delivered, currency detail storage) and International Payment Vendor Status Normalization (normalized model at ingest, configuration-driven mapping without code deploy) (6 requirements)'},
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
