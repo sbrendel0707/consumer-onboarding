@@ -57,6 +57,27 @@ body {
   margin-bottom: 24px;
 }
 .nav-group { margin-bottom: 18px; }
+.nav-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--hz-hint);
+  padding: 9px 8px 2px;
+  margin-top: 4px;
+  border-top: 1px solid var(--hz-border);
+  opacity: 0.65;
+}
+.nav-section-label:first-child { border-top: none; margin-top: 0; }
+.req-persona {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--hz-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0 0 3px;
+  opacity: 0.8;
+}
 .nav-group-label {
   font-size: 9.5px;
   font-weight: 700;
@@ -1172,13 +1193,16 @@ body {
 
     <div class="nav-group">
       <div class="nav-group-label">Foundation</div>
-      <a href="#perspective-shift" class="nav-link">Perspective Shift</a>
-      <a href="#vision"            class="nav-link">Product Vision</a>
-      <a href="#onboarding-vision" class="nav-link">Onboarding Vision</a>
-      <a href="#comms-vision"      class="nav-link">Communications Vision</a>
-      <a href="#pot-vision"        class="nav-link">Pay Over Time Vision</a>
-      <a href="#support-vision"    class="nav-link">In‑App Support Vision</a>
       <a href="#he-market"         class="nav-link">HE Market Context</a>
+      <div class="nav-section-label">Consumer Vision</div>
+      <a href="#perspective-shift" class="nav-link nav-sub-item">Perspective Shift</a>
+      <a href="#vision"            class="nav-link nav-sub-item">Product Vision</a>
+      <a href="#onboarding-vision" class="nav-link nav-sub-item">Onboarding Vision</a>
+      <a href="#comms-vision"      class="nav-link nav-sub-item">Communications Vision</a>
+      <a href="#pot-vision"        class="nav-link nav-sub-item">Pay Over Time Vision</a>
+      <a href="#support-vision"    class="nav-link nav-sub-item">In‑App Support Vision</a>
+      <div class="nav-section-label">Institution Vision</div>
+      <a href="#inst-vision" class="nav-link nav-sub-item soon">Coming soon <span class="nav-sub">Content to be added</span></a>
     </div>
 
     <div class="nav-group">
@@ -1201,13 +1225,53 @@ body {
 
     <div class="nav-group">
       <div class="nav-group-label">NBS Process Flow</div>
-      <a href="#nbs-flow-hl"             class="nav-link">High-Level End-to-End</a>
-      <a href="#nbs-flow-student-setup"  class="nav-link nav-sub-item">Student Account Setup</a>
-      <a href="#nbs-flow-plan-admin"     class="nav-link nav-sub-item">Payment Plan Administration</a>
-      <a href="#nbs-flow-guarantee"      class="nav-link nav-sub-item">Guarantee Program Processing</a>
-      <a href="#nbs-flow-collections"    class="nav-link nav-sub-item">Collections &amp; LTPP</a>
-      <a href="#nbs-flow-disbursements"  class="nav-link nav-sub-item">Disbursements</a>
-      <a href="#nbs-flow-reporting"      class="nav-link nav-sub-item">Reporting &amp; Reconciliation</a>
+      <a href="#nbs-flow-hl"          class="nav-link">High-Level End-to-End</a>
+      <a href="#nbs-selling"          class="nav-link nav-sub-item">Selling &amp; Pricing</a>
+      <a href="#nbs-implementation"   class="nav-link nav-sub-item">Implementation</a>
+      <a href="#nbs-pot-reenrollment" class="nav-link nav-sub-item">Pay Over Time Re-enrollment</a>
+      <a href="#nbs-tech-support"     class="nav-link nav-sub-item">Technical Support</a>
+      <a href="#nbs-pas-support"      class="nav-link nav-sub-item">PAS Support</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Institution Config</div>
+      <a href="#inst-config"            class="nav-link">Overview &amp; Scope</a>
+      <a href="#inst-payment-methods"   class="nav-link nav-sub-item">Payment Methods</a>
+      <a href="#inst-pay-over-time"     class="nav-link nav-sub-item">Pay Over Time</a>
+      <a href="#inst-insurance"         class="nav-link nav-sub-item">Tuition Insurance</a>
+      <a href="#inst-auth-parties"      class="nav-link nav-sub-item">Authorized Parties</a>
+      <a href="#inst-disclosures"       class="nav-link nav-sub-item">Disclosures</a>
+      <a href="#inst-communications"    class="nav-link nav-sub-item">Communications</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Features · Onboarding</div>
+      <a href="#feat-auth"               class="nav-link nav-sub-item">Authentication</a>
+      <a href="#feat-balance-overview"   class="nav-link nav-sub-item">Balance Overview</a>
+      <a href="#feat-tuition-insurance"  class="nav-link nav-sub-item">Tuition Insurance</a>
+      <a href="#feat-how-to-pay"         class="nav-link nav-sub-item">How to Pay</a>
+      <a href="#feat-authorized-parties" class="nav-link nav-sub-item">Authorized Parties</a>
+      <a href="#feat-communications"     class="nav-link nav-sub-item">Communications</a>
+      <a href="#feat-disclosures"        class="nav-link nav-sub-item">Disclosures</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Features · Home Screen</div>
+      <a href="#feat-account-settings"     class="nav-link nav-sub-item">Account Settings</a>
+      <a href="#feat-todos"                class="nav-link nav-sub-item">To-dos</a>
+      <a href="#feat-recent-activity"      class="nav-link nav-sub-item">Recent Activity</a>
+      <a href="#feat-upcoming"             class="nav-link nav-sub-item">Upcoming Payments</a>
+      <a href="#feat-account-presentment"  class="nav-link nav-sub-item">Account Presentment</a>
+      <a href="#feat-quick-actions"        class="nav-link nav-sub-item">Quick Actions</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Features · Pay Over Time</div>
+      <a href="#feat-pot-enrollment"    class="nav-link nav-sub-item">Plan Enrollment Flow</a>
+      <a href="#feat-pot-confirmation"  class="nav-link nav-sub-item">Confirmation &amp; Agreement</a>
+      <a href="#feat-pot-management"    class="nav-link nav-sub-item">Plan Management</a>
+      <a href="#feat-pot-balance-change" class="nav-link nav-sub-item">Balance Change Handling</a>
+      <a href="#feat-pot-default"       class="nav-link nav-sub-item">Default &amp; Recovery</a>
     </div>
 
     <div class="nav-group">
@@ -1239,14 +1303,31 @@ body {
     </div>
 
     <div class="nav-group">
-      <div class="nav-group-label">Features · Onboarding</div>
-      <a href="#feat-auth"               class="nav-link nav-sub-item">Authentication</a>
-      <a href="#feat-balance-overview"   class="nav-link nav-sub-item">Balance Overview</a>
-      <a href="#feat-tuition-insurance"  class="nav-link nav-sub-item">Tuition Insurance</a>
-      <a href="#feat-how-to-pay"         class="nav-link nav-sub-item">How to Pay</a>
-      <a href="#feat-authorized-parties" class="nav-link nav-sub-item">Authorized Parties</a>
-      <a href="#feat-communications"     class="nav-link nav-sub-item">Communications</a>
-      <a href="#feat-disclosures"        class="nav-link nav-sub-item">Disclosures</a>
+      <div class="nav-group-label">Scenarios — Home Screen</div>
+      <a href="#hs1" class="nav-link">
+        1b · Balance Increase on Plan
+        <span class="nav-sub">Open charge not covered by plan</span>
+      </a>
+      <a href="#hs2" class="nav-link">
+        2b · Simple Balance, No Plan
+        <span class="nav-sub">Balance due, no payment plan</span>
+      </a>
+      <a href="#hs3" class="nav-link">
+        3b · Credit Balance &amp; Refund
+        <span class="nav-sub">Overpayment / aid credit pending</span>
+      </a>
+      <a href="#hs4" class="nav-link">
+        4b · Defaulted Plan
+        <span class="nav-sub">Plan failed, registration hold</span>
+      </a>
+      <a href="#hs5" class="nav-link">
+        5b · Past Due &amp; Mixed Dates
+        <span class="nav-sub">Prior term + current term due</span>
+      </a>
+      <a href="#hs6" class="nav-link">
+        6b · Active Plan + Outside Charges
+        <span class="nav-sub">Charges not covered by plan</span>
+      </a>
     </div>
 
     <div class="nav-group">
@@ -1280,27 +1361,6 @@ body {
       <a href="#plat-payment-plans"    class="nav-link">Pay Over Time</a>
       <a href="#plat-billing"          class="nav-link">Billing</a>
     </div>
-
-    <div class="nav-group">
-      <div class="nav-group-label">Institution Config</div>
-      <a href="#inst-config"            class="nav-link">Overview &amp; Scope</a>
-      <a href="#inst-payment-methods"   class="nav-link nav-sub-item">Payment Methods</a>
-      <a href="#inst-pay-over-time"     class="nav-link nav-sub-item">Pay Over Time</a>
-      <a href="#inst-insurance"         class="nav-link nav-sub-item">Tuition Insurance</a>
-      <a href="#inst-auth-parties"      class="nav-link nav-sub-item">Authorized Parties</a>
-      <a href="#inst-disclosures"       class="nav-link nav-sub-item">Disclosures</a>
-      <a href="#inst-communications"    class="nav-link nav-sub-item">Communications</a>
-    </div>
-
-    <div class="nav-group">
-      <div class="nav-group-label">Features · Home Screen</div>
-      <a href="#feat-account-settings"     class="nav-link nav-sub-item">Account Settings</a>
-      <a href="#feat-todos"                class="nav-link nav-sub-item">To-dos</a>
-      <a href="#feat-recent-activity"      class="nav-link nav-sub-item">Recent Activity</a>
-      <a href="#feat-upcoming"             class="nav-link nav-sub-item">Upcoming Payments</a>
-      <a href="#feat-account-presentment"  class="nav-link nav-sub-item">Account Presentment</a>
-      <a href="#feat-quick-actions"        class="nav-link nav-sub-item">Quick Actions</a>
-    </div>
   </nav>
 
   <!-- Main content -->
@@ -1318,6 +1378,103 @@ body {
 
     <!-- Change banner (shown after name entry when there are updates) -->
     <div id="change-banner" class="change-banner" role="alert"></div>
+
+
+    <!-- ════════════════════════════════════════
+         HE MARKET CONTEXT
+    ════════════════════════════════════════ -->
+    <section id="he-market" class="prd-section">
+      <div class="section-eyebrow">Foundation</div>
+      <h2 class="section-title">HE Market Context</h2>
+      <p class="section-subtitle">Source: NCC Market Briefing, March 2026 — compiled by NCC market strategy team from Deloitte 2025/2026 HE Trends, Gartner 2025 Magic Quadrant HE SIS SaaS, NAFSA, IIE Open Doors, National Student Clearinghouse, ListEdTech, and internal data. This is the most current market intelligence available; it supersedes any prior statistics in this document.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group" id="he-enrollment">
+        <h3 class="need-group-title">Enrollment: A Market in Transition</h3>
+
+        <div class="req-item">
+          <p class="req-text"><strong>The Demographic Cliff Has Arrived.</strong> 2025 is the projected peak year for U.S. high school graduates. After that, the number declines across 38 states through at least 2041. Total postsecondary enrollment is still growing but the composition is changing: non-traditional and CE enrollment grew ~17–20% in 2024 as traditional freshman enrollment fell ~5%. Community colleges grew 3–5% per year for three consecutive years. Adults 25–29 showed the largest gains. Traditional private nonprofit 4-year institutions declined nearly 2% in fall 2025.</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> The growing student population has different financial needs than the one most platforms were built for. Non-traditional, CE, and workforce-aligned students pay out of pocket or through employer reimbursement. Institutions that cannot serve them financially will not retain them. Horizon must support flexible billing structures and payment options that fit non-traditional academic calendars — not just semester-based, full-time students.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>International Enrollment: A Revenue Crisis in Motion.</strong> New international student enrollment fell 17% in fall 2025 — the steepest non-pandemic decline on record. Overall international enrollment fell ~7%. 57%+ of institutions reported declines. Some schools saw 25–60% drops in new international enrollment in a single semester. International students contributed ~$43 billion to the U.S. economy in 2024–25 and typically pay the highest tuition balances of any student population. NAFSA estimates $1B+ in institutional revenue lost in 2025; if trends continue into 2026, the total impact could approach $7B.</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> International students generate the highest payment plan balances. A 17% enrollment drop directly reduces the highest-value segment of the payment plan market. This accelerates the need for international payment plan capability as a retention and expansion tool for the international students who do remain — and for institutions seeking to recover revenue from this segment. International payment plan support is not optional; it is a response to a live financial crisis at our client institutions.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>The Revenue Mix Shift.</strong> One international student financing $30,000 generates roughly the same payment plan volume as 7–8 CE students each financing a $4,000 program. As enrollment shifts from higher-balance traditional and international students toward lower-balance adult and CE learners, payment plan count could grow while average dollars processed per plan declines. CE/certificate students typically pay $2,000–$8,000 per program; international/private nonprofit students pay $25,000–$43,000+/year.</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> A platform built to grow revenue on balance size needs to expand the services it delivers per student as average balance per student declines. This is the market case for broader financial wellness capability beyond payment plans. It also means CE payment plan support (no named competitor has this in checkout) is a high-leverage opportunity that would let NCC capture growing volume even as individual balances shrink.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>The Non-Traditional and CE Student Is the New Majority.</strong> The U.S. continuing education market is valued at ~$67B and projected to reach ~$96B by 2030. These learners balance work and family alongside education. They pay out of pocket or through employer reimbursement. They stop out when financial processes are too complex. 50%+ of CE/certificate learners are self-pay. No named competitor has built payment plan capability into a checkout product for continuing education.</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> This is NCC's largest uncontested competitive opportunity. The institutions that need CE payment flexibility most are already NCC clients navigating the enrollment shift without a tool that fits this population. Horizon's architecture should accommodate CE checkout payment plans as a distinct configuration path.</p>
+        </div>
+      </div>
+
+      <div class="need-group" id="he-fiscal">
+        <h3 class="need-group-title">Fiscal Pressure on Institutions</h3>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Revenue Under Structural Stress.</strong> The institutional revenue model faces simultaneous pressure from every direction: federal research funding frozen or cut at hundreds of institutions (multiple agencies capped indirect cost reimbursements at 15%); international tuition down 17% in new enrollment; new federal graduate loan limits effective July 1, 2026 constraining institutional pricing power; at least 15 states proposed or enacted cuts to public HE in 2025; endowment tax in the One Big Beautiful Bill Act affecting even well-endowed institutions. Roughly 80 non-profit institutions have closed or merged in five years.</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> Maximizing financial recovery from every enrolled student is now an institutional C-suite priority. Net tuition revenue per student — not total enrollment — is the metric presidents and CFOs are focused on. The CFO is now a primary buyer for student financial tools. Horizon's value case must be framed around retention outcomes and net tuition revenue recovery, not product features. This changes how we write RFP responses, how we structure our competitive comparisons, and what outcomes we track and report.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Systemness as an Accelerating Response.</strong> State systems and multi-campus institutions are consolidating administrative functions to reduce redundancy. California, Georgia, and others are already executing. System-level procurement creates larger, stickier agreements but requires more complex delivery and longer sales cycles (12–24 month procurement cycle; 6–18 month implementation after signature).</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> Horizon must be configurable at both the system level (shared defaults, governance settings) and the campus level (local overrides). A single-tenant per-institution model will not win system RFPs. System-level reporting that rolls up across campuses is a procurement requirement, not a nice-to-have.</p>
+        </div>
+      </div>
+
+      <div class="need-group" id="he-sis">
+        <h3 class="need-group-title">The SIS Migration Wave</h3>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Gartner's Headline Projection.</strong> Gartner published its first-ever Magic Quadrant for Higher Education SIS SaaS in March 2025. Projection: 75% of institutions in some stage of SIS SaaS migration or deployment by 2030. Every SIS transition is a moment when every connected vendor gets re-evaluated.</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> Each of the ~1,200 NCC client institutions mid-migration is an NCC renewal risk and an expansion opportunity simultaneously. Finding out about a client migration at contract renewal is the wrong time. Our integration certification status at each SIS platform determines whether we appear on a post-migration shortlist or get discovered afterward. This is current risk management, not future planning.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Current SIS Market Share (North America).</strong> Ellucian Banner: 24% (Leader in Gartner MQ). Ellucian Colleague: 11% (Leader via Ellucian). Jenzabar: 11% (in 2025 MQ). Oracle PeopleSoft: 10% (not in MQ; Oracle Fusion Cloud Student is the successor). Anthology: 10% (in 2025 MQ). Populi: 7% (not in MQ). Workday: 3% (fastest growing; in 2025 MQ; displacing Banner, Colleague, PeopleSoft, and homegrown). Ellucian has communicated a ~5-year ramp to move entire customer base from on-premise to SaaS. 80% of Ellucian customers globally are already on at least one SaaS product.</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> Workday is achieving 15% penetration among institutions above 30,000 FTE and growing. Oracle Fusion Cloud Student early adopters are live today. Salesforce launched student financials on Education Cloud in 2025. These are not future threats — they are current re-evaluation triggers across our installed base.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Salesforce Education Cloud: The Platform Entrant to Watch.</strong> Salesforce is building billing, payments, and refunds into Education Cloud. Course registration launched Summer 2025. Student financials module now live. Salesforce's own research found ~75% of U.S. institutions are running an SIS more than 10 years old and ~60% plan to upgrade within 3–5 years. Salesforce is positioning itself as the destination for that upgrade cycle, using existing CRM relationships at many institutions as the entry point.</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> The scenario to watch is not Salesforce winning a head-to-head RFP against NCC. It is Salesforce expanding a CRM contract to include student financials before an NCC renewal conversation begins. Horizon's answer must be depth Salesforce cannot replicate: a decade of higher education payment and financial wellness experience delivered as a configurable, student-first platform.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>NCC's Partner Standing vs. Where We Need to Be.</strong> Ellucian EPN: Base Partner tier (needs Verified for SaaS Solution minimum + Go-to-Market Referral tier to appear in institutional SaaS procurement). Workday: Access Partner — entry level, no Marketplace listing, no Innovation Partner certification, not visible to institutions selecting Workday integrations. Oracle: Validated Integration for PeopleSoft Campus Solutions only — zero standing with Oracle Fusion Cloud Student. Jenzabar: Touchstone Education Partner (relatively stable, lower urgency).</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> Partner standing gaps are a sales prerequisite problem, not a product problem. But Horizon's integration architecture directly affects our ability to earn and hold these tiers. Oracle Fusion Student integration work and Workday Innovation Partner certification need to be on the roadmap with resource allocation now. These gaps are active risks in the 2026 new logo pipeline.</p>
+        </div>
+      </div>
+
+      <div class="need-group" id="he-competitive">
+        <h3 class="need-group-title">Competitive Landscape</h3>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Market Share (CFPB 2023).</strong> Among institutions offering installment payment plans: Nelnet 34% · Illumia (formerly Transact) 16% · TouchNet 11% · Flywire ~1% · Other/small 2% · Unknown/own system or white-labeled 36%. The 36% unknown/own segment is the largest single segment and the one from which NCC wins new clients most consistently.</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> NCC is the market leader but not dominant. Horizon must protect the leadership position while converting the 36% self-managed segment — those institutions are not choosing a competitor; they are outside the vendor market entirely. The pitch for that segment must address PCI scope burden, staff knowledge risk, and functional gaps (automated plan enrollment, past-due communications, sponsor billing) that manual processes cannot sustain as CE enrollment grows.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>TouchNet (Global Payments) — 11% market share.</strong> Strongest at large public 4-year institutions. Well-established SIS integration with Banner and Colleague. All-in SaaS pricing. Known vulnerabilities: high rep turnover, 2–3 day response times vs. same-day from competitors, payment plan configuration requires individual plans not templates, e-commerce customization constrained. Active pipeline: Austin Community College (replacing TouchNet; dissatisfied with confusing billing, difficult plan setup, no notifications, no chat) and Arkansas State University.</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> TouchNet displacement is appearing in active pipeline now. The friction points in those deals are exactly what Horizon's product thesis addresses: proactive notifications, easier plan configuration, chat support. These are confirmed competitive advantages, not theoretical ones — they appear in documented deal notes.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>Flywire — ~1% market share (domestic).</strong> Entered through international payment processing (~80% capture of that segment). Domestic billing/payment plan platform is newer expansion. Claims only provider with automated past-due collections software. High payment plan flexibility including per-student plans with different amounts and due dates. Supports 529 plan disbursements (NCC does not). Known vulnerability: SIS integration is the persistent gap — one research participant documented active transition away from Flywire because it never built direct SIS integration.</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> Flywire's SIS integration gap is a confirmed displacement trigger. As 75% of institutions move through SIS migrations by 2030, the integration question becomes the evaluation question. Flywire is running toward the standard NCC has already set. One concrete product gap: Flywire and Transact both support 529 plan disbursements. NCC does not. This surfaces in competitive evaluations at public 4-year universities where 529 adoption is highest.</p>
+        </div>
+
+        <div class="req-item">
+          <p class="req-text"><strong>The Uncontested CE Gap.</strong> No named competitor has built payment plan capability into a checkout product for continuing education. CE students pay out of pocket in amounts often too small for traditional installment plans but large enough that a single upfront payment creates friction and stop-out risk. NCC has the platform architecture to close this gap. The institutions that need it most are already NCC clients navigating the enrollment shift without a tool that fits this population.</p>
+          <p class="req-why"><strong>Why this matters for Horizon:</strong> This is a first-mover opportunity with no current competitive pressure. CE checkout payment plan support should be on the Horizon roadmap with sufficient priority to capture this gap before Flywire, TouchNet, or Salesforce builds it. Speed matters here.</p>
+        </div>
+      </div>
+    </section>
 
 
     <!-- ════════════════════════════════════════
@@ -1874,6 +2031,17 @@ body {
         </div>
       </div>
 
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         INSTITUTION VISION
+    ════════════════════════════════════════ -->
+    <section id="inst-vision" class="prd-section">
+      <div class="section-eyebrow">Foundation · Institution Vision</div>
+      <h2 class="section-title">Institution Vision <span class="soon-badge" style="font-size:12px;font-weight:500;color:var(--hz-muted);margin-left:8px;">Coming soon</span></h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;">This section will define the institutional perspective on what Horizon should deliver — the core jobs-to-be-done from the bursar's office, finance leadership, and institutional technology teams. To be authored by Sophie.</p>
     </section>
 
 
@@ -2756,63 +2924,58 @@ body {
       </div>
     </section>
 
-    <section id="nbs-flow-student-setup" class="prd-section">
+    <section id="nbs-selling" class="prd-section">
       <div class="section-eyebrow">NBS Process Flow · Detail</div>
-      <h2 class="section-title">NBS — Student Account Setup</h2>
+      <h2 class="section-title">NBS — Selling &amp; Pricing</h2>
       <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">The processes NBS sales, account management, and pricing teams follow from initial prospect identification through signed contract — including how products are scoped, how pricing is structured, and how the contract feeds into implementation kickoff.</p>
       <div class="sophie-flag">
         <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add detail on NBS's process for managing student account setup from the NBS side: how NBS receives student account data from the institution's SIS, data validation and exception handling, how NBS creates and maintains student records in Horizon, and what NBS does when account data is incomplete or invalid. Include NBS tools used and SLAs for account setup completion.</span>
+        <span>Add detail on: how NBS sales identifies and qualifies prospects (inbound RFPs, referrals from SIS partner ecosystem, renewal expansion conversations), the product scoping process (which modules, which integrations, which plan types), how pricing is determined (per-student, SaaS, hybrid), contract structure, how the signed contract triggers an implementation ticket, and what information must flow from Sales to Implementation to avoid scope gaps at kickoff. Identify actors: NBS Sales, NBS Account Management, NBS Pricing, NBS Legal, Institution Procurement.</span>
       </div>
     </section>
 
-    <section id="nbs-flow-plan-admin" class="prd-section">
+    <section id="nbs-implementation" class="prd-section">
       <div class="section-eyebrow">NBS Process Flow · Detail</div>
-      <h2 class="section-title">NBS — Payment Plan Administration</h2>
+      <h2 class="section-title">NBS — Implementation</h2>
       <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">The end-to-end process for taking a newly contracted institution from signed agreement to go-live on Horizon — including ERP integration setup, configuration, testing, training, and handoff to ongoing support.</p>
       <div class="sophie-flag">
         <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add detail on NBS's role in payment plan operations: plan enrollment processing (what NBS validates and what is fully automated), scheduled payment processing cycle, returned payment handling and retry, plan modification requests from institutions, and escalation paths when a plan exception requires NBS human review. Include NBS monitoring and alerting processes for plan health.</span>
+        <span>Add detail on: implementation project phases (kickoff, discovery, ERP integration setup by SIS type, configuration build, UAT, training, go-live, hypercare), NBS roles involved (Implementation Manager, Integration Engineer, Training Specialist), typical timelines per SIS type, common blockers and how they are resolved, what the institution must provide and when, go/no-go criteria for go-live, and post-go-live hypercare period. Cross-reference with Institution Process Flow Phase 1 (Contract &amp; System Setup) which covers the institution's perspective on the same process.</span>
       </div>
     </section>
 
-    <section id="nbs-flow-guarantee" class="prd-section">
+    <section id="nbs-pot-reenrollment" class="prd-section">
       <div class="section-eyebrow">NBS Process Flow · Detail</div>
-      <h2 class="section-title">NBS — Guarantee Program Processing</h2>
+      <h2 class="section-title">NBS — Pay Over Time Re-enrollment</h2>
       <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">The recurring process NBS operations follows each term to ensure payment plan enrollment windows are correctly configured, institution settings are up to date, and students are reaching the enrollment experience without friction.</p>
       <div class="sophie-flag">
         <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add detail on NBS's guarantee program operations: how NBS monitors agreements approaching the Guarantee Date, the remittance calculation and payment process (1st and 2nd remittance), how NBS tracks the Maximum Amount across institutions, the Default Date monitoring process, and how NBS manages state-specific fee schedule compliance (VA, FL, GA). Reference the Guarantee Plans requirements section for the plan-level requirements; this section should focus on NBS operational process.</span>
+        <span>Add detail on: the per-term re-enrollment checklist (opening enrollment windows, confirming installment schedules, verifying fee configurations, confirming communication templates are active), how NBS monitors enrollment rates and flags abnormal patterns, the process for handling institutions that miss their configuration window, how mid-term plan adjustments are handled operationally (add/drop balance changes, student requests to modify plan), and the close-of-term reconciliation process. Actors: NBS Operations, NBS Account Management, Institution Admin.</span>
       </div>
     </section>
 
-    <section id="nbs-flow-collections" class="prd-section">
+    <section id="nbs-tech-support" class="prd-section">
       <div class="section-eyebrow">NBS Process Flow · Detail</div>
-      <h2 class="section-title">NBS — Collections &amp; LTPP Operations</h2>
+      <h2 class="section-title">NBS — Technical Support</h2>
       <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">How NBS technical support handles integration issues, system errors, and platform defects reported by institutions or detected through monitoring — from initial triage through resolution and root cause documentation.</p>
       <div class="sophie-flag">
         <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add detail on NBS's role in collections and LTPP: how NBS monitors past-due accounts eligible for LTPP, how NBS coordinates with institutions to offer LTPP as an alternative to direct collections referral, NBS's process when an LTPP is terminated (notification to institution, account handoff), and any NBS-managed collections outreach that occurs before or alongside LTPP. Also cover NBS's relationship with outside collections agencies when accounts are referred.</span>
+        <span>Add detail on: support ticket intake channels (admin portal, email, phone), severity classification and SLA targets by severity, triage process (which team handles what: tech support vs. engineering escalation), ERP integration issue handling (what NBS can debug vs. what requires institution IT involvement), how NBS communicates status to institutions during an active incident, post-incident root cause analysis process, and how recurring issues feed back into the product roadmap. Actors: NBS Technical Support, NBS Engineering, Institution IT, SIS vendor (for integration issues).</span>
       </div>
     </section>
 
-    <section id="nbs-flow-disbursements" class="prd-section">
+    <section id="nbs-pas-support" class="prd-section">
       <div class="section-eyebrow">NBS Process Flow · Detail</div>
-      <h2 class="section-title">NBS — Disbursements</h2>
+      <h2 class="section-title">NBS — PAS Support</h2>
       <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">How NBS's Payment and Account Services (PAS) team handles student-facing and institution-facing support cases that involve account management, payment disputes, and operational exceptions — distinct from technical/integration issues handled by Technical Support.</p>
       <div class="sophie-flag">
         <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add detail on NBS's disbursement operations: how NBS receives and validates disbursement instructions from institutions, the payment routing process (ACH, check, card refund), Nelnet Treasury's role in disbursement funding, settlement timing and float management, exception handling for failed disbursements, and the batch credit card refund sub-process (regulatory constraints, timing, reconciliation). Cross-reference with the Institution Process Flow Phase 6 (Disbursements) which covers the institution's perspective.</span>
-      </div>
-    </section>
-
-    <section id="nbs-flow-reporting" class="prd-section">
-      <div class="section-eyebrow">NBS Process Flow · Detail</div>
-      <h2 class="section-title">NBS — Reporting &amp; Reconciliation</h2>
-      <hr class="section-divider"/>
-      <div class="sophie-flag">
-        <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add detail on NBS's reporting and reconciliation operations: daily reconciliation cycle between Horizon transaction records and bank settlement, how NBS produces and delivers institution-facing reports, NBS internal finance reporting (revenue recognition, guarantee exposure, collections pipeline), and how discrepancies are identified and resolved. Cross-reference with the Guarantee Plans reports section which covers guarantee-specific reports.</span>
+        <span>Add detail on: types of cases PAS handles (student payment disputes, returned payment resolution, refund status inquiries, plan modification requests, account correction requests), intake channels (phone, email, institution-submitted cases), how PAS accesses student account data in Horizon, what actions PAS can take directly vs. what requires institution authorization, escalation paths for complex cases, SLA targets for case resolution, and how case outcomes are recorded and reported. Actors: NBS PAS, NBS Phone Support, Institution Student Accounts, Student.</span>
       </div>
     </section>
 
@@ -3490,6 +3653,143 @@ body {
 
 
     <!-- ════════════════════════════════════════
+         SCENARIOS — HOME SCREEN
+    ════════════════════════════════════════ -->
+    <section id="hs-intro" class="prd-section">
+      <div class="section-eyebrow">Scenarios — Home Screen</div>
+      <h2 class="section-title">Home Screen Scenarios</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;">These scenarios document the distinct balance states a returning student may encounter on the Home Screen — each representing a specific financial situation that the Home Screen must handle clearly. Each scenario has a corresponding click-through prototype. See Features · Home Screen for the feature-level requirements that underpin all scenarios.</p>
+    </section>
+
+    <section id="hs1" class="prd-section">
+      <div class="section-eyebrow">Scenario 1b · Student</div>
+      <h2 class="section-title">Balance Increase While on Plan</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:12px;"><strong>Prototype:</strong> <code>home-1b-balance-increase.html</code> · Student: Alex · Balance state: <code>on-plan-open</code></p>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;"><strong>Setup:</strong> Alex is on an active pay over time plan ($4,680 remaining, $517/month, next May 10). A new lab fee of $350 was added to the account after enrollment. The $350 is not covered by the plan — it shows as an open balance alongside the on-plan amount.</p>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> immediately see that a new charge has been added to my account that is not covered by my existing pay over time plan, with a clear to-do item explaining the charge and offering a direct action path.</p>
+        <p class="req-why"><strong>Why:</strong> A student on a plan who gets a new charge has no mental model that it won't be auto-handled — they need a proactive, prominent signal that action is required. Without this, students assume the charge will be added to their plan and are surprised when it goes to collections.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> see a clear visual distinction between my plan balance (covered, auto-debit scheduled) and my open balance (not covered, action needed) on the balance card — without having to navigate away from the home screen to understand my financial status.</p>
+        <p class="req-why"><strong>Why:</strong> Mixing covered and uncovered amounts without visual distinction causes confusion and support calls. The balance card in <code>on-plan-open</code> mode shows two segments: teal for on-plan, blue for open. This distinction must be present at home-screen level.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> address the open balance directly from the home screen to-do item — either by paying the open amount immediately or by adding it to my existing plan (if the institution allows plan balance increases).</p>
+        <p class="req-why"><strong>Why:</strong> The further a student has to navigate to resolve an open balance, the more likely they are to defer the action. The to-do CTA ("Address now") must take the student directly into the resolution flow.</p>
+      </div>
+    </section>
+
+    <section id="hs2" class="prd-section">
+      <div class="section-eyebrow">Scenario 2b · Student</div>
+      <h2 class="section-title">Simple Balance, No Plan</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:12px;"><strong>Prototype:</strong> <code>home-2b-no-plan.html</code> · Student: Emily · Balance state: <code>open</code></p>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;"><strong>Setup:</strong> Emily has an $8,750 balance due September 15 with no payment plan and no saved payment method. She has not completed onboarding. The home screen shows the balance due to-do, and provides the option to pay in full or set up a plan.</p>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> see my outstanding balance, due date, and available payment options clearly as my primary to-do when I land on the home screen with no active plan, without having to navigate into an account detail view first.</p>
+        <p class="req-why"><strong>Why:</strong> A student without a plan who lands on the home screen has one primary financial job to complete: decide how to pay. Surfacing this as the lead to-do with a direct CTA reduces time-to-action and reduces the likelihood of the balance becoming past-due.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> initiate pay-in-full or set up a pay over time plan from the home screen to-do with a single tap, proceeding directly into the selected payment flow without an intermediate navigation step.</p>
+        <p class="req-why"><strong>Why:</strong> Every extra navigation step between intent and action reduces completion rates. The CTA "Pay or plan" from the to-do card should route directly into the appropriate flow based on the student's selection.</p>
+      </div>
+    </section>
+
+    <section id="hs3" class="prd-section">
+      <div class="section-eyebrow">Scenario 3b · Student</div>
+      <h2 class="section-title">Credit Balance &amp; Refund Pending</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:12px;"><strong>Prototype:</strong> <code>home-3b-credit-balance.html</code> · Student: David · Balance state: <code>credit</code></p>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;"><strong>Setup:</strong> David has a $2,150 credit balance (overpayment from excess aid). A refund of $2,150 is pending, expected October 1. A partial refund of $1,500 has already been issued by check. The home screen shows the upcoming refund in the upcoming payments section with no open balance to-dos.</p>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> see that I have a credit balance on my account and understand when and how my refund will be disbursed, without needing to contact the institution or navigate to a separate refund tracking screen.</p>
+        <p class="req-why"><strong>Why:</strong> Credit balances and pending refunds are a major source of student service calls at institutions. Surfacing refund status proactively on the home screen reduces inbound calls and gives the student confidence that the process is underway.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> see partially-issued refunds and pending remaining refunds as separate line items, so I understand that a portion has been issued and the remainder is still processing — not that the full refund is still outstanding.</p>
+        <p class="req-why"><strong>Why:</strong> Partial refund situations (e.g., one check issued, one still processing) look like a discrepancy if shown as a single "refund pending" amount. The split display prevents the student from calling to ask why their refund isn't the amount they expected.</p>
+      </div>
+    </section>
+
+    <section id="hs4" class="prd-section">
+      <div class="section-eyebrow">Scenario 4b · Student</div>
+      <h2 class="section-title">Defaulted Payment Plan</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:12px;"><strong>Prototype:</strong> <code>home-4b-defaulted-plan.html</code> · Student: Nicole · Balance state: <code>defaulted</code></p>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;"><strong>Setup:</strong> Nicole's pay over time plan has defaulted. $7,400 past-due is immediately due. She also has $6,500 due December 15 for the current term. A registration hold is active. Her saved payment method is on file. Total balance: $11,275.</p>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> immediately understand that my payment plan has failed, what is immediately due, and that a registration hold is in effect — with high-urgency visual treatment that is distinct from informational to-dos.</p>
+        <p class="req-why"><strong>Why:</strong> A defaulted plan with a registration hold is the highest-stakes situation a student can arrive on the home screen with. Understated visual treatment would cause the student to under-prioritize the action. The danger-colored to-do items and registration hold indicator must be unmissable.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> see both the defaulted amount and the upcoming term balance clearly separated — understanding that the $7,400 is immediately due and the $6,500 is a separate future obligation — so I can address them in the correct order.</p>
+        <p class="req-why"><strong>Why:</strong> Presenting all balance components together without chronological priority causes students to be confused about how much they actually need to pay right now to clear the hold. Clear separation of "immediately due" vs. "due December 15" prevents this confusion.</p>
+      </div>
+    </section>
+
+    <section id="hs5" class="prd-section">
+      <div class="section-eyebrow">Scenario 5b · Student</div>
+      <h2 class="section-title">Past Due &amp; Mixed Due Dates</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:12px;"><strong>Prototype:</strong> <code>home-5b-past-due-mixed.html</code> · Student: James · Balance state: <code>past-due</code></p>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;"><strong>Setup:</strong> James has a $2,500 past-due balance from Summer 2025 (overdue), a $9,500 current-term balance due September 15, a $50 returned payment fee due immediately, and a $1,000 balance with no due date. Total: $12,450. No active plan. No registration hold.</p>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> see which of my charges are past-due (requiring immediate action) and which are upcoming (due on specific dates) separately, so I understand my financial priority order without having to add up line items myself.</p>
+        <p class="req-why"><strong>Why:</strong> Students with multiple balance components across different terms and due dates are the most likely to be overwhelmed and do nothing. The home screen must impose a clear priority order — past-due first, then upcoming by date — rather than presenting an undifferentiated list.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> see the returned payment fee of $50 as a separate, immediately-actionable to-do item — not bundled into the general past-due balance — because it has a different resolution path (paying a fee, not a tuition balance).</p>
+        <p class="req-why"><strong>Why:</strong> A returned payment fee has a specific cause and a specific action. Bundling it with other past-due amounts obscures its nature and makes it harder for the student to understand and resolve it. The to-do card must surface it discretely with a "Pay now" CTA.</p>
+      </div>
+    </section>
+
+    <section id="hs6" class="prd-section">
+      <div class="section-eyebrow">Scenario 6b · Student</div>
+      <h2 class="section-title">Active Plan + Outside-Plan Charges</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:12px;"><strong>Prototype:</strong> <code>home-6b-outside-plan-charges.html</code> · Student: Marcus · Balance state: <code>outside-plan</code></p>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;"><strong>Setup:</strong> Marcus has an active pay over time plan ($6,000 remaining, $1,500/month). A meal plan charge and an enrollment fee totaling $1,550 are due September 15 but are NOT included in his pay over time plan. Total account balance: $9,200.</p>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> see that I have charges on my account that are outside my pay over time plan and due on a specific date, distinct from the plan amount that is auto-debit — so I know I need to take action on the $1,550 separately from my scheduled plan payments.</p>
+        <p class="req-why"><strong>Why:</strong> This is a very common scenario: a student sets up a plan for tuition, then gets a separate meal plan or fee charge that is not plan-eligible or was added after enrollment closed. If this charge is not surfaced prominently, it goes past-due while the student assumes their plan is covering everything.</p>
+      </div>
+
+      <div class="req-item">
+        <p class="req-persona">As a student payer</p>
+        <p class="req-text"><strong>I need to be able to</strong> clearly see both my plan amount (covered, auto-debit on Oct 1) and my outside-plan amount (not covered, due Sep 15) as separate line items on the balance card — understanding that I need to act on the Sep 15 amount and that the Oct 1 amount will process automatically.</p>
+        <p class="req-why"><strong>Why:</strong> The visual split between "on-plan" and "outside-plan" on the balance card (mode: <code>outside-plan</code>) is the core feature of this scenario. Without this split, a student would see a total balance of $9,200 and not understand that $6,000 of it is auto-handled while $1,550 requires action in the next two weeks.</p>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
          FEATURES — ONBOARDING
     ════════════════════════════════════════ -->
     <section id="feat-onboarding" class="prd-section">
@@ -4122,6 +4422,67 @@ body {
         <div class="req-tags"><span class="tag tag-req">Required</span></div>
       </div>
 
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         FEATURES — PAY OVER TIME
+    ════════════════════════════════════════ -->
+    <section id="feat-pot" class="prd-section">
+      <div class="section-eyebrow">Features</div>
+      <h2 class="section-title">Pay Over Time Features</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">Feature requirements for the Pay Over Time consumer experience — the enrollment flow, plan confirmation, ongoing plan management, balance change handling, and default recovery flow. These requirements apply to all plan types (Standard, Past-Due, LTPP, International, Hidden, Guarantee, Custom) unless a specific plan type section calls out an exception.</p>
+    </section>
+
+    <section id="feat-pot-enrollment" class="prd-section">
+      <div class="section-eyebrow">Features · Pay Over Time</div>
+      <h2 class="section-title">Plan Enrollment Flow</h2>
+      <hr class="section-divider"/>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add consumer-facing feature requirements for the plan enrollment flow: plan type selection (how standard vs. international vs. guarantee plans are presented), schedule picker (installment count selection, down payment display), enrollment fee disclosure, agreement acceptance (TILA/Reg Z disclosures, auto-debit authorization), and payment method entry. Use agile user story format: "As a [student/consumer], I need to be able to...".</span>
+      </div>
+    </section>
+
+    <section id="feat-pot-confirmation" class="prd-section">
+      <div class="section-eyebrow">Features · Pay Over Time</div>
+      <h2 class="section-title">Confirmation &amp; Agreement</h2>
+      <hr class="section-divider"/>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add feature requirements for the confirmation screen and agreement acceptance step: what must be shown (plan summary, total due today, schedule preview, auto-debit authorization language), what the student must explicitly accept, confirmation email/notification, and the success state. Also cover what happens if the down payment fails at enrollment.</span>
+      </div>
+    </section>
+
+    <section id="feat-pot-management" class="prd-section">
+      <div class="section-eyebrow">Features · Pay Over Time</div>
+      <h2 class="section-title">Plan Management</h2>
+      <hr class="section-divider"/>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add feature requirements for ongoing plan management from the consumer portal: viewing plan details (schedule, remaining balance, upcoming payments, payment history), updating payment method, canceling a plan, and what the student sees when a scheduled payment is processed vs. fails. Use agile user story format.</span>
+      </div>
+    </section>
+
+    <section id="feat-pot-balance-change" class="prd-section">
+      <div class="section-eyebrow">Features · Pay Over Time</div>
+      <h2 class="section-title">Balance Change Handling</h2>
+      <hr class="section-divider"/>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add feature requirements for how the consumer experience handles balance changes after plan enrollment: new charges added (the "open balance" state shown in scenario 1b), charges removed (add/drop), financial aid applied or reversed. What does the student see? What actions are available? What notifications are sent? Reference scenario 1b (home-1b-balance-increase.html) for the visual design direction.</span>
+      </div>
+    </section>
+
+    <section id="feat-pot-default" class="prd-section">
+      <div class="section-eyebrow">Features · Pay Over Time</div>
+      <h2 class="section-title">Default &amp; Recovery</h2>
+      <hr class="section-divider"/>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Add feature requirements for what the student sees when a plan payment fails: returned payment notification, retry options, plan default state (as shown in scenario 4b, home-4b-defaulted-plan.html), re-enrollment path, and collections escalation messaging. What actions can the student take? What is locked? Reference scenario 4b for the visual design direction.</span>
+      </div>
     </section>
 
 
@@ -4778,103 +5139,6 @@ body {
         </div>
       </div>
 
-    </section>
-
-
-    <!-- ════════════════════════════════════════
-         HE MARKET CONTEXT
-    ════════════════════════════════════════ -->
-    <section id="he-market" class="prd-section">
-      <div class="section-eyebrow">Foundation</div>
-      <h2 class="section-title">HE Market Context</h2>
-      <p class="section-subtitle">Source: NCC Market Briefing, March 2026 — compiled by NCC market strategy team from Deloitte 2025/2026 HE Trends, Gartner 2025 Magic Quadrant HE SIS SaaS, NAFSA, IIE Open Doors, National Student Clearinghouse, ListEdTech, and internal data. This is the most current market intelligence available; it supersedes any prior statistics in this document.</p>
-      <hr class="section-divider"/>
-
-      <div class="need-group" id="he-enrollment">
-        <h3 class="need-group-title">Enrollment: A Market in Transition</h3>
-
-        <div class="req-item">
-          <p class="req-text"><strong>The Demographic Cliff Has Arrived.</strong> 2025 is the projected peak year for U.S. high school graduates. After that, the number declines across 38 states through at least 2041. Total postsecondary enrollment is still growing but the composition is changing: non-traditional and CE enrollment grew ~17–20% in 2024 as traditional freshman enrollment fell ~5%. Community colleges grew 3–5% per year for three consecutive years. Adults 25–29 showed the largest gains. Traditional private nonprofit 4-year institutions declined nearly 2% in fall 2025.</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> The growing student population has different financial needs than the one most platforms were built for. Non-traditional, CE, and workforce-aligned students pay out of pocket or through employer reimbursement. Institutions that cannot serve them financially will not retain them. Horizon must support flexible billing structures and payment options that fit non-traditional academic calendars — not just semester-based, full-time students.</p>
-        </div>
-
-        <div class="req-item">
-          <p class="req-text"><strong>International Enrollment: A Revenue Crisis in Motion.</strong> New international student enrollment fell 17% in fall 2025 — the steepest non-pandemic decline on record. Overall international enrollment fell ~7%. 57%+ of institutions reported declines. Some schools saw 25–60% drops in new international enrollment in a single semester. International students contributed ~$43 billion to the U.S. economy in 2024–25 and typically pay the highest tuition balances of any student population. NAFSA estimates $1B+ in institutional revenue lost in 2025; if trends continue into 2026, the total impact could approach $7B.</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> International students generate the highest payment plan balances. A 17% enrollment drop directly reduces the highest-value segment of the payment plan market. This accelerates the need for international payment plan capability as a retention and expansion tool for the international students who do remain — and for institutions seeking to recover revenue from this segment. International payment plan support is not optional; it is a response to a live financial crisis at our client institutions.</p>
-        </div>
-
-        <div class="req-item">
-          <p class="req-text"><strong>The Revenue Mix Shift.</strong> One international student financing $30,000 generates roughly the same payment plan volume as 7–8 CE students each financing a $4,000 program. As enrollment shifts from higher-balance traditional and international students toward lower-balance adult and CE learners, payment plan count could grow while average dollars processed per plan declines. CE/certificate students typically pay $2,000–$8,000 per program; international/private nonprofit students pay $25,000–$43,000+/year.</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> A platform built to grow revenue on balance size needs to expand the services it delivers per student as average balance per student declines. This is the market case for broader financial wellness capability beyond payment plans. It also means CE payment plan support (no named competitor has this in checkout) is a high-leverage opportunity that would let NCC capture growing volume even as individual balances shrink.</p>
-        </div>
-
-        <div class="req-item">
-          <p class="req-text"><strong>The Non-Traditional and CE Student Is the New Majority.</strong> The U.S. continuing education market is valued at ~$67B and projected to reach ~$96B by 2030. These learners balance work and family alongside education. They pay out of pocket or through employer reimbursement. They stop out when financial processes are too complex. 50%+ of CE/certificate learners are self-pay. No named competitor has built payment plan capability into a checkout product for continuing education.</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> This is NCC's largest uncontested competitive opportunity. The institutions that need CE payment flexibility most are already NCC clients navigating the enrollment shift without a tool that fits this population. Horizon's architecture should accommodate CE checkout payment plans as a distinct configuration path.</p>
-        </div>
-      </div>
-
-      <div class="need-group" id="he-fiscal">
-        <h3 class="need-group-title">Fiscal Pressure on Institutions</h3>
-
-        <div class="req-item">
-          <p class="req-text"><strong>Revenue Under Structural Stress.</strong> The institutional revenue model faces simultaneous pressure from every direction: federal research funding frozen or cut at hundreds of institutions (multiple agencies capped indirect cost reimbursements at 15%); international tuition down 17% in new enrollment; new federal graduate loan limits effective July 1, 2026 constraining institutional pricing power; at least 15 states proposed or enacted cuts to public HE in 2025; endowment tax in the One Big Beautiful Bill Act affecting even well-endowed institutions. Roughly 80 non-profit institutions have closed or merged in five years.</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> Maximizing financial recovery from every enrolled student is now an institutional C-suite priority. Net tuition revenue per student — not total enrollment — is the metric presidents and CFOs are focused on. The CFO is now a primary buyer for student financial tools. Horizon's value case must be framed around retention outcomes and net tuition revenue recovery, not product features. This changes how we write RFP responses, how we structure our competitive comparisons, and what outcomes we track and report.</p>
-        </div>
-
-        <div class="req-item">
-          <p class="req-text"><strong>Systemness as an Accelerating Response.</strong> State systems and multi-campus institutions are consolidating administrative functions to reduce redundancy. California, Georgia, and others are already executing. System-level procurement creates larger, stickier agreements but requires more complex delivery and longer sales cycles (12–24 month procurement cycle; 6–18 month implementation after signature).</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> Horizon must be configurable at both the system level (shared defaults, governance settings) and the campus level (local overrides). A single-tenant per-institution model will not win system RFPs. System-level reporting that rolls up across campuses is a procurement requirement, not a nice-to-have.</p>
-        </div>
-      </div>
-
-      <div class="need-group" id="he-sis">
-        <h3 class="need-group-title">The SIS Migration Wave</h3>
-
-        <div class="req-item">
-          <p class="req-text"><strong>Gartner's Headline Projection.</strong> Gartner published its first-ever Magic Quadrant for Higher Education SIS SaaS in March 2025. Projection: 75% of institutions in some stage of SIS SaaS migration or deployment by 2030. Every SIS transition is a moment when every connected vendor gets re-evaluated.</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> Each of the ~1,200 NCC client institutions mid-migration is an NCC renewal risk and an expansion opportunity simultaneously. Finding out about a client migration at contract renewal is the wrong time. Our integration certification status at each SIS platform determines whether we appear on a post-migration shortlist or get discovered afterward. This is current risk management, not future planning.</p>
-        </div>
-
-        <div class="req-item">
-          <p class="req-text"><strong>Current SIS Market Share (North America).</strong> Ellucian Banner: 24% (Leader in Gartner MQ). Ellucian Colleague: 11% (Leader via Ellucian). Jenzabar: 11% (in 2025 MQ). Oracle PeopleSoft: 10% (not in MQ; Oracle Fusion Cloud Student is the successor). Anthology: 10% (in 2025 MQ). Populi: 7% (not in MQ). Workday: 3% (fastest growing; in 2025 MQ; displacing Banner, Colleague, PeopleSoft, and homegrown). Ellucian has communicated a ~5-year ramp to move entire customer base from on-premise to SaaS. 80% of Ellucian customers globally are already on at least one SaaS product.</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> Workday is achieving 15% penetration among institutions above 30,000 FTE and growing. Oracle Fusion Cloud Student early adopters are live today. Salesforce launched student financials on Education Cloud in 2025. These are not future threats — they are current re-evaluation triggers across our installed base.</p>
-        </div>
-
-        <div class="req-item">
-          <p class="req-text"><strong>Salesforce Education Cloud: The Platform Entrant to Watch.</strong> Salesforce is building billing, payments, and refunds into Education Cloud. Course registration launched Summer 2025. Student financials module now live. Salesforce's own research found ~75% of U.S. institutions are running an SIS more than 10 years old and ~60% plan to upgrade within 3–5 years. Salesforce is positioning itself as the destination for that upgrade cycle, using existing CRM relationships at many institutions as the entry point.</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> The scenario to watch is not Salesforce winning a head-to-head RFP against NCC. It is Salesforce expanding a CRM contract to include student financials before an NCC renewal conversation begins. Horizon's answer must be depth Salesforce cannot replicate: a decade of higher education payment and financial wellness experience delivered as a configurable, student-first platform.</p>
-        </div>
-
-        <div class="req-item">
-          <p class="req-text"><strong>NCC's Partner Standing vs. Where We Need to Be.</strong> Ellucian EPN: Base Partner tier (needs Verified for SaaS Solution minimum + Go-to-Market Referral tier to appear in institutional SaaS procurement). Workday: Access Partner — entry level, no Marketplace listing, no Innovation Partner certification, not visible to institutions selecting Workday integrations. Oracle: Validated Integration for PeopleSoft Campus Solutions only — zero standing with Oracle Fusion Cloud Student. Jenzabar: Touchstone Education Partner (relatively stable, lower urgency).</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> Partner standing gaps are a sales prerequisite problem, not a product problem. But Horizon's integration architecture directly affects our ability to earn and hold these tiers. Oracle Fusion Student integration work and Workday Innovation Partner certification need to be on the roadmap with resource allocation now. These gaps are active risks in the 2026 new logo pipeline.</p>
-        </div>
-      </div>
-
-      <div class="need-group" id="he-competitive">
-        <h3 class="need-group-title">Competitive Landscape</h3>
-
-        <div class="req-item">
-          <p class="req-text"><strong>Market Share (CFPB 2023).</strong> Among institutions offering installment payment plans: Nelnet 34% · Illumia (formerly Transact) 16% · TouchNet 11% · Flywire ~1% · Other/small 2% · Unknown/own system or white-labeled 36%. The 36% unknown/own segment is the largest single segment and the one from which NCC wins new clients most consistently.</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> NCC is the market leader but not dominant. Horizon must protect the leadership position while converting the 36% self-managed segment — those institutions are not choosing a competitor; they are outside the vendor market entirely. The pitch for that segment must address PCI scope burden, staff knowledge risk, and functional gaps (automated plan enrollment, past-due communications, sponsor billing) that manual processes cannot sustain as CE enrollment grows.</p>
-        </div>
-
-        <div class="req-item">
-          <p class="req-text"><strong>TouchNet (Global Payments) — 11% market share.</strong> Strongest at large public 4-year institutions. Well-established SIS integration with Banner and Colleague. All-in SaaS pricing. Known vulnerabilities: high rep turnover, 2–3 day response times vs. same-day from competitors, payment plan configuration requires individual plans not templates, e-commerce customization constrained. Active pipeline: Austin Community College (replacing TouchNet; dissatisfied with confusing billing, difficult plan setup, no notifications, no chat) and Arkansas State University.</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> TouchNet displacement is appearing in active pipeline now. The friction points in those deals are exactly what Horizon's product thesis addresses: proactive notifications, easier plan configuration, chat support. These are confirmed competitive advantages, not theoretical ones — they appear in documented deal notes.</p>
-        </div>
-
-        <div class="req-item">
-          <p class="req-text"><strong>Flywire — ~1% market share (domestic).</strong> Entered through international payment processing (~80% capture of that segment). Domestic billing/payment plan platform is newer expansion. Claims only provider with automated past-due collections software. High payment plan flexibility including per-student plans with different amounts and due dates. Supports 529 plan disbursements (NCC does not). Known vulnerability: SIS integration is the persistent gap — one research participant documented active transition away from Flywire because it never built direct SIS integration.</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> Flywire's SIS integration gap is a confirmed displacement trigger. As 75% of institutions move through SIS migrations by 2030, the integration question becomes the evaluation question. Flywire is running toward the standard NCC has already set. One concrete product gap: Flywire and Transact both support 529 plan disbursements. NCC does not. This surfaces in competitive evaluations at public 4-year universities where 529 adoption is highest.</p>
-        </div>
-
-        <div class="req-item">
-          <p class="req-text"><strong>The Uncontested CE Gap.</strong> No named competitor has built payment plan capability into a checkout product for continuing education. CE students pay out of pocket in amounts often too small for traditional installment plans but large enough that a single upfront payment creates friction and stop-out risk. NCC has the platform architecture to close this gap. The institutions that need it most are already NCC clients navigating the enrollment shift without a tool that fits this population.</p>
-          <p class="req-why"><strong>Why this matters for Horizon:</strong> This is a first-mover opportunity with no current competitive pressure. CE checkout payment plan support should be on the Horizon roadmap with sufficient priority to capture this gap before Flywire, TouchNet, or Salesforce builds it. Speed matters here.</p>
-        </div>
-      </div>
     </section>
 
 
