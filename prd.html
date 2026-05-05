@@ -1283,6 +1283,65 @@ body {
   text-decoration: none;
 }
 .manage-prefs-btn:hover { background: rgba(100,92,220,.15); }
+
+/* ── My Updates section ──────────────────────────────────── */
+.my-updates-section { border-left: 4px solid var(--hz-indigo); background: rgba(100,92,220,.03); }
+.my-updates-eyebrow { color: var(--hz-indigo) !important; }
+.my-updates-actions { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.mu-dismiss-btn { font-size:12px; color:var(--hz-muted); background:none; border:1px solid var(--hz-border); border-radius:6px; padding:4px 10px; cursor:pointer; }
+.mu-dismiss-btn:hover { background:var(--hz-cloud); }
+.mu-collapse-btn { font-size:12px; color:var(--hz-indigo); background:rgba(100,92,220,.07); border:1px solid rgba(100,92,220,.2); border-radius:6px; padding:4px 10px; cursor:pointer; }
+.my-updates-content { display:flex; flex-direction:column; gap:24px; }
+.mu-section-block { border:1px solid var(--hz-border); border-radius:12px; overflow:hidden; }
+.mu-section-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:var(--hz-cloud); border-bottom:1px solid var(--hz-border); cursor:pointer; }
+.mu-section-header:hover { background:#e5e8ff; }
+.mu-section-meta { display:flex; flex-direction:column; gap:2px; }
+.mu-section-group { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--hz-muted); }
+.mu-section-label { font-size:13px; font-weight:700; color:var(--hz-text); }
+.mu-goto-btn { font-size:11px; font-weight:600; color:var(--hz-indigo); background:white; border:1px solid rgba(100,92,220,.25); border-radius:6px; padding:4px 10px; cursor:pointer; white-space:nowrap; }
+.mu-goto-btn:hover { background:var(--hz-cloud); }
+.mu-items-wrap { padding:12px 16px; display:flex; flex-direction:column; gap:8px; }
+.mu-items-wrap .req-item { border:none; border-bottom:1px solid var(--hz-border); padding-bottom:12px; margin:0; }
+.mu-items-wrap .req-item:last-child { border-bottom:none; padding-bottom:0; }
+.mu-collapsed .mu-items-wrap { display:none; }
+.mu-section-toggle { font-size:10px; color:var(--hz-muted); margin-left:8px; }
+
+/* ── Sophie dashboard ────────────────────────────────────── */
+.sophie-dashboard-section { border-left:4px solid #c026d3; background:rgba(192,38,211,.03); }
+.sd-content { display:flex; flex-direction:column; gap:10px; }
+.sd-item { border:1px solid var(--hz-border); border-radius:10px; overflow:hidden; }
+.sd-item-source { display:flex; align-items:center; justify-content:space-between; padding:8px 14px; background:var(--hz-cloud); border-bottom:1px solid var(--hz-border); }
+.sd-goto-btn { font-size:11px; font-weight:600; color:var(--hz-indigo); background:white; border:1px solid rgba(100,92,220,.25); border-radius:6px; padding:3px 10px; cursor:pointer; }
+.sd-goto-btn:hover { background:var(--hz-cloud); }
+.sd-item .req-item { margin:0; border:none; border-radius:0; padding:12px 14px; }
+.sd-comments-list { padding:8px 14px 10px; display:flex; flex-direction:column; gap:8px; border-top:1px solid var(--hz-border); background:#fafbff; }
+.sd-comment { background:white; border:1px solid var(--hz-border); border-radius:8px; padding:8px 12px; }
+.sd-comment-user { font-size:11px; font-weight:700; color:var(--hz-indigo); margin-right:8px; }
+.sd-comment-date { font-size:10px; color:var(--hz-muted); }
+.sd-comment-text { font-size:12px; color:var(--hz-text); margin-top:4px; line-height:1.5; }
+
+/* ── Requirement comments ────────────────────────────────── */
+.req-comment-btn {
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:11px; font-weight:600; color:var(--hz-muted);
+  background:none; border:1px solid var(--hz-border);
+  border-radius:6px; padding:2px 8px; cursor:pointer;
+  margin-top:8px; transition:all .12s;
+  float:right; clear:both;
+}
+.req-comment-btn:hover, .req-comment-btn.has-comments { color:var(--hz-indigo); border-color:rgba(100,92,220,.35); background:rgba(100,92,220,.06); }
+.req-comment-panel { margin-top:10px; padding:10px; background:#f8f9ff; border:1px solid var(--hz-border); border-radius:8px; }
+.req-comment-input { width:100%; font-size:12px; font-family:inherit; padding:8px 10px; border:1px solid var(--hz-border); border-radius:6px; resize:vertical; color:var(--hz-text); background:white; }
+.req-comment-input:focus { outline:none; border-color:var(--hz-indigo); }
+.req-comment-submit { margin-top:6px; font-size:12px; font-weight:600; color:white; background:var(--hz-indigo); border:none; border-radius:6px; padding:5px 14px; cursor:pointer; }
+.req-comment-submit:hover { opacity:.88; }
+.req-comment-thread { margin-top:10px; padding-top:8px; border-top:1px solid var(--hz-border); display:flex; flex-direction:column; gap:6px; }
+.req-comment-row { background:#f8f9ff; border:1px solid var(--hz-border); border-radius:8px; padding:8px 12px; }
+.req-comment-user { font-size:11px; font-weight:700; color:var(--hz-indigo); margin-right:6px; }
+.req-comment-date { font-size:10px; color:var(--hz-muted); }
+.req-comment-text { font-size:12px; color:var(--hz-text); margin:4px 0 2px; line-height:1.5; }
+.req-comment-resolve { font-size:10px; color:#059669; background:none; border:1px solid rgba(5,150,105,.25); border-radius:5px; padding:2px 7px; cursor:pointer; }
+.req-comment-resolve:hover { background:rgba(5,150,105,.08); }
 </style>
 </head>
 <body>
@@ -1348,15 +1407,26 @@ body {
     <div class="nav-group">
       <div class="nav-group-label">Foundation</div>
       <a href="#he-market"         class="nav-link">HE Market Context</a>
-      <div class="nav-section-label">Consumer Vision</div>
-      <a href="#perspective-shift" class="nav-link nav-sub-item">Perspective Shift</a>
-      <a href="#vision"            class="nav-link nav-sub-item">Product Vision</a>
-      <a href="#onboarding-vision" class="nav-link nav-sub-item">Onboarding Vision</a>
-      <a href="#comms-vision"      class="nav-link nav-sub-item">Communications Vision</a>
-      <a href="#pot-vision"        class="nav-link nav-sub-item">Pay Over Time Vision</a>
-      <a href="#support-vision"    class="nav-link nav-sub-item">In‑App Support Vision</a>
-      <div class="nav-section-label">Institution Vision</div>
-      <a href="#inst-vision" class="nav-link nav-sub-item soon">Coming soon <span class="nav-sub">Content to be added</span></a>
+      <a href="#perspective-shift" class="nav-link">Perspective Shift</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Consumer Vision</div>
+      <a href="#vision"            class="nav-link">Product Vision</a>
+      <a href="#onboarding-vision" class="nav-link">Onboarding Vision</a>
+      <a href="#comms-vision"      class="nav-link">Communications Vision</a>
+      <a href="#pot-vision"        class="nav-link">Pay Over Time Vision</a>
+      <a href="#support-vision"    class="nav-link">In‑App Support Vision</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Institution Vision</div>
+      <a href="#inst-vision" class="nav-link soon">Coming soon <span class="nav-sub">Content to be added</span></a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">NBS Vision</div>
+      <a href="#nbs-vision" class="nav-link soon">Coming soon <span class="nav-sub">Content to be added</span></a>
     </div>
 
     <div class="nav-group">
@@ -1564,6 +1634,44 @@ body {
       <div class="ctr-list" id="ctr-list"></div>
     </div>
 
+
+    <!-- ════════════════════════════════════════
+         SOPHIE DASHBOARD (Sophie only, built by JS)
+    ════════════════════════════════════════ -->
+    <section id="sophie-dashboard" class="prd-section sophie-dashboard-section" style="display:none">
+      <div class="section-eyebrow" style="color:#c026d3">Sophie's Dashboard</div>
+      <h2 class="section-title">📋 Requirements Review Dashboard</h2>
+      <p class="section-subtitle">All requirements that need your attention: items with comments from other viewers, items missing a "Why", and items with Sophie review flags. Updates automatically as you edit.</p>
+      <hr class="section-divider"/>
+
+      <div class="need-group">
+        <h3 class="need-group-title">💬 Requirements with Comments (<span id="sophie-comments-count">0</span>)</h3>
+        <div id="sophie-comments-content" class="sd-content"></div>
+      </div>
+
+      <div class="need-group">
+        <h3 class="need-group-title">⚠️ Requirements Missing a "Why" (<span id="sophie-missing-count">0</span>)</h3>
+        <p style="font-size:12px;color:var(--hz-muted);margin-bottom:12px">These req-items either have a Sophie flag or are missing a .req-why paragraph. Click "Go to section" to navigate and edit inline.</p>
+        <div id="sophie-missing-why-content" class="sd-content"></div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         MY UPDATES (personalized, built by JS)
+    ════════════════════════════════════════ -->
+    <section id="my-updates" class="prd-section my-updates-section" style="display:none" aria-live="polite">
+      <div class="section-eyebrow my-updates-eyebrow">Your Updates</div>
+      <h2 class="section-title">
+        <span id="my-updates-count">0 requirements</span> updated since your last visit
+      </h2>
+      <p class="section-subtitle" id="my-updates-subtitle"></p>
+      <div class="my-updates-actions">
+        <button class="mu-dismiss-btn" onclick="document.getElementById('my-updates').style.display='none'">Dismiss ✕</button>
+        <button class="mu-collapse-btn" onclick="toggleMyUpdates()" id="mu-collapse-btn">▼ Collapse all</button>
+      </div>
+      <hr class="section-divider"/>
+      <div id="my-updates-content" class="my-updates-content"></div>
+    </section>
 
     <!-- ════════════════════════════════════════
          HE MARKET CONTEXT
@@ -2227,6 +2335,20 @@ body {
       <h2 class="section-title">Institution Vision <span class="soon-badge" style="font-size:12px;font-weight:500;color:var(--hz-muted);margin-left:8px;">Coming soon</span></h2>
       <hr class="section-divider"/>
       <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;">This section will define the institutional perspective on what Horizon should deliver — the core jobs-to-be-done from the bursar's office, finance leadership, and institutional technology teams. To be authored by Sophie.</p>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         NBS VISION
+    ════════════════════════════════════════ -->
+    <section id="nbs-vision" class="prd-section">
+      <div class="section-eyebrow">NBS Vision</div>
+      <h2 class="section-title">NBS Vision</h2>
+      <hr class="section-divider"/>
+      <div class="sophie-flag">
+        <span class="sophie-flag-label">Sophie review needed</span>
+        <span>Document NBS's vision for Horizon — how NBS positions the product internally, what success looks like from the NBS perspective, and how the NBS organization sees Horizon evolving relative to the existing NCC product suite.</span>
+      </div>
     </section>
 
 
@@ -6388,12 +6510,19 @@ var SECTION_TREE = [
   { id:'Foundation', label:'Foundation', first:'he-market', children:[
     {id:'he-market',label:'HE Market Context'},
     {id:'perspective-shift',label:'Perspective Shift'},
+  ]},
+  { id:'Consumer Vision', label:'Consumer Vision', first:'vision', children:[
     {id:'vision',label:'Product Vision'},
     {id:'onboarding-vision',label:'Onboarding Vision'},
     {id:'comms-vision',label:'Communications Vision'},
     {id:'pot-vision',label:'Pay Over Time Vision'},
     {id:'support-vision',label:'In-App Support Vision'},
+  ]},
+  { id:'Institution Vision', label:'Institution Vision', first:'inst-vision', children:[
     {id:'inst-vision',label:'Institution Vision'},
+  ]},
+  { id:'NBS Vision', label:'NBS Vision', first:'nbs-vision', children:[
+    {id:'nbs-vision',label:'NBS Vision'},
   ]},
   { id:'Problems & Needs', label:'Problems & Needs', first:'inst-problems', children:[
     {id:'inst-problems',label:'Institution Problems & Needs'},
@@ -6815,6 +6944,305 @@ function jumpToSection(id) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// MY UPDATES — full requirement content for changed sections
+// ─────────────────────────────────────────────────────────────────────────────
+var _myUpdatesCollapsed = false;
+
+function buildMyUpdates(userData) {
+  var lastVisit = userData.lastVisit || '2000-01-01';
+  var prefs = userData.prefs || {watchAll:true};
+
+  var relevant = CHANGE_LOG.filter(function(entry) {
+    if (entry.date <= lastVisit) return false;
+    if (prefs.watchAll) return true;
+    if ((prefs.groups||[]).indexOf(entry.group) !== -1) return true;
+    if ((prefs.sections||[]).indexOf(entry.sectionId) !== -1) return true;
+    return false;
+  });
+
+  if (relevant.length === 0) return;
+
+  var container = document.getElementById('my-updates-content');
+  container.innerHTML = '';
+  var totalItems = 0;
+
+  relevant.forEach(function(entry) {
+    var section = document.getElementById(entry.sectionId);
+    if (!section) return;
+    var reqItems = section.querySelectorAll(':scope > .need-group .req-item, :scope > .req-item');
+    if (reqItems.length === 0) {
+      // Section may have content but no req-items — still show it
+      reqItems = section.querySelectorAll('.req-item');
+    }
+    if (reqItems.length === 0) return;
+
+    var block = document.createElement('div');
+    block.className = 'mu-section-block';
+
+    var header = document.createElement('div');
+    header.className = 'mu-section-header';
+    header.innerHTML =
+      '<div class="mu-section-meta">' +
+        '<div class="mu-section-group">' + entry.group + '</div>' +
+        '<div class="mu-section-label">' + entry.label + '</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px">' +
+        '<span class="mu-section-toggle">▼</span>' +
+        '<button class="mu-goto-btn" onclick="event.stopPropagation();jumpToSection(\'' + entry.sectionId + '\')">Go to section →</button>' +
+      '</div>';
+    header.addEventListener('click', function() {
+      block.classList.toggle('mu-collapsed');
+      var tog = header.querySelector('.mu-section-toggle');
+      if (tog) tog.textContent = block.classList.contains('mu-collapsed') ? '▶' : '▼';
+    });
+    block.appendChild(header);
+
+    var wrap = document.createElement('div');
+    wrap.className = 'mu-items-wrap';
+
+    reqItems.forEach(function(item) {
+      var clone = item.cloneNode(true);
+      clone.classList.remove('changed');
+      clone.querySelectorAll('.req-comment-btn, .req-comment-panel, .req-comment-thread, button[data-sophie]').forEach(function(b) { b.remove(); });
+      wrap.appendChild(clone);
+      totalItems++;
+    });
+    block.appendChild(wrap);
+    container.appendChild(block);
+  });
+
+  if (totalItems === 0) return;
+
+  document.getElementById('my-updates-count').textContent =
+    totalItems + ' requirement' + (totalItems !== 1 ? 's' : '');
+  document.getElementById('my-updates-subtitle').textContent =
+    'Showing ' + relevant.length + ' section' + (relevant.length !== 1 ? 's' : '') +
+    ' updated since your last visit, filtered to your watched preferences.';
+  document.getElementById('my-updates').style.display = 'block';
+}
+
+function toggleMyUpdates() {
+  _myUpdatesCollapsed = !_myUpdatesCollapsed;
+  document.querySelectorAll('.mu-section-block').forEach(function(b) {
+    if (_myUpdatesCollapsed) {
+      b.classList.add('mu-collapsed');
+      var tog = b.querySelector('.mu-section-toggle');
+      if (tog) tog.textContent = '▶';
+    } else {
+      b.classList.remove('mu-collapsed');
+      var tog = b.querySelector('.mu-section-toggle');
+      if (tog) tog.textContent = '▼';
+    }
+  });
+  var btn = document.getElementById('mu-collapse-btn');
+  if (btn) btn.textContent = _myUpdatesCollapsed ? '▶ Expand all' : '▼ Collapse all';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMMENTS SYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+var COMMENTS_KEY = 'hz_prd_comments';
+var _currentUser  = '';
+
+function loadComments() {
+  try { return JSON.parse(localStorage.getItem(COMMENTS_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveComments(data) {
+  localStorage.setItem(COMMENTS_KEY, JSON.stringify(data));
+}
+function getReqId(reqItem) {
+  var t = '';
+  var el = reqItem.querySelector('.req-text') || reqItem;
+  t = el.textContent.replace(/\s+/g,' ').trim().slice(0, 60);
+  var h = 0;
+  for (var i = 0; i < t.length; i++) h = ((h << 5) - h + t.charCodeAt(i)) | 0;
+  return 'r' + Math.abs(h).toString(36);
+}
+function _esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function initComments(currentUser) {
+  _currentUser = currentUser;
+  var comments = loadComments();
+  document.querySelectorAll('.req-item').forEach(function(item) {
+    var reqId = getReqId(item);
+    item.dataset.reqId = reqId;
+    if (item.querySelector('.req-comment-btn')) return; // already inited
+
+    var btn = document.createElement('button');
+    btn.className = 'req-comment-btn';
+    btn.title = 'Add or view comments';
+    var existing = comments[reqId] || [];
+    btn.innerHTML = existing.length > 0 ? ('💬 ' + existing.length) : '💬';
+    if (existing.length > 0) btn.classList.add('has-comments');
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleCommentPanel(item, reqId);
+    });
+    item.appendChild(btn);
+
+    if (existing.length > 0) renderCommentThread(item, reqId, existing);
+  });
+}
+
+function toggleCommentPanel(item, reqId) {
+  var existing = item.querySelector('.req-comment-panel');
+  if (existing) { existing.remove(); return; }
+  var panel = document.createElement('div');
+  panel.className = 'req-comment-panel';
+  var ta = document.createElement('textarea');
+  ta.className = 'req-comment-input';
+  ta.placeholder = 'Add a comment or question for Sophie…';
+  ta.rows = 2;
+  var sub = document.createElement('button');
+  sub.className = 'req-comment-submit';
+  sub.textContent = 'Post comment';
+  sub.addEventListener('click', function() {
+    var text = ta.value.trim();
+    if (!text) return;
+    var all = loadComments();
+    if (!all[reqId]) all[reqId] = [];
+    all[reqId].push({user:_currentUser, text:text, date:new Date().toISOString().slice(0,10)});
+    saveComments(all);
+    panel.remove();
+    var old = item.querySelector('.req-comment-thread');
+    if (old) old.remove();
+    renderCommentThread(item, reqId, all[reqId]);
+    var b = item.querySelector('.req-comment-btn');
+    if (b) { b.innerHTML = '💬 ' + all[reqId].length; b.classList.add('has-comments'); }
+  });
+  panel.appendChild(ta);
+  panel.appendChild(sub);
+  item.appendChild(panel);
+  ta.focus();
+}
+
+function renderCommentThread(item, reqId, comments) {
+  var thread = document.createElement('div');
+  thread.className = 'req-comment-thread';
+  comments.forEach(function(c, idx) {
+    var row = document.createElement('div');
+    row.className = 'req-comment-row';
+    var isSophie = _currentUser.toLowerCase() === 'sophie';
+    var isOwn = c.user.toLowerCase() === _currentUser.toLowerCase();
+    row.innerHTML =
+      '<span class="req-comment-user">' + _esc(c.user) + '</span>' +
+      '<span class="req-comment-date">' + c.date + '</span>' +
+      '<div class="req-comment-text">' + _esc(c.text) + '</div>' +
+      ((isSophie || isOwn) ? '<button class="req-comment-resolve" onclick="resolveComment(\'' + reqId + '\',' + idx + ',this)">Resolve ✓</button>' : '');
+    thread.appendChild(row);
+  });
+  item.appendChild(thread);
+}
+
+function resolveComment(reqId, idx, btn) {
+  var all = loadComments();
+  if (!all[reqId]) return;
+  all[reqId].splice(idx, 1);
+  if (all[reqId].length === 0) delete all[reqId];
+  saveComments(all);
+  var item = btn.closest('.req-item');
+  var t = item.querySelector('.req-comment-thread');
+  if (t) t.remove();
+  var remaining = (all[reqId] || []).length;
+  if (remaining > 0) renderCommentThread(item, reqId, all[reqId]);
+  var b = item.querySelector('.req-comment-btn');
+  if (b) {
+    b.innerHTML = remaining > 0 ? ('💬 ' + remaining) : '💬';
+    if (remaining === 0) b.classList.remove('has-comments');
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SOPHIE DASHBOARD
+// ─────────────────────────────────────────────────────────────────────────────
+function buildSophieDashboard() {
+  var all = loadComments();
+  var withComments = [];
+  var missingWhy = [];
+
+  document.querySelectorAll('.req-item').forEach(function(item) {
+    var reqId = item.dataset.reqId || getReqId(item);
+    var hasC = all[reqId] && all[reqId].length > 0;
+    var hasWhy = !!item.querySelector('.req-why');
+    var hasFlag = !!item.querySelector('.sophie-flag');
+    if (hasC) withComments.push({item:item, reqId:reqId, comments:all[reqId]});
+    if (!hasWhy || hasFlag) missingWhy.push({item:item, reqId:reqId});
+  });
+
+  // Comments panel
+  var commentsContent = document.getElementById('sophie-comments-content');
+  var commentsCount   = document.getElementById('sophie-comments-count');
+  commentsContent.innerHTML = '';
+  commentsCount.textContent = withComments.length;
+
+  if (withComments.length === 0) {
+    commentsContent.innerHTML = '<p style="font-size:13px;color:var(--hz-muted);padding:8px 0">No comments yet. When other viewers comment on a requirement, it appears here.</p>';
+  } else {
+    withComments.forEach(function(entry) {
+      var section = entry.item.closest('section[id]');
+      var sId = section ? section.id : '';
+      var sName = section ? (section.querySelector('.section-title')||{textContent:'Unknown'}).textContent : 'Unknown';
+      var wrap = document.createElement('div');
+      wrap.className = 'sd-item';
+      var src = document.createElement('div');
+      src.className = 'sd-item-source';
+      src.innerHTML = '<span style="font-size:12px;color:var(--hz-muted)">' + _esc(sName) + '</span>' +
+        '<button class="sd-goto-btn" onclick="jumpToSection(\'' + sId + '\')">Go to section →</button>';
+      // Clone req-item without comment UI
+      var clone = entry.item.cloneNode(true);
+      clone.querySelectorAll('.req-comment-btn,.req-comment-panel,.req-comment-thread,button').forEach(function(b){b.remove();});
+      clone.style.margin = '0';
+      // Comment list
+      var cList = document.createElement('div');
+      cList.className = 'sd-comments-list';
+      entry.comments.forEach(function(c) {
+        cList.innerHTML += '<div class="sd-comment"><span class="sd-comment-user">' + _esc(c.user) + '</span><span class="sd-comment-date">' + c.date + '</span><div class="sd-comment-text">' + _esc(c.text) + '</div></div>';
+      });
+      wrap.appendChild(src);
+      wrap.appendChild(clone);
+      wrap.appendChild(cList);
+      commentsContent.appendChild(wrap);
+    });
+  }
+
+  // Missing why panel
+  var missingContent = document.getElementById('sophie-missing-why-content');
+  var missingCount   = document.getElementById('sophie-missing-count');
+  missingContent.innerHTML = '';
+  missingCount.textContent = missingWhy.length;
+
+  if (missingWhy.length === 0) {
+    missingContent.innerHTML = '<p style="font-size:13px;color:#059669;padding:8px 0">✅ All requirements have a "Why" — great work!</p>';
+  } else {
+    var shown = missingWhy.slice(0, 40);
+    shown.forEach(function(entry) {
+      var section = entry.item.closest('section[id]');
+      var sId = section ? section.id : '';
+      var sName = section ? (section.querySelector('.section-title')||{textContent:'Unknown'}).textContent : 'Unknown';
+      var wrap = document.createElement('div');
+      wrap.className = 'sd-item';
+      var src = document.createElement('div');
+      src.className = 'sd-item-source';
+      src.innerHTML = '<span style="font-size:12px;color:var(--hz-muted)">' + _esc(sName) + '</span>' +
+        '<button class="sd-goto-btn" onclick="jumpToSection(\'' + sId + '\')">Go to section →</button>';
+      var clone = entry.item.cloneNode(true);
+      clone.querySelectorAll('.req-comment-btn,.req-comment-panel,.req-comment-thread,button').forEach(function(b){b.remove();});
+      clone.style.margin = '0';
+      wrap.appendChild(src);
+      wrap.appendChild(clone);
+      missingContent.appendChild(wrap);
+    });
+    if (missingWhy.length > 40) {
+      missingContent.innerHTML += '<p style="font-size:12px;color:var(--hz-muted);padding:8px 0">…and ' + (missingWhy.length-40) + ' more. Use the Sophie flags in the document to find all items.</p>';
+    }
+  }
+
+  document.getElementById('sophie-dashboard').style.display = 'block';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // LOGIN FLOW
 // ─────────────────────────────────────────────────────────────────────────────
 document.getElementById('name-form').addEventListener('submit', function(e) {
@@ -6878,6 +7306,7 @@ function openAsViewer(name) {
   if (name.toLowerCase() === 'sophie') {
     document.getElementById('home-link').style.display = 'flex';
     initSophieMode();
+    buildSophieDashboard();
   }
 
   // Show change pill + banner
@@ -6896,6 +7325,12 @@ function openAsViewer(name) {
   if (userData.prefs) {
     buildCTRPanel(userData);
   }
+
+  // Init comments for all users
+  initComments(name);
+
+  // Build My Updates section
+  buildMyUpdates(userData);
 }
 
 function switchViewer() {
@@ -6914,6 +7349,11 @@ function switchViewer() {
   var dlBtn = document.querySelector('.sophie-download-btn');
   if (dlBtn) dlBtn.remove();
   document.querySelectorAll('.req-item[data-editing]').forEach(abortEdit);
+  var mu = document.getElementById('my-updates');
+  if (mu) mu.style.display = 'none';
+  var sd = document.getElementById('sophie-dashboard');
+  if (sd) sd.style.display = 'none';
+  document.querySelectorAll('.req-comment-btn,.req-comment-panel,.req-comment-thread').forEach(function(el){el.remove();});
 }
 
 // ── Active nav highlight on scroll ──────────────────────────────────────────
