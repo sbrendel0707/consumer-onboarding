@@ -1044,6 +1044,127 @@ body {
   margin-top: 1px;
 }
 
+/* ── GitHub Sync ── */
+.gh-sync-btn {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--hz-indigo);
+  background: var(--hz-cloud);
+  border: 1px solid rgba(100,92,220,.2);
+  border-radius: 7px;
+  padding: 3px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.gh-sync-btn:hover { background: #dde1ff; }
+.gh-sync-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: none;
+  white-space: nowrap;
+}
+.gh-sync-saving { display:inline; color: var(--hz-accent); background: var(--hz-cloud); }
+.gh-sync-ok     { display:inline; color: var(--hz-teal);   background: var(--hz-teal-bg); }
+.gh-sync-error  { display:inline; color: var(--hz-danger); background: #fff0f0; }
+.gh-settings-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26,16,96,.5);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+}
+.gh-settings-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 32px 24px;
+  max-width: 440px;
+  width: 92%;
+  box-shadow: 0 12px 48px rgba(26,16,96,.18);
+}
+.gh-settings-box h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--hz-text);
+  margin-bottom: 6px;
+}
+.gh-settings-box .gh-settings-desc {
+  font-size: 12.5px;
+  color: var(--hz-muted);
+  line-height: 1.55;
+  margin-bottom: 18px;
+}
+.gh-settings-box label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--hz-hint);
+  margin-bottom: 5px;
+}
+.gh-token-input {
+  width: 100%;
+  font-size: 13px;
+  padding: 8px 12px;
+  border: 1px solid rgba(100,92,220,.25);
+  border-radius: 8px;
+  outline: none;
+  font-family: 'Plus Jakarta Sans', monospace;
+  color: var(--hz-text);
+  margin-bottom: 14px;
+}
+.gh-token-input:focus { border-color: var(--hz-accent); box-shadow: 0 0 0 3px rgba(100,92,220,.12); }
+.gh-settings-note {
+  font-size: 11px;
+  color: var(--hz-hint);
+  background: var(--hz-bg);
+  border-radius: 7px;
+  padding: 8px 10px;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+.gh-settings-note strong { color: var(--hz-indigo); }
+.gh-settings-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.gh-settings-save {
+  background: var(--hz-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.gh-settings-save:hover { background: var(--hz-indigo); }
+.gh-settings-clear {
+  background: #fff;
+  color: var(--hz-muted);
+  border: 1px solid #dde1f0;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.gh-settings-cancel {
+  background: var(--hz-bg);
+  color: var(--hz-muted);
+  border: 1px solid #dde1f0;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 /* ── Problem statement ── */
 .problem-stmt {
   background: #FFF3F3;
@@ -1474,6 +1595,9 @@ body {
   <span>Viewing as <span id="visitor-name" class="visitor-name"></span></span>
   <span id="visitor-change-pill" class="visitor-change-pill"></span>
   <button class="manage-prefs-btn" onclick="openPrefOverlay(true)" style="display:none" id="manage-prefs-btn">⚙ Preferences</button>
+  <button class="gh-sync-btn" id="gh-sync-btn" onclick="ghManualSync()" title="Pull latest comments &amp; edits from GitHub">☁ Sync</button>
+  <button class="gh-sync-btn" id="gh-settings-btn" onclick="openGhSettings()" title="Configure GitHub token for saving" style="display:none">🔑 GitHub</button>
+  <span class="gh-sync-status" id="gh-sync-status"></span>
   <button class="visitor-switch" onclick="switchViewer()">Not you?</button>
 </div>
 
@@ -9096,6 +9220,7 @@ function loadComments() {
 }
 function saveComments(data) {
   localStorage.setItem(COMMENTS_KEY, JSON.stringify(data));
+  if (typeof ghPushComments === 'function') ghPushComments();
 }
 function getReqId(reqItem) {
   var t = '';
@@ -9919,6 +10044,9 @@ function openAsViewer(name) {
   // Init tag filter bar (all users)
   initTagFilter();
 
+  // Show GitHub sync controls for all logged-in users
+  if (typeof ghShowControls === 'function') ghShowControls();
+
   // Show personal dashboard nav link; Sophie gets Sophie dashboard, others get My Updates
   var dashLink = document.getElementById('nav-dashboard-link');
   if (dashLink) {
@@ -10032,17 +10160,26 @@ function getSophieEdits() {
   try { return JSON.parse(localStorage.getItem(SOPHIE_EDITS_KEY) || '{}'); }
   catch (e) { return {}; }
 }
-function storeSophieEdits(edits) { localStorage.setItem(SOPHIE_EDITS_KEY, JSON.stringify(edits)); }
+function storeSophieEdits(edits) {
+  localStorage.setItem(SOPHIE_EDITS_KEY, JSON.stringify(edits));
+  if (typeof ghPushEdits === 'function') ghPushEdits();
+}
 function getSophieAdded() {
   try { return JSON.parse(localStorage.getItem(SOPHIE_ADDED_KEY) || '[]'); }
   catch (e) { return []; }
 }
-function storeSophieAdded(arr) { localStorage.setItem(SOPHIE_ADDED_KEY, JSON.stringify(arr)); }
+function storeSophieAdded(arr) {
+  localStorage.setItem(SOPHIE_ADDED_KEY, JSON.stringify(arr));
+  if (typeof ghPushEdits === 'function') ghPushEdits();
+}
 function getSophieVisionAdded() {
   try { return JSON.parse(localStorage.getItem(SOPHIE_VISION_ADDED_KEY) || '[]'); }
   catch (e) { return []; }
 }
-function storeSophieVisionAdded(arr) { localStorage.setItem(SOPHIE_VISION_ADDED_KEY, JSON.stringify(arr)); }
+function storeSophieVisionAdded(arr) {
+  localStorage.setItem(SOPHIE_VISION_ADDED_KEY, JSON.stringify(arr));
+  if (typeof ghPushEdits === 'function') ghPushEdits();
+}
 
 // Stable content-hash ID from first 50 visible chars
 function hashReqText(str) {
@@ -10706,7 +10843,7 @@ function initSophieMode() {
         '<div style="background:#fff;border-radius:16px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.18);text-align:center">' +
           '<div style="font-size:24px;margin-bottom:12px">⬇</div>' +
           '<h3 style="font-size:16px;font-weight:700;color:#1a1060;margin-bottom:8px">Download your changes first?</h3>' +
-          '<p style="font-size:13px;color:#57548d;margin-bottom:20px;line-height:1.5">You have unsaved edits in Sophie mode. Download the updated prd.html before leaving so your changes aren\'t lost.</p>' +
+          '<p style="font-size:13px;color:#57548d;margin-bottom:20px;line-height:1.5">You have edits in Sophie mode. If GitHub sync is configured, your changes are already saved to the repo. Download only if you want a local backup copy.</p>' +
           '<div style="display:flex;gap:10px;justify-content:center">' +
             '<button id="sm-download-leave" style="background:#4f46e5;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">⬇ Download &amp; Leave</button>' +
             '<button id="sm-leave-anyway" style="background:#fff;color:#57548d;border:1px solid #dde1f0;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">Leave anyway</button>' +
@@ -10714,6 +10851,11 @@ function initSophieMode() {
           '</div>' +
         '</div>';
       document.body.appendChild(modal);
+      document.getElementById('sm-download-leave').onclick = function() {
+        downloadUpdatedHTML();
+        setTimeout(function() { window.location.href = dest; }, 800);
+        modal.remove();
+      };
       document.getElementById('sm-download-leave').onclick = function() {
         downloadUpdatedHTML();
         setTimeout(function() { window.location.href = dest; }, 800);
@@ -10727,6 +10869,232 @@ function initSophieMode() {
     });
   });
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GITHUB SYNC
+// Comments and Sophie edits persist to comments.json / sophie-edits.json
+// in the repo via the GitHub Contents API.  The token is stored only in
+// localStorage — it is never written into this file.
+// ─────────────────────────────────────────────────────────────────────────────
+var GH_OWNER         = 'sbrendel0707';
+var GH_REPO_NAME     = 'consumer-onboarding';
+var GH_BRANCH        = 'master';
+var GH_COMMENTS_PATH = 'comments.json';
+var GH_EDITS_PATH    = 'sophie-edits.json';
+var GH_TOKEN_KEY     = 'hz_gh_token';
+var GH_DEVICE_KEY    = 'hz_gh_allowed_device';
+var GH_SOPHIE_LOCK   = 'RMT-541628L.us.nelnet.biz'; // machine lock for Sophie mode writes
+var GH_API_BASE      = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO_NAME + '/contents/';
+var GH_RAW_BASE      = 'https://raw.githubusercontent.com/' + GH_OWNER + '/' + GH_REPO_NAME + '/' + GH_BRANCH + '/';
+
+function ghGetToken() {
+  try { return localStorage.getItem(GH_TOKEN_KEY) || ''; } catch(e) { return ''; }
+}
+
+// Device fingerprint — hostname on corp Windows = their device name
+function ghGetDeviceId() {
+  return window.location.hostname === 'localhost' ? 'localhost' : window.location.hostname;
+}
+
+// Sophie writes are only allowed from the locked device
+function ghSophieWriteAllowed() {
+  // Localhost (dev server) is always allowed so testing works
+  var h = window.location.hostname;
+  return h === 'localhost' || h === '127.0.0.1' || h === GH_SOPHIE_LOCK;
+}
+
+// ── Read a JSON file from the repo (public reads — no token needed) ──
+async function ghReadFile(path) {
+  try {
+    var r = await fetch(GH_RAW_BASE + path + '?_bust=' + Date.now());
+    if (r.status === 404) return null;
+    if (!r.ok) return null;
+    return await r.json();
+  } catch(e) { return null; }
+}
+
+// ── Write a JSON file to the repo (token required) ──
+async function ghWriteFile(path, data, message) {
+  var token = ghGetToken();
+  if (!token) { console.warn('[GH Sync] No token — save skipped'); return false; }
+
+  // Get current file SHA (required by GitHub API for updates)
+  var url = GH_API_BASE + path;
+  var sha = null;
+  try {
+    var metaR = await fetch(url + '?ref=' + GH_BRANCH, {
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (metaR.ok) sha = (await metaR.json()).sha;
+  } catch(e) {}
+
+  // Base64-encode the JSON (btoa can't handle raw Unicode — encode first)
+  var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+  var body = { message: message, content: encoded, branch: GH_BRANCH };
+  if (sha) body.sha = sha;
+
+  try {
+    var r = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + token,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (r.status === 401) {
+      ghSetStatus('error', '✕ Token invalid — click 🔑 GitHub to update');
+      return false;
+    }
+    return r.ok;
+  } catch(e) { return false; }
+}
+
+// ── Sync status indicator ──
+function ghSetStatus(state, msg) {
+  var el = document.getElementById('gh-sync-status');
+  if (!el) return;
+  el.className = 'gh-sync-status';
+  if (state !== 'idle') el.className += ' gh-sync-' + state;
+  el.textContent = msg;
+  if (state === 'ok') setTimeout(function() { ghSetStatus('idle', ''); }, 3000);
+}
+
+// ── Comments: pull remote → localStorage ──
+async function ghPullComments() {
+  var remote = await ghReadFile(GH_COMMENTS_PATH);
+  if (!remote || typeof remote !== 'object') return;
+  // Remote is shared source of truth; overwrite local
+  try { localStorage.setItem(COMMENTS_KEY, JSON.stringify(remote)); } catch(e) {}
+}
+
+// ── Comments: localStorage → GitHub ──
+async function ghPushComments() {
+  if (!ghSophieWriteAllowed() && _currentUser.toLowerCase() !== 'sophie') {
+    // Other users: still allow their comments to be pushed
+  }
+  var data = loadComments();
+  ghSetStatus('saving', '↑ Saving…');
+  var ok = await ghWriteFile(GH_COMMENTS_PATH, data, 'Update comments [PRD UI] — ' + (_currentUser || 'viewer'));
+  ghSetStatus(ok ? 'ok' : 'error', ok ? '✓ Saved' : '✕ Save failed — click 🔑 GitHub');
+}
+
+// ── Sophie edits: pull remote → localStorage ──
+async function ghPullEdits() {
+  var remote = await ghReadFile(GH_EDITS_PATH);
+  if (!remote || typeof remote !== 'object') return;
+  try {
+    if (remote.edits)       localStorage.setItem(SOPHIE_EDITS_KEY,        JSON.stringify(remote.edits));
+    if (remote.added)       localStorage.setItem(SOPHIE_ADDED_KEY,        JSON.stringify(remote.added));
+    if (remote.visionAdded) localStorage.setItem(SOPHIE_VISION_ADDED_KEY, JSON.stringify(remote.visionAdded));
+  } catch(e) {}
+}
+
+// ── Sophie edits: localStorage → GitHub ──
+async function ghPushEdits() {
+  if (!ghSophieWriteAllowed()) {
+    ghSetStatus('error', '✕ Sophie edits only save from your registered device');
+    return;
+  }
+  var data = {
+    edits:       getSophieEdits(),
+    added:       getSophieAdded(),
+    visionAdded: getSophieVisionAdded()
+  };
+  ghSetStatus('saving', '↑ Saving…');
+  var ok = await ghWriteFile(GH_EDITS_PATH, data, 'Update Sophie edits [PRD UI]');
+  ghSetStatus(ok ? 'ok' : 'error', ok ? '✓ Saved to GitHub' : '✕ Save failed — click 🔑 GitHub');
+}
+
+// ── Manual sync (☁ Sync button) ──
+async function ghManualSync() {
+  ghSetStatus('saving', '⟳ Syncing…');
+  await Promise.all([ghPullComments(), ghPullEdits()]);
+  // Refresh comment badges for current viewer
+  if (_currentUser) {
+    document.querySelectorAll('.req-comment-thread').forEach(function(t) { t.remove(); });
+    document.querySelectorAll('.req-comment-btn').forEach(function(b) { b.remove(); });
+    initComments(_currentUser);
+  }
+  // Re-apply Sophie edits so freshly-pulled edits render
+  applySophieEdits();
+  ghSetStatus('ok', '✓ Synced');
+}
+
+// ── Settings modal ──
+function openGhSettings() {
+  var overlay = document.getElementById('gh-settings-overlay');
+  var input   = document.getElementById('gh-token-input');
+  if (!overlay) return;
+  if (input) {
+    var t = ghGetToken();
+    input.value = t ? t.slice(0, 10) + '…' + t.slice(-4) : '';
+    input.placeholder = t ? '(token already saved — paste to replace)' : 'github_pat_… or ghp_…';
+  }
+  overlay.style.display = 'flex';
+  setTimeout(function() { if (input && !ghGetToken()) input.focus(); }, 50);
+}
+function closeGhSettings() {
+  var overlay = document.getElementById('gh-settings-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+function saveGhToken() {
+  var input = document.getElementById('gh-token-input');
+  if (!input) return;
+  var val = input.value.trim();
+  // Don't save if user left the masked placeholder untouched
+  if (val && !val.includes('…')) {
+    try { localStorage.setItem(GH_TOKEN_KEY, val); } catch(e) {}
+  }
+  closeGhSettings();
+  ghSetStatus('ok', '✓ Token saved');
+}
+function clearGhToken() {
+  try { localStorage.removeItem(GH_TOKEN_KEY); } catch(e) {}
+  var input = document.getElementById('gh-token-input');
+  if (input) { input.value = ''; input.placeholder = 'github_pat_… or ghp_…'; }
+  ghSetStatus('idle', '');
+}
+
+// ── Show GitHub controls in visitor bar after login ──
+function ghShowControls() {
+  var syncBtn = document.getElementById('gh-sync-btn');
+  var settingsBtn = document.getElementById('gh-settings-btn');
+  if (syncBtn)    syncBtn.style.display    = 'inline-flex';
+  if (settingsBtn) settingsBtn.style.display = 'inline-flex';
+}
+
+// ── Initial pull on page load — hydrate localStorage from GitHub ──
+// Runs early so applySophieEdits() (called later in openAsViewer) gets fresh data
+document.addEventListener('DOMContentLoaded', async function() {
+  await Promise.all([ghPullComments(), ghPullEdits()]);
+});
 </script>
+
+<!-- ════════════════════════════════════════
+     GITHUB SYNC SETTINGS MODAL
+════════════════════════════════════════ -->
+<div id="gh-settings-overlay" class="gh-settings-overlay" onclick="if(event.target===this)closeGhSettings()">
+  <div class="gh-settings-box">
+    <h3>☁ GitHub Sync</h3>
+    <p class="gh-settings-desc">
+      Your token lets this page save comments and edits directly back to the GitHub repo — no download needed.
+      It's stored only in <em>your</em> browser (localStorage) and is never written into the file or shared with anyone.
+    </p>
+    <label for="gh-token-input">Personal Access Token</label>
+    <input type="password" id="gh-token-input" class="gh-token-input" placeholder="github_pat_… or ghp_…" autocomplete="off" spellcheck="false"/>
+    <div class="gh-settings-note">
+      <strong>How to get one:</strong> github.com → click your avatar (top-right) → Settings → scroll to bottom → Developer settings → Personal access tokens → Tokens (classic) → Generate new token (classic) → check <strong>repo</strong> → copy.
+      <br/>Only needs to be done once per device.
+    </div>
+    <div class="gh-settings-actions">
+      <button class="gh-settings-clear" onclick="clearGhToken()">Clear token</button>
+      <button class="gh-settings-cancel" onclick="closeGhSettings()">Cancel</button>
+      <button class="gh-settings-save" onclick="saveGhToken()">Save token</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
