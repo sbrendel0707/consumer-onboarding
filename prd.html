@@ -11180,6 +11180,7 @@ function ghShowControls() {
 function initLeaveIntercept() {
   document.querySelectorAll('a[href]:not([href^="#"])').forEach(function(link) {
     if (link.dataset.leaveGuarded) return;
+    if (link.id === 'home-link') return; // ← Prototypes always navigates directly
     link.dataset.leaveGuarded = '1';
     link.addEventListener('click', function(e) {
       if (!_currentUser) return; // not logged in yet — let it pass
