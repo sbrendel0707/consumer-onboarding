@@ -1704,8 +1704,8 @@ body {
     <div class="overlay-eyebrow">Horizon · Consumer Onboarding</div>
     <span class="auth-pending-icon">📬</span>
     <h1 class="overlay-title">Access Requested</h1>
-    <p class="overlay-sub">Your request has been sent to <strong>Sophie Brendel</strong> for review. You'll receive an email at <strong id="pending-email-display"></strong> once your access is approved.</p>
-    <p class="overlay-note" style="margin-top:16px">This document contains confidential internal requirements. Access is granted on a need-to-know basis. Questions? <a href="mailto:sophie.brendel@nelnet.net">sophie.brendel@nelnet.net</a></p>
+    <p class="overlay-sub">Your request has been sent to <strong>Sophie Brendel</strong>. She'll reach out to you directly via Teams once your access has been approved or rejected.</p>
+    <p class="overlay-note" style="margin-top:16px">This document contains confidential internal requirements. Access is granted on a need-to-know basis.</p>
   </div>
 </div>
 
@@ -11195,7 +11195,7 @@ var AUTH_CONFIG = {
   publicKey:        'YOUR_EMAILJS_PUBLIC_KEY',   // Account → API Keys
   serviceId:        'service_3a5ktdv',
   templateOtp:      'template_84lgh0l',          // OTP code email
-  templateRequest:  'YOUR_REQUEST_TEMPLATE_ID',  // Access request → Sophie (with approve/reject buttons)
+  templateRequest:  'template_clmcvua',           // Access request → Sophie (with approve/reject buttons)
   templateApproved: 'YOUR_APPROVED_TEMPLATE_ID', // Notify user: approved
   templateRejected: 'YOUR_REJECTED_TEMPLATE_ID', // Notify user: rejected
 
@@ -11647,11 +11647,7 @@ async function authApproveRequest(name, email) {
     return r.email === email.toLowerCase() ? Object.assign({}, r, {status:'approved'}) : r;
   });
   await ghWriteFile(GH_PENDING_ACCESS_PATH, pending, 'Mark approved: ' + email);
-  // Notify user
-  await authSendEmail(AUTH_CONFIG.templateApproved, {
-    to_email: email, to_name: name,
-    prd_url: window.location.origin + window.location.pathname
-  });
+  // Notification handled via Teams by Sophie directly
 }
 
 async function authRejectRequest(name, email) {
@@ -11660,7 +11656,7 @@ async function authRejectRequest(name, email) {
     return r.email === email.toLowerCase() ? Object.assign({}, r, {status:'rejected'}) : r;
   });
   await ghWriteFile(GH_PENDING_ACCESS_PATH, pending, 'Mark rejected: ' + email);
-  await authSendEmail(AUTH_CONFIG.templateRejected, { to_email: email, to_name: name });
+  // Notification handled via Teams by Sophie directly
 }
 </script>
 
