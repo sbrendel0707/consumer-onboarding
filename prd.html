@@ -4498,9 +4498,18 @@ body {
         <div class="if-label">IF: Student selects "splitting" between self + one AP, or among multiple APs</div>
         <div class="req-item" data-modified="2026-05-05">
           <p class="req-text"><strong>Percentage assignment — two options the student chooses between:</strong><br/>
-          <strong>Option A: Assign now.</strong> The student assigns a percentage of the balance to each payer. The percentages must add up to 100%. Each payer's portion is calculated from the current balance and surfaced during that payer's own payment setup — the AP sees only their slice, with a breakdown showing why their amount is what it is.<br/>
-          <strong>Option B: Let APs decide at login.</strong> The student does not assign percentages. Instead, each AP is prompted to agree on their percentage when they complete their own onboarding. This option is for situations where the APs (e.g., two parents) need to discuss the split amongst themselves before committing.</p>
-          <p class="req-why"><strong>Why:</strong> Two equally valid real-world situations. Some students know exactly what each party is covering; others are setting up APs whose split needs to be decided between the APs themselves. Forcing either approach on the other would create friction or incorrect setups.</p>
+          <strong>Option A: Assign now.</strong> The student assigns a percentage of the balance to each payer. The percentages must add up to exactly 100% before the student can proceed. The UI enforces this in real time — as the student enters percentages, a running total shows how much of the balance has been assigned and how much remains unassigned. The "Continue" action is disabled until the total equals exactly 100%. Neither over-assigning (e.g., two APs each assigned 60%) nor under-assigning (e.g., leaving 20% unaccounted for) is permitted.<br/>
+          <strong>Option B: Let APs decide at login.</strong> The student does not assign percentages. Instead, each AP is prompted to agree on their percentage when they complete their own onboarding. This option is for situations where the APs (e.g., two parents) need to discuss the split amongst themselves before committing. When Option B is chosen, the student's onboarding proceeds without resolving the split — but see the to-do requirement below for what happens if APs do not complete their percentage assignment.</p>
+          <p class="req-why"><strong>Why:</strong> 110% coverage means a payer is overcharged; 80% coverage means 20% of the balance is unaccounted for and will not be paid by anyone. Both are incorrect financial outcomes. The system must mathematically enforce 100% allocation when percentages are assigned by the student, and must never allow a split arrangement to leave the balance partially uncovered without the student being aware and accountable.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>If percentages are not fully resolved — either because Option B (defer to APs) was chosen and APs have not yet completed their setup, or because an AP has been invited but not yet responded — the student sees a to-do on their home screen identifying the unresolved coverage gap.</strong> The to-do reads clearly: "[AP Name] hasn't set up their payment yet — [X]% of your balance is not yet covered." The to-do persists until the AP completes their onboarding and percentage is confirmed. The student can take action from the to-do: resend the invitation, remove the AP and cover the gap themselves, or adjust the split.</p>
+          <p class="req-why"><strong>Why:</strong> A balance that is 80% covered is a balance with a real delinquency risk on the remaining 20%. The student is the account owner — they are responsible for ensuring 100% of the balance has a payer. If an AP they invited hasn't followed through, the student must know immediately so they can act before a payment becomes past due. Hiding this gap until the bill comes due generates avoidable collections contacts.</p>
+          <div class="req-tags">
+            <span class="tag tag-if">Cascades to: Home screen to-do — if AP hasn't completed setup</span>
+            <span class="tag tag-req">Required — balance coverage must be 100% or explicitly flagged</span>
+          </div>
         </div>
       </div>
 
@@ -5535,6 +5544,21 @@ body {
         <p class="req-text"><strong>Multiple APs may be added during a single onboarding session.</strong> The student can add more than one authorized party before completing the onboarding flow. Each AP has independently-configured permissions. There is no hard limit specified — institution may configure a maximum if needed.</p>
         <p class="req-why"><strong>Why:</strong> Multi-payer arrangements (divorced parents, student + grandparent, scholarship sponsor + parent) are common. Requiring students to return post-onboarding to add additional APs creates an avoidable second trip through a setup flow.</p>
         <div class="req-tags"><span class="tag tag-inst">Institution: AP count limit (optional)</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>When percentages are assigned across payers, they must total exactly 100% — the system enforces this and will not allow completion with any other total.</strong> Over-assignment (e.g., student assigns 60% to AP1 and 60% to AP2) and under-assignment (e.g., student assigns 40% to AP1 and leaves 40% unaccounted for) are both hard errors, not warnings. The student cannot proceed past the payer setup step until all assigned percentages sum to exactly 100%. The only valid exception is "Let APs decide at login" — in which case no percentage is assigned during the student's onboarding, and the system tracks the unresolved gap.</p>
+        <p class="req-why"><strong>Why:</strong> Percentage math errors translate directly into real payment shortfalls or overcharges. 110% = double-billing someone; 80% = a gap that nobody will pay. These are not soft validation issues — they are financial integrity constraints that must be enforced at the point of input, before any AP is invited or any payment setup begins.</p>
+        <div class="req-tags"><span class="tag tag-req">Required — hard constraint, no exceptions</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>If an invited AP has not yet completed their setup, a to-do appears on the student's home screen identifying the uncovered portion.</strong> The to-do names the specific AP and shows the percentage of the balance that is not yet covered. The student can take action from the to-do: resend the invitation, remove that AP and absorb their portion themselves, or (if Option B "let APs decide" was chosen) track which APs still haven't logged in to confirm their share. The to-do clears automatically once all APs have completed setup and 100% of the balance is covered.</p>
+        <p class="req-why"><strong>Why:</strong> The student is responsible for their account. If a parent they invited hasn't set up their portion, that gap falls back to the student — they must know this and be empowered to fix it before the balance becomes delinquent. A silent gap is a missed collections risk.</p>
+        <div class="req-tags">
+          <span class="tag tag-if">IF: AP invited but setup incomplete → home screen to-do</span>
+          <span class="tag tag-if">To-do clears when all payers have confirmed 100% coverage</span>
+        </div>
       </div>
 
 
