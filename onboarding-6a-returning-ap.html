@@ -2,331 +2,419 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>6a · Returning AP Onboarding – Horizon Prototype</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config={theme:{extend:{colors:{'hz-indigo':'#2D1FA3','hz-accent':'#645CDC','hz-cloud':'#EEF0FF','hz-teal':'#0D7A55','hz-teal-bg':'#E1F5EE','hz-bg':'#F4F5FF','hz-text':'#1A1060','hz-muted':'#57548D','hz-hint':'#6B6899','hz-border':'rgba(100,92,220,0.14)','hz-danger':'#E24B4A'},fontFamily:{sans:["'Plus Jakarta Sans'",'system-ui','sans-serif']},borderRadius:{'hz':'18px','hz-sm':'12px','hz-pill':'99px'}}}}
-</script>
-<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>6A – Returning AP</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-hz-bg">
+<body class="bg-gray-50">
 <div id="root"></div>
 <script type="text/babel">
+const {useState} = React;
 
-const STUDENT      = 'Connor Walsh';
-const AP_FIRST     = 'Michael';
-const AP_LAST      = 'Walsh';
-const SCHOOL       = 'Ridgemont University';
-const NEW_BALANCE  = 5600;
-const OLD_BALANCE  = 5100;
-const AP_PCT       = 100;
-const OLD_INSTALL  = 9;
-const OLD_FREQ     = 'Monthly';
-const OLD_PMT      = fmt2(OLD_BALANCE / OLD_INSTALL);
-const NEW_PMT      = fmt2(NEW_BALANCE / OLD_INSTALL);
-const INSURANCE_PREM = 336;
+// ── Scenario: Patricia Moore — returning AP (Mom), paid 60% last term, same arrangement this term ──
+const AP={name:"Patricia Moore",role:"Mom",username:"pmoore_parent"};
+const STUDENT={name:"Devon Moore",school:"Hargrove University"};
+const NEW_TERM="Spring 2025",LAST_TERM="Fall 2024";
+const LAST_BAL=5100,NEW_BAL=5600;
+const AP_PCT=60;
+const MY_LAST_BAL=LAST_BAL*AP_PCT/100;  // 3060
+const MY_NEW_BAL=NEW_BAL*AP_PCT/100;    // 3360
+const NELNET_FEE=34;
+const INSURANCE_PREM=118;
+const DUE_DATE="March 15, 2025";
+// Last term plan: monthly, started Oct 15, $612/mo x 5
+const LAST_PLAN={freq:'monthly',startDow:'Tuesday',startDate:'Oct 15',installments:5,installAmt:612,method:'ach',methodLabel:'Chase ····4491',down:600};
 
-function fmt2(n){return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
-const fmt = fmt2;
-
-const Shell = ({children,step,total,onBack,showBack=true}) => (
-  <div className="min-h-screen bg-hz-bg flex flex-col items-center py-8 px-4">
-    <div className="w-full max-w-sm">
-      <div className="flex items-center justify-between mb-6">
-        {showBack?<button onClick={onBack} className="text-hz-accent text-sm font-semibold">← Back</button>
-          :<a href="index.html" className="text-hz-accent text-sm font-semibold">⌂ Home</a>}
-        <span className="text-xs text-hz-hint">{SCHOOL}</span>
-      </div>
-      {total>0&&<div className="mb-6"><div className="text-xs text-hz-hint mb-1.5">Step {step} of {total}</div>
-        <div className="h-1 bg-hz-cloud rounded-full overflow-hidden"><div className="h-full bg-hz-accent rounded-full transition-all duration-500" style={{width:`${(step/total)*100}%`}}/></div></div>}
-      {children}
+const Shell=({title,step,total,onBack,children})=>(
+  <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="bg-white border-b px-4 py-3 flex items-center gap-3 sticky top-0 z-10 shadow-sm">
+      {onBack&&<button onClick={onBack} className="text-gray-400 hover:text-gray-700 text-xl">←</button>}
+      <div className="flex-1"><div className="text-sm font-bold text-gray-800">{title}</div>{step&&<div className="text-xs text-gray-400">Step {step} of {total}</div>}</div>
+      <span className="text-blue-700 font-bold text-sm">Nelnet</span>
     </div>
+    <div className="flex-1 px-4 py-5 max-w-md mx-auto w-full">{children}</div>
   </div>
 );
-
-const Btn=({children,onClick,variant='primary',disabled=false,className=''})=>{
-  const v={primary:'bg-hz-indigo text-white',ghost:'bg-hz-cloud text-hz-indigo',teal:'bg-hz-teal text-white',outline:'border border-[rgba(100,92,220,0.3)] text-hz-indigo hover:bg-hz-cloud'};
-  return <button onClick={onClick} disabled={disabled} className={`w-full py-3.5 rounded-hz-pill font-semibold text-[15px] hover:opacity-90 active:scale-[0.97] transition-all ${v[variant]} ${disabled?'opacity-40 cursor-not-allowed':''} ${className}`}>{children}</button>;
+const Btn=({onClick,children,variant="primary",className=""})=>{
+  const s={primary:"bg-blue-600 text-white hover:bg-blue-700",secondary:"bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50",ghost:"text-blue-600 underline bg-transparent text-center"};
+  return <button onClick={onClick} className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all ${s[variant]} ${className}`}>{children}</button>;
 };
-const Card=({children,className=''})=><div className={`bg-white rounded-hz border border-hz-border shadow-sm ${className}`}>{children}</div>;
-const Info=({children})=><div className="flex gap-2 p-3 bg-hz-cloud rounded-hz-sm border border-[rgba(100,92,220,0.2)] text-xs text-hz-muted leading-relaxed"><span className="shrink-0 mt-0.5">ℹ️</span><span>{children}</span></div>;
-
-const ConfirmCard=({icon,label,prior,current,onSame,onChange,done,changedLabel})=>(
-  <Card className={`p-4 transition-all ${done?'border-hz-teal/30':''}`}>
-    <div className="flex items-start gap-3 mb-3">
-      <span className="text-xl shrink-0">{icon}</span>
-      <div className="flex-1 min-w-0">
-        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-0.5">{label}</div>
-        <div className="text-sm text-hz-muted">{prior}</div>
-        {changedLabel&&<div className="text-sm text-hz-teal font-semibold mt-0.5">→ {changedLabel}</div>}
-      </div>
-      {done&&<span className="text-hz-teal text-xl shrink-0">✓</span>}
+const Card=({children,className=""})=><div className={`bg-white rounded-2xl shadow-sm border border-gray-100 p-5 ${className}`}>{children}</div>;
+const Tag=({color,children})=>{const c={blue:"bg-blue-100 text-blue-700",green:"bg-green-100 text-green-700",amber:"bg-amber-100 text-amber-700",gray:"bg-gray-100 text-gray-500"};return<span className={`text-xs font-bold px-2 py-0.5 rounded-full ${c[color]||c.gray}`}>{children}</span>;};
+const Lbl=({children})=><div className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 mt-4">{children}</div>;
+const InfoBox=({color="blue",children})=>{const c={blue:"bg-blue-50 border-blue-200 text-blue-800",amber:"bg-amber-50 border-amber-200 text-amber-800",green:"bg-green-50 border-green-200 text-green-800"};return<div className={`border rounded-xl p-3 text-sm ${c[color]}`}>{children}</div>;};
+const CB=({sel,onClick,title,sub})=>(
+  <button onClick={onClick} className={`w-full p-4 rounded-xl border-2 text-left transition-all ${sel?"border-blue-600 bg-blue-50":"border-gray-200 bg-white hover:border-blue-300"}`}>
+    <div className="font-bold text-gray-900 text-sm">{title}</div>
+    {sub&&<div className="text-xs text-gray-500 mt-0.5">{sub}</div>}
+  </button>
+);
+const ConfirmRow=({label,value,confirmed,onConfirm,onChange})=>(
+  <Card className="mb-3">
+    <div className="flex items-start justify-between gap-3">
+      <div><div className="text-xs text-gray-400 uppercase tracking-wide font-bold">{label}</div><div className="text-sm font-semibold text-gray-800 mt-0.5">{value}</div></div>
+      {confirmed
+        ?<div className="flex items-center gap-2 shrink-0"><span className="text-green-600 text-xs font-bold">✓ Confirmed</span><button onClick={onChange} className="text-xs text-blue-600 underline">Edit</button></div>
+        :<div className="flex gap-2 shrink-0"><button onClick={onConfirm} className="text-xs bg-green-600 text-white px-3 py-1 rounded-lg font-semibold">Same</button><button onClick={onChange} className="text-xs border border-blue-600 text-blue-600 px-3 py-1 rounded-lg font-semibold">Change</button></div>}
     </div>
-    {!done?(
-      <div className="grid grid-cols-2 gap-2">
-        <button onClick={onSame} className="py-2 rounded-hz-sm text-sm font-semibold bg-hz-teal-bg text-hz-teal border border-hz-teal/20 hover:opacity-90">✓ Same as before</button>
-        <button onClick={onChange} className="py-2 rounded-hz-sm text-sm font-semibold bg-hz-cloud text-hz-indigo border border-hz-border hover:opacity-90">Make a change</button>
-      </div>
-    ):(
-      <button onClick={onChange} className="w-full py-1.5 text-xs font-semibold text-hz-accent border border-[rgba(100,92,220,0.2)] rounded-hz-sm hover:bg-hz-cloud transition-colors">Edit</button>
-    )}
   </Card>
 );
-
-// ── S1: Login ──────────────────────────────────────────────────────────────
-const S1=({onNext})=>{
-  const [em,setEm]=React.useState('michael.walsh@gmail.com');
-  const [pw,setPw]=React.useState('');
-  return (
-    <Shell step={0} total={0} showBack={false}>
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 rounded-full bg-hz-cloud flex items-center justify-center mx-auto mb-4 text-3xl">🔑</div>
-        <div className="text-xs font-bold uppercase tracking-widest text-hz-accent mb-2">Returning Authorized Party</div>
-        <h1 className="text-2xl font-bold text-hz-text mb-2">Welcome back!</h1>
-        <p className="text-sm text-hz-muted">Log in with your existing Nelnet credentials.</p>
-      </div>
-      <div className="space-y-3 mb-5">
-        <div>
-          <label className="block text-xs font-semibold text-hz-muted mb-1">Username or email</label>
-          <input value={em} onChange={e=>setEm(e.target.value)} className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/>
-        </div>
-        <div>
-          <label className="block text-xs font-semibold text-hz-muted mb-1">Password</label>
-          <input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="Your password"
-            className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/>
-        </div>
-      </div>
-      <Btn onClick={onNext} disabled={!em||!pw}>Sign in →</Btn>
-      <div className="text-center mt-3 text-xs text-hz-hint">No new account creation needed — you already have an account.</div>
-    </Shell>
-  );
-};
-
-// ── S2: Welcome back + new term ────────────────────────────────────────────
-const S2=({onNext,onBack})=>(
-  <Shell step={1} total={4} onBack={onBack}>
-    <div className="text-center mb-6">
-      <div className="w-12 h-12 rounded-full bg-hz-teal-bg flex items-center justify-center mx-auto mb-3 text-2xl">👋</div>
-      <h2 className="text-xl font-bold text-hz-text mb-1">Welcome back, {AP_FIRST}!</h2>
-      <p className="text-sm text-hz-muted">A new term has started for {STUDENT}. Here's what's changed.</p>
-    </div>
-    <Card className="p-4 mb-4">
-      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Fall 2026 — What's new</div>
-      <div className="space-y-3">
-        {[
-          {icon:'💰',label:'New term balance',old:fmt(OLD_BALANCE),new:fmt(NEW_BALANCE)},
-          {icon:'📅',label:'Term',old:'Spring 2026',new:'Fall 2026'},
-        ].map((r,i)=>(
-          <div key={i} className="flex items-start gap-2.5">
-            <span className="text-lg shrink-0 mt-0.5">{r.icon}</span>
-            <div className="flex-1">
-              <div className="text-xs text-hz-hint mb-0.5">{r.label}</div>
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-hz-muted line-through">{r.old}</span>
-                <span className="text-hz-text font-semibold">→ {r.new}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </Card>
-    <Info>We'll confirm your prior setup quickly — tap "Same as before" for anything that stays the same, or make a change where needed.</Info>
-    <div className="mt-5"><Btn onClick={onNext}>Review my {SCHOOL.split(' ')[0]} setup →</Btn></div>
-  </Shell>
-);
-
-// ── S3: Confirm setup ──────────────────────────────────────────────────────
-const S3=({onNext,onBack})=>{
-  const [pctDone,setPctDone]=React.useState(false);
-  const [insDone,setInsDone]=React.useState(false);
-  const [insChoice,setInsChoice]=React.useState(null);
-  const [potDone,setPotDone]=React.useState(false);
-  const [potChanged,setPotChanged]=React.useState(false);
-  const [methodDone,setMethodDone]=React.useState(false);
-  const allDone=pctDone&&insDone&&potDone&&methodDone;
-  return (
-    <Shell step={2} total={4} onBack={onBack}>
-      <h2 className="text-xl font-bold text-hz-text mb-1">Confirm your setup</h2>
-      <p className="text-sm text-hz-muted mb-5">Confirm or update each item for Fall 2026.</p>
-      <div className="space-y-3 mb-5">
-        {/* Payment split */}
-        <ConfirmCard icon="💯" label="Payment responsibility" prior={`You: ${AP_PCT}% of ${STUDENT}'s balance`}
-          done={pctDone} onSame={()=>setPctDone(true)} onChange={()=>setPctDone(true)}/>
-        {/* Insurance */}
-        <Card className={`p-4 transition-all ${insDone?'border-hz-teal/30':''}`}>
-          <div className="flex items-start gap-3 mb-3">
-            <span className="text-xl shrink-0">🛡️</span>
-            <div className="flex-1">
-              <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-0.5">Tuition insurance</div>
-              <div className="text-sm text-hz-muted">You purchased GradGuard last term — it expired.</div>
-              {insDone&&<div className="text-sm text-hz-teal font-semibold mt-0.5">→ {insChoice==='renew'?`Renewed — ${fmt(INSURANCE_PREM)} today`:'Declined for this term'}</div>}
-            </div>
-            {insDone&&<span className="text-hz-teal text-xl shrink-0">✓</span>}
-          </div>
-          {!insDone?(
-            <div className="space-y-2">
-              {[
-                {v:'renew',l:'🔄 Renew insurance',sub:`${fmt(INSURANCE_PREM)} for Fall 2026`},
-                {v:'decline',l:'✗ Decline this term',sub:'No coverage'},
-                {v:'later',l:'⏸ Decide later',sub:'Added as a to-do'},
-              ].map(opt=>(
-                <button key={opt.v} onClick={()=>{setInsChoice(opt.v);setInsDone(true);}}
-                  className="w-full p-3 rounded-hz-sm border border-hz-border bg-hz-cloud text-left text-sm hover:border-hz-accent transition-all">
-                  <div className="font-semibold text-hz-text">{opt.l}</div>
-                  <div className="text-xs text-hz-muted mt-0.5">{opt.sub}</div>
-                </button>
-              ))}
-            </div>
-          ):(
-            <button onClick={()=>setInsDone(false)} className="w-full py-1.5 text-xs font-semibold text-hz-accent border border-[rgba(100,92,220,0.2)] rounded-hz-sm hover:bg-hz-cloud">Edit</button>
-          )}
-        </Card>
-        {/* POT plan */}
-        <Card className={`p-4 transition-all ${potDone?'border-hz-teal/30':''}`}>
-          <div className="flex items-start gap-3 mb-3">
-            <span className="text-xl shrink-0">📅</span>
-            <div className="flex-1">
-              <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-0.5">Pay over time plan</div>
-              <div className="text-sm text-hz-muted">Last term: Monthly · {OLD_INSTALL} installments · ≈{OLD_PMT}/mo</div>
-              {potDone&&<div className="text-sm text-hz-teal font-semibold mt-0.5">→ {potChanged?`Same structure · new amounts — ≈${NEW_PMT}/mo`:`Same structure · ≈${NEW_PMT}/mo`}</div>}
-            </div>
-            {potDone&&<span className="text-hz-teal text-xl shrink-0">✓</span>}
-          </div>
-          {!potDone&&(
-            <div className="grid grid-cols-2 gap-2">
-              <button onClick={()=>{setPotDone(true);setPotChanged(false);}} className="py-2 rounded-hz-sm text-sm font-semibold bg-hz-teal-bg text-hz-teal border border-hz-teal/20 hover:opacity-90">✓ Same structure</button>
-              <button onClick={()=>{setPotDone(true);setPotChanged(true);}} className="py-2 rounded-hz-sm text-sm font-semibold bg-hz-cloud text-hz-indigo border border-hz-border hover:opacity-90">Adjust plan</button>
-            </div>
-          )}
-          {potDone&&<button onClick={()=>setPotDone(false)} className="w-full py-1.5 text-xs font-semibold text-hz-accent border border-[rgba(100,92,220,0.2)] rounded-hz-sm hover:bg-hz-cloud">Edit</button>}
-          {potDone&&(
-            <div className="mt-3 bg-hz-cloud rounded-hz-sm p-3 text-xs space-y-1">
-              <div className="text-hz-muted font-semibold mb-1">Recalculated for Fall 2026</div>
-              <div className="flex justify-between text-hz-muted"><span>New term balance</span><span>{fmt(NEW_BALANCE)}</span></div>
-              <div className="flex justify-between text-hz-muted"><span>Plan structure</span><span>Monthly · {OLD_INSTALL} payments</span></div>
-              <div className="flex justify-between font-bold text-hz-text border-t border-hz-border pt-1 mt-1"><span>New installment</span><span>≈{NEW_PMT}/mo</span></div>
-            </div>
-          )}
-        </Card>
-        {/* Payment method */}
-        <ConfirmCard icon="🏦" label="Payment method" prior="Chase Checking ···4521"
-          done={methodDone} onSame={()=>setMethodDone(true)} onChange={()=>setMethodDone(true)}/>
-      </div>
-      <Btn onClick={onNext} disabled={!allDone}>Continue →</Btn>
-    </Shell>
-  );
-};
-
-// ── S4: Disclosures ────────────────────────────────────────────────────────
-const S4=({onNext,onBack})=>{
-  const [acked,setAcked]=React.useState([false,false]);
-  const toggle=i=>setAcked(a=>a.map((v,j)=>j===i?!v:v));
-  return (
-    <Shell step={3} total={4} onBack={onBack}>
-      <h2 className="text-xl font-bold text-hz-text mb-1">Disclosures</h2>
-      <p className="text-sm text-hz-muted mb-5">Required acknowledgment for the new term. Please review each.</p>
-      <div className="space-y-3 mb-5">
-        {[
-          {t:'Financial Responsibility — Fall 2026',b:'I agree to pay the balance assigned to me for Connor Walsh\'s account for the Fall 2026 term.'},
-          {t:'Updated GradGuard Terms',b:'I acknowledge the updated GradGuard refund policy terms for Fall 2026.'},
-        ].map((d,i)=>(
-          <div key={i} onClick={()=>toggle(i)} className={`bg-white rounded-hz-sm border p-4 cursor-pointer transition-all ${acked[i]?'border-hz-teal/40 bg-hz-teal-bg/20':'border-hz-border'}`}>
-            <div className="flex items-start gap-3">
-              <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 ${acked[i]?'bg-hz-teal border-hz-teal':'border-hz-border bg-white'}`}>
-                {acked[i]&&<span className="text-white text-xs font-bold">✓</span>}
-              </div>
-              <div>
-                <div className="font-semibold text-sm text-hz-text mb-1">{d.t}</div>
-                <div className="text-xs text-hz-muted leading-relaxed">{d.b}</div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <Btn onClick={onNext} disabled={!acked.every(Boolean)}>I agree →</Btn>
-    </Shell>
-  );
-};
-
-// ── S5: All set ────────────────────────────────────────────────────────────
-const S5=({onNext,onBack})=>(
-  <Shell step={4} total={4} onBack={onBack}>
-    <div className="text-center mb-6">
-      <div className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center mx-auto mb-4 text-3xl">✅</div>
-      <h2 className="text-xl font-bold text-hz-text mb-2">All set for Fall 2026!</h2>
-      <p className="text-sm text-hz-muted leading-relaxed">Your plan has been renewed with updated amounts. First payment due May 15, 2026.</p>
-    </div>
-    <Card className="p-4 mb-4">
-      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Fall 2026 summary</div>
-      <div className="space-y-2 text-sm">
-        {[
-          ['Student',STUDENT],
-          ['Your share','100% · '+fmt(NEW_BALANCE)],
-          ['Plan','Monthly · 9 installments · ≈'+NEW_PMT+'/mo'],
-          ['Insurance','GradGuard renewed'],
-          ['Payment method','Chase Checking ···4521'],
-          ['First payment','May 15, 2026'],
-        ].map(([k,v],i)=>(
-          <div key={i} className="flex justify-between">
-            <span className="text-hz-muted">{k}</span>
-            <span className="font-medium text-hz-text">{v}</span>
-          </div>
-        ))}
-      </div>
-    </Card>
-    <Btn onClick={onNext} variant="teal">Go to my account →</Btn>
-  </Shell>
-);
-
-// ── S6: Home ───────────────────────────────────────────────────────────────
-const S6=()=>(
-  <div className="min-h-screen bg-hz-bg">
-    <div className="bg-white border-b border-hz-border px-4 py-3 flex items-center justify-between">
-      <div className="text-xs font-bold text-hz-accent tracking-wide">HORIZON</div>
-      <div className="w-8 h-8 rounded-full bg-hz-cloud flex items-center justify-center text-xs font-bold text-hz-accent">MW</div>
-    </div>
-    <div className="px-4 py-6 max-w-sm mx-auto">
-      <h1 className="text-2xl font-bold text-hz-text mb-0.5">Hi, {AP_FIRST} 👋</h1>
-      <p className="text-xs text-hz-hint mb-5">Authorized party for {STUDENT} · {SCHOOL} · Fall 2026</p>
-      <Card className="p-4 mb-4">
-        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Account summary</div>
-        <div className="text-3xl font-bold text-hz-text mb-0.5">{fmt(NEW_BALANCE)}</div>
-        <div className="text-xs text-hz-muted mb-3">Your share (100%) · Fall 2026 plan active</div>
-        <div className="h-2.5 bg-hz-cloud rounded-full overflow-hidden mb-2">
-          <div className="h-full w-0 bg-hz-teal rounded-full transition-all duration-1000"/>
-        </div>
-        <div className="text-xs text-hz-muted">First payment due May 15, 2026</div>
-      </Card>
-      <div className="space-y-2.5">
-        {[
-          {icon:'📅',l:'My Pay Over Time Plan',s:'Monthly · 9 installments · ≈'+NEW_PMT+'/mo',hi:true},
-          {icon:'💳',l:'Make a Payment',s:'Next payment May 15'},
-          {icon:'📊',l:'Account History',s:'View all activity'},
-        ].map((a,i)=>(
-          <Card key={i} className={`p-3.5 flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow ${a.hi?'border-hz-accent/30':''}`}>
-            <span className="text-xl shrink-0">{a.icon}</span>
-            <div className="flex-1 min-w-0">
-              <div className={`text-sm font-semibold ${a.hi?'text-hz-accent':'text-hz-text'}`}>{a.l}</div>
-              <div className="text-xs text-hz-hint truncate">{a.s}</div>
-            </div>
-            <span className="text-hz-hint text-sm">›</span>
-          </Card>
-        ))}
-      </div>
-    </div>
+const Toggle=({label,sub,val,set})=>(
+  <div className="flex items-start gap-3">
+    <button onClick={()=>set(!val)} className={`w-11 h-6 rounded-full transition-colors shrink-0 mt-0.5 ${val?'bg-blue-600':'bg-gray-300'}`}>
+      <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform mx-0.5 ${val?'translate-x-5':'translate-x-0'}`}/>
+    </button>
+    <div><div className="text-sm font-semibold text-gray-800">{label}</div>{sub&&<div className="text-xs text-gray-500 mt-0.5">{sub}</div>}</div>
   </div>
 );
 
-const App=()=>{
-  const [s,setS]=React.useState(0);
-  const go=n=>{setS(n);window.scrollTo(0,0);};
-  return [<S1 onNext={()=>go(1)}/>,<S2 onNext={()=>go(2)} onBack={()=>go(0)}/>,<S3 onNext={()=>go(3)} onBack={()=>go(1)}/>,<S4 onNext={()=>go(4)} onBack={()=>go(2)}/>,<S5 onNext={()=>go(5)} onBack={()=>go(3)}/>,<S6/>][s]||null;
-};
+export default function App(){
+  const[sc,setSc]=useState(0);
+  const go=n=>{setSc(n);window.scrollTo(0,0);};
+  const[loginPwd,setLoginPwd]=useState('');
+  const[showForgot,setShowForgot]=useState(false);
+  const[forgotType,setForgotType]=useState(null);
+  const[confirms,setConfirms]=useState({info:false,pct:false,ins:false,plan:false,method:false,refund:false});
+  const conf=(k)=>setConfirms(c=>({...c,[k]:true}));
+  const[ins,setIns]=useState(null);
+  const[pay,setPay]=useState(null);
+  const[pifWhen,setPifWhen]=useState('today');
+  const[pifDate,setPifDate]=useState('');
+  const[freq,setFreq]=useState(null);
+  const[startD,setStartD]=useState(null);
+  const[down,setDown]=useState(LAST_PLAN.down);
+  const[method,setMethod]=useState(null);
+  const[nameSigned,setNameSigned]=useState(false);
+  const[refundSame,setRefundSame]=useState(null);
+  const[prefs,setPrefs]=useState({changes:true,reminders:true,confirms:true,autoOff:false});
+  const newInstallAmt=freq&&startD?((MY_NEW_BAL-down)/( freq==='monthly'?5:10)).toFixed(2):null;
 
+  // New start date: same day of week as last term (Tuesday), first available
+  const newStartDateSuggestions=[["Jan14","Tuesday, January 14, 2025"],["Jan21","Tuesday, January 21, 2025"],["Feb4","Tuesday, February 4, 2025"]];
+
+  const S={
+    // 0 ─ Login
+    0:()=>(
+      <Shell title="Welcome Back">
+        <div className="text-center mb-5">
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-3xl mx-auto mb-3">👤</div>
+          <h1 className="text-xl font-bold">Log in to Nelnet</h1>
+          <p className="text-sm text-gray-500 mt-1">{STUDENT.name} has a new term ready for setup</p>
+        </div>
+        {!showForgot&&<>
+          <Card className="space-y-3 mb-4">
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Username</label><input defaultValue={AP.username} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Password</label><input type="password" placeholder="Your password" value={loginPwd} onChange={e=>setLoginPwd(e.target.value)} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+          </Card>
+          <Btn disabled={loginPwd.length<3} onClick={()=>go(1)}>Log In →</Btn>
+          <div className="mt-3">
+            <button onClick={()=>setShowForgot(true)} className="w-full text-center text-xs text-blue-600 underline">Forgot username or password?</button>
+          </div>
+        </>}
+        {showForgot&&<>
+          <Card className="mb-4">
+            <div className="font-semibold text-gray-800 mb-3">Account Recovery</div>
+            <div className="space-y-2">
+              <CB sel={forgotType==='username'} onClick={()=>setForgotType('username')} title="I forgot my username" sub="We'll send it to your email"/>
+              <CB sel={forgotType==='password'} onClick={()=>setForgotType('password')} title="I forgot my password" sub="We'll send a reset link to your email"/>
+            </div>
+            {forgotType&&<>
+              <div className="mt-3"><label className="text-xs text-gray-400 uppercase font-bold">Your email address</label><input type="email" placeholder="Enter your email" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+              <div className="mt-3"><Btn onClick={()=>{setShowForgot(false);setForgotType(null);}}>Send Recovery Email →</Btn></div>
+            </>}
+          </Card>
+          <button onClick={()=>{setShowForgot(false);setForgotType(null);}} className="w-full text-center text-xs text-blue-600 underline">Back to login</button>
+        </>}
+      </Shell>
+    ),
+
+    // 1 ─ Welcome back + balance comparison
+    1:()=>(
+      <Shell title="New Term Ready" onBack={()=>go(0)}>
+        <div className="text-center mb-4">
+          <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white text-lg font-bold mx-auto mb-3">PM</div>
+          <h1 className="text-xl font-bold">Welcome back, Patricia!</h1>
+          <p className="text-sm text-gray-500">{STUDENT.name} · {STUDENT.school}</p>
+        </div>
+        <Card className="mb-3 bg-blue-50 border-blue-200">
+          <div className="font-bold text-blue-900 mb-2">📋 {NEW_TERM} is ready to set up</div>
+          <div className="text-sm text-blue-800">We just need to confirm a few things — most of your settings from last term can carry over.</div>
+        </Card>
+        <Lbl>Balance Comparison</Lbl>
+        <Card className="mb-4">
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <div><div className="text-sm font-semibold text-gray-700">{LAST_TERM}</div><div className="text-xs text-gray-400">Your {AP_PCT}% share</div></div>
+              <div className="text-right"><div className="font-bold text-gray-800">${MY_LAST_BAL.toLocaleString()}</div><Tag color="green">✓ Paid</Tag></div>
+            </div>
+            <div className="h-px bg-gray-100"/>
+            <div className="flex justify-between items-center">
+              <div><div className="text-sm font-semibold text-blue-700">{NEW_TERM}</div><div className="text-xs text-gray-400">Your {AP_PCT}% share</div></div>
+              <div className="text-right"><div className="font-bold text-blue-700 text-lg">${MY_NEW_BAL.toLocaleString()}</div><Tag color="amber">Due {DUE_DATE}</Tag></div>
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-400">
+            Balance increased by ${(NEW_BAL-LAST_BAL).toLocaleString()} from last term. Your {AP_PCT}% share: +${(MY_NEW_BAL-MY_LAST_BAL).toLocaleString()}.
+          </div>
+        </Card>
+        <Btn onClick={()=>go(2)}>Let's Confirm My Setup →</Btn>
+      </Shell>
+    ),
+
+    // 2 ─ Confirm everything
+    2:()=>(
+      <Shell title="Confirm Your Setup" step={1} total={5} onBack={()=>go(1)}>
+        <h2 className="text-lg font-bold mb-1">Quick check — anything changed?</h2>
+        <p className="text-sm text-gray-500 mb-4">Confirm what's the same or update anything that's different.</p>
+
+        <ConfirmRow label="Personal Information" value={`${AP.name} · ${AP.username}`} confirmed={confirms.info} onConfirm={()=>conf('info')} onChange={()=>go('2info')}/>
+        <ConfirmRow label="Payment Percentage" value={`${AP_PCT}% of balance — $${MY_NEW_BAL.toLocaleString()}`} confirmed={confirms.pct} onConfirm={()=>conf('pct')} onChange={()=>go('2pct')}/>
+        <ConfirmRow label="Tuition Insurance" value={`Renew GradGuard coverage — $${INSURANCE_PREM}/term`} confirmed={confirms.ins} onConfirm={()=>{setIns('accept');conf('ins');}} onChange={()=>go('2ins')}/>
+        <ConfirmRow
+          label="Payment Plan"
+          value={`Monthly · starts ${newStartDateSuggestions[0][1]} (same day of week as last term) · min. down $${LAST_PLAN.down}`}
+          confirmed={confirms.plan}
+          onConfirm={()=>{setPay('pot');setFreq('monthly');setStartD('Jan14');setDown(LAST_PLAN.down);conf('plan');}}
+          onChange={()=>go('2plan')}
+        />
+        <ConfirmRow label="Payment Method" value={`Bank account (ACH) · ${LAST_PLAN.methodLabel}`} confirmed={confirms.method} onConfirm={()=>conf('method')} onChange={()=>go('2method')}/>
+        <ConfirmRow label="Refund Account" value={`Same bank account · ${LAST_PLAN.methodLabel}`} confirmed={confirms.refund} onConfirm={()=>{setRefundSame(true);conf('refund');}} onChange={()=>go('2refund')}/>
+
+        {Object.values(confirms).every(Boolean)&&<div className="mt-2"><Btn onClick={()=>go(3)}>All confirmed — continue →</Btn></div>}
+        {!Object.values(confirms).every(Boolean)&&<div className="mt-2"><p className="text-xs text-center text-gray-400">Confirm or update each item above to continue</p></div>}
+      </Shell>
+    ),
+
+    '2info':()=>(
+      <Shell title="Update Personal Info" onBack={()=>go(2)}>
+        <h2 className="text-lg font-bold mb-4">Update your information</h2>
+        <Card className="space-y-3 mb-4">
+          <div><label className="text-xs text-gray-400 uppercase font-bold">Full name</label><input defaultValue={AP.name} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+          <div><label className="text-xs text-gray-400 uppercase font-bold">Email</label><input type="email" placeholder="your@email.com" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+          <div><label className="text-xs text-gray-400 uppercase font-bold">Phone</label><input type="tel" placeholder="(555) 000-0000" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+          <div><label className="text-xs text-gray-400 uppercase font-bold">Username</label><input defaultValue={AP.username} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+          <div><label className="text-xs text-gray-400 uppercase font-bold">New password (leave blank to keep same)</label><input type="password" placeholder="Enter new password" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+        </Card>
+        <Btn onClick={()=>{conf('info');go(2);}}>Save Changes →</Btn>
+      </Shell>
+    ),
+
+    '2pct':()=>(
+      <Shell title="Update Your Share" onBack={()=>go(2)}>
+        <h2 className="text-lg font-bold mb-2">Change your payment percentage</h2>
+        <InfoBox color="amber">⚠ Changing your percentage requires {STUDENT.name} to approve the change — they set the original split. Contact them first if needed.</InfoBox>
+        <Card className="mt-4 mb-4">
+          <div className="text-sm text-gray-600 mb-2">Current: <strong>{AP_PCT}% · ${MY_NEW_BAL.toLocaleString()}</strong></div>
+          <div className="text-sm text-gray-500">To request a percentage change, please contact {STUDENT.name} directly. They must update your assigned percentage from their account.</div>
+        </Card>
+        <Btn variant="secondary" onClick={()=>{conf('pct');go(2);}}>Keep {AP_PCT}% — continue</Btn>
+      </Shell>
+    ),
+
+    '2ins':()=>(
+      <Shell title="Insurance Decision" onBack={()=>go(2)}>
+        <h2 className="text-lg font-bold mb-3">Tuition Protection Insurance</h2>
+        <Card className="mb-4 border-blue-200 bg-blue-50">
+          <div className="font-bold text-blue-900 mb-1">GradGuard — ${INSURANCE_PREM}/term</div>
+          <div className="text-sm text-blue-800">Renew coverage for {STUDENT.name}'s {NEW_TERM}.</div>
+        </Card>
+        <div className="space-y-2">
+          <CB sel={ins==='accept'}  onClick={()=>{setIns('accept');conf('ins');go(2);}}  title="✓ Renew coverage"   sub={`$${INSURANCE_PREM} added to today's total`}/>
+          <CB sel={ins==='decline'} onClick={()=>{setIns('decline');conf('ins');go(2);}} title="✗ Decline for this term" sub="I'm not renewing coverage"/>
+          <CB sel={ins==='later'}   onClick={()=>{setIns('later');conf('ins');go(2);}}   title="🕐 Decide later" sub="A reminder will appear on your home screen"/>
+        </div>
+      </Shell>
+    ),
+
+    '2plan':()=>(
+      <Shell title="Update Payment Plan" onBack={()=>go(2)}>
+        <h2 className="text-lg font-bold mb-3">Set up your {NEW_TERM} payment plan</h2>
+        <InfoBox color="blue">Last term: monthly · started {LAST_PLAN.startDate} ({LAST_PLAN.startDow}) · $600 down payment · 5 × $492/mo</InfoBox>
+        <div className="mt-4 space-y-3">
+          <CB sel={pay==='pot'} onClick={()=>setPay('pot')} title="Pay Over Time" sub="Monthly or bi-weekly installments"/>
+          <CB sel={pay==='pif'} onClick={()=>setPay('pif')} title="Pay in Full"   sub="Today or schedule for a future date"/>
+          <CB sel={pay==='later'} onClick={()=>{setPay('later');conf('plan');go(2);}} title="🕐 Decide later" sub="A reminder will appear on your home screen"/>
+        </div>
+        {pay==='pot'&&<>
+          <Lbl>Frequency</Lbl>
+          <div className="space-y-2">
+            <CB sel={freq==='monthly'}  onClick={()=>{setFreq('monthly');setStartD(null);}}  title="Monthly"   sub="Same as last term · 5 installments"/>
+            <CB sel={freq==='biweekly'} onClick={()=>{setFreq('biweekly');setStartD(null);}} title="Bi-Weekly" sub="10 installments"/>
+          </div>
+          {freq&&<>
+            <Lbl>Start Date</Lbl>
+            <p className="text-xs text-gray-400 mb-2">We've suggested {LAST_PLAN.startDow}s — same day as last term. You can change it.</p>
+            <div className="space-y-2">
+              {newStartDateSuggestions.map(([v,l])=>(
+                <CB key={v} sel={startD===v} onClick={()=>setStartD(v)} title={l} sub={v===newStartDateSuggestions[0][0]?"Same day of week as last term (suggested)":undefined}/>
+              ))}
+            </div>
+          </>}
+          {freq&&startD&&<>
+            <Lbl>Down Payment</Lbl>
+            <Card className="mt-2">
+              <div className="flex justify-between mb-2"><span className="text-sm text-gray-600">Down Payment</span><span className="font-bold text-lg">${down}</span></div>
+              <div className="text-xs text-gray-400 mb-2">Minimum: $0 · Last term you paid: ${LAST_PLAN.down}</div>
+              <input type="range" min={0} max={MY_NEW_BAL} step={50} value={down} onChange={e=>setDown(Number(e.target.value))} className="w-full mb-3"/>
+              <div className="bg-blue-50 rounded-xl p-3 text-sm space-y-1">
+                <div className="text-xs font-bold text-blue-800 mb-1">Due today</div>
+                <div className="flex justify-between"><span className="text-gray-600">Down payment</span><span>${down}</span></div>
+                <div className="flex justify-between"><span className="text-gray-600">Nelnet fee</span><span>${NELNET_FEE}</span></div>
+                {ins==='accept'&&<div className="flex justify-between text-blue-700"><span>GradGuard</span><span>${INSURANCE_PREM}</span></div>}
+                <div className="flex justify-between font-bold pt-1.5 border-t border-blue-200"><span>Total due today</span><span>${down+NELNET_FEE+(ins==='accept'?INSURANCE_PREM:0)}</span></div>
+              </div>
+              <div className="mt-3"><Btn onClick={()=>{conf('plan');go(2);}}>Confirm This Plan →</Btn></div>
+            </Card>
+          </>}
+        </>}
+        {pay==='pif'&&<>
+          <Lbl>When?</Lbl>
+          <div className="space-y-2">
+            <CB sel={pifWhen==='today'}    onClick={()=>{setPifWhen('today');setPifDate('');}}   title="Pay today"              sub="Full payment immediately"/>
+            <CB sel={pifWhen==='schedule'} onClick={()=>setPifWhen('schedule')} title="Schedule for a future date" sub={`On or before ${DUE_DATE}`}/>
+          </div>
+          {pifWhen==='schedule'&&<Card className="mt-3"><input type="date" max="2025-03-15" value={pifDate} onChange={e=>setPifDate(e.target.value)} className="w-full border rounded-lg p-2 text-sm"/></Card>}
+          {(pifWhen==='today'||pifDate)&&<div className="mt-4"><Btn onClick={()=>{conf('plan');go(2);}}>Confirm →</Btn></div>}
+        </>}
+      </Shell>
+    ),
+
+    '2method':()=>(
+      <Shell title="Update Payment Method" onBack={()=>go(2)}>
+        <h2 className="text-lg font-bold mb-3">Select a payment method</h2>
+        <p className="text-sm text-gray-500 mb-4">Currently: Bank account (ACH) · {LAST_PLAN.methodLabel}</p>
+        <div className="space-y-3">
+          <CB sel={method==='ach'||method===null} onClick={()=>setMethod('ach')} title={`🏦 Keep using ${LAST_PLAN.methodLabel}`} sub="Same ACH account as last term"/>
+          <CB sel={method==='new-ach'} onClick={()=>setMethod('new-ach')} title="🏦 Use a different bank account" sub="Enter new ACH details"/>
+          <CB sel={method==='cc'}      onClick={()=>setMethod('cc')}      title="💳 Switch to credit/debit card"   sub="⚠ 2.85% service fee applies"/>
+        </div>
+        {method==='new-ach'&&<>
+          <Lbl>New Bank Account</Lbl>
+          <Card className="space-y-3 mb-3">
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Account holder name</label><input defaultValue={AP.name} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Routing number</label><input placeholder="9 digits" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Account number</label><input placeholder="Enter account number" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Account type</label><select className="w-full border rounded-lg p-2 mt-1 text-sm"><option>Checking</option><option>Savings</option></select></div>
+          </Card>
+          <InfoBox color="blue">Name will be verified against your profile ({AP.name}).</InfoBox>
+          <div className="mt-3 space-y-2"><Btn onClick={()=>{conf('method');go(2);}}>Save Account →</Btn><Btn variant="secondary" onClick={()=>go('6namematch')}>Name is different</Btn></div>
+        </>}
+        {method==='cc'&&<>
+          <InfoBox color="amber">⚠ 2.85% non-refundable service fee applies to card payments.</InfoBox>
+          <Lbl>Card Details</Lbl>
+          <Card className="space-y-3 mb-3">
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Name on card</label><input defaultValue={AP.name} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Card number</label><input placeholder="•••• •••• •••• ••••" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className="text-xs text-gray-400 uppercase font-bold">Expires</label><input placeholder="MM/YY" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+              <div><label className="text-xs text-gray-400 uppercase font-bold">CVV</label><input placeholder="•••" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            </div>
+          </Card>
+          <div className="space-y-2"><Btn onClick={()=>{conf('method');go(2);}}>Save Card →</Btn><Btn variant="secondary" onClick={()=>go('6namematch')}>Name is different</Btn></div>
+        </>}
+        {(method===null||method==='ach')&&<div className="mt-4"><Btn onClick={()=>{setMethod('ach');conf('method');go(2);}}>Keep Existing Account →</Btn></div>}
+      </Shell>
+    ),
+
+    '6namematch':()=>(
+      <Shell title="Account Authorization" onBack={()=>go('2method')}>
+        <h2 className="text-lg font-bold mb-2">Name doesn't match your profile</h2>
+        <InfoBox color="amber">The name on this account doesn't match <strong>{AP.name}</strong> on your profile.</InfoBox>
+        <div className="mt-4 space-y-3">
+          <Card className="border-blue-200">
+            <div className="font-semibold text-blue-900 mb-1">✍ This is my own account</div>
+            <div className="text-sm text-gray-600 mb-3">Sign to confirm ownership and authorize recurring charges.</div>
+            <div className="border-2 border-dashed border-gray-300 rounded-xl h-14 flex items-center justify-center mb-3 cursor-pointer hover:border-blue-400" onClick={()=>setNameSigned(true)}>
+              <span className="text-gray-400 text-sm">{nameSigned?`✓ Signed — ${AP.name}`:"Tap to sign"}</span>
+            </div>
+            {nameSigned&&<Btn onClick={()=>{conf('method');go(2);}}>Continue →</Btn>}
+          </Card>
+        </div>
+      </Shell>
+    ),
+
+    '2refund':()=>(
+      <Shell title="Update Refund Account" onBack={()=>go(2)}>
+        <h2 className="text-lg font-bold mb-3">Update your refund account</h2>
+        <p className="text-sm text-gray-500 mb-4">Currently: same as payment account ({LAST_PLAN.methodLabel})</p>
+        <div className="space-y-2">
+          <CB sel={refundSame===true}  onClick={()=>{setRefundSame(true);conf('refund');go(2);}}  title={`Keep using ${LAST_PLAN.methodLabel}`}/>
+          <CB sel={refundSame===false} onClick={()=>setRefundSame(false)} title="Use a different bank account"/>
+        </div>
+        {refundSame===false&&<>
+          <Lbl>New Refund Account</Lbl>
+          <Card className="space-y-3 mb-4">
+            <div><label className="text-xs text-gray-400 uppercase">Account holder name</label><input defaultValue={AP.name} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase">Routing number</label><input placeholder="9 digits" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase">Account number</label><input placeholder="Enter account number" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase">Account type</label><select className="w-full border rounded-lg p-2 mt-1 text-sm"><option>Checking</option><option>Savings</option></select></div>
+          </Card>
+          <Btn onClick={()=>{conf('refund');go(2);}}>Save Refund Account →</Btn>
+        </>}
+      </Shell>
+    ),
+
+    3:()=>(
+      <Shell title="Notification Preferences" step={2} total={5} onBack={()=>go(2)}>
+        <h2 className="text-lg font-bold mb-1">Notification preferences</h2>
+        <p className="text-sm text-gray-500 mb-3">Same as last term by default. Change anything you'd like.</p>
+        <Lbl>Your Preferences</Lbl>
+        <Card className="space-y-4 mb-4">
+          <Toggle label="Account changes & balance updates" sub="Notify me when the balance or charges change." val={prefs.changes} set={v=>setPrefs(p=>({...p,changes:v}))}/>
+          <Toggle label="Payment reminders" sub="Remind me before each scheduled payment." val={prefs.reminders} set={v=>setPrefs(p=>({...p,reminders:v}))}/>
+          <Toggle label="Payment confirmations" sub="Confirm after each payment processes." val={prefs.confirms} set={v=>setPrefs(p=>({...p,confirms:v}))}/>
+          <Toggle label="Skip reminders for auto payments" sub="No reminders for auto-drafted installments." val={prefs.autoOff} set={v=>setPrefs(p=>({...p,autoOff:v}))}/>
+        </Card>
+        <Btn onClick={()=>go(4)}>Save Preferences →</Btn>
+      </Shell>
+    ),
+    4:()=>(
+      <Shell title="Agreements" step={3} total={5} onBack={()=>go(3)}>
+        <h2 className="text-lg font-bold mb-1">Agreements</h2>
+        <p className="text-sm text-gray-500 mb-4">Review any documents that changed from last term.</p>
+        <Card className="mb-3">
+          <div className="font-semibold text-gray-800 mb-1">Nelnet Payment Agreement — {NEW_TERM}</div>
+          <div className="text-xs text-gray-500 mb-3">Updated for {NEW_TERM}. Your payment plan and authorization terms for this term.</div>
+          <div className="border border-dashed border-gray-300 rounded-lg p-3 text-xs text-gray-400 mb-3">[ Scroll to read full document ]</div>
+          <label className="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" className="rounded"/> I agree to the {NEW_TERM} Payment Agreement</label>
+        </Card>
+        <Btn onClick={()=>go(5)}>Sign &amp; Finish →</Btn>
+      </Shell>
+    ),
+    5:()=>(
+      <Shell title={STUDENT.school}>
+        <div className="text-center mb-5">
+          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-3">✓</div>
+          <h1 className="text-2xl font-bold">{NEW_TERM} is all set!</h1>
+          <p className="text-sm text-gray-500 mt-1">{STUDENT.name} · {STUDENT.school}</p>
+        </div>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">PM</div>
+          <div><div className="font-bold text-gray-900">{AP.name}</div><div className="text-xs text-gray-500">AP · {AP_PCT}% · ${MY_NEW_BAL.toLocaleString()}</div></div>
+        </div>
+        <Card className="mb-4 bg-gradient-to-br from-blue-700 to-blue-500 text-white">
+          <div className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">Your Share — {NEW_TERM}</div>
+          <div className="text-3xl font-bold">${MY_NEW_BAL.toLocaleString()}</div>
+          <div className="text-xs opacity-80 mt-1">{AP_PCT}% · {STUDENT.name} · Due {DUE_DATE}</div>
+          <div className="mt-2 pt-2 border-t border-white/20 text-xs opacity-70">{pay==='pif'?'Pay in Full':'Monthly POT'} · Bank (ACH)</div>
+        </Card>
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {["View schedule","Make a payment","Account details","Settings"].map(a=>(
+            <Card key={a} className="text-center py-3 cursor-pointer hover:border-blue-300 transition-colors"><div className="text-sm font-semibold text-gray-700">{a}</div></Card>
+          ))}
+        </div>
+        <div className="text-center">
+          <a href="index.html" target="_top" onClick={e=>{e.preventDefault();try{window.top.location.href='index.html';}catch(_){window.location.href='index.html';}}} className="text-xs text-gray-400 hover:text-blue-600 underline">⌂ Back to prototype index</a>
+        </div>
+      </Shell>
+    ),
+  };
+  const Screen=S[sc];
+  return Screen?<Screen/>:null;
+}
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>

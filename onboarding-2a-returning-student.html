@@ -2,432 +2,412 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>2a · Returning Student Onboarding – Horizon Prototype</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        'hz-indigo':'#2D1FA3','hz-mid':'#4A4580','hz-accent':'#645CDC','hz-cloud':'#EEF0FF',
-        'hz-teal':'#0D7A55','hz-teal-bg':'#E1F5EE','hz-amber':'#EF9F27','hz-amber-bg':'#FAEEDA',
-        'hz-danger':'#E24B4A','hz-danger-bg':'#F7C1C1','hz-bg':'#F4F5FF','hz-card':'#FFFFFF',
-        'hz-text':'#1A1060','hz-muted':'#57548D','hz-hint':'#6B6899','hz-border':'rgba(100,92,220,0.14)',
-      },
-      fontFamily: { sans: ["'Plus Jakarta Sans'", 'system-ui', 'sans-serif'] },
-      borderRadius: { 'hz':'18px','hz-sm':'12px','hz-pill':'99px' },
-    },
-  },
-}
-</script>
-<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>2A – Returning Student · New Term</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-hz-bg">
+<body class="bg-gray-50">
 <div id="root"></div>
 <script type="text/babel">
+const {useState} = React;
 
-const STUDENT_FIRST  = 'Alex';
-const STUDENT_LAST   = 'Johnson';
-const SCHOOL_NAME    = 'Ridgemont University';
-const BALANCE        = 5400;
-const APPLIED_AID    = 2400;
-const ANTICIPATED    = 1100;
-const CHARGES        = 8900;
-const AP_NAME        = 'Sarah Johnson';
-const AP_PCT         = 40;
-const MY_PCT         = 60;
-const PRIOR_TERM     = 'Spring 2026';
-const CURRENT_TERM   = 'Fall 2026';
-const INSURANCE_PREM = 287;
+const STUDENT={name:"Alex Johnson",email:"alex.j@ridgemont.edu",phone:"(555) 203-8847",address:"1420 Maple St, Springfield IL 62701"};
+const SCHOOL="Ridgemont University";
+const NEW_TERM="Spring 2025",LAST_TERM="Fall 2024";
+const NEW_BAL=5800,STUDENT_PCT=60,AP_PCT=40;
+const AP={name:"Sarah Johnson",role:"Mom"};
+const MY_BAL=NEW_BAL*STUDENT_PCT/100;
+const NELNET_FEE=34,INSURANCE_PREM=127,SCHOOL_FEE=0;
+const DUE_DATE="April 15, 2025";
 
-const fmt = (n) => '$' + Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-
-// ── Shared ─────────────────────────────────────────────────────────────────
-const Shell = ({children, step, totalSteps, showBack, onBack}) => (
-  <div className="min-h-screen bg-hz-bg flex flex-col items-center py-8 px-4">
-    <div className="w-full max-w-sm">
-      <div className="flex items-center justify-between mb-6">
-        {showBack
-          ? <button onClick={onBack} className="text-hz-accent font-semibold text-sm flex items-center gap-1">← Back</button>
-          : <a href="index.html" className="text-hz-accent font-semibold text-sm">⌂ Home</a>
-        }
-        <div className="text-xs text-hz-hint font-medium">{SCHOOL_NAME}</div>
-      </div>
-      {totalSteps > 0 && (
-        <div className="mb-6">
-          <div className="flex justify-between text-xs text-hz-hint mb-1.5">
-            <span>Step {step} of {totalSteps}</span>
-          </div>
-          <div className="h-1 bg-hz-cloud rounded-full overflow-hidden">
-            <div className="h-full bg-hz-accent rounded-full transition-all duration-500" style={{width:`${(step/totalSteps)*100}%`}} />
-          </div>
-        </div>
-      )}
-      {children}
+const Shell=({title,step,total,onBack,children})=>(
+  <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="bg-white border-b px-4 py-3 flex items-center gap-3 sticky top-0 z-10 shadow-sm">
+      {onBack&&<button onClick={onBack} className="text-gray-400 hover:text-gray-700 text-xl">←</button>}
+      <div className="flex-1"><div className="text-sm font-bold text-gray-800">{title}</div>{step&&<div className="text-xs text-gray-400">Step {step} of {total}</div>}</div>
+      <span className="text-blue-700 font-bold text-sm">Nelnet</span>
     </div>
+    <div className="flex-1 px-4 py-5 max-w-md mx-auto w-full">{children}</div>
   </div>
 );
-
-const Btn = ({children,onClick,variant='primary',disabled=false,className=''}) => {
-  const v = {primary:'bg-hz-indigo text-white',ghost:'bg-hz-cloud text-hz-indigo',outline:'border border-[rgba(100,92,220,0.3)] text-hz-indigo hover:bg-hz-cloud',teal:'bg-hz-teal text-white'};
-  return <button onClick={onClick} disabled={disabled}
-    className={`w-full py-3.5 rounded-hz-pill font-semibold text-[15px] transition-all active:scale-[0.97] hover:opacity-90 ${v[variant]||v.primary} ${disabled?'opacity-40 cursor-not-allowed':''} ${className}`}>{children}</button>;
+const Btn=({onClick,children,variant="primary",className=""})=>{
+  const s={primary:"bg-blue-600 text-white hover:bg-blue-700",secondary:"bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50",ghost:"text-blue-600 underline bg-transparent text-center",warn:"bg-amber-500 text-white hover:bg-amber-600",danger:"bg-red-600 text-white hover:bg-red-700"};
+  return <button onClick={onClick} className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all ${s[variant]} ${className}`}>{children}</button>;
 };
-
-const Card = ({children,className=''}) => (
-  <div className={`bg-white rounded-hz border border-hz-border shadow-sm ${className}`}>{children}</div>
+const Card=({children,className=""})=><div className={`bg-white rounded-2xl shadow-sm border border-gray-100 p-5 ${className}`}>{children}</div>;
+const Tag=({color,children})=>{const c={blue:"bg-blue-100 text-blue-700",green:"bg-green-100 text-green-700",amber:"bg-amber-100 text-amber-700",gray:"bg-gray-100 text-gray-500"};return<span className={`text-xs font-bold px-2 py-0.5 rounded-full ${c[color]||c.gray}`}>{children}</span>;};
+const Lbl=({children})=><div className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 mt-4">{children}</div>;
+const InfoBox=({color="blue",children})=>{const c={blue:"bg-blue-50 border-blue-200 text-blue-800",amber:"bg-amber-50 border-amber-200 text-amber-800",green:"bg-green-50 border-green-200 text-green-800",red:"bg-red-50 border-red-200 text-red-800"};return<div className={`border rounded-xl p-3 text-sm ${c[color]}`}>{children}</div>;};
+const CB=({sel,onClick,title,sub})=>(
+  <button onClick={onClick} className={`w-full p-4 rounded-xl border-2 text-left transition-all ${sel?"border-blue-600 bg-blue-50":"border-gray-200 bg-white hover:border-blue-300"}`}>
+    <div className="font-bold text-gray-900 text-sm">{title}</div>
+    {sub&&<div className="text-xs text-gray-500 mt-0.5">{sub}</div>}
+  </button>
 );
 
-// "Confirm or change" card component
-const ConfirmCard = ({icon, label, lastTerm, onSame, onChange, confirmed, changedLabel}) => (
-  <Card className="p-4">
-    <div className="flex items-start gap-3 mb-3">
-      <span className="text-xl shrink-0">{icon}</span>
-      <div className="flex-1 min-w-0">
-        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-0.5">{label}</div>
-        <div className="text-sm text-hz-text">{confirmed ? (changedLabel || lastTerm) : lastTerm}</div>
-      </div>
-      {confirmed && <span className="text-hz-teal text-lg shrink-0">✓</span>}
-    </div>
-    {!confirmed && (
-      <div className="grid grid-cols-2 gap-2">
-        <button onClick={onSame} className="py-2 rounded-hz-sm text-sm font-semibold bg-hz-teal-bg text-hz-teal border border-hz-teal/20 hover:opacity-90 transition-opacity">
-          ✓ Same as before
-        </button>
-        <button onClick={onChange} className="py-2 rounded-hz-sm text-sm font-semibold bg-hz-cloud text-hz-indigo border border-hz-border hover:opacity-90 transition-opacity">
-          Make a change
-        </button>
-      </div>
-    )}
-    {confirmed && (
-      <button onClick={onChange} className="w-full py-1.5 text-xs font-semibold text-hz-accent border border-[rgba(100,92,220,0.2)] rounded-hz-sm hover:bg-hz-cloud transition-colors">
-        Edit
-      </button>
-    )}
-  </Card>
-);
+export default function App(){
+  const[sc,setSc]=useState(0);
+  const go=n=>{setSc(n);window.scrollTo(0,0);};
+  const[ins,setIns]=useState(null);
+  const[pay,setPay]=useState(null);
+  const[pifWhen,setPifWhen]=useState('today');
+  const[pifDate,setPifDate]=useState('');
+  const[freq,setFreq]=useState(null);
+  const[startD,setStartD]=useState(null);
+  const[down,setDown]=useState(300);
+  const[method,setMethod]=useState(null);
+  const[intlProv,setIntlProv]=useState(null);
+  const[nameSigned,setNameSigned]=useState(false);
+  const[refundSame,setRefundSame]=useState(null);
+  const[prefs,setPrefs]=useState({changes:true,reminders:true,confirms:true,autoOff:false});
+  const hasIns=ins==='accept';
+  const installments=freq==='monthly'?5:freq==='biweekly'?10:0;
+  const instAmt=installments>0?((MY_BAL-down)/installments).toFixed(2):0;
+  const todayTotal=down+NELNET_FEE+(hasIns&&method!=='intl'?INSURANCE_PREM:0);
+  const intlConflict=method==='intl'&&hasIns;
 
-// ── Screen 1: SSO welcome back ─────────────────────────────────────────────
-const S1_WelcomeBack = ({onNext}) => (
-  <Shell step={0} totalSteps={0} showBack={false}>
-    <div className="text-center mb-8">
-      <div className="w-16 h-16 rounded-full bg-hz-cloud flex items-center justify-center mx-auto mb-4 text-3xl">🎓</div>
-      <div className="text-xs font-bold uppercase tracking-widest text-hz-teal mb-2">Returning Student</div>
-      <h1 className="text-2xl font-bold text-hz-text mb-2">Welcome back, {STUDENT_FIRST}!</h1>
-      <p className="text-hz-muted text-sm leading-relaxed">You've been authenticated via {SCHOOL_NAME}'s student portal. We've synced your new term charges.</p>
-    </div>
-
-    <Card className="p-4 mb-4">
-      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">What's new for {CURRENT_TERM}</div>
-      <div className="space-y-2.5">
-        {[
-          {icon:'💰', label:'New term balance', val: fmt(BALANCE)},
-          {icon:'🎓', label:'Institution', val: SCHOOL_NAME},
-          {icon:'📅', label:'Term', val: CURRENT_TERM},
-        ].map((r,i)=>(
-          <div key={i} className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-hz-muted"><span>{r.icon}</span>{r.label}</div>
-            <span className="text-sm font-semibold text-hz-text">{r.val}</span>
+  const S={
+    0:()=>(
+      <Shell title="Welcome Back">
+        <div className="text-center mb-5">
+          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold mx-auto mb-3">AJ</div>
+          <h1 className="text-xl font-bold">Welcome back, Alex!</h1>
+          <p className="text-sm text-gray-500 mt-1">{SCHOOL}</p>
+        </div>
+        <InfoBox color="blue">🎓 <strong>{NEW_TERM} charges are ready.</strong> Your {LAST_TERM} plan is paid in full — great work! Let's set up {NEW_TERM}.</InfoBox>
+        <Card className="mt-4">
+          <div className="flex justify-between items-center mb-2"><span className="text-sm text-gray-500">{LAST_TERM}</span><Tag color="green">✓ Paid in full</Tag></div>
+          <div className="flex justify-between items-center"><span className="text-sm text-gray-500">{NEW_TERM}</span><Tag color="amber">Action needed</Tag></div>
+        </Card>
+        <Card className="mt-3">
+          <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">New Balance — {NEW_TERM}</div>
+          <div className="text-3xl font-bold">${NEW_BAL.toLocaleString()}</div>
+          <div className="text-xs text-gray-500 mt-1">Due {DUE_DATE}</div>
+          <div className="mt-3 pt-3 border-t border-gray-100 space-y-1">
+            <div className="flex justify-between text-sm"><span className="text-gray-500">Your share ({STUDENT_PCT}%)</span><span className="font-bold">${MY_BAL.toLocaleString()}</span></div>
+            <div className="flex justify-between text-xs text-gray-400"><span>{AP.name} — {AP.role} ({AP_PCT}%)</span><span>${(NEW_BAL*AP_PCT/100).toLocaleString()}</span></div>
           </div>
-        ))}
-      </div>
-    </Card>
-
-    <div className="bg-hz-cloud rounded-hz-sm border border-[rgba(100,92,220,0.2)] px-4 py-3 text-xs text-hz-muted mb-6 leading-relaxed">
-      ℹ️ We'll quickly confirm your prior setup for this new term. Anything that still works the same, you can approve with one tap.
-    </div>
-
-    <Btn onClick={onNext}>Review my setup for {CURRENT_TERM} →</Btn>
-  </Shell>
-);
-
-// ── Screen 2: Balance overview ─────────────────────────────────────────────
-const S2_Balance = ({onNext, onBack}) => (
-  <Shell step={1} totalSteps={5} showBack onBack={onBack}>
-    <h2 className="text-xl font-bold text-hz-text mb-1">{CURRENT_TERM} balance</h2>
-    <p className="text-sm text-hz-muted mb-5">Here's your account for the new term, synced from {SCHOOL_NAME}.</p>
-
-    <Card className="p-4 mb-5">
-      <div className="text-3xl font-bold text-hz-text mb-0.5">{fmt(BALANCE)}</div>
-      <div className="text-xs text-hz-muted mb-4">Balance due · {CURRENT_TERM}</div>
-      <div className="space-y-2 text-sm">
-        <div className="flex justify-between text-hz-muted"><span>Total charges</span><span className="text-hz-text font-medium">{fmt(CHARGES)}</span></div>
-        <div className="flex justify-between text-hz-muted"><span>Applied aid</span><span className="text-hz-text font-medium">−{fmt(APPLIED_AID)}</span></div>
-        <div className="flex justify-between text-hz-muted">
-          <span className="flex items-center gap-1">Anticipated aid <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-semibold cursor-pointer">Est.</span></span>
-          <span className="text-hz-text font-medium">−{fmt(ANTICIPATED)}</span>
-        </div>
-        <div className="flex justify-between font-bold text-hz-text pt-2 border-t border-hz-border"><span>Balance due</span><span>{fmt(BALANCE)}</span></div>
-      </div>
-    </Card>
-
-    <div className="bg-amber-50 border border-amber-200 rounded-hz-sm px-3 py-2.5 text-xs text-amber-800 mb-6 leading-relaxed">
-      ⚠️ Anticipated aid ({fmt(ANTICIPATED)}) is subtracted from your balance but not yet officially applied. If it doesn't finalize, you may owe that amount.
-    </div>
-
-    <Btn onClick={onNext}>Continue →</Btn>
-  </Shell>
-);
-
-// ── Screen 3: Insurance ────────────────────────────────────────────────────
-const S3_Insurance = ({onNext, onBack}) => {
-  const [choice, setChoice] = React.useState(null);
-  return (
-    <Shell step={2} totalSteps={5} showBack onBack={onBack}>
-      <h2 className="text-xl font-bold text-hz-text mb-1">Tuition insurance</h2>
-      <p className="text-sm text-hz-muted mb-2">You declined this last semester. {SCHOOL_NAME} re-presents the offer each term.</p>
-
-      <Card className="p-4 mb-4">
-        <div className="flex items-start gap-3 mb-3">
-          <span className="text-2xl shrink-0">🛡️</span>
-          <div>
-            <div className="font-semibold text-hz-text mb-0.5">GradGuard Tuition Insurance</div>
-            <div className="text-xs text-hz-muted">Protect up to 100% of tuition if you must withdraw for a covered reason</div>
-          </div>
-        </div>
-        <div className="flex justify-between items-center py-2.5 border-t border-hz-border">
-          <span className="text-sm text-hz-muted">Premium (your portion)</span>
-          <span className="text-lg font-bold text-hz-text">{fmt(INSURANCE_PREM)}</span>
-        </div>
-        <div className="text-xs text-hz-hint mt-1">Based on your {CURRENT_TERM} balance · California rate</div>
-      </Card>
-
-      <div className="space-y-2 mb-6">
-        {[
-          {val:'accept', label:'✓ Yes, I want insurance', sub:`${fmt(INSURANCE_PREM)} added to today's payment`, color:'bg-hz-teal-bg text-hz-teal border-hz-teal/20'},
-          {val:'decline', label:'✗ No thanks, I'll decline', sub:'Coverage not applied', color:'bg-hz-cloud text-hz-muted border-hz-border'},
-          {val:'later', label:'⏸ Decide later', sub:'Becomes a to-do on your home screen', color:'bg-hz-cloud text-hz-muted border-hz-border'},
-        ].map(opt=>(
-          <button key={opt.val} onClick={()=>setChoice(opt.val)}
-            className={`w-full p-3.5 rounded-hz-sm border text-left transition-all ${choice===opt.val ? opt.color + ' ring-1 ring-inset ring-current' : 'bg-white border-hz-border hover:border-hz-accent'}`}>
-            <div className="font-semibold text-sm">{opt.label}</div>
-            <div className="text-xs mt-0.5 opacity-70">{opt.sub}</div>
-          </button>
-        ))}
-      </div>
-
-      {choice === 'later' && (
-        <div className="bg-hz-cloud border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-xs text-hz-muted mb-4 leading-relaxed">
-          ℹ️ You'll see a to-do on your home screen with a deadline to decide. We'll also send reminders. The decision option won't be obvious — look for it in your insurance to-do.
-        </div>
-      )}
-
-      <Btn onClick={onNext} disabled={!choice}>Continue →</Btn>
-    </Shell>
-  );
-};
-
-// ── Screen 4: Confirm setup ────────────────────────────────────────────────
-const S4_ConfirmSetup = ({onNext, onBack}) => {
-  const [payConfirmed, setPayConfirmed]   = React.useState(false);
-  const [methodConfirmed, setMethodConfirmed] = React.useState(false);
-  const [potConfirmed, setPotConfirmed]   = React.useState(false);
-  const [commsConfirmed, setCommsConfirmed] = React.useState(false);
-  const [payChanged, setPayChanged] = React.useState(false);
-
-  const allDone = payConfirmed && methodConfirmed && potConfirmed && commsConfirmed;
-
-  return (
-    <Shell step={3} totalSteps={5} showBack onBack={onBack}>
-      <h2 className="text-xl font-bold text-hz-text mb-1">Confirm your setup</h2>
-      <p className="text-sm text-hz-muted mb-5">Review what's carrying over from {PRIOR_TERM}. Confirm or update each item.</p>
-
-      <div className="space-y-3 mb-6">
-
-        {/* Who's paying */}
-        <ConfirmCard
-          icon="👥" label="Who's paying"
-          lastTerm={payChanged ? 'You: 100% (AP removed)' : `You: ${MY_PCT}% · ${AP_NAME}: ${AP_PCT}%`}
-          changedLabel={payChanged ? 'You: 100% (AP removed)' : null}
-          confirmed={payConfirmed}
-          onSame={()=>setPayConfirmed(true)}
-          onChange={()=>{ setPayChanged(true); setPayConfirmed(true); }}
-        />
-
-        {/* Payment method */}
-        <ConfirmCard
-          icon="🏦" label="Payment method"
-          lastTerm="Chase Checking ···4521"
-          confirmed={methodConfirmed}
-          onSame={()=>setMethodConfirmed(true)}
-          onChange={()=>setMethodConfirmed(true)}
-        />
-
-        {/* Pay Over Time */}
-        <ConfirmCard
-          icon="📅" label="Pay Over Time plan"
-          lastTerm="Monthly · 9 installments · $480/mo"
-          confirmed={potConfirmed}
-          onSame={()=>setPotConfirmed(true)}
-          onChange={()=>setPotConfirmed(true)}
-        />
-
-        {/* Comms */}
-        <ConfirmCard
-          icon="📱" label="Communication preferences"
-          lastTerm="Transactional SMS: On · Marketing SMS: Off"
-          confirmed={commsConfirmed}
-          onSame={()=>setCommsConfirmed(true)}
-          onChange={()=>setCommsConfirmed(true)}
-        />
-
-      </div>
-
-      {payConfirmed && !payChanged && (
-        <div className="bg-hz-teal-bg border border-hz-teal/20 rounded-hz-sm px-3 py-2.5 text-xs text-hz-teal mb-4 leading-relaxed">
-          ✓ Reminder sent to {AP_NAME} — a new term has started and their payment commitment has been renewed.
-        </div>
-      )}
-
-      <Btn onClick={onNext} disabled={!allDone}>Continue →</Btn>
-    </Shell>
-  );
-};
-
-// ── Screen 5: Disclosures ──────────────────────────────────────────────────
-const S5_Disclosures = ({onNext, onBack}) => {
-  const [acked, setAcked] = React.useState([false,false,false]);
-  const toggle = (i) => setAcked(a => a.map((v,j)=>j===i?!v:v));
-  const allAcked = acked.every(Boolean);
-  const disclosures = [
-    {title:'Financial Responsibility Agreement',body:'I understand I am responsible for all tuition, fees, and charges incurred, and agree to pay by the stated due date.'},
-    {title:'GradGuard Refund Policy',body:'By enrolling in a tuition insurance plan, I acknowledge the GradGuard refund terms and agree to the policy terms for the current term.'},
-    {title:'Electronic Communication Consent',body:'I consent to receive account notifications, payment reminders, and required disclosures electronically to my email and phone on file.'},
-  ];
-  return (
-    <Shell step={4} totalSteps={5} showBack onBack={onBack}>
-      <h2 className="text-xl font-bold text-hz-text mb-1">Updated disclosures</h2>
-      <p className="text-sm text-hz-muted mb-5">{SCHOOL_NAME} requires acknowledgment of these agreements each term. Please review and accept each one.</p>
-      <div className="space-y-3 mb-6">
-        {disclosures.map((d,i)=>(
-          <div key={i} className={`bg-white rounded-hz-sm border p-4 cursor-pointer transition-all ${acked[i]?'border-hz-teal/40 bg-hz-teal-bg/30':'border-hz-border'}`}
-            onClick={()=>toggle(i)}>
-            <div className="flex items-start gap-3">
-              <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-all ${acked[i]?'bg-hz-teal border-hz-teal':'border-hz-border bg-white'}`}>
-                {acked[i] && <span className="text-white text-xs font-bold">✓</span>}
-              </div>
-              <div>
-                <div className="font-semibold text-sm text-hz-text mb-1">{d.title}</div>
-                <div className="text-xs text-hz-muted leading-relaxed">{d.body}</div>
-              </div>
+        </Card>
+        <div className="mt-4"><Btn onClick={()=>go(1)}>Get Started →</Btn></div>
+      </Shell>
+    ),
+    1:()=>(
+      <Shell title="Confirm Your Info" step={1} total={8} onBack={()=>go(0)}>
+        <h2 className="text-lg font-bold mb-1">Is your information still accurate?</h2>
+        <p className="text-sm text-gray-500 mb-4">Please review — we use this to reach you about your account.</p>
+        <Card className="mb-3 space-y-3">
+          {[["Full Name",STUDENT.name],["Email",STUDENT.email],["Phone",STUDENT.phone],["Address",STUDENT.address]].map(([l,v])=>(
+            <div key={l} className="flex justify-between items-start">
+              <div><div className="text-xs text-gray-400 uppercase tracking-wide">{l}</div><div className="text-sm font-semibold text-gray-800">{v}</div></div>
+              <button className="text-xs text-blue-600 underline shrink-0 ml-4">Edit</button>
             </div>
+          ))}
+        </Card>
+        <InfoBox color="amber">📱 <strong>Phone highly recommended</strong> — used for payment reminders via text.</InfoBox>
+        <div className="mt-4 space-y-2">
+          <Btn onClick={()=>go(2)}>Everything looks correct</Btn>
+          <Btn variant="ghost" onClick={()=>go(2)}>I've updated my info — continue</Btn>
+        </div>
+      </Shell>
+    ),
+    2:()=>(
+      <Shell title="Tuition Protection" step={2} total={8} onBack={()=>go(1)}>
+        <h2 className="text-lg font-bold mb-1">Tuition Protection Insurance</h2>
+        <p className="text-sm text-gray-500 mb-4">Protect your investment if unexpected events force a withdrawal.</p>
+        <Card className="mb-4 border-blue-200 bg-blue-50">
+          <div className="font-bold text-blue-900 mb-1">GradGuard Tuition Protection</div>
+          <div className="text-sm text-blue-800 mb-2">Covers up to 100% of tuition if you must withdraw for a covered reason — illness, injury, mental health, military, and more.</div>
+          <div className="flex justify-between items-center"><span className="text-xl font-bold text-blue-900">${INSURANCE_PREM}<span className="text-sm font-normal">/term</span></span><button className="text-xs text-blue-600 underline">View coverage →</button></div>
+        </Card>
+        <div className="space-y-2">
+          <CB sel={ins==='accept'}  onClick={()=>{setIns('accept');go(3);}}  title="✓ Yes, protect my investment"  sub={`$${INSURANCE_PREM} added to today's total`}/>
+          <CB sel={ins==='decline'} onClick={()=>{setIns('decline');go(3);}} title="✗ No, I'll go without coverage"  sub="I understand I'm declining protection"/>
+          <CB sel={ins==='later'}   onClick={()=>{setIns('later');go(3);}}   title="🕐 I'll decide later"            sub="A reminder will appear on your home screen"/>
+        </div>
+      </Shell>
+    ),
+    3:()=>(
+      <Shell title="How to Pay" step={3} total={8} onBack={()=>go(2)}>
+        <h2 className="text-lg font-bold mb-1">How would you like to pay?</h2>
+        <p className="text-sm text-gray-500 mb-1">Your share: <strong>${MY_BAL.toLocaleString()}</strong> · {NEW_TERM}</p>
+        <p className="text-xs text-gray-400 mb-4">{AP.name} manages their {AP_PCT}% separately</p>
+        <div className="space-y-3">
+          <CB sel={pay==='pot'} onClick={()=>setPay('pot')} title="Pay Over Time" sub="Split into monthly or bi-weekly installments"/>
+          <CB sel={pay==='pif'} onClick={()=>setPay('pif')} title="Pay in Full"   sub="Pay the full amount — today, or schedule for a future date before the due date"/>
+        </div>
+        {pay==='pot'&&<>
+          <Lbl>Payment Frequency</Lbl>
+          <div className="space-y-2">
+            <CB sel={freq==='monthly'}  onClick={()=>{setFreq('monthly');setStartD(null);}}  title="Monthly"   sub="5 installments"/>
+            <CB sel={freq==='biweekly'} onClick={()=>{setFreq('biweekly');setStartD(null);}} title="Bi-Weekly" sub="10 installments"/>
           </div>
-        ))}
-      </div>
-      <Btn onClick={onNext} disabled={!allAcked}>I agree to all disclosures →</Btn>
-    </Shell>
-  );
-};
-
-// ── Screen 6: All set ──────────────────────────────────────────────────────
-const S6_AllSet = ({onNext, onBack}) => (
-  <Shell step={5} totalSteps={5} showBack onBack={onBack}>
-    <div className="text-center mb-8">
-      <div className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center mx-auto mb-4 text-3xl">🎉</div>
-      <h2 className="text-xl font-bold text-hz-text mb-2">You're all set for {CURRENT_TERM}!</h2>
-      <p className="text-sm text-hz-muted leading-relaxed">Your setup has been confirmed. Your Pay Over Time plan will begin on May 15, 2026.</p>
-    </div>
-    <Card className="p-4 mb-4">
-      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Confirmed for {CURRENT_TERM}</div>
-      <div className="space-y-2 text-sm">
-        {[
-          ['Balance',fmt(BALANCE)],
-          ['Your share (60%)', fmt(BALANCE * 0.6)],
-          ["Sarah's share (40%)", fmt(BALANCE * 0.4)],
-          ['Plan', 'Monthly · 9 installments · ~$360/mo'],
-          ['First payment', 'May 15, 2026'],
-        ].map(([k,v],i)=>(
-          <div key={i} className="flex justify-between">
-            <span className="text-hz-muted">{k}</span>
-            <span className="text-hz-text font-medium">{v}</span>
-          </div>
-        ))}
-      </div>
-    </Card>
-    <div className="bg-amber-50 border border-amber-200 rounded-hz-sm px-3 py-2.5 text-xs text-amber-800 mb-6 leading-relaxed">
-      Your Pay Over Time plan setup is confirmed — payment method already on file. A payment setup confirmation will be sent to your email.
-    </div>
-    <Btn onClick={onNext} variant="teal">Go to my home screen →</Btn>
-  </Shell>
-);
-
-// ── Screen 7: Home screen ──────────────────────────────────────────────────
-const S7_Home = () => (
-  <div className="min-h-screen bg-hz-bg">
-    <div className="bg-white border-b border-hz-border px-4 py-3 flex items-center justify-between">
-      <div className="text-xs font-bold text-hz-accent tracking-wide">HORIZON</div>
-      <div className="w-8 h-8 rounded-full bg-hz-cloud flex items-center justify-center text-xs font-bold text-hz-accent">AJ</div>
-    </div>
-    <div className="px-4 py-6 max-w-sm mx-auto">
-      <div className="flex items-center justify-between mb-5">
-        <div>
-          <h1 className="text-2xl font-bold text-hz-text">Hi, {STUDENT_FIRST} 👋</h1>
-          <p className="text-xs text-hz-hint mt-0.5">{CURRENT_TERM} · {SCHOOL_NAME}</p>
-        </div>
-      </div>
-
-      {/* Balance card */}
-      <Card className="p-4 mb-4">
-        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Account summary</div>
-        <div className="flex items-end justify-between mb-3">
-          <div>
-            <div className="text-3xl font-bold text-hz-text">{fmt(BALANCE * 0.6)}</div>
-            <div className="text-xs text-hz-muted">Your share (60%)</div>
-          </div>
-          <button className="text-xs text-hz-accent font-semibold">View full breakdown</button>
-        </div>
-        <div className="h-2.5 bg-hz-cloud rounded-full overflow-hidden mb-2">
-          <div className="h-full w-4/5 bg-hz-teal rounded-full" />
-        </div>
-        <div className="flex justify-between text-xs text-hz-hint">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-hz-teal inline-block"/>On plan {fmt(BALANCE * 0.6 * 0.8)}</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-hz-accent inline-block"/>Open {fmt(BALANCE * 0.6 * 0.2)}</span>
-        </div>
-      </Card>
-
-      {/* Quick actions */}
-      <div className="space-y-2.5">
-        {[
-          {icon:'📅',label:'My Pay Over Time Plan',sub:'Monthly · 9 installments remaining',highlight:true},
-          {icon:'👥',label:'Manage Authorized Parties',sub:'Sarah Johnson (40%)'},
-          {icon:'🔗',label:'Guest Payment Link',sub:'Send a one-time payment link'},
-          {icon:'💳',label:'Make a Payment',sub:'Open balance available'},
-          {icon:'📊',label:'Account History',sub:'Payments and activity'},
-        ].map((a,i)=>(
-          <Card key={i} className={`p-3.5 flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow ${a.highlight?'border-hz-accent/30':''}`}>
-            <span className="text-xl shrink-0">{a.icon}</span>
-            <div className="flex-1 min-w-0">
-              <div className={`text-sm font-semibold ${a.highlight?'text-hz-accent':'text-hz-text'}`}>{a.label}</div>
-              <div className="text-xs text-hz-hint truncate">{a.sub}</div>
+          {freq&&<>
+            <Lbl>First Installment Date</Lbl>
+            <div className="space-y-2">
+              {[["Jan15","January 15, 2025"],["Feb1","February 1, 2025"],["Feb15","February 15, 2025"]].map(([v,l])=>(
+                <CB key={v} sel={startD===v} onClick={()=>setStartD(v)} title={l}/>
+              ))}
             </div>
-            <span className="text-hz-hint text-sm shrink-0">›</span>
+          </>}
+          {freq&&startD&&<>
+            <Lbl>Plan Preview</Lbl>
+            <Card className="bg-gray-50 text-sm mb-3 space-y-1.5">
+              <div className="flex justify-between"><span className="text-gray-500">Your balance</span><span>${MY_BAL.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Installments</span><span>{installments} × ${Number(instAmt).toLocaleString('en-US',{minimumFractionDigits:2})}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Nelnet fee</span><span>${NELNET_FEE}</span></div>
+              {hasIns&&<div className="flex justify-between text-blue-700"><span>GradGuard insurance</span><span>${INSURANCE_PREM}</span></div>}
+            </Card>
+            <Lbl>Down Payment</Lbl>
+            <Card>
+              <div className="flex justify-between items-center mb-2"><span className="text-sm text-gray-600">Down Payment</span><span className="font-bold text-xl">${down}</span></div>
+              <input type="range" min={0} max={MY_BAL} step={50} value={down} onChange={e=>setDown(Number(e.target.value))} className="w-full mb-3"/>
+              <div className="bg-blue-50 rounded-xl p-3 space-y-1 text-sm">
+                <div className="text-xs font-bold text-blue-800 mb-1">Due today</div>
+                <div className="flex justify-between"><span className="text-gray-600">Down payment</span><span>${down}</span></div>
+                <div className="flex justify-between"><span className="text-gray-600">Nelnet enrollment fee</span><span>${NELNET_FEE}</span></div>
+                {hasIns&&<div className="flex justify-between text-blue-700"><span>GradGuard premium</span><span>${INSURANCE_PREM}</span></div>}
+                <div className="flex justify-between font-bold pt-1.5 border-t border-blue-200"><span>Total due today</span><span>${down+NELNET_FEE+(hasIns?INSURANCE_PREM:0)}</span></div>
+              </div>
+              <div className="mt-3"><Btn onClick={()=>go(4)}>Confirm This Plan →</Btn></div>
+            </Card>
+          </>}
+        </>}
+        {pay==='pif'&&<>
+          <Lbl>When would you like to pay?</Lbl>
+          <div className="space-y-2">
+            <CB sel={pifWhen==='today'}    onClick={()=>{setPifWhen('today');setPifDate('');}}   title="Pay today"                 sub="Full payment processed immediately"/>
+            <CB sel={pifWhen==='schedule'} onClick={()=>setPifWhen('schedule')} title="Schedule for a future date" sub={`Choose any date on or before ${DUE_DATE}`}/>
+          </div>
+          {pifWhen==='schedule'&&<Card className="mt-3">
+            <label className="text-sm font-semibold text-gray-700 block mb-2">Select payment date</label>
+            <input type="date" max="2025-04-15" value={pifDate} onChange={e=>setPifDate(e.target.value)} className="w-full border rounded-lg p-2 text-sm"/>
+            <p className="text-xs text-gray-400 mt-1">Must be on or before {DUE_DATE}</p>
+          </Card>}
+          {(pifWhen==='today'||pifDate)&&<div className="mt-4"><Btn onClick={()=>go(4)}>Continue →</Btn></div>}
+        </>}
+      </Shell>
+    ),
+    4:()=>(
+      <Shell title="Payment Method" step={4} total={8} onBack={()=>go(3)}>
+        <h2 className="text-lg font-bold mb-1">Select a payment method</h2>
+        <p className="text-sm text-gray-500 mb-4">{pay==='pot'?"This school accepts bank account and credit card for payment plans.":"This school also accepts international payments for pay-in-full."}</p>
+        <div className="space-y-3">
+          <CB sel={method==='ach'}  onClick={()=>setMethod('ach')}  title="🏦 Bank Account (ACH)"       sub="Free — no service fee · Most common"/>
+          <CB sel={method==='cc'}   onClick={()=>setMethod('cc')}   title="💳 Credit or Debit Card"     sub="⚠ 2.85% service fee applies"/>
+          {pay==='pif'&&<CB sel={method==='intl'} onClick={()=>setMethod('intl')} title="🌐 International Payment" sub="Via Convera or Flywire · Pay in your local currency"/>}
+        </div>
+        {intlConflict&&method==='intl'&&(
+          <Card className="border-amber-300 bg-amber-50 mt-4">
+            <div className="font-bold text-amber-900 mb-2">⚠️ Insurance Conflict</div>
+            <div className="text-sm text-amber-800 mb-3">International payment providers cannot process tuition insurance, and international residents are generally not eligible for insurance payouts. Please choose:</div>
+            <div className="space-y-2">
+              <Btn variant="warn" onClick={()=>{setIns('decline');go(4);}}>Decline insurance &amp; keep international</Btn>
+              <Btn variant="secondary" onClick={()=>setMethod(null)}>Choose a different payment method</Btn>
+            </div>
+          </Card>
+        )}
+        {method==='ach'&&!intlConflict&&<>
+          <Lbl>Bank Account Details</Lbl>
+          <Card className="space-y-3 mb-3">
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Account holder name</label><input defaultValue={STUDENT.name} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Routing number</label><input placeholder="9 digits" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Account number</label><input placeholder="Enter account number" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Account type</label><select className="w-full border rounded-lg p-2 mt-1 text-sm"><option>Checking</option><option>Savings</option></select></div>
+          </Card>
+          <InfoBox color="blue" className="mb-3">The account holder name will be verified against your profile (<strong>{STUDENT.name}</strong>). If the name differs, you'll need to confirm authorization.</InfoBox>
+          <div className="space-y-2 mt-3">
+            <Btn onClick={()=>go(5)}>Name matches — Save Account →</Btn>
+            <Btn variant="secondary" onClick={()=>go('4n')}>Name is different</Btn>
+          </div>
+        </>}
+        {method==='cc'&&!intlConflict&&<>
+          <InfoBox color="amber">⚠ <strong>Service fee:</strong> A 2.85% non-refundable service fee will be added to your total.</InfoBox>
+          <Lbl>Card Details</Lbl>
+          <Card className="space-y-3 mb-3">
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Name on card</label><input defaultValue={STUDENT.name} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Card number</label><input placeholder="•••• •••• •••• ••••" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className="text-xs text-gray-400 uppercase font-bold">Expires</label><input placeholder="MM / YY" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+              <div><label className="text-xs text-gray-400 uppercase font-bold">CVV</label><input placeholder="•••" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            </div>
+          </Card>
+          <div className="space-y-2">
+            <Btn onClick={()=>go(5)}>Name matches — Save Card →</Btn>
+            <Btn variant="secondary" onClick={()=>go('4n')}>Name is different</Btn>
+          </div>
+        </>}
+        {method==='intl'&&!intlConflict&&<>
+          <Lbl>Select Provider</Lbl>
+          <div className="space-y-2 mb-3">
+            <CB sel={intlProv==='flywire'} onClick={()=>setIntlProv('flywire')} title="Flywire"  sub="International student payment specialist"/>
+            <CB sel={intlProv==='convera'} onClick={()=>setIntlProv('convera')} title="Convera"  sub="Formerly Western Union Business Solutions"/>
+          </div>
+          {intlProv&&<>
+            <InfoBox color="amber">⚠ <strong>Important:</strong> You'll be redirected to {intlProv==='flywire'?'Flywire':'Convera'} to complete today's payment. Future installments will NOT auto-draft — you'll receive a manual reminder each payment date to log in and pay.</InfoBox>
+            <div className="mt-3"><Btn onClick={()=>go('4i')}>Continue to {intlProv==='flywire'?'Flywire':'Convera'} →</Btn></div>
+          </>}
+        </>}
+      </Shell>
+    ),
+    '4n':()=>(
+      <Shell title="Account Authorization" step={4} total={8} onBack={()=>go(4)}>
+        <h2 className="text-lg font-bold mb-2">Name doesn't match your profile</h2>
+        <InfoBox color="amber">The name on this payment account doesn't match <strong>{STUDENT.name}</strong> on your profile. To protect you and {SCHOOL} from disputed payments, we need one of the following.</InfoBox>
+        <div className="mt-4 space-y-3">
+          <Card className="border-blue-200">
+            <div className="font-semibold text-blue-900 mb-1">✍ This is my own account</div>
+            <div className="text-sm text-gray-600 mb-3">Sign below to confirm you own this account and authorize Nelnet to charge it, including recurring charges if you're setting up a payment plan.</div>
+            <div className="border-2 border-dashed border-gray-300 rounded-xl h-14 flex items-center justify-center mb-3 cursor-pointer hover:border-blue-400" onClick={()=>setNameSigned(true)}>
+              <span className="text-gray-400 text-sm">{nameSigned?"✓ Signed — Alex Johnson":"Tap to sign"}</span>
+            </div>
+            {nameSigned&&<Btn onClick={()=>go(5)}>Continue with this account →</Btn>}
+          </Card>
+          <Card className="border-green-200">
+            <div className="font-semibold text-green-900 mb-1">👥 Invite the account owner as a payer</div>
+            <div className="text-sm text-gray-600 mb-2">If this is someone else's account, the safest option is to invite them as an Authorized Party so they pay directly from their own login.</div>
+            <Btn variant="secondary" onClick={()=>go(0)}>Go back &amp; invite as Authorized Party</Btn>
+          </Card>
+        </div>
+      </Shell>
+    ),
+    '4i':()=>(
+      <Shell title={intlProv==='flywire'?'Flywire':'Convera'} step={4} total={8}>
+        <div className="text-center mb-4">
+          <div className={`w-16 h-16 ${intlProv==='flywire'?'bg-purple-600':'bg-orange-500'} rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3`}>{intlProv==='flywire'?'FW':'CV'}</div>
+          <h2 className="text-lg font-bold">{intlProv==='flywire'?'Flywire':'Convera'} Secure Payment</h2>
+          <p className="text-sm text-gray-500">International payment portal</p>
+        </div>
+        <Card className="space-y-2 text-sm mb-4">
+          <div className="text-xs font-bold text-gray-400 uppercase">Payment details</div>
+          <div className="flex justify-between"><span className="text-gray-500">Amount</span><span className="font-bold">${MY_BAL.toLocaleString()} USD</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Recipient</span><span>{SCHOOL}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Student ID</span><span>RU-2025-{STUDENT.name.split(' ')[1].toUpperCase()}</span></div>
+        </Card>
+        <Card className="space-y-3 mb-4">
+          <div className="text-xs font-bold text-gray-400 uppercase">Enter your payment details</div>
+          <div><label className="text-xs text-gray-500 uppercase">Sending from country</label><select className="w-full border rounded-lg p-2 mt-1 text-sm"><option>Select country</option><option>China (CNY)</option><option>India (INR)</option><option>South Korea (KRW)</option><option>Other</option></select></div>
+          <div><label className="text-xs text-gray-500 uppercase">Local currency amount</label><input placeholder="Calculated automatically" className="w-full border rounded-lg p-2 mt-1 text-sm bg-gray-50"/></div>
+          <div><label className="text-xs text-gray-500 uppercase">Bank or card details</label><input placeholder="Enter payment details" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+        </Card>
+        <Btn onClick={()=>go(5)}>Payment Complete — Return to Nelnet →</Btn>
+      </Shell>
+    ),
+    5:()=>(
+      <Shell title="Refund Account" step={5} total={8} onBack={()=>go(4)}>
+        <h2 className="text-lg font-bold mb-1">Set up your refund account</h2>
+        <p className="text-sm text-gray-500 mb-4">If a refund is issued on your account, where should it go? This is required for all payers.</p>
+        {method==='ach'&&refundSame===null&&(
+          <Card className="border-green-200 bg-green-50 mb-4">
+            <div className="font-semibold text-green-900 mb-1">Use same account for refunds?</div>
+            <div className="text-sm text-gray-600 mb-3">We can send refunds to the same bank account you set up for payments (Chase checking ····6789).</div>
+            <div className="space-y-2">
+              <CB sel={false} onClick={()=>{setRefundSame(true);go(6);}} title="Yes, use my payment account"/>
+              <CB sel={false} onClick={()=>setRefundSame(false)} title="No, use a different account"/>
+            </div>
+          </Card>
+        )}
+        {(method!=='ach'||refundSame===false)&&<>
+          <Card className="space-y-3 mb-4">
+            <div className="text-xs text-gray-400 uppercase font-bold">Refund Bank Account (ACH)</div>
+            <div><label className="text-xs text-gray-400 uppercase">Account holder name</label><input defaultValue={STUDENT.name} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase">Routing number</label><input placeholder="9 digits" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase">Account number</label><input placeholder="Enter account number" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase">Account type</label><select className="w-full border rounded-lg p-2 mt-1 text-sm"><option>Checking</option><option>Savings</option></select></div>
+          </Card>
+          <Btn onClick={()=>go(6)}>Save Refund Account →</Btn>
+        </>}
+      </Shell>
+    ),
+    6:()=>(
+      <Shell title="Notification Preferences" step={6} total={8} onBack={()=>go(5)}>
+        <h2 className="text-lg font-bold mb-1">Stay in the loop</h2>
+        <p className="text-sm text-gray-500 mb-3">We've set smart defaults based on your choices. Adjust anything you'd like.</p>
+        <InfoBox color="blue">📱 Text notifications work best — make sure a phone number is on file.</InfoBox>
+        <Lbl>Your Notification Preferences</Lbl>
+        <Card className="space-y-4 mb-4">
+          {[
+            ["Account changes & balance updates","Notify me when my balance changes or charges are added.",prefs.changes,v=>setPrefs(p=>({...p,changes:v}))],
+            ["Payment reminders","Remind me before each scheduled payment date.",prefs.reminders,v=>setPrefs(p=>({...p,reminders:v}))],
+            ["Payment confirmations","Send a confirmation after each payment processes.",prefs.confirms,v=>setPrefs(p=>({...p,confirms:v}))],
+            ["Skip reminders for automatic payments","I don't need reminders for auto-drafted installments.",prefs.autoOff,v=>setPrefs(p=>({...p,autoOff:v}))],
+          ].map(([title,sub,val,setter])=>(
+            <div key={title} className="flex items-start gap-3">
+              <button onClick={()=>setter(!val)} className={`w-11 h-6 rounded-full transition-colors shrink-0 mt-0.5 ${val?'bg-blue-600':'bg-gray-300'}`}>
+                <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform mx-0.5 ${val?'translate-x-5':'translate-x-0'}`}/>
+              </button>
+              <div><div className="text-sm font-semibold text-gray-800">{title}</div><div className="text-xs text-gray-500 mt-0.5">{sub}</div></div>
+            </div>
+          ))}
+        </Card>
+        <Btn onClick={()=>go(7)}>Save Preferences →</Btn>
+      </Shell>
+    ),
+    7:()=>(
+      <Shell title="Agreements" step={7} total={8} onBack={()=>go(6)}>
+        <h2 className="text-lg font-bold mb-1">Review &amp; sign</h2>
+        <p className="text-sm text-gray-500 mb-4">Please acknowledge each document to complete setup.</p>
+        {[["Nelnet Payment Agreement","By enrolling, you authorize Nelnet to process payments per the schedule you selected."],["Electronic Communications Disclosure","You agree to receive account communications electronically."],...(hasIns?[["GradGuard Tuition Protection Terms","You've accepted coverage — these are the terms and conditions."]]:[])]
+          .map(([title,text])=>(
+          <Card key={title} className="mb-3">
+            <div className="font-semibold text-gray-800 mb-1">{title}</div>
+            <div className="text-xs text-gray-500 mb-3">{text}</div>
+            <div className="border border-dashed border-gray-300 rounded-lg p-3 text-xs text-gray-400 mb-3">[ Scroll to read full document ]</div>
+            <label className="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" className="rounded"/> I have read and agree to the {title}</label>
           </Card>
         ))}
-      </div>
-    </div>
-  </div>
-);
-
-// ── App ────────────────────────────────────────────────────────────────────
-const App = () => {
-  const [s, setS] = React.useState(0);
-  const go = (n) => { setS(n); window.scrollTo(0,0); };
-  return [
-    <S1_WelcomeBack onNext={()=>go(1)} />,
-    <S2_Balance     onNext={()=>go(2)} onBack={()=>go(0)} />,
-    <S3_Insurance   onNext={()=>go(3)} onBack={()=>go(1)} />,
-    <S4_ConfirmSetup onNext={()=>go(4)} onBack={()=>go(2)} />,
-    <S5_Disclosures  onNext={()=>go(5)} onBack={()=>go(3)} />,
-    <S6_AllSet       onNext={()=>go(6)} onBack={()=>go(4)} />,
-    <S7_Home />,
-  ][s] || null;
-};
-
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+        <Btn onClick={()=>go(8)}>Sign &amp; Finish →</Btn>
+      </Shell>
+    ),
+    8:()=>(
+      <Shell title="All Set!">
+        <div className="text-center mb-5">
+          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-3">✓</div>
+          <h1 className="text-2xl font-bold">{NEW_TERM} is set up!</h1>
+          <p className="text-sm text-gray-500 mt-1">{SCHOOL}</p>
+        </div>
+        <Card className="mb-3 space-y-2 text-sm">
+          <div className="font-bold text-gray-700 mb-1">Your setup summary</div>
+          <div className="flex justify-between"><span className="text-gray-500">Your balance</span><span>${MY_BAL.toLocaleString()}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Payment plan</span><span>{pay==='pif'?'Pay in Full':freq==='monthly'?'Monthly POT':'Bi-Weekly POT'}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Insurance</span><span className={ins==='accept'?"text-blue-700":""}>{ins==='accept'?'GradGuard accepted':ins==='decline'?'Declined':'Decide later'}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Payment method</span><span>{method==='ach'?'Bank account (ACH)':method==='cc'?'Credit card':'International'}</span></div>
+        </Card>
+        <Btn onClick={()=>go(9)}>Go to My Account →</Btn>
+      </Shell>
+    ),
+    9:()=>(
+      <Shell title={SCHOOL}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">AJ</div>
+          <div><div className="font-bold text-gray-900">{STUDENT.name}</div><div className="text-xs text-gray-500">{NEW_TERM}</div></div>
+        </div>
+        <Card className="mb-4 bg-gradient-to-br from-blue-700 to-blue-500 text-white">
+          <div className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">Your Balance</div>
+          <div className="text-3xl font-bold mb-1">${MY_BAL.toLocaleString()}</div>
+          <div className="text-xs opacity-80">{NEW_TERM} · Due {DUE_DATE}</div>
+          <div className="mt-3 pt-3 border-t border-white/20 text-xs opacity-70">{pay==='pif'?'Pay in Full':freq==='monthly'?'Monthly':'Bi-Weekly'} · {method==='ach'?'Bank (ACH)':method==='cc'?'Card':'International'}</div>
+        </Card>
+        {ins==='later'&&<div className="mb-3"><InfoBox color="amber">🕐 <strong>To-do:</strong> Decide on tuition insurance. <button className="underline ml-1">Decide now</button></InfoBox></div>}
+        <div className="mb-4"><InfoBox color="green">✓ {LAST_TERM} is fully paid — all set!</InfoBox></div>
+        <Lbl>Quick Actions</Lbl>
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {["View schedule","Make a payment","Manage APs","Settings"].map(a=>(
+            <Card key={a} className="text-center py-3 cursor-pointer hover:border-blue-300 transition-colors"><div className="text-sm font-semibold text-gray-700">{a}</div></Card>
+          ))}
+        </div>
+        <div className="text-center">
+          <a href="index.html" target="_top" onClick={e=>{e.preventDefault();try{window.top.location.href='index.html';}catch(_){window.location.href='index.html';}}} className="text-xs text-gray-400 hover:text-blue-600 underline">⌂ Back to prototype index</a>
+        </div>
+      </Shell>
+    ),
+  };
+  const Screen=S[sc];
+  return Screen?<Screen/>:null;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>

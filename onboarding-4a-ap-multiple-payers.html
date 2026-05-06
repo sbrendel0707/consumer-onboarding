@@ -2,360 +2,437 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>4a · New AP Multiple Payers – Horizon Prototype</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config={theme:{extend:{colors:{'hz-indigo':'#2D1FA3','hz-accent':'#645CDC','hz-cloud':'#EEF0FF','hz-teal':'#0D7A55','hz-teal-bg':'#E1F5EE','hz-bg':'#F4F5FF','hz-text':'#1A1060','hz-muted':'#57548D','hz-hint':'#6B6899','hz-border':'rgba(100,92,220,0.14)','hz-danger':'#E24B4A'},fontFamily:{sans:["'Plus Jakarta Sans'",'system-ui','sans-serif']},borderRadius:{'hz':'18px','hz-sm':'12px','hz-pill':'99px'}}}}
-</script>
-<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>4A – New AP · Multi-Payer · Decide Percentage</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-hz-bg">
+<body class="bg-gray-50">
 <div id="root"></div>
 <script type="text/babel">
+const {useState} = React;
 
-// Scenario: Marcus invited TWO parents (Dad 60%, Mom 40%)
-// This prototype = Dad's flow (David Williams, 60%)
-const STUDENT        = 'Marcus Williams';
-const AP_FIRST       = 'David';
-const AP_LAST        = 'Williams';
-const OTHER_AP       = 'Angela Williams (Mom)';
-const SCHOOL         = 'Ridgemont University';
-const TOTAL_BAL      = 6800;
-const THIS_PCT       = 60;
-const OTHER_PCT      = 40;
-const MY_BAL         = Math.round(TOTAL_BAL * THIS_PCT / 100);
-const INSURANCE_PREM = Math.round(MY_BAL * 0.06);
-const NELNET_FEE     = 25;
-const DOWN_MIN       = Math.round(MY_BAL * 0.05);
+// ── Scenario: Marcus Williams invited both parents as co-payers, but let them decide the split ──
+const AP={name:"Angela Williams",role:"Mom"};
+const OTHER_AP={name:"David Williams",role:"Dad"};
+const STUDENT={name:"Marcus Williams",school:"Lakeside University",term:"Spring 2025"};
+const TOTAL_BAL=7400;
+const NELNET_FEE=34; const SCHOOL_FEE=45; // This school has a CFI school enrollment fee
+const INSURANCE_PREM=163;
+const DUE_DATE="March 20, 2025";
 
-const fmt = n => '$' + Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-
-const Shell=({children,step,total,onBack,showBack=true})=>(
-  <div className="min-h-screen bg-hz-bg flex flex-col items-center py-8 px-4">
-    <div className="w-full max-w-sm">
-      <div className="flex items-center justify-between mb-6">
-        {showBack?<button onClick={onBack} className="text-hz-accent text-sm font-semibold">← Back</button>
-          :<a href="index.html" className="text-hz-accent text-sm font-semibold">⌂ Home</a>}
-        <span className="text-xs text-hz-hint">{SCHOOL}</span>
-      </div>
-      {total>0&&<div className="mb-6"><div className="text-xs text-hz-hint mb-1.5">Step {step} of {total}</div>
-        <div className="h-1 bg-hz-cloud rounded-full overflow-hidden"><div className="h-full bg-hz-accent rounded-full transition-all duration-500" style={{width:`${(step/total)*100}%`}}/></div></div>}
-      {children}
+const Shell=({title,step,total,onBack,children})=>(
+  <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="bg-white border-b px-4 py-3 flex items-center gap-3 sticky top-0 z-10 shadow-sm">
+      {onBack&&<button onClick={onBack} className="text-gray-400 hover:text-gray-700 text-xl">←</button>}
+      <div className="flex-1"><div className="text-sm font-bold text-gray-800">{title}</div>{step&&<div className="text-xs text-gray-400">Step {step} of {total}</div>}</div>
+      <span className="text-blue-700 font-bold text-sm">Nelnet</span>
     </div>
+    <div className="flex-1 px-4 py-5 max-w-md mx-auto w-full">{children}</div>
   </div>
 );
-const Btn=({children,onClick,variant='primary',disabled=false,className=''})=>{
-  const v={primary:'bg-hz-indigo text-white',ghost:'bg-hz-cloud text-hz-indigo',teal:'bg-hz-teal text-white'};
-  return <button onClick={onClick} disabled={disabled} className={`w-full py-3.5 rounded-hz-pill font-semibold text-[15px] hover:opacity-90 active:scale-[0.97] transition-all ${v[variant]} ${disabled?'opacity-40 cursor-not-allowed':''} ${className}`}>{children}</button>;
+const Btn=({onClick,children,variant="primary",disabled=false,className=""})=>{
+  const s={primary:"bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40",secondary:"bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50",ghost:"text-blue-600 underline bg-transparent text-center"};
+  return <button onClick={onClick} disabled={disabled} className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all ${s[variant]} ${className}`}>{children}</button>;
 };
-const Card=({children,className=''})=><div className={`bg-white rounded-hz border border-hz-border shadow-sm ${className}`}>{children}</div>;
-const Info=({children})=><div className="flex gap-2 p-3 bg-hz-cloud rounded-hz-sm border border-[rgba(100,92,220,0.2)] text-xs text-hz-muted leading-relaxed"><span className="shrink-0 mt-0.5">ℹ️</span><span>{children}</span></div>;
-
-// ── S1: Welcome ────────────────────────────────────────────────────────────
-const S1=({onNext})=>(
-  <Shell step={0} total={0} showBack={false}>
-    <div className="text-center mb-8">
-      <div className="w-16 h-16 rounded-full bg-hz-cloud flex items-center justify-center mx-auto mb-4 text-3xl">💌</div>
-      <div className="text-xs font-bold uppercase tracking-widest text-hz-accent mb-2">Authorized Party Invitation</div>
-      <h1 className="text-2xl font-bold text-hz-text mb-3">You're one of {STUDENT}'s payers</h1>
-      <p className="text-sm text-hz-muted leading-relaxed">{STUDENT} has set you up as a co-payer on their {SCHOOL} account alongside {OTHER_AP}.</p>
-    </div>
-    <Card className="p-4 mb-4">
-      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Your share</div>
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-hz-indigo flex items-center justify-center text-white text-xs font-bold shrink-0">You</div>
-          <div className="flex-1">
-            <div className="text-sm font-bold text-hz-text">{AP_FIRST} {AP_LAST}</div>
-            <div className="text-xs text-hz-muted">Responsible for {THIS_PCT}% — {fmt(MY_BAL)}</div>
-          </div>
-          <div className="text-lg font-bold text-hz-indigo">{THIS_PCT}%</div>
-        </div>
-        <div className="h-1.5 bg-hz-cloud rounded-full overflow-hidden">
-          <div className="h-full rounded-full bg-hz-indigo" style={{width:`${THIS_PCT}%`}}/>
-        </div>
-        <div className="flex items-center gap-2 opacity-60">
-          <div className="w-8 h-8 rounded-full bg-hz-muted flex items-center justify-center text-white text-xs font-bold shrink-0">AW</div>
-          <div className="flex-1">
-            <div className="text-sm font-bold text-hz-text">{OTHER_AP}</div>
-            <div className="text-xs text-hz-muted">{OTHER_PCT}% — {fmt(TOTAL_BAL - MY_BAL)} (setting up separately)</div>
-          </div>
-          <div className="text-lg font-bold text-hz-muted">{OTHER_PCT}%</div>
-        </div>
-      </div>
-    </Card>
-    <Info>You only set up payment for your {THIS_PCT}% share ({fmt(MY_BAL)}). {OTHER_AP} has a separate onboarding flow for their {OTHER_PCT}%.</Info>
-    <div className="mt-5"><Btn onClick={onNext}>Get started →</Btn></div>
-  </Shell>
+const Card=({children,className=""})=><div className={`bg-white rounded-2xl shadow-sm border border-gray-100 p-5 ${className}`}>{children}</div>;
+const Tag=({color,children})=>{const c={blue:"bg-blue-100 text-blue-700",green:"bg-green-100 text-green-700",amber:"bg-amber-100 text-amber-700",teal:"bg-teal-100 text-teal-700"};return<span className={`text-xs font-bold px-2 py-0.5 rounded-full ${c[color]||"bg-gray-100 text-gray-500"}`}>{children}</span>;};
+const Lbl=({children})=><div className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 mt-4">{children}</div>;
+const InfoBox=({color="blue",children})=>{const c={blue:"bg-blue-50 border-blue-200 text-blue-800",amber:"bg-amber-50 border-amber-200 text-amber-800",green:"bg-green-50 border-green-200 text-green-800"};return<div className={`border rounded-xl p-3 text-sm ${c[color]}`}>{children}</div>;};
+const CB=({sel,onClick,title,sub})=>(
+  <button onClick={onClick} className={`w-full p-4 rounded-xl border-2 text-left transition-all ${sel?"border-blue-600 bg-blue-50":"border-gray-200 bg-white hover:border-blue-300"}`}>
+    <div className="font-bold text-gray-900 text-sm">{title}</div>
+    {sub&&<div className="text-xs text-gray-500 mt-0.5">{sub}</div>}
+  </button>
+);
+const Toggle=({label,sub,val,set})=>(
+  <div className="flex items-start gap-3">
+    <button onClick={()=>set(!val)} className={`w-11 h-6 rounded-full transition-colors shrink-0 mt-0.5 ${val?'bg-blue-600':'bg-gray-300'}`}>
+      <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform mx-0.5 ${val?'translate-x-5':'translate-x-0'}`}/>
+    </button>
+    <div><div className="text-sm font-semibold text-gray-800">{label}</div>{sub&&<div className="text-xs text-gray-500 mt-0.5">{sub}</div>}</div>
+  </div>
 );
 
-// ── S2: Create Account ─────────────────────────────────────────────────────
-const S2=({onNext,onBack})=>{
-  const [fn,setFn]=React.useState(AP_FIRST);
-  const [ln,setLn]=React.useState(AP_LAST);
-  const [em,setEm]=React.useState('david.williams@gmail.com');
-  const [un,setUn]=React.useState('');
-  const [pw,setPw]=React.useState('');
-  const ok=fn&&ln&&em&&un.length>=6&&pw.length>=8;
-  return (
-    <Shell step={1} total={6} onBack={onBack}>
-      <h2 className="text-xl font-bold text-hz-text mb-1">Create your Nelnet account</h2>
-      <p className="text-sm text-hz-muted mb-5">Separate from {STUDENT}'s school login — these are your personal credentials.</p>
-      <div className="grid grid-cols-2 gap-3 mb-3">
-        {[['First',fn,setFn],['Last',ln,setLn]].map(([l,v,s],i)=>(
-          <div key={i}><label className="block text-xs font-semibold text-hz-muted mb-1">{l} name</label>
-          <input value={v} onChange={e=>s(e.target.value)} className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/></div>
-        ))}
-      </div>
-      {[['Email',em,setEm,'email'],['Username (min 6 chars)',un,setUn,'text'],['Password (min 8 chars)',pw,setPw,'password']].map(([l,v,s,t],i)=>(
-        <div key={i} className="mb-3">
-          <label className="block text-xs font-semibold text-hz-muted mb-1">{l}</label>
-          <input type={t} value={v} onChange={e=>s(e.target.value)} className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/>
-        </div>
-      ))}
-      <Btn onClick={onNext} disabled={!ok} className="mt-1">Continue →</Btn>
-    </Shell>
-  );
-};
+export default function App(){
+  const[sc,setSc]=useState(0);
+  const go=n=>{setSc(n);window.scrollTo(0,0);};
+  const[myPct,setMyPct]=useState(50);
+  const[pctConfirmed,setPctConfirmed]=useState(false);
+  const[ins,setIns]=useState(null);
+  const[pay,setPay]=useState(null);
+  const[pifWhen,setPifWhen]=useState('today');
+  const[pifDate,setPifDate]=useState('');
+  const[freq,setFreq]=useState(null);
+  const[startD,setStartD]=useState(null);
+  const[down,setDown]=useState(350);
+  const[method,setMethod]=useState(null);
+  const[nameSigned,setNameSigned]=useState(false);
+  const[refundSame,setRefundSame]=useState(null);
+  const[phone,setPhone]=useState('');
+  const[prefs,setPrefs]=useState({changes:true,reminders:true,confirms:true,autoOff:false});
+  const hasIns=ins==='accept';
+  const myBal=Math.round(TOTAL_BAL*myPct/100);
+  const otherPct=100-myPct;
+  const otherBal=TOTAL_BAL-myBal;
+  const installments=freq==='monthly'?5:freq==='biweekly'?10:0;
+  const instAmt=installments>0?((myBal-down)/installments).toFixed(2):0;
+  const todayTotal=down+NELNET_FEE+SCHOOL_FEE+(hasIns?INSURANCE_PREM:0);
 
-// ── S3: Security ───────────────────────────────────────────────────────────
-const S3=({onNext,onBack})=>{
-  const [a1,setA1]=React.useState('');
-  const [a2,setA2]=React.useState('');
-  return (
-    <Shell step={2} total={6} onBack={onBack}>
-      <h2 className="text-xl font-bold text-hz-text mb-1">Security questions</h2>
-      <p className="text-sm text-hz-muted mb-5">For account recovery.</p>
-      <div className="space-y-4 mb-5">
-        {[['What was your childhood nickname?',a1,setA1],['What is your mother\'s maiden name?',a2,setA2]].map(([q,v,s],i)=>(
-          <div key={i}><label className="block text-xs font-semibold text-hz-muted mb-1">{q}</label>
-          <input value={v} onChange={e=>s(e.target.value)} placeholder="Answer" className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/></div>
-        ))}
-      </div>
-      <Btn onClick={onNext} disabled={a1.trim().length<2||a2.trim().length<2}>Continue →</Btn>
-    </Shell>
-  );
-};
-
-// ── S4: Agreements ─────────────────────────────────────────────────────────
-const S4=({onNext,onBack})=>{
-  const [acked,setAcked]=React.useState([false,false]);
-  const toggle=i=>setAcked(a=>a.map((v,j)=>j===i?!v:v));
-  return (
-    <Shell step={3} total={6} onBack={onBack}>
-      <h2 className="text-xl font-bold text-hz-text mb-1">School agreements</h2>
-      <p className="text-sm text-hz-muted mb-5">{SCHOOL} requires acknowledgment before payment setup.</p>
-      <div className="space-y-3 mb-5">
-        {[
-          {t:'Authorized Co-Payer Responsibility',b:`I agree to pay ${THIS_PCT}% (${fmt(MY_BAL)}) of ${STUDENT}'s balance as assigned. My portion does not affect the other authorized party's obligation.`},
-          {t:'GradGuard Refund Policy',b:'I acknowledge GradGuard refund policy terms applicable to this institution.'},
-        ].map((d,i)=>(
-          <div key={i} onClick={()=>toggle(i)} className={`bg-white rounded-hz-sm border p-4 cursor-pointer transition-all ${acked[i]?'border-hz-teal/40 bg-hz-teal-bg/20':'border-hz-border'}`}>
-            <div className="flex items-start gap-3">
-              <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 ${acked[i]?'bg-hz-teal border-hz-teal':'border-hz-border bg-white'}`}>{acked[i]&&<span className="text-white text-xs font-bold">✓</span>}</div>
-              <div><div className="font-semibold text-sm text-hz-text mb-1">{d.t}</div><div className="text-xs text-hz-muted leading-relaxed">{d.b}</div></div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <Btn onClick={onNext} disabled={!acked.every(Boolean)}>I agree →</Btn>
-    </Shell>
-  );
-};
-
-// ── S5: Balance + Insurance ────────────────────────────────────────────────
-const S5=({onNext,onBack,setInsurance})=>{
-  const [insChoice,setInsChoice]=React.useState(null);
-  const choose=v=>{setInsChoice(v);setInsurance(v==='accept');};
-  return (
-    <Shell step={4} total={6} onBack={onBack}>
-      <h2 className="text-xl font-bold text-hz-text mb-1">Your share &amp; insurance</h2>
-      <p className="text-sm text-hz-muted mb-4">Everything here is scoped to your {THIS_PCT}% of {STUDENT}'s balance.</p>
-      <Card className="p-4 mb-4">
-        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Your responsibility</div>
-        <div className="text-3xl font-bold text-hz-text mb-0.5">{fmt(MY_BAL)}</div>
-        <div className="text-xs text-hz-muted mb-3">{THIS_PCT}% of {fmt(TOTAL_BAL)} total balance · Fall 2026</div>
-        <div className="space-y-1.5 text-xs text-hz-muted border-t border-hz-border pt-3">
-          <div className="flex justify-between"><span>Total student balance</span><span className="text-hz-text font-medium">{fmt(TOTAL_BAL)}</span></div>
-          <div className="flex justify-between"><span>Your {THIS_PCT}%</span><span className="text-hz-text font-medium">{fmt(MY_BAL)}</span></div>
-          <div className="flex justify-between"><span>{OTHER_AP}'s {OTHER_PCT}%</span><span className="text-hz-muted">{fmt(TOTAL_BAL-MY_BAL)} (separate setup)</span></div>
+  const S={
+    0:()=>(
+      <Shell title="You're Invited">
+        <div className="text-center mb-5">
+          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3">✉</div>
+          <h1 className="text-xl font-bold">You've been invited!</h1>
+          <p className="text-sm text-gray-500 mt-1">{STUDENT.name} · {STUDENT.school}</p>
         </div>
-        <button className="mt-3 text-xs text-hz-accent font-semibold w-full text-center">View {STUDENT}'s full balance breakdown →</button>
-      </Card>
-      <Card className="p-4 mb-4">
-        <div className="flex items-center gap-2 mb-3"><span className="text-xl">🛡️</span>
-          <div><div className="font-semibold text-sm text-hz-text">GradGuard Tuition Insurance</div>
-          <div className="text-xs text-hz-muted">{STUDENT} declined — you can accept on their behalf</div></div>
-        </div>
-        <div className="flex justify-between items-center py-2 border-t border-hz-border">
-          <span className="text-sm text-hz-muted">Premium (your {THIS_PCT}% of tuition)</span>
-          <span className="text-xl font-bold text-hz-text">{fmt(INSURANCE_PREM)}</span>
-        </div>
-      </Card>
-      <div className="space-y-2 mb-4">
-        {[
-          {v:'accept',l:'✓ Accept insurance',sub:`${fmt(INSURANCE_PREM)} added today`,c:'bg-hz-teal-bg text-hz-teal border-hz-teal/20'},
-          {v:'decline',l:'✗ Decline',sub:'No coverage',c:'bg-hz-cloud text-hz-muted border-hz-border'},
-          {v:'later',l:'⏸ Decide later',sub:'To-do on home screen',c:'bg-hz-cloud text-hz-muted border-hz-border'},
-        ].map(opt=>(
-          <button key={opt.v} onClick={()=>choose(opt.v)}
-            className={`w-full p-3 rounded-hz-sm border text-left transition-all ${insChoice===opt.v?opt.c+' ring-1 ring-inset ring-current':'bg-white border-hz-border hover:border-hz-accent'}`}>
-            <div className="font-semibold text-sm">{opt.l}</div><div className="text-xs mt-0.5 opacity-70">{opt.sub}</div>
-          </button>
-        ))}
-      </div>
-      <Btn onClick={onNext} disabled={!insChoice}>Continue →</Btn>
-    </Shell>
-  );
-};
-
-// ── S6: How to Pay (simplified) ────────────────────────────────────────────
-const S6=({onNext,onBack,insurance})=>{
-  const [path,setPath]=React.useState('pot');
-  const [downSlider,setDownSlider]=React.useState(DOWN_MIN);
-  const totalToday=downSlider+NELNET_FEE+(insurance?INSURANCE_PREM:0);
-  return (
-    <Shell step={5} total={6} onBack={onBack}>
-      <h2 className="text-xl font-bold text-hz-text mb-1">How would you like to pay?</h2>
-      <p className="text-sm text-hz-muted mb-1">Your share: <strong className="text-hz-text">{fmt(MY_BAL)}</strong></p>
-      <div className="flex items-center justify-between px-3 py-2 bg-hz-cloud rounded-hz-sm border border-[rgba(100,92,220,0.2)] mb-4 text-xs text-hz-muted">
-        <span>Your balance</span><span className="font-bold text-hz-text">{fmt(MY_BAL)}</span>
-      </div>
-      {/* Quick path selection */}
-      <div className="space-y-2 mb-4">
-        {[
-          {v:'pot',icon:'📅',l:'Pay Over Time',s:'Split your '+fmt(MY_BAL)+' share into installments'},
-          {v:'full',icon:'💳',l:'Pay in Full',s:'Pay '+fmt(MY_BAL+(insurance?INSURANCE_PREM:0))+' today'},
-          {v:'schedule',icon:'🗓️',l:'Schedule a Payment',s:'Choose a future date'},
-        ].map(opt=>(
-          <button key={opt.v} onClick={()=>setPath(opt.v)}
-            className={`w-full p-4 rounded-hz-sm border text-left transition-all ${path===opt.v?'border-hz-indigo bg-hz-cloud':'border-hz-border bg-white hover:border-hz-accent'}`}>
-            <div className="flex items-center gap-3">
-              <span className="text-xl">{opt.icon}</span>
-              <div><div className={`font-semibold text-sm ${path===opt.v?'text-hz-indigo':'text-hz-text'}`}>{opt.l}</div>
-              <div className="text-xs text-hz-muted mt-0.5">{opt.s}</div></div>
-            </div>
-          </button>
-        ))}
-      </div>
-      {path==='pot'&&(
-        <Card className="p-4 mb-4">
-          <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Pay Over Time setup — down payment</div>
-          <div className="flex justify-between text-xs text-hz-muted mb-1">
-            <span>School min (5%) — {fmt(DOWN_MIN)}</span><span>{fmt(downSlider)} selected</span>
-          </div>
-          <input type="range" min={DOWN_MIN} max={MY_BAL} step={50} value={downSlider} onChange={e=>setDownSlider(+e.target.value)} className="w-full accent-hz-indigo mb-3"/>
-          <div className="bg-hz-cloud rounded-hz-sm p-3 space-y-1.5 text-xs">
-            <div className="flex justify-between text-hz-muted"><span>Down payment</span><span>{fmt(downSlider)}</span></div>
-            <div className="flex justify-between text-hz-muted"><span>Nelnet fee</span><span>{fmt(NELNET_FEE)}</span></div>
-            {insurance&&<div className="flex justify-between text-hz-muted"><span>GradGuard premium</span><span>{fmt(INSURANCE_PREM)}</span></div>}
-            <div className="flex justify-between font-bold text-hz-text border-t border-hz-border pt-1.5"><span>Total due today</span><span>{fmt(totalToday)}</span></div>
-            <div className="flex justify-between text-hz-muted border-t border-hz-border pt-1 mt-0.5"><span>Remaining in plan</span><span>≈{fmt((MY_BAL-downSlider)/9)}/mo × 9</span></div>
-          </div>
-          <Info className="mt-2">Frequency, start date, and installment count are configured next.</Info>
+        <Card className="mb-4 border-blue-200 bg-blue-50">
+          <div className="font-bold text-blue-900 mb-2">{STUDENT.name} has invited you as a co-payer</div>
+          <div className="text-sm text-blue-800">You're sharing payment responsibility with <strong>{OTHER_AP.name}</strong> ({OTHER_AP.role}). You'll decide your percentage split during setup.</div>
         </Card>
-      )}
-      <Btn onClick={onNext}>Continue to plan finalization →</Btn>
-    </Shell>
-  );
-};
-
-// ── S7: Confirmation ───────────────────────────────────────────────────────
-const S7=({onNext,onBack,insurance})=>(
-  <Shell step={6} total={6} onBack={onBack}>
-    <div className="text-center mb-6">
-      <div className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center mx-auto mb-4 text-3xl">✅</div>
-      <h2 className="text-xl font-bold text-hz-text mb-2">Your share is set up!</h2>
-      <p className="text-sm text-hz-muted">{OTHER_AP} will complete their {OTHER_PCT}% setup separately.</p>
-    </div>
-    <Card className="p-4 mb-4">
-      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Your confirmed setup</div>
-      <div className="space-y-2 text-sm">
-        {[
-          ['Student',STUDENT],
-          ['Your share',`${THIS_PCT}% · ${fmt(MY_BAL)}`],
-          [`${OTHER_AP}`,`${OTHER_PCT}% · ${fmt(TOTAL_BAL-MY_BAL)} (pending setup)`],
-          ['Insurance',insurance?'GradGuard accepted':'Declined'],
-          ['Plan','Monthly · 9 installments · ≈'+fmt(MY_BAL/9)+'/mo'],
-        ].map(([k,v],i)=>(
-          <div key={i} className="flex justify-between">
-            <span className="text-hz-muted">{k}</span>
-            <span className="font-medium text-hz-text text-right max-w-[60%]">{v}</span>
-          </div>
-        ))}
-      </div>
-    </Card>
-    <div className="bg-amber-50 border border-amber-200 rounded-hz-sm px-3 py-2.5 text-xs text-amber-800 mb-5">
-      ⚠️ {TOTAL_BAL-MY_BAL} ({OTHER_PCT}%) is not yet set up. {OTHER_AP} will receive a reminder to complete their portion.
-    </div>
-    <Btn onClick={onNext} variant="teal">Go to my account →</Btn>
-  </Shell>
-);
-
-// ── S8: AP Home ────────────────────────────────────────────────────────────
-const S8=()=>(
-  <div className="min-h-screen bg-hz-bg">
-    <div className="bg-white border-b border-hz-border px-4 py-3 flex items-center justify-between">
-      <div className="text-xs font-bold text-hz-accent tracking-wide">HORIZON</div>
-      <div className="w-8 h-8 rounded-full bg-hz-cloud flex items-center justify-center text-xs font-bold text-hz-accent">DW</div>
-    </div>
-    <div className="px-4 py-6 max-w-sm mx-auto">
-      <h1 className="text-2xl font-bold text-hz-text mb-0.5">Hi, {AP_FIRST} 👋</h1>
-      <p className="text-xs text-hz-hint mb-4">Co-payer for {STUDENT} · {SCHOOL} · {THIS_PCT}% responsibility</p>
-      {/* To-do: other AP pending */}
-      <Card className="p-3.5 mb-4 border-amber-200 bg-amber-50">
-        <div className="flex items-start gap-2.5">
-          <span className="text-amber-500 text-lg shrink-0">⚠️</span>
-          <div>
-            <div className="font-semibold text-sm text-amber-800">Angela Williams hasn't completed setup</div>
-            <div className="text-xs text-amber-700 mt-0.5">{fmt(TOTAL_BAL-MY_BAL)} ({OTHER_PCT}%) of the balance is not yet covered. She's been sent a reminder.</div>
-          </div>
-        </div>
-      </Card>
-      <Card className="p-4 mb-4">
-        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Your share ({THIS_PCT}%)</div>
-        <div className="text-3xl font-bold text-hz-text mb-0.5">{fmt(MY_BAL)}</div>
-        <div className="text-xs text-hz-muted mb-3">Your portion · Pay Over Time plan active</div>
-        <div className="h-2 bg-hz-cloud rounded-full overflow-hidden"><div className="h-full w-0 bg-hz-teal rounded-full"/></div>
-        <div className="text-xs text-hz-muted mt-2">First payment due May 15, 2026 · ≈{fmt(MY_BAL/9)}/mo</div>
-      </Card>
-      <div className="space-y-2.5">
-        {[
-          {icon:'📅',l:'My Pay Over Time Plan',s:'Monthly · 9 installments',hi:true},
-          {icon:'💳',l:'Make a Payment',s:'Next due May 15'},
-          {icon:'📊',l:'Account History',s:'View all activity'},
-        ].map((a,i)=>(
-          <Card key={i} className={`p-3.5 flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow ${a.hi?'border-hz-accent/30':''}`}>
-            <span className="text-xl shrink-0">{a.icon}</span>
-            <div className="flex-1 min-w-0">
-              <div className={`text-sm font-semibold ${a.hi?'text-hz-accent':'text-hz-text'}`}>{a.l}</div>
-              <div className="text-xs text-hz-hint">{a.s}</div>
+        <Card className="mb-4 space-y-2 text-sm">
+          <div className="flex justify-between"><span className="text-gray-500">Student</span><span className="font-semibold">{STUDENT.name}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">School</span><span className="font-semibold">{STUDENT.school}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Term</span><span className="font-semibold">{STUDENT.term}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Total balance</span><span className="font-bold text-gray-900">${TOTAL_BAL.toLocaleString()}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Co-payer</span><span className="font-semibold">{OTHER_AP.name} ({OTHER_AP.role})</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Your split</span><span><Tag color="amber">Pending — you'll decide</Tag></span></div>
+        </Card>
+        <Btn onClick={()=>go(1)}>Accept Invitation →</Btn>
+      </Shell>
+    ),
+    1:()=>(
+      <Shell title="Create Your Account" step={1} total={12} onBack={()=>go(0)}>
+        <h2 className="text-lg font-bold mb-1">Set up your Nelnet login</h2>
+        <p className="text-sm text-gray-500 mb-4">You'll use these credentials each time you log in.</p>
+        <Card className="space-y-3 mb-4">
+          <div><label className="text-xs text-gray-400 uppercase font-bold">Full name</label><input defaultValue={AP.name} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+          <div><label className="text-xs text-gray-400 uppercase font-bold">Email address</label><input type="email" placeholder="your@email.com" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+          <div><label className="text-xs text-gray-400 uppercase font-bold">Username</label><input placeholder="Choose a username" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+          <div><label className="text-xs text-gray-400 uppercase font-bold">Password</label><input type="password" placeholder="8+ characters" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+          <div><label className="text-xs text-gray-400 uppercase font-bold">Confirm password</label><input type="password" placeholder="Repeat password" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+        </Card>
+        <Btn onClick={()=>go(2)}>Create Account →</Btn>
+      </Shell>
+    ),
+    2:()=>(
+      <Shell title="Security Questions" step={2} total={12} onBack={()=>go(1)}>
+        <h2 className="text-lg font-bold mb-1">Security questions</h2>
+        <p className="text-sm text-gray-500 mb-4">Used to verify your identity if you need to recover your account.</p>
+        <Card className="space-y-4 mb-4">
+          {[["Question 1","What was the name of your first pet?"],["Question 2","What city were you born in?"],["Question 3","What is your mother's maiden name?"]].map(([q,placeholder])=>(
+            <div key={q}><label className="text-xs text-gray-400 uppercase font-bold">{q}</label>
+              <select className="w-full border rounded-lg p-2 mt-1 mb-1 text-sm"><option>{placeholder}</option><option>What was your childhood nickname?</option></select>
+              <input placeholder="Your answer" className="w-full border rounded-lg p-2 text-sm"/>
             </div>
-            <span className="text-hz-hint text-sm">›</span>
+          ))}
+        </Card>
+        <Btn onClick={()=>go(3)}>Continue →</Btn>
+      </Shell>
+    ),
+    3:()=>(
+      <Shell title="Your Contact Info" step={3} total={12} onBack={()=>go(2)}>
+        <h2 className="text-lg font-bold mb-1">Confirm your information</h2>
+        <p className="text-sm text-gray-500 mb-4">We use this for account notifications and payment reminders.</p>
+        <Card className="space-y-3 mb-3">
+          <div><label className="text-xs text-gray-400 uppercase font-bold">Full name</label><input defaultValue={AP.name} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+          <div><label className="text-xs text-gray-400 uppercase font-bold">Email</label><input type="email" placeholder="your@email.com" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+          <div>
+            <label className="text-xs text-gray-400 uppercase font-bold flex justify-between"><span>Phone</span><span className="font-normal normal-case text-gray-400">Optional but recommended</span></label>
+            <input type="tel" placeholder="(555) 000-0000" value={phone} onChange={e=>setPhone(e.target.value)} className="w-full border rounded-lg p-2 mt-1 text-sm"/>
+          </div>
+          <div><label className="text-xs text-gray-400 uppercase font-bold">Mailing address</label><input placeholder="Street, city, state, ZIP" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+        </Card>
+        {!phone&&<InfoBox color="amber">📱 <strong>Phone recommended</strong> — enables text payment reminders.</InfoBox>}
+        <div className="mt-4"><Btn onClick={()=>go(4)}>Continue →</Btn></div>
+      </Shell>
+    ),
+    4:()=>(
+      <Shell title="Your Payment Share" step={4} total={12} onBack={()=>go(3)}>
+        <h2 className="text-lg font-bold mb-1">Decide your payment percentage</h2>
+        <p className="text-sm text-gray-500 mb-3">{STUDENT.name} set up a shared payment arrangement. You and {OTHER_AP.name} each need to decide your share. Together you must cover 100%.</p>
+        <InfoBox color="amber">⚠ <strong>Coordinate with {OTHER_AP.name}</strong> — they'll also be asked to set a percentage. The total between you must equal 100%.</InfoBox>
+        <div className="mt-4">
+          <Card>
+            <div className="flex justify-between items-center mb-3">
+              <span className="font-semibold text-gray-800">Your share</span>
+              <span className="text-2xl font-bold text-blue-600">{myPct}%</span>
+            </div>
+            <input type="range" min={0} max={100} step={5} value={myPct} onChange={e=>setMyPct(Number(e.target.value))} className="w-full mb-4"/>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center p-3 bg-blue-50 rounded-xl">
+                <div><div className="text-sm font-bold text-blue-900">You ({AP.name})</div><div className="text-xs text-blue-700">{myPct}% of balance</div></div>
+                <div className="text-lg font-bold text-blue-900">${myBal.toLocaleString()}</div>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                <div><div className="text-sm font-bold text-gray-700">{OTHER_AP.name} ({OTHER_AP.role})</div><div className="text-xs text-gray-500">{otherPct}% of balance (remaining)</div></div>
+                <div className="text-lg font-bold text-gray-700">${otherBal.toLocaleString()}</div>
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <div className="flex justify-between text-sm font-bold"><span>Total</span><span>100% · ${TOTAL_BAL.toLocaleString()}</span></div>
+            </div>
+          </Card>
+        </div>
+        <div className="mt-4">
+          <Btn disabled={myPct===0} onClick={()=>{setPctConfirmed(true);go(5);}}>Confirm {myPct}% — ${myBal.toLocaleString()} is my share →</Btn>
+        </div>
+      </Shell>
+    ),
+    5:()=>(
+      <Shell title="School Agreements" step={5} total={12} onBack={()=>go(4)}>
+        <h2 className="text-lg font-bold mb-1">Agreements from {STUDENT.school}</h2>
+        <p className="text-sm text-gray-500 mb-4">Please review and agree to these documents.</p>
+        {[["Authorized Party Access Agreement","By proceeding, you acknowledge that you are an authorized party on this student account."],["Financial Responsibility Agreement","You agree to be financially responsible for "+myPct+"% of the student's balance — $"+myBal.toLocaleString()+"."]].map(([title,text])=>(
+          <Card key={title} className="mb-3">
+            <div className="font-semibold text-gray-800 mb-1">{title}</div>
+            <div className="text-xs text-gray-500 mb-3">{text}</div>
+            <div className="border border-dashed border-gray-300 rounded-lg p-3 text-xs text-gray-400 mb-3">[ Scroll to read full document ]</div>
+            <label className="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" className="rounded"/> I agree</label>
           </Card>
         ))}
-      </div>
-    </div>
-  </div>
-);
-
-const App=()=>{
-  const [s,setS]=React.useState(0);
-  const [insurance,setInsurance]=React.useState(false);
-  const go=n=>{setS(n);window.scrollTo(0,0);};
-  return [
-    <S1 onNext={()=>go(1)}/>,<S2 onNext={()=>go(2)} onBack={()=>go(0)}/>,
-    <S3 onNext={()=>go(3)} onBack={()=>go(1)}/>,<S4 onNext={()=>go(4)} onBack={()=>go(2)}/>,
-    <S5 onNext={()=>go(5)} onBack={()=>go(3)} setInsurance={setInsurance}/>,
-    <S6 onNext={()=>go(6)} onBack={()=>go(4)} insurance={insurance}/>,
-    <S7 onNext={()=>go(7)} onBack={()=>go(5)} insurance={insurance}/>,
-    <S8/>,
-  ][s]||null;
-};
+        <Btn onClick={()=>go(6)}>Continue →</Btn>
+      </Shell>
+    ),
+    6:()=>(
+      <Shell title="Tuition Insurance" step={6} total={12} onBack={()=>go(5)}>
+        <h2 className="text-lg font-bold mb-1">Tuition Protection Insurance</h2>
+        <p className="text-sm text-gray-500 mb-4">Protect your {myPct}% share if {STUDENT.name} must withdraw unexpectedly.</p>
+        <Card className="mb-4 border-blue-200 bg-blue-50">
+          <div className="font-bold text-blue-900 mb-1">GradGuard Tuition Protection</div>
+          <div className="text-sm text-blue-800 mb-2">Covers your ${myBal.toLocaleString()} share of tuition for covered withdrawals — illness, injury, mental health, military service, and more.</div>
+          <div className="flex justify-between items-center"><span className="text-xl font-bold text-blue-900">${INSURANCE_PREM}<span className="text-sm font-normal">/term</span></span><button className="text-xs text-blue-600 underline">View coverage →</button></div>
+        </Card>
+        <div className="space-y-2">
+          <CB sel={ins==='accept'}  onClick={()=>{setIns('accept');go(7);}}  title="✓ Yes, protect my share"    sub={`$${INSURANCE_PREM} added to today's total`}/>
+          <CB sel={ins==='decline'} onClick={()=>{setIns('decline');go(7);}} title="✗ No, decline coverage"     sub="I understand I'm declining protection"/>
+          <CB sel={ins==='later'}   onClick={()=>{setIns('later');go(7);}}   title="🕐 I'll decide later"       sub="A reminder will appear on your home screen"/>
+        </div>
+      </Shell>
+    ),
+    7:()=>(
+      <Shell title="How to Pay" step={7} total={12} onBack={()=>go(6)}>
+        <h2 className="text-lg font-bold mb-1">How would you like to pay?</h2>
+        <p className="text-sm text-gray-500 mb-1">Your share: <strong>${myBal.toLocaleString()}</strong> ({myPct}%) · {STUDENT.term}</p>
+        <p className="text-xs text-gray-400 mb-4">{OTHER_AP.name} manages their {otherPct}% separately</p>
+        <div className="space-y-3">
+          <CB sel={pay==='pot'} onClick={()=>setPay('pot')} title="Pay Over Time" sub="Split into monthly or bi-weekly installments"/>
+          <CB sel={pay==='pif'} onClick={()=>setPay('pif')} title="Pay in Full"   sub="Pay the full amount — today, or schedule for any date before the due date"/>
+          <CB sel={pay==='later'} onClick={()=>{setPay('later');go(8);}} title="🕐 I'll decide later" sub="A reminder will appear on your home screen"/>
+        </div>
+        {pay==='pot'&&<>
+          <Lbl>Payment Frequency</Lbl>
+          <div className="space-y-2">
+            <CB sel={freq==='monthly'}  onClick={()=>{setFreq('monthly');setStartD(null);}}  title="Monthly"   sub="5 installments"/>
+            <CB sel={freq==='biweekly'} onClick={()=>{setFreq('biweekly');setStartD(null);}} title="Bi-Weekly" sub="10 installments"/>
+          </div>
+          {freq&&<>
+            <Lbl>First Installment Date</Lbl>
+            <div className="space-y-2">
+              {[["Jan1","January 1, 2025"],["Jan15","January 15, 2025"],["Feb1","February 1, 2025"]].map(([v,l])=>(
+                <CB key={v} sel={startD===v} onClick={()=>setStartD(v)} title={l}/>
+              ))}
+            </div>
+          </>}
+          {freq&&startD&&<>
+            <Lbl>Plan Preview</Lbl>
+            <Card className="bg-gray-50 text-sm mb-3 space-y-1.5">
+              <div className="flex justify-between"><span className="text-gray-500">Your share</span><span>${myBal.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Installments</span><span>{installments} × ${Number(instAmt).toLocaleString('en-US',{minimumFractionDigits:2})}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Nelnet fee</span><span>${NELNET_FEE}</span></div>
+              {SCHOOL_FEE>0&&<div className="flex justify-between text-teal-700"><span>School enrollment fee</span><span>${SCHOOL_FEE}</span></div>}
+              {hasIns&&<div className="flex justify-between text-blue-700"><span>GradGuard insurance</span><span>${INSURANCE_PREM}</span></div>}
+            </Card>
+            <InfoBox color="amber">This school charges a ${SCHOOL_FEE} enrollment fee on top of Nelnet's fee.</InfoBox>
+            <Lbl>Down Payment</Lbl>
+            <Card className="mt-2">
+              <div className="flex justify-between items-center mb-2"><span className="text-sm text-gray-600">Down Payment</span><span className="font-bold text-xl">${down}</span></div>
+              <input type="range" min={0} max={myBal} step={50} value={down} onChange={e=>setDown(Number(e.target.value))} className="w-full mb-3"/>
+              <div className="bg-blue-50 rounded-xl p-3 space-y-1 text-sm">
+                <div className="text-xs font-bold text-blue-800 mb-1">Due today</div>
+                <div className="flex justify-between"><span className="text-gray-600">Down payment</span><span>${down}</span></div>
+                <div className="flex justify-between"><span className="text-gray-600">Nelnet enrollment fee</span><span>${NELNET_FEE}</span></div>
+                {SCHOOL_FEE>0&&<div className="flex justify-between text-teal-700"><span>School enrollment fee</span><span>${SCHOOL_FEE}</span></div>}
+                {hasIns&&<div className="flex justify-between text-blue-700"><span>GradGuard premium</span><span>${INSURANCE_PREM}</span></div>}
+                <div className="flex justify-between font-bold pt-1.5 border-t border-blue-200"><span>Total due today</span><span>${todayTotal}</span></div>
+              </div>
+              <div className="mt-3"><Btn onClick={()=>go(8)}>Confirm This Plan →</Btn></div>
+            </Card>
+          </>}
+        </>}
+        {pay==='pif'&&<>
+          <Lbl>When would you like to pay?</Lbl>
+          <div className="space-y-2">
+            <CB sel={pifWhen==='today'}    onClick={()=>{setPifWhen('today');setPifDate('');}}   title="Pay today"                 sub="Full payment immediately"/>
+            <CB sel={pifWhen==='schedule'} onClick={()=>setPifWhen('schedule')} title="Schedule for a future date" sub={`Any date on or before ${DUE_DATE}`}/>
+          </div>
+          {pifWhen==='schedule'&&<Card className="mt-3">
+            <label className="text-sm font-semibold text-gray-700 block mb-2">Select payment date</label>
+            <input type="date" max="2025-03-20" value={pifDate} onChange={e=>setPifDate(e.target.value)} className="w-full border rounded-lg p-2 text-sm"/>
+          </Card>}
+          {(pifWhen==='today'||pifDate)&&<div className="mt-4"><Btn onClick={()=>go(8)}>Continue →</Btn></div>}
+        </>}
+      </Shell>
+    ),
+    8:()=>(
+      <Shell title="Payment Method" step={8} total={12} onBack={()=>go(7)}>
+        <h2 className="text-lg font-bold mb-1">Select a payment method</h2>
+        <p className="text-sm text-gray-500 mb-4">This school accepts bank account and credit card for all payment types.</p>
+        <div className="space-y-3">
+          <CB sel={method==='ach'} onClick={()=>setMethod('ach')} title="🏦 Bank Account (ACH)" sub="Free — no service fee"/>
+          <CB sel={method==='cc'}  onClick={()=>setMethod('cc')}  title="💳 Credit or Debit Card" sub="⚠ 2.85% service fee applies"/>
+        </div>
+        {method==='ach'&&<>
+          <Lbl>Bank Account Details</Lbl>
+          <Card className="space-y-3 mb-3">
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Account holder name</label><input defaultValue={AP.name} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Routing number</label><input placeholder="9 digits" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Account number</label><input placeholder="Enter account number" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Account type</label><select className="w-full border rounded-lg p-2 mt-1 text-sm"><option>Checking</option><option>Savings</option></select></div>
+          </Card>
+          <InfoBox color="blue">The account holder name will be verified against your profile (<strong>{AP.name}</strong>).</InfoBox>
+          <div className="mt-3 space-y-2">
+            <Btn onClick={()=>go(9)}>Name matches — Save Account →</Btn>
+            <Btn variant="secondary" onClick={()=>go('8n')}>Name is different</Btn>
+          </div>
+        </>}
+        {method==='cc'&&<>
+          <InfoBox color="amber">⚠ <strong>Service fee:</strong> A 2.85% non-refundable service fee will be added.</InfoBox>
+          <Lbl>Card Details</Lbl>
+          <Card className="space-y-3 mb-3">
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Name on card</label><input defaultValue={AP.name} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase font-bold">Card number</label><input placeholder="•••• •••• •••• ••••" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className="text-xs text-gray-400 uppercase font-bold">Expires</label><input placeholder="MM/YY" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+              <div><label className="text-xs text-gray-400 uppercase font-bold">CVV</label><input placeholder="•••" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            </div>
+          </Card>
+          <div className="space-y-2">
+            <Btn onClick={()=>go(9)}>Name matches — Save Card →</Btn>
+            <Btn variant="secondary" onClick={()=>go('8n')}>Name is different</Btn>
+          </div>
+        </>}
+      </Shell>
+    ),
+    '8n':()=>(
+      <Shell title="Account Authorization" step={8} total={12} onBack={()=>go(8)}>
+        <h2 className="text-lg font-bold mb-2">Name doesn't match your profile</h2>
+        <InfoBox color="amber">The name on this payment account doesn't match <strong>{AP.name}</strong> on your profile.</InfoBox>
+        <div className="mt-4 space-y-3">
+          <Card className="border-blue-200">
+            <div className="font-semibold text-blue-900 mb-1">✍ This is my own account</div>
+            <div className="text-sm text-gray-600 mb-3">Sign below to confirm you own this account and authorize recurring charges.</div>
+            <div className="border-2 border-dashed border-gray-300 rounded-xl h-14 flex items-center justify-center mb-3 cursor-pointer hover:border-blue-400" onClick={()=>setNameSigned(true)}>
+              <span className="text-gray-400 text-sm">{nameSigned?`✓ Signed — ${AP.name}`:"Tap to sign"}</span>
+            </div>
+            {nameSigned&&<Btn onClick={()=>go(9)}>Continue →</Btn>}
+          </Card>
+          <Card className="border-green-200">
+            <div className="font-semibold text-green-900 mb-1">👥 Invite the account owner</div>
+            <div className="text-sm text-gray-600 mb-2">If this is someone else's account, they should pay directly as an Authorized Party.</div>
+            <Btn variant="secondary" onClick={()=>go(0)}>Go back</Btn>
+          </Card>
+        </div>
+      </Shell>
+    ),
+    9:()=>(
+      <Shell title="Refund Account" step={9} total={12} onBack={()=>go(8)}>
+        <h2 className="text-lg font-bold mb-1">Set up your refund account</h2>
+        <p className="text-sm text-gray-500 mb-4">If a refund is issued on your portion, where should it go? Required for all payers.</p>
+        {method==='ach'&&refundSame===null&&<Card className="border-green-200 bg-green-50 mb-4">
+          <div className="font-semibold text-green-900 mb-1">Use same account for refunds?</div>
+          <div className="text-sm text-gray-600 mb-3">We can use the same bank account you set up for payments.</div>
+          <div className="space-y-2">
+            <CB sel={false} onClick={()=>{setRefundSame(true);go(10);}} title="Yes, use my payment account"/>
+            <CB sel={false} onClick={()=>setRefundSame(false)} title="No, use a different account"/>
+          </div>
+        </Card>}
+        {(method!=='ach'||refundSame===false)&&<>
+          <Card className="space-y-3 mb-4">
+            <div className="text-xs text-gray-400 uppercase font-bold">Refund Bank Account</div>
+            <div><label className="text-xs text-gray-400 uppercase">Account holder name</label><input defaultValue={AP.name} className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase">Routing number</label><input placeholder="9 digits" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase">Account number</label><input placeholder="Enter account number" className="w-full border rounded-lg p-2 mt-1 text-sm"/></div>
+            <div><label className="text-xs text-gray-400 uppercase">Account type</label><select className="w-full border rounded-lg p-2 mt-1 text-sm"><option>Checking</option><option>Savings</option></select></div>
+          </Card>
+          <Btn onClick={()=>go(10)}>Save Refund Account →</Btn>
+        </>}
+      </Shell>
+    ),
+    10:()=>(
+      <Shell title="Notification Preferences" step={10} total={12} onBack={()=>go(9)}>
+        <h2 className="text-lg font-bold mb-1">Stay in the loop</h2>
+        <p className="text-sm text-gray-500 mb-3">Smart defaults based on your role as a payer. Adjust as needed.</p>
+        <Lbl>Your Notification Preferences</Lbl>
+        <Card className="space-y-4 mb-4">
+          <Toggle label="Account changes & balance updates" sub="Notify me when the balance changes for my portion." val={prefs.changes} set={v=>setPrefs(p=>({...p,changes:v}))}/>
+          <Toggle label="Payment reminders" sub="Remind me before each scheduled payment." val={prefs.reminders} set={v=>setPrefs(p=>({...p,reminders:v}))}/>
+          <Toggle label="Payment confirmations" sub="Confirm after each payment processes." val={prefs.confirms} set={v=>setPrefs(p=>({...p,confirms:v}))}/>
+          <Toggle label="Skip reminders for auto payments" sub="No reminders for auto-drafted installments." val={prefs.autoOff} set={v=>setPrefs(p=>({...p,autoOff:v}))}/>
+        </Card>
+        <Btn onClick={()=>go(11)}>Save Preferences →</Btn>
+      </Shell>
+    ),
+    11:()=>(
+      <Shell title="Agreements" step={11} total={12} onBack={()=>go(10)}>
+        <h2 className="text-lg font-bold mb-1">Nelnet Agreements</h2>
+        <p className="text-sm text-gray-500 mb-4">Final documents before we're done.</p>
+        {[["Nelnet Authorized Party Agreement","You agree to the terms of access and payment for your "+myPct+"% share of this student account."],["Auto-Pay Authorization",pay!=='later'?"You authorize Nelnet to automatically draft payments from your saved payment method on each scheduled date.":null]].filter(([,t])=>t).map(([title,text])=>(
+          <Card key={title} className="mb-3">
+            <div className="font-semibold text-gray-800 mb-1">{title}</div>
+            <div className="text-xs text-gray-500 mb-3">{text}</div>
+            <div className="border border-dashed border-gray-300 rounded-lg p-3 text-xs text-gray-400 mb-3">[ Scroll to read full document ]</div>
+            <label className="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" className="rounded"/> I agree</label>
+          </Card>
+        ))}
+        <Btn onClick={()=>go(12)}>Sign &amp; Finish →</Btn>
+      </Shell>
+    ),
+    12:()=>(
+      <Shell title={STUDENT.school}>
+        <div className="text-center mb-5">
+          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-3">✓</div>
+          <h1 className="text-2xl font-bold">You're all set!</h1>
+          <p className="text-sm text-gray-500 mt-1">{STUDENT.name} · {STUDENT.school}</p>
+        </div>
+        <Card className="mb-3 space-y-2 text-sm">
+          <div className="font-bold text-gray-700 mb-1">Your setup summary</div>
+          <div className="flex justify-between"><span className="text-gray-500">Your share</span><span className="font-bold">{myPct}% · ${myBal.toLocaleString()}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">{OTHER_AP.name}'s share</span><span>{otherPct}% · ${otherBal.toLocaleString()}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Payment plan</span><span>{pay==='pif'?'Pay in Full':pay==='later'?'Decide later':freq==='monthly'?'Monthly POT':'Bi-Weekly POT'}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Insurance</span><span className={ins==='accept'?"text-blue-700":""}>{ins==='accept'?'GradGuard':ins==='decline'?'Declined':'Decide later'}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Method</span><span>{method==='ach'?'Bank (ACH)':'Credit card'}</span></div>
+        </Card>
+        <div className="mb-3">
+          {OTHER_AP.name&&<InfoBox color="amber">⏳ <strong>{OTHER_AP.name}</strong> hasn't completed setup yet. {STUDENT.name} can see this on their home screen.</InfoBox>}
+        </div>
+        <div className="flex items-center gap-3 mb-4 mt-4">
+          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">AW</div>
+          <div><div className="font-bold text-gray-900">{AP.name}</div><div className="text-xs text-gray-500">AP for {STUDENT.name} · {myPct}% · ${myBal.toLocaleString()}</div></div>
+        </div>
+        <Card className="mb-4 bg-gradient-to-br from-blue-700 to-blue-500 text-white">
+          <div className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">Your Share — {STUDENT.term}</div>
+          <div className="text-3xl font-bold">${myBal.toLocaleString()}</div>
+          <div className="text-xs opacity-80 mt-1">{myPct}% of ${TOTAL_BAL.toLocaleString()} total · {STUDENT.name}</div>
+          <button onClick={()=>{}} className="mt-2 text-xs underline opacity-80">See full balance breakdown</button>
+        </Card>
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {["View schedule","Make a payment","Account details","Settings"].map(a=>(
+            <Card key={a} className="text-center py-3 cursor-pointer hover:border-blue-300 transition-colors"><div className="text-sm font-semibold text-gray-700">{a}</div></Card>
+          ))}
+        </div>
+        <div className="text-center">
+          <a href="index.html" target="_top" onClick={e=>{e.preventDefault();try{window.top.location.href='index.html';}catch(_){window.location.href='index.html';}}} className="text-xs text-gray-400 hover:text-blue-600 underline">⌂ Back to prototype index</a>
+        </div>
+      </Shell>
+    ),
+  };
+  const Screen=S[sc];
+  return Screen?<Screen/>:null;
+}
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>

@@ -264,79 +264,85 @@ a.tile:hover::after { opacity: 1; right: 16px; }
           <span style="font-size:11px;font-weight:800;background:rgba(100,92,220,.12);color:#3C3489;padding:2px 7px;border-radius:5px;letter-spacing:.3px;">2a</span>
           <span>Student</span>
         </div>
-        <div class="tile-name">Returning Student</div>
+        <div class="tile-name">Returning Student — New Term</div>
       </div>
       <div class="hz-divider"></div>
       <div>
         <div class="settings-label">Scenario Setup</div>
         <div class="settings-chips">
-          <span class="chip highlight">SSO login — existing account</span>
-          <span class="chip">Saved payment method</span>
-          <span class="chip">Prior APs on file</span>
-          <span class="chip">Insurance re-present: yes</span>
-          <span class="chip">Confirm-or-change flow</span>
+          <span class="chip highlight">SSO — last term paid in full</span>
+          <span class="chip">Confirm info · Insurance · How to Pay</span>
+          <span class="chip">ACH / CC / International payment</span>
+          <span class="chip">Name validation · ACH refund setup</span>
+          <span class="chip">Communications preferences</span>
         </div>
       </div>
     </a>
 
-    <!-- ── 3a. New AP — single payer ── -->
-    <a class="tile hz-card" href="onboarding-3a-ap-single-payer.html" aria-label="3a · New AP Single Payer prototype">
+    <!-- ── 3a. New AP — email invite, sole payer ── -->
+    <a class="tile hz-card" href="onboarding-3a-ap-single-payer.html" aria-label="3a · New AP Email Invite prototype">
       <div>
         <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:11px;font-weight:800;background:rgba(100,92,220,.12);color:#3C3489;padding:2px 7px;border-radius:5px;letter-spacing:.3px;">3a</span>
           <span>Authorized Party</span>
         </div>
-        <div class="tile-name">New Authorized Party — Single Payer</div>
+        <div class="tile-name">New AP — Email Invite · Sole Payer</div>
       </div>
       <div class="hz-divider"></div>
       <div>
         <div class="settings-label">Scenario Setup</div>
         <div class="settings-chips">
-          <span class="chip highlight">Nelnet credentials (not SSO)</span>
-          <span class="chip">100% responsibility</span>
-          <span class="chip">GradGuard insurance offer</span>
-          <span class="chip">POT plan setup</span>
+          <span class="chip highlight">New Nelnet account · 100% payer</span>
+          <span class="chip">Account creation + security Qs</span>
+          <span class="chip">Contact info · School agreements</span>
+          <span class="chip">Insurance · How to Pay</span>
+          <span class="chip">ACH only for POT · ACH + CC for PIF</span>
+          <span class="chip">Nelnet fee only (no school fee)</span>
+          <span class="chip">ACH refund · Comms preferences</span>
         </div>
       </div>
     </a>
 
-    <!-- ── 4a. New AP — multiple payers ── -->
-    <a class="tile hz-card" href="onboarding-4a-ap-multiple-payers.html" aria-label="4a · New AP Multiple Payers prototype">
+    <!-- ── 4a. New AP — multi-payer, decide % ── -->
+    <a class="tile hz-card" href="onboarding-4a-ap-multiple-payers.html" aria-label="4a · New AP Multi-Payer Decide % prototype">
       <div>
         <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:11px;font-weight:800;background:rgba(100,92,220,.12);color:#3C3489;padding:2px 7px;border-radius:5px;letter-spacing:.3px;">4a</span>
           <span>Authorized Party</span>
         </div>
-        <div class="tile-name">New Authorized Party — Multiple Payers</div>
+        <div class="tile-name">New AP — Multi-Payer · Decide Your %</div>
       </div>
       <div class="hz-divider"></div>
       <div>
         <div class="settings-label">Scenario Setup</div>
         <div class="settings-chips">
-          <span class="chip highlight">Dad: 60% · Mom: 40%</span>
-          <span class="chip">Separate flows per AP</span>
+          <span class="chip highlight">Student left % open for APs to decide</span>
+          <span class="chip">Percentage slider · Coordinate with co-payer</span>
           <span class="chip">Scoped balance view</span>
-          <span class="chip">Other AP pending badge</span>
+          <span class="chip">School CFI fee + Nelnet fee</span>
+          <span class="chip">ACH + CC payment methods</span>
+          <span class="chip">Name validation · ACH refund · Comms</span>
         </div>
       </div>
     </a>
 
-    <!-- ── 5a. AP non-payer ── -->
-    <a class="tile hz-card" href="onboarding-5a-ap-nonpayer.html" aria-label="5a · AP Non-Payer prototype">
+    <!-- ── 5a. Returning Student — Non-Payer ── -->
+    <a class="tile hz-card" href="onboarding-5a-ap-nonpayer.html" aria-label="5a · Returning Student Non-Payer prototype">
       <div>
         <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:11px;font-weight:800;background:rgba(100,92,220,.12);color:#3C3489;padding:2px 7px;border-radius:5px;letter-spacing:.3px;">5a</span>
-          <span>Authorized Party</span>
+          <span>Student</span>
         </div>
-        <div class="tile-name">Authorized Party — Non-Payer (View Only)</div>
+        <div class="tile-name">Returning Student — Non-Payer</div>
       </div>
       <div class="hz-divider"></div>
       <div>
         <div class="settings-label">Scenario Setup</div>
         <div class="settings-chips">
-          <span class="chip highlight">View-only access</span>
-          <span class="chip">No payment setup</span>
-          <span class="chip">Read-only home screen</span>
+          <span class="chip highlight">Last term paid in full · AP paid</span>
+          <span class="chip">Confirm same payer or invite new</span>
+          <span class="chip">View-only home screen</span>
+          <span class="chip">Non-payer notification defaults</span>
         </div>
       </div>
     </a>
@@ -348,16 +354,18 @@ a.tile:hover::after { opacity: 1; right: 16px; }
           <span style="font-size:11px;font-weight:800;background:rgba(100,92,220,.12);color:#3C3489;padding:2px 7px;border-radius:5px;letter-spacing:.3px;">6a</span>
           <span>Authorized Party</span>
         </div>
-        <div class="tile-name">Returning Authorized Party</div>
+        <div class="tile-name">Returning AP — Confirm or Change Setup</div>
       </div>
       <div class="hz-divider"></div>
       <div>
         <div class="settings-label">Scenario Setup</div>
         <div class="settings-chips">
-          <span class="chip highlight">Existing Nelnet login</span>
-          <span class="chip">New term notification</span>
-          <span class="chip">Confirm-or-change flow</span>
-          <span class="chip">Plan recalculated</span>
+          <span class="chip highlight">Login + forgot username/password</span>
+          <span class="chip">Balance comparison last vs. new term</span>
+          <span class="chip">Confirm-or-change all settings</span>
+          <span class="chip">Same day of week for start date</span>
+          <span class="chip">Min. down payment pre-filled</span>
+          <span class="chip">ACH refund confirm or update</span>
         </div>
       </div>
     </a>
@@ -400,6 +408,29 @@ a.tile:hover::after { opacity: 1; right: 16px; }
           <span class="chip">Same-as-other-student flow</span>
           <span class="chip">Before/after plan comparison</span>
           <span class="chip">One consolidated payment</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- ── 7c. Returning Student — Rollover Balance ── -->
+    <a class="tile hz-card" href="onboarding-7c-returning-student-rollover.html" aria-label="7c · Returning Student Rollover Balance prototype">
+      <div>
+        <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;font-weight:800;background:rgba(100,92,220,.12);color:#3C3489;padding:2px 7px;border-radius:5px;letter-spacing:.3px;">7c</span>
+          <span>Student</span>
+        </div>
+        <div class="tile-name">Returning Student — One-Term Rollover Balance</div>
+      </div>
+      <div class="hz-divider"></div>
+      <div>
+        <div class="settings-label">Scenario Setup</div>
+        <div class="settings-chips">
+          <span class="chip highlight">$480 remaining from Fall rolled over</span>
+          <span class="chip">Combined balance: rollover + new term</span>
+          <span class="chip">Term breakdown drilldown on demand</span>
+          <span class="chip">Insurance for new term only</span>
+          <span class="chip">School CFI fee + Nelnet fee</span>
+          <span class="chip">Rollover acknowledgment in agreements</span>
         </div>
       </div>
     </a>
