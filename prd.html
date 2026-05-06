@@ -1734,7 +1734,7 @@ body {
      VISITOR BAR
 ════════════════════════════════════════ -->
 <div id="visitor-bar" class="visitor-bar" role="status">
-  <a id="home-link" href="index.html" target="_top" style="display:none;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--hz-indigo);text-decoration:none;background:var(--hz-cloud);border:1px solid rgba(100,92,220,.2);border-radius:7px;padding:3px 10px;" aria-label="Back to home">⌂ Home</a>
+  <a id="home-link" href="index.html" target="_top" onclick="try{window.top.location.href='index.html';return false;}catch(e){}" style="display:none;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--hz-indigo);text-decoration:none;background:var(--hz-cloud);border:1px solid rgba(100,92,220,.2);border-radius:7px;padding:3px 10px;" aria-label="Back to home">⌂ Home</a>
   <span>Viewing as <span id="visitor-name" class="visitor-name"></span></span>
   <span id="visitor-change-pill" class="visitor-change-pill"></span>
   <button class="manage-prefs-btn" onclick="openPrefOverlay(true)" style="display:none" id="manage-prefs-btn">⚙ Preferences</button>
@@ -5225,6 +5225,84 @@ body {
         <p class="req-text"><strong>I need to be able to</strong> clearly see both my plan amount (covered, auto-debit on Oct 1) and my outside-plan amount (not covered, due Sep 15) as separate line items on the balance card — understanding that I need to act on the Sep 15 amount and that the Oct 1 amount will process automatically.</p>
         <p class="req-why"><strong>Why:</strong> The visual split between "on-plan" and "outside-plan" on the balance card (mode: <code>outside-plan</code>) is the core feature of this scenario. Without this split, a student would see a total balance of $9,200 and not understand that $6,000 of it is auto-handled while $1,550 requires action in the next two weeks.</p>
       </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         SCENARIOS — CONSUMER PAY OVER TIME
+    ════════════════════════════════════════ -->
+    <section id="pot-scenarios-intro" class="prd-section">
+      <div class="section-eyebrow">Scenarios — Consumer Pay Over Time</div>
+      <h2 class="section-title">Consumer Pay Over Time Scenarios</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">These scenarios cover the payment setup step that onboarding scenarios hand off to — specifically the flow where a payer enters their payment method, confirms today's total, and completes the initial charge. They also cover GradGuard's split-processor behavior, Dewar's single-processor flow, error states, and post-enrollment confirmation. See the d-series clickable prototypes on the home screen.</p>
+      <div class="coming-soon">Detailed step-by-step requirements coming soon. Scenario descriptions and clickable prototype tiles are live on the home screen.</div>
+    </section>
+
+    <section id="pot-d1" class="prd-section">
+      <div class="section-eyebrow">Scenario 1d · Student</div>
+      <h2 class="section-title">First-Time POT Setup — Student Paying</h2>
+      <hr class="section-divider"/>
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>The student is the sole payer (100%). They've completed onboarding and selected Pay Over Time. This scenario covers: entering a payment method (ACH), reviewing the itemized confirmation (down payment + Nelnet fee + insurance premium if accepted), authorizing the initial charge, and landing on the success screen. The student has accepted GradGuard insurance — today's charge includes both the down payment and the premium.</p>
+      </div>
+      <div class="coming-soon" style="margin-top:12px;">Full requirements coming soon.</div>
+    </section>
+
+    <section id="pot-d2" class="prd-section">
+      <div class="section-eyebrow">Scenario 2d · Authorized Party</div>
+      <h2 class="section-title">AP POT Setup — 100% Payer, GradGuard Accepted</h2>
+      <hr class="section-divider"/>
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>An authorized party is the sole payer. They've completed onboarding and selected Pay Over Time. They accepted GradGuard insurance — which processes through GradGuard's own payment processor, separate from the Nelnet POT down payment. This scenario covers the split-processor payment confirmation: the AP sees a single itemized total but the system makes two separate charges (one to GradGuard, one to Nelnet). Both must succeed for the session to be complete; if either fails, the scenario diverges. Success state = both succeed. Error states: GradGuard fails (Scenario 4d), Nelnet fails.</p>
+      </div>
+      <div class="coming-soon" style="margin-top:12px;">Full requirements coming soon.</div>
+    </section>
+
+    <section id="pot-d3" class="prd-section">
+      <div class="section-eyebrow">Scenario 3d · Split Payers</div>
+      <h2 class="section-title">Student + AP — Split Payer POT Setup</h2>
+      <hr class="section-divider"/>
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>The student (60%) and one AP (40%) each set up their own POT plans independently. Each payer's payment method entry, down payment, and confirmation screens are scoped to their portion only. The student's plan and the AP's plan are separate records but both cover the same student balance. This scenario documents the per-payer confirmation experience — neither payer sees the other's payment details.</p>
+      </div>
+      <div class="coming-soon" style="margin-top:12px;">Full requirements coming soon.</div>
+    </section>
+
+    <section id="pot-d4" class="prd-section">
+      <div class="section-eyebrow">Scenario 4d · Error State</div>
+      <h2 class="section-title">GradGuard Payment Fails — Nelnet Plan Succeeds</h2>
+      <hr class="section-divider"/>
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>The payer has accepted GradGuard insurance and is paying a POT down payment. The Nelnet charge succeeds, but GradGuard's processor returns an error on the insurance premium. The payer is now in a split-outcome state: their POT plan is active, but their insurance is not. The system must communicate this clearly — not a generic error — and provide a path to retry the insurance charge without re-entering the payment method or re-doing the plan setup.</p>
+      </div>
+      <div class="coming-soon" style="margin-top:12px;">Full requirements coming soon.</div>
+    </section>
+
+    <section id="pot-d5" class="prd-section">
+      <div class="section-eyebrow">Scenario 5d · Dewar Insurance</div>
+      <h2 class="section-title">Dewar Insurance + POT Setup</h2>
+      <hr class="section-divider"/>
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>The institution uses Dewar instead of GradGuard. Unlike GradGuard, Dewar's premium processes through Nelnet's own payment system — no split processor. The payer's confirmation screen shows all charges as a single payment with one authorization. No state-of-residence step was required during onboarding (Dewar skips that). The confirmation and success screens are simpler than the GradGuard split-processor scenario.</p>
+      </div>
+      <div class="coming-soon" style="margin-top:12px;">Full requirements coming soon.</div>
+    </section>
+
+    <section id="pot-d6" class="prd-section">
+      <div class="section-eyebrow">Scenario 6d · Student</div>
+      <h2 class="section-title">Pay in Full — Confirmation &amp; Receipt</h2>
+      <hr class="section-divider"/>
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>The payer selected Pay in Full during onboarding. This scenario covers: entering a payment method (ACH or credit card), viewing the itemized confirmation (full balance + any insurance premium), authorizing the charge, and the success/receipt screen. No plan setup, no installment structure, no down payment slider. The simplest payment path — but still requires full itemized transparency before authorization.</p>
+      </div>
+      <div class="coming-soon" style="margin-top:12px;">Full requirements coming soon.</div>
     </section>
 
 
@@ -9393,12 +9471,14 @@ var SECTION_TREE = [
     {id:'feat-ap-management',label:'AP Management'},
   ]},
   { id:'Scenarios — Onboarding', label:'Scenarios — Onboarding', first:'s1', children:[
-    {id:'s1',label:'1 · First Time Student'},
-    {id:'s2',label:'2 · Returning Student'},
-    {id:'s3',label:'3 · New AP — Single Payer'},
-    {id:'s4',label:'4 · New AP — Multi Payer'},
-    {id:'s5',label:'5 · AP — Non-Payer'},
-    {id:'s6',label:'6 · Returning AP'},
+    {id:'s1',label:'1a · First Time Student'},
+    {id:'s2',label:'2a · Returning Student'},
+    {id:'s3',label:'3a · New AP — Single Payer'},
+    {id:'s4',label:'4a · New AP — Multi Payer'},
+    {id:'s5',label:'5a · AP — Non-Payer'},
+    {id:'s6',label:'6a · Returning AP'},
+    {id:'s7a',label:'7a · New AP — Two Students'},
+    {id:'s7b',label:'7b · Existing AP — Second Student'},
   ]},
   { id:'Scenarios — Home Screen', label:'Scenarios — Home Screen', first:'hs-intro', children:[
     {id:'hs1',label:'1b · Balance Increase on Plan'},
@@ -9407,6 +9487,15 @@ var SECTION_TREE = [
     {id:'hs4',label:'4b · Defaulted Plan'},
     {id:'hs5',label:'5b · Past Due & Mixed Dates'},
     {id:'hs6',label:'6b · Active Plan + Outside Charges'},
+  ]},
+  { id:'Scenarios — Consumer POT', label:'Scenarios — Consumer Pay Over Time', first:'pot-scenarios-intro', children:[
+    {id:'pot-scenarios-intro',label:'Overview'},
+    {id:'pot-d1',label:'1d · Student — First-Time POT'},
+    {id:'pot-d2',label:'2d · AP — 100% Payer + GradGuard'},
+    {id:'pot-d3',label:'3d · Split Payers — Student + AP'},
+    {id:'pot-d4',label:'4d · GradGuard Fails · Plan Succeeds'},
+    {id:'pot-d5',label:'5d · Dewar Insurance + POT'},
+    {id:'pot-d6',label:'6d · Pay in Full Confirmation'},
   ]},
   { id:'Solutions We Sell', label:'Solutions We Sell', first:'sol-pot', children:[
     {id:'sol-pot',label:'Pay Over Time Overview'},

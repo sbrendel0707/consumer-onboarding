@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>7a · New AP — Two Students Same Institution – Horizon Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{'hz-indigo':'#2D1FA3','hz-accent':'#645CDC','hz-cloud':'#EEF0FF','hz-teal':'#0D7A55','hz-teal-bg':'#E1F5EE','hz-bg':'#F4F5FF','hz-text':'#1A1060','hz-muted':'#57548D','hz-hint':'#6B6899','hz-border':'rgba(100,92,220,0.14)','hz-danger':'#E24B4A'},fontFamily:{sans:["'Plus Jakarta Sans'",'system-ui','sans-serif']},borderRadius:{'hz':'18px','hz-sm':'12px','hz-pill':'99px'}}}}
+</script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-hz-bg">
+<div id="root"></div>
+<script type="text/babel">
+
+const STUDENT_A  = {name:'Emma Davis', balance:5200};
+const STUDENT_B  = {name:'Ryan Davis',  balance:4800};
+const AP_FIRST   = 'Linda';
+const AP_LAST    = 'Davis';
+const SCHOOL     = 'Ridgemont University';
+const COMBINED   = STUDENT_A.balance + STUDENT_B.balance;
+const INS_A      = 312;
+const INS_B      = 288;
+const COMBINED_INS = INS_A + INS_B;
+const NELNET_FEE = 25;
+const DOWN_PCT   = 0.05;
+const DOWN_MIN   = Math.round(COMBINED * DOWN_PCT);
+
+const fmt = n=>'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+const Shell=({children,step,total,onBack,showBack=true})=>(
+  <div className="min-h-screen bg-hz-bg flex flex-col items-center py-8 px-4">
+    <div className="w-full max-w-sm">
+      <div className="flex items-center justify-between mb-6">
+        {showBack?<button onClick={onBack} className="text-hz-accent text-sm font-semibold">← Back</button>
+          :<a href="index.html" className="text-hz-accent text-sm font-semibold">⌂ Home</a>}
+        <span className="text-xs text-hz-hint">{SCHOOL}</span>
+      </div>
+      {total>0&&<div className="mb-6"><div className="text-xs text-hz-hint mb-1.5">Step {step} of {total}</div>
+        <div className="h-1 bg-hz-cloud rounded-full overflow-hidden"><div className="h-full bg-hz-accent rounded-full transition-all duration-500" style={{width:`${(step/total)*100}%`}}/></div></div>}
+      {children}
+    </div>
+  </div>
+);
+const Btn=({children,onClick,variant='primary',disabled=false,className=''})=>{
+  const v={primary:'bg-hz-indigo text-white',ghost:'bg-hz-cloud text-hz-indigo',teal:'bg-hz-teal text-white'};
+  return <button onClick={onClick} disabled={disabled} className={`w-full py-3.5 rounded-hz-pill font-semibold text-[15px] hover:opacity-90 active:scale-[0.97] transition-all ${v[variant]} ${disabled?'opacity-40 cursor-not-allowed':''} ${className}`}>{children}</button>;
+};
+const Card=({children,className=''})=><div className={`bg-white rounded-hz border border-hz-border shadow-sm ${className}`}>{children}</div>;
+const Info=({children})=><div className="flex gap-2 p-3 bg-hz-cloud rounded-hz-sm border border-[rgba(100,92,220,0.2)] text-xs text-hz-muted leading-relaxed"><span className="shrink-0 mt-0.5">ℹ️</span><span>{children}</span></div>;
+
+// ── S1: Welcome — Two Students ─────────────────────────────────────────────
+const S1=({onNext})=>(
+  <Shell step={0} total={0} showBack={false}>
+    <div className="text-center mb-6">
+      <div className="w-16 h-16 rounded-full bg-hz-cloud flex items-center justify-center mx-auto mb-4 text-3xl">👨‍👩‍👧‍👦</div>
+      <div className="text-xs font-bold uppercase tracking-widest text-hz-accent mb-2">Two Invitations — Same School</div>
+      <h1 className="text-2xl font-bold text-hz-text mb-2">You've been invited as payer for two students</h1>
+      <p className="text-sm text-hz-muted leading-relaxed">Both students attend {SCHOOL}. You can set up one combined account that covers both.</p>
+    </div>
+    <Card className="p-4 mb-4">
+      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Students you're paying for</div>
+      <div className="space-y-3">
+        {[STUDENT_A, STUDENT_B].map((s,i)=>(
+          <div key={i} className="flex items-center justify-between p-2.5 bg-hz-cloud rounded-hz-sm">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-hz-indigo flex items-center justify-center text-white text-xs font-bold shrink-0">{s.name[0]}{s.name.split(' ')[1][0]}</div>
+              <div><div className="text-sm font-semibold text-hz-text">{s.name}</div><div className="text-xs text-hz-muted">{SCHOOL}</div></div>
+            </div>
+            <span className="font-bold text-hz-text">{fmt(s.balance)}</span>
+          </div>
+        ))}
+        <div className="flex justify-between items-center pt-2 border-t border-hz-border">
+          <span className="font-bold text-hz-text">Combined total</span>
+          <span className="text-xl font-bold text-hz-indigo">{fmt(COMBINED)}</span>
+        </div>
+      </div>
+    </Card>
+    <Info>Since both students attend the same school, you can complete one combined onboarding — one account, one payment plan, one payment today.</Info>
+    <div className="mt-5"><Btn onClick={onNext}>Set up combined account →</Btn></div>
+  </Shell>
+);
+
+// ── S2: Create Account ─────────────────────────────────────────────────────
+const S2=({onNext,onBack})=>{
+  const [fn,setFn]=React.useState(AP_FIRST);
+  const [ln,setLn]=React.useState(AP_LAST);
+  const [em,setEm]=React.useState('linda.davis@gmail.com');
+  const [un,setUn]=React.useState('');
+  const [pw,setPw]=React.useState('');
+  const ok=fn&&ln&&em&&un.length>=6&&pw.length>=8;
+  return (
+    <Shell step={1} total={6} onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Create your Nelnet account</h2>
+      <p className="text-sm text-hz-muted mb-5">One account covers both students — not tied to either school login.</p>
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        {[['First',fn,setFn],['Last',ln,setLn]].map(([l,v,s],i)=>(
+          <div key={i}><label className="block text-xs font-semibold text-hz-muted mb-1">{l} name</label>
+          <input value={v} onChange={e=>s(e.target.value)} className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/></div>
+        ))}
+      </div>
+      {[['Email',em,setEm,'email'],['Username (min 6 chars)',un,setUn,'text'],['Password (min 8 chars)',pw,setPw,'password']].map(([l,v,s,t],i)=>(
+        <div key={i} className="mb-3">
+          <label className="block text-xs font-semibold text-hz-muted mb-1">{l}</label>
+          <input type={t} value={v} onChange={e=>s(e.target.value)} className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/>
+        </div>
+      ))}
+      <Btn onClick={onNext} disabled={!ok} className="mt-1">Continue →</Btn>
+    </Shell>
+  );
+};
+
+// ── S3: Security + Agreements ──────────────────────────────────────────────
+const S3=({onNext,onBack})=>{
+  const [a1,setA1]=React.useState('');
+  const [acked,setAcked]=React.useState([false,false,false]);
+  const toggle=i=>setAcked(a=>a.map((v,j)=>j===i?!v:v));
+  const ok=a1.trim().length>2&&acked.every(Boolean);
+  return (
+    <Shell step={2} total={6} onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Security &amp; agreements</h2>
+      <p className="text-sm text-hz-muted mb-5">One set — covers both students at {SCHOOL}.</p>
+      <div className="mb-4">
+        <label className="block text-xs font-semibold text-hz-muted mb-1">Security question: What is your mother's maiden name?</label>
+        <input value={a1} onChange={e=>setA1(e.target.value)} placeholder="Your answer" className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/>
+      </div>
+      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">School agreements</div>
+      <div className="space-y-2.5 mb-5">
+        {[
+          {t:'Authorized Payer Responsibility — Emma Davis',b:'I agree to pay 100% of Emma Davis\'s balance as her designated authorized payer.'},
+          {t:'Authorized Payer Responsibility — Ryan Davis',b:'I agree to pay 100% of Ryan Davis\'s balance as his designated authorized payer.'},
+          {t:'GradGuard Refund Policy',b:'I acknowledge GradGuard terms applicable to both students\' accounts at Ridgemont University.'},
+        ].map((d,i)=>(
+          <div key={i} onClick={()=>toggle(i)} className={`bg-white rounded-hz-sm border p-3.5 cursor-pointer transition-all ${acked[i]?'border-hz-teal/40 bg-hz-teal-bg/20':'border-hz-border'}`}>
+            <div className="flex items-start gap-2.5">
+              <div className={`w-4.5 h-4.5 w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 ${acked[i]?'bg-hz-teal border-hz-teal':'border-hz-border bg-white'}`}>{acked[i]&&<span className="text-white text-xs font-bold">✓</span>}</div>
+              <div><div className="font-semibold text-xs text-hz-text mb-0.5">{d.t}</div><div className="text-xs text-hz-muted leading-relaxed">{d.b}</div></div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Btn onClick={onNext} disabled={!ok}>I agree to all →</Btn>
+    </Shell>
+  );
+};
+
+// ── S4: Combined Balance + Insurance ──────────────────────────────────────
+const S4=({onNext,onBack,setInsurance})=>{
+  const [expanded,setExpanded]=React.useState(false);
+  const [insChoice,setInsChoice]=React.useState(null);
+  const choose=v=>{setInsChoice(v);setInsurance(v==='accept');};
+  return (
+    <Shell step={3} total={6} onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Combined balance &amp; insurance</h2>
+      <p className="text-sm text-hz-muted mb-4">You're covering both students — here's the full picture.</p>
+
+      <Card className="p-4 mb-4">
+        <div className="flex items-end justify-between mb-3">
+          <div>
+            <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-1">Combined balance</div>
+            <div className="text-3xl font-bold text-hz-text">{fmt(COMBINED)}</div>
+          </div>
+          <button onClick={()=>setExpanded(!expanded)} className="text-xs text-hz-accent font-semibold">{expanded?'Hide':'View'} breakdown</button>
+        </div>
+        {expanded&&(
+          <div className="space-y-2.5 border-t border-hz-border pt-3">
+            {[STUDENT_A,STUDENT_B].map((s,i)=>(
+              <div key={i} className="bg-hz-cloud rounded-hz-sm p-2.5">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-sm font-semibold text-hz-text">{s.name}</span>
+                  <span className="font-bold text-hz-text">{fmt(s.balance)}</span>
+                </div>
+                <div className="space-y-1 text-xs text-hz-muted">
+                  <div className="flex justify-between"><span>Total charges</span><span>{fmt(Math.round(s.balance*1.7))}</span></div>
+                  <div className="flex justify-between"><span>Applied aid</span><span>−{fmt(Math.round(s.balance*0.42))}</span></div>
+                  <div className="flex justify-between"><span>Anticipated aid <span className="bg-amber-100 text-amber-700 px-1 rounded text-[10px]">Est.</span></span><span>−{fmt(Math.round(s.balance*0.28))}</span></div>
+                  <div className="flex justify-between font-semibold text-hz-text border-t border-hz-border pt-1"><span>Balance due</span><span>{fmt(s.balance)}</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+
+      <Card className="p-4 mb-4">
+        <div className="flex items-center gap-2 mb-3"><span className="text-xl">🛡️</span>
+          <div><div className="font-semibold text-sm text-hz-text">GradGuard Tuition Insurance</div>
+          <div className="text-xs text-hz-muted">For both students · Combined premium</div></div>
+        </div>
+        <div className="space-y-1.5 text-xs mb-2">
+          <div className="flex justify-between text-hz-muted"><span>{STUDENT_A.name} premium</span><span>{fmt(INS_A)}</span></div>
+          <div className="flex justify-between text-hz-muted"><span>{STUDENT_B.name} premium</span><span>{fmt(INS_B)}</span></div>
+          <div className="flex justify-between font-bold text-hz-text border-t border-hz-border pt-1.5"><span>Combined premium</span><span>{fmt(COMBINED_INS)}</span></div>
+        </div>
+      </Card>
+
+      <div className="space-y-2 mb-5">
+        {[
+          {v:'accept',l:'✓ Accept for both students',sub:`${fmt(COMBINED_INS)} added today`,c:'bg-hz-teal-bg text-hz-teal border-hz-teal/20'},
+          {v:'decline',l:'✗ Decline for both',sub:'No coverage',c:'bg-hz-cloud text-hz-muted border-hz-border'},
+          {v:'later',l:'⏸ Decide later',sub:'Added as to-do',c:'bg-hz-cloud text-hz-muted border-hz-border'},
+        ].map(opt=>(
+          <button key={opt.v} onClick={()=>choose(opt.v)}
+            className={`w-full p-3 rounded-hz-sm border text-left transition-all ${insChoice===opt.v?opt.c+' ring-1 ring-inset ring-current':'bg-white border-hz-border hover:border-hz-accent'}`}>
+            <div className="font-semibold text-sm">{opt.l}</div><div className="text-xs mt-0.5 opacity-70">{opt.sub}</div>
+          </button>
+        ))}
+      </div>
+      <Btn onClick={onNext} disabled={!insChoice}>Continue →</Btn>
+    </Shell>
+  );
+};
+
+// ── S5: How to Pay (combined) ──────────────────────────────────────────────
+const S5=({onNext,onBack,insurance})=>{
+  const [planType,setPlanType]=React.useState(null);
+  const [downSlider,setDownSlider]=React.useState(DOWN_MIN);
+  const totalToday=downSlider+NELNET_FEE+(insurance?COMBINED_INS:0);
+  const canContinue=!!planType;
+  return (
+    <Shell step={4} total={6} onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">How would you like to pay?</h2>
+      <p className="text-sm text-hz-muted mb-2">Combined total: <strong className="text-hz-text">{fmt(COMBINED)}</strong></p>
+      <div className="flex items-center justify-between px-3 py-2 bg-hz-cloud rounded-hz-sm border border-[rgba(100,92,220,0.2)] mb-4 text-xs text-hz-muted">
+        <span className="flex items-center gap-2"><span className="text-hz-text font-bold">Combined</span>{STUDENT_A.name} + {STUDENT_B.name}</span>
+        <span className="font-bold text-hz-text">{fmt(COMBINED)}</span>
+      </div>
+
+      {!planType&&(
+        <div className="space-y-2 mb-4">
+          {[
+            {v:'combined-pot',icon:'📅',l:'One combined Pay Over Time plan',s:`Cover both students with one plan — ${fmt(COMBINED)} total`},
+            {v:'separate-pot',icon:'📅📅',l:'Separate plans per student',s:'Individual plans for each — more flexibility'},
+            {v:'full',icon:'💳',l:'Pay combined total in full',s:`${fmt(COMBINED+(insurance?COMBINED_INS:0))} today`},
+          ].map(opt=>(
+            <button key={opt.v} onClick={()=>setPlanType(opt.v)}
+              className="w-full p-4 rounded-hz-sm border border-hz-border bg-white text-left hover:border-hz-accent hover:shadow-sm transition-all">
+              <div className="flex items-start gap-3">
+                <span className="text-xl shrink-0">{opt.icon}</span>
+                <div><div className="font-semibold text-hz-text text-sm">{opt.l}</div><div className="text-xs text-hz-muted mt-0.5">{opt.s}</div></div>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {planType&&(
+        <div className="space-y-3 mb-4">
+          <button onClick={()=>setPlanType(null)} className="text-sm font-semibold text-hz-accent">← Change selection</button>
+          {planType==='combined-pot'&&(
+            <Card className="p-4">
+              <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Combined Pay Over Time</div>
+              <div className="flex justify-between text-xs text-hz-muted mb-1"><span>School min (5%) — {fmt(DOWN_MIN)}</span><span>{fmt(downSlider)} selected</span></div>
+              <input type="range" min={DOWN_MIN} max={COMBINED} step={100} value={downSlider} onChange={e=>setDownSlider(+e.target.value)} className="w-full accent-hz-indigo mb-3"/>
+              <div className="bg-hz-cloud rounded-hz-sm p-3 space-y-1.5 text-xs">
+                <div className="flex justify-between text-hz-muted"><span>Down payment</span><span>{fmt(downSlider)}</span></div>
+                <div className="flex justify-between text-hz-muted"><span>Nelnet fee</span><span>{fmt(NELNET_FEE)}</span></div>
+                {insurance&&<div className="flex justify-between text-hz-muted"><span>GradGuard (both students)</span><span>{fmt(COMBINED_INS)}</span></div>}
+                <div className="flex justify-between font-bold text-hz-text border-t border-hz-border pt-1.5"><span>Total due today</span><span>{fmt(totalToday)}</span></div>
+                <div className="flex justify-between text-hz-muted border-t border-hz-border pt-1 mt-0.5"><span>Remaining ÷ 9 months</span><span>≈{fmt((COMBINED-downSlider)/9)}/mo</span></div>
+              </div>
+              <div className="mt-3 text-xs text-hz-hint">Frequency, start date, installment count finalized next.</div>
+            </Card>
+          )}
+          {planType==='separate-pot'&&(
+            <Card className="p-4">
+              <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Separate plans</div>
+              {[STUDENT_A,STUDENT_B].map((s,i)=>(
+                <div key={i} className="mb-3 last:mb-0 pb-3 last:pb-0 border-b last:border-0 border-hz-border">
+                  <div className="text-sm font-semibold text-hz-text mb-1">{s.name}</div>
+                  <div className="text-xs text-hz-muted">Monthly · 9 installments · ≈{fmt(s.balance/9)}/mo</div>
+                </div>
+              ))}
+              <div className="mt-3 bg-hz-cloud rounded p-2.5 text-xs">
+                <div className="flex justify-between text-hz-muted"><span>Down payment (each 5%)</span><span>{fmt(Math.round(STUDENT_A.balance*.05)+Math.round(STUDENT_B.balance*.05))}</span></div>
+                <div className="flex justify-between text-hz-muted"><span>Nelnet fee</span><span>{fmt(NELNET_FEE)}</span></div>
+                {insurance&&<div className="flex justify-between text-hz-muted"><span>GradGuard (both)</span><span>{fmt(COMBINED_INS)}</span></div>}
+                <div className="flex justify-between font-bold text-hz-text border-t border-hz-border pt-1 mt-1"><span>Total due today</span><span>{fmt(Math.round(STUDENT_A.balance*.05)+Math.round(STUDENT_B.balance*.05)+NELNET_FEE+(insurance?COMBINED_INS:0))}</span></div>
+              </div>
+            </Card>
+          )}
+          {planType==='full'&&(
+            <Card className="p-4">
+              <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Pay in Full — Combined</div>
+              <div className="space-y-1.5 text-xs">
+                <div className="flex justify-between text-hz-muted"><span>{STUDENT_A.name}</span><span>{fmt(STUDENT_A.balance)}</span></div>
+                <div className="flex justify-between text-hz-muted"><span>{STUDENT_B.name}</span><span>{fmt(STUDENT_B.balance)}</span></div>
+                {insurance&&<div className="flex justify-between text-hz-muted"><span>GradGuard (both)</span><span>{fmt(COMBINED_INS)}</span></div>}
+                <div className="flex justify-between font-bold text-hz-text border-t border-hz-border pt-1.5"><span>Total due today</span><span>{fmt(COMBINED+(insurance?COMBINED_INS:0))}</span></div>
+              </div>
+            </Card>
+          )}
+        </div>
+      )}
+      <Btn onClick={onNext} disabled={!canContinue}>Continue to payment setup →</Btn>
+    </Shell>
+  );
+};
+
+// ── S6: Confirmation ───────────────────────────────────────────────────────
+const S6=({onNext,onBack,insurance})=>(
+  <Shell step={5} total={6} onBack={onBack}>
+    <div className="text-center mb-6">
+      <div className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center mx-auto mb-4 text-3xl">🎉</div>
+      <h2 className="text-xl font-bold text-hz-text mb-2">Combined setup complete!</h2>
+      <p className="text-sm text-hz-muted">Both students are covered. Payment method entry is the final step.</p>
+    </div>
+    <Card className="p-4 mb-4">
+      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Confirmed setup</div>
+      <div className="space-y-2 text-sm">
+        {[
+          [`${STUDENT_A.name}`,fmt(STUDENT_A.balance)],
+          [`${STUDENT_B.name}`,fmt(STUDENT_B.balance)],
+          ['Combined total',fmt(COMBINED)],
+          ['Insurance',insurance?`GradGuard — ${fmt(COMBINED_INS)} combined`:'Declined'],
+          ['Plan','Combined monthly · 9 installments · ≈'+fmt(COMBINED/9)+'/mo'],
+          ['One payment today',fmt(DOWN_MIN+NELNET_FEE+(insurance?COMBINED_INS:0))],
+        ].map(([k,v],i)=>(
+          <div key={i} className={`flex justify-between ${i===2||i===5?'font-bold border-t border-hz-border pt-2 mt-1':''}`}>
+            <span className={i===2||i===5?'text-hz-text':'text-hz-muted'}>{k}</span>
+            <span className={`font-medium ${i===2||i===5?'text-hz-indigo':'text-hz-text'} text-right`}>{v}</span>
+          </div>
+        ))}
+      </div>
+    </Card>
+    <div className="bg-hz-cloud border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-xs text-hz-muted mb-5">
+      ℹ️ One consolidated signature. One charge today. Payment method entry and final processing is handled next in the POT setup flow.
+    </div>
+    <Btn onClick={onNext} variant="teal">Continue to payment setup →</Btn>
+    <div className="mt-2 text-center text-xs text-hz-hint">Payment processing covered in c-series prototypes</div>
+  </Shell>
+);
+
+// ── S7: Combined Home ──────────────────────────────────────────────────────
+const S7=({insurance})=>(
+  <div className="min-h-screen bg-hz-bg">
+    <div className="bg-white border-b border-hz-border px-4 py-3 flex items-center justify-between">
+      <div className="text-xs font-bold text-hz-accent tracking-wide">HORIZON</div>
+      <div className="w-8 h-8 rounded-full bg-hz-cloud flex items-center justify-center text-xs font-bold text-hz-accent">LD</div>
+    </div>
+    <div className="px-4 py-6 max-w-sm mx-auto">
+      <h1 className="text-2xl font-bold text-hz-text mb-0.5">Hi, {AP_FIRST} 👋</h1>
+      <p className="text-xs text-hz-hint mb-5">Authorized party · {STUDENT_A.name} &amp; {STUDENT_B.name} · {SCHOOL}</p>
+      <Card className="p-4 mb-4">
+        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Combined account summary</div>
+        <div className="text-3xl font-bold text-hz-text mb-0.5">{fmt(COMBINED)}</div>
+        <div className="text-xs text-hz-muted mb-3">Combined balance · Combined plan active</div>
+        <div className="space-y-2 text-xs text-hz-muted border-t border-hz-border pt-2 mt-1">
+          {[STUDENT_A,STUDENT_B].map((s,i)=>(
+            <div key={i} className="flex justify-between"><span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-hz-indigo inline-block"/>{s.name}</span><span className="font-medium text-hz-text">{fmt(s.balance)}</span></div>
+          ))}
+        </div>
+        <div className="h-2 bg-hz-cloud rounded-full overflow-hidden mt-3"><div className="h-full w-0 bg-hz-teal rounded-full"/></div>
+        <div className="text-xs text-hz-muted mt-1.5">First payment due May 15 · ≈{fmt(COMBINED/9)}/mo</div>
+      </Card>
+      <div className="space-y-2.5">
+        {[
+          {icon:'📅',l:'My Combined Pay Over Time Plan',s:'Monthly · 9 installments remaining',hi:true},
+          {icon:'💳',l:'Make a Payment',s:'Combined account'},
+          {icon:'📊',l:'Account History',s:'View all activity'},
+        ].map((a,i)=>(
+          <Card key={i} className={`p-3.5 flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow ${a.hi?'border-hz-accent/30':''}`}>
+            <span className="text-xl shrink-0">{a.icon}</span>
+            <div className="flex-1 min-w-0">
+              <div className={`text-sm font-semibold ${a.hi?'text-hz-accent':'text-hz-text'}`}>{a.l}</div>
+              <div className="text-xs text-hz-hint">{a.s}</div>
+            </div>
+            <span className="text-hz-hint text-sm">›</span>
+          </Card>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const App=()=>{
+  const [s,setS]=React.useState(0);
+  const [insurance,setInsurance]=React.useState(false);
+  const go=n=>{setS(n);window.scrollTo(0,0);};
+  return [
+    <S1 onNext={()=>go(1)}/>,<S2 onNext={()=>go(2)} onBack={()=>go(0)}/>,
+    <S3 onNext={()=>go(3)} onBack={()=>go(1)}/>,<S4 onNext={()=>go(4)} onBack={()=>go(2)} setInsurance={setInsurance}/>,
+    <S5 onNext={()=>go(5)} onBack={()=>go(3)} insurance={insurance}/>,
+    <S6 onNext={()=>go(6)} onBack={()=>go(4)} insurance={insurance}/>,
+    <S7 insurance={insurance}/>,
+  ][s]||null;
+};
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
