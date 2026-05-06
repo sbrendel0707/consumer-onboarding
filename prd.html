@@ -5288,16 +5288,24 @@ body {
       </div>
       <div class="cross-note"><strong>Cross-scenario rule:</strong> Balance is always derived from ERP in real time. No balance is ever hard-coded or estimated by Horizon. Returning students see a comparison of prior-term vs. current-term amounts. APs see only the balance components the student has granted visibility to.</div>
 
-      <div class="req-item" data-modified="2026-05-01">
-        <p class="req-text"><strong>Display a full balance breakdown on entry to the payment decision step.</strong> Show: total charges (tuition + institutional fees), financial aid applied, school enrollment fee (if applicable), and the resulting net balance. Each component must be labeled clearly — no abbreviations the student may not recognize.</p>
-        <p class="req-why"><strong>Why:</strong> Students make their payment decision (pay in full vs. plan) based on this breakdown. If any component is missing or unlabeled, the student cannot verify their balance is correct — leading to calls to the bursar or hesitation to complete setup.</p>
-        <div class="req-tags"><span class="tag tag-erp">ERP: charges + financial aid</span><span class="tag tag-inst">Institution: enrollment fee amount</span></div>
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>The headline number shown to each payer is the amount that requires their action — nothing more.</strong> For a payer who owns 100% of the balance, this is the full outstanding balance. For a payer who owns a percentage (split arrangement), this is their assigned percentage of the outstanding balance. The goal is to show the payer exactly what they are responsible for without surrounding noise from amounts that belong to other payers or are not yet actionable. All other context — the full account balance, what other APs are covering — is available on request but must not compete with the headline number.</p>
+        <p class="req-why"><strong>Why:</strong> A parent responsible for 60% of a $10,000 balance should immediately see "$6,000" — not "$10,000" and then have to calculate their share. Showing the full balance as the primary number when a split applies creates confusion about what the payer actually owes and undermines confidence in the number.</p>
+        <div class="req-tags">
+          <span class="tag tag-if">IF: Sole payer → headline = full outstanding balance</span>
+          <span class="tag tag-if">IF: Split arrangement → headline = payer's percentage of balance</span>
+        </div>
       </div>
 
-      <div class="req-item" data-modified="2026-05-01">
-        <p class="req-text"><strong>Distinguish estimated vs. finalized balances.</strong> If the ERP has not yet posted final charges (e.g., registration is still open), the balance is marked "estimated" with a plain-language explanation. Decisions made on an estimated balance (e.g., POT enrollment) are confirmed again once the balance is finalized.</p>
-        <p class="req-why"><strong>Why:</strong> Students who enroll in a plan based on an estimated balance and later see a different amount feel misled. Clearly flagging the estimate sets expectations and triggers a re-confirmation step to keep plan terms accurate.</p>
-        <div class="req-tags"><span class="tag tag-erp">ERP: balance finalization flag</span></div>
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>The payer can always access the full balance breakdown before committing to payment.</strong> A tappable "View full breakdown" affordance (link, button, or expandable row) is available before any payment decision is made. The full breakdown shows: all charges by type, applied financial aid, anticipated financial aid, and the resulting outstanding balance — plus, in a split scenario, how that balance is divided across payers and what amount the current payer is covering. This exists so the payer can verify accuracy before paying — and know to call the institution if something looks incorrect.</p>
+        <p class="req-why"><strong>Why:</strong> Payers — especially authorized parties — may not be familiar with every charge on the student's account. They need the ability to inspect the details before committing money, without being forced to see all of it as the primary presentation. Putting this detail behind a tap keeps the primary view clean while making the information accessible when trust or accuracy needs to be verified.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>Estimated financial aid is always subtracted from charges to arrive at the outstanding balance shown.</strong> The outstanding balance = total charges − applied aid − anticipated (estimated) aid. The student is never shown a balance that includes aid that has already been awarded and subtracted by the institution — regardless of whether that aid has posted vs. is still anticipated. Whether the "Estimated" label is displayed next to anticipated aid amounts is institution-configured (some schools prefer not to surface the estimated/applied distinction; others require it for transparency). In all cases, the math is the same: anticipated aid reduces the balance.</p>
+        <p class="req-why"><strong>Why:</strong> Showing a balance that hasn't already subtracted anticipated aid inflates the apparent amount owed and triggers panic or incorrect payment actions. The student should always see their real net obligation — what they actually need to arrange payment for — not a gross charge figure before aid is factored in. The institution controls whether to visually label the aid as "estimated" vs. "applied," but the subtraction always happens.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution: show estimated label (on/off)</span><span class="tag tag-erp">ERP: charges + applied aid + anticipated aid</span></div>
       </div>
 
       <div class="req-item" data-modified="2026-05-01">
@@ -5383,8 +5391,42 @@ body {
         <div class="req-tags"><span class="tag tag-inst">Institution: POT enabled + plan count</span></div>
       </div>
 
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>When enrolling in a Pay Over Time plan, the payer makes three active decisions: payment frequency, first payment date, and down payment amount.</strong> Each decision must be an explicit choice — not a hidden default. These decisions shape the entire plan structure and the payer must own them, not discover them after confirmation.</p>
+        <p class="req-why"><strong>Why:</strong> A plan the payer didn't consciously set up is a plan they'll dispute later. Passive defaults on frequency or start date create "I didn't sign up for this" contacts when the first installment drafts. Active choices, clearly confirmed, reduce disputes and increase plan completion rates.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>Payment frequency.</strong> The payer selects how often installments are charged — monthly, bi-weekly, or institution-defined custom schedule. The available options are institution-configured. The selection drives all downstream schedule calculations (installment count, dates, per-installment amount).</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution: available frequency options per plan</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>First payment date.</strong> The payer selects the date their first installment will be charged. This is distinct from today's sign-up payment — the first installment starts a future recurring cycle. The selectable range is constrained by the institution's plan configuration (e.g., first payment must fall within 30 days of enrollment, or must be on a specific calendar date). Once a start date is selected, the full installment schedule is calculated and displayed: each payment date, amount, and the final payment date.</p>
+        <p class="req-why"><strong>Why:</strong> The start date directly affects the payer's cash flow and must be a conscious choice. Defaulting to the earliest possible date without a payer decision causes missed payments from users who didn't realize installments started immediately.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution: first payment date constraints</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>Down payment amount.</strong> The institution configures a minimum down payment — expressed as either a minimum percentage of the plan balance or a minimum flat dollar amount. This minimum is the starting point presented to the payer, labeled clearly as "School minimum." The payer can increase their down payment above the minimum — up to the full plan balance — using a slider or input. Increasing the down payment reduces the per-installment amount; this recalculation happens in real time as the payer adjusts the value.</p>
+        <p class="req-why"><strong>Why:</strong> Payers who can put more down often want to — it reduces their ongoing commitment. The minimum is a constraint, not a suggestion. Showing it as the only option removes flexibility that could help payers manage their cash flow better and reduces mid-plan defaults from people who overcommitted to a plan without checking if a larger down payment helped.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution: down payment minimum (% or flat $)</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>The total payment due today for POT enrollment is shown as a live running total as the payer makes decisions.</strong> Today's total = sign-up fee + selected down payment. The sign-up fee is composed of:<br/>
+        &nbsp;· <strong>Nelnet enrollment fee</strong> — always present when POT is configured (institution-set amount)<br/>
+        &nbsp;· <strong>School enrollment fee (CFI)</strong> — present only if the institution has CFI enabled; the exact CFI dollar amount configured by the school is used, not an estimate<br/>
+        As the payer adjusts the down payment slider or input, the "Total due today" updates in real time to reflect the new down payment amount added to the fixed sign-up fee. The payer must always see the full today-total — not just the down payment value in isolation — so they understand the complete cash impact of their down payment choice.</p>
+        <p class="req-why"><strong>Why:</strong> The down payment choice and the total-due-today are inseparable decisions. Showing only the down payment while the sign-up fee is hidden elsewhere means the payer can't evaluate their full financial commitment as they adjust. Real-time total updates make the down payment slider a meaningful tool — the payer immediately sees the cash consequence of moving it.</p>
+        <div class="req-tags">
+          <span class="tag tag-inst">Nelnet enrollment fee: institution-configured</span>
+          <span class="tag tag-inst">CFI (school enrollment fee): applies only if CFI enabled; use exact CFI amount</span>
+        </div>
+      </div>
+
       <div class="req-item" data-modified="2026-05-01">
-        <p class="req-text"><strong>POT plans require a down payment selection before the schedule is confirmed.</strong> The down payment amount and/or percentage is configurable per plan. The resulting installment schedule (number of payments, amount per installment, payment dates, plan end date) must be displayed in a natural-language summary — not a raw table — before the student commits.</p>
+        <p class="req-text"><strong>POT plans require a down payment selection before the schedule is confirmed.</strong> The resulting installment schedule (number of payments, amount per installment, payment dates, plan end date) must be displayed in a natural-language summary — not a raw table — before the payer commits.</p>
         <p class="req-why"><strong>Why:</strong> A raw installment table requires the student to mentally parse numbers. A natural-language summary ("4 payments of $1,250 starting November 1") communicates the same information in a form students can actually act on and remember.</p>
         <div class="req-tags"><span class="tag tag-inst">Institution: down payment rules per plan</span></div>
       </div>
@@ -6678,14 +6720,16 @@ body {
           <div class="inst-item-impact"><strong>Consumer impact:</strong> The fee notice reads "Card payments include a <strong>[X]% service fee</strong>" — the percentage is dynamic. A student paying $1,000 by card at 2.75% sees their total displayed as $1,027.50 before confirming. ACH always shows no fee.</div>
         </div>
 
-        <div class="inst-item" data-modified="2026-05-01">
-          <div class="inst-item-name">School Enrollment Fee</div>
-          <div class="inst-item-desc">A one-time, non-refundable fee charged by the institution at the time the student confirms their payment setup. Appears as a separate line item in the balance breakdown.</div>
+        <div class="inst-item" data-modified="2026-05-05">
+          <div class="inst-item-name">School Enrollment Fee (CFI)</div>
+          <div class="inst-item-desc">A one-time, non-refundable fee charged by the institution at the time the payer confirms Pay Over Time enrollment. Controlled by the institution's CFI (Consolidated Fee Integration) configuration. When CFI is enabled, the exact CFI dollar amount is used — not an estimate or a rounding. When CFI is not enabled, this fee does not appear anywhere in the experience. Appears as a distinct line item in the sign-up fee breakdown, separate from the Nelnet enrollment fee.</div>
           <div class="inst-options-row">
             <span class="inst-options-label">Options</span>
-            <span class="iopt iopt-variable">$0 (waived) or institution-set amount <span class="iopt-proto">$25 in prototype</span></span>
+            <span class="iopt iopt-on">CFI enabled → exact CFI amount charged</span>
+            <span class="iopt iopt-off">CFI not enabled → fee does not appear</span>
+            <span class="iopt iopt-proto">Prototype default: $25 (CFI enabled)</span>
           </div>
-          <div class="inst-item-impact"><strong>Consumer impact:</strong> When set to $0 the enrollment fee line is hidden entirely. When set to a positive amount it appears in the balance summary and is included in the total the student pays at confirmation. It does not roll into POT installments.</div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> When CFI is enabled, the school enrollment fee appears as its own named line item in the "Today's total" breakdown during POT enrollment — separate from the Nelnet enrollment fee. Both fees together make up the "sign-up fee" the payer sees before they choose their down payment. When CFI is not enabled, no school fee line appears and the sign-up fee consists of the Nelnet enrollment fee only. The school enrollment fee never rolls into POT installments.</div>
         </div>
       </div>
 
