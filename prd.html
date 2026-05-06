@@ -369,6 +369,7 @@ body {
 .tag-status-devdone  { background: #f0fdf4; color: #166534; border: 1px solid #86efac; font-weight: 700; }
 .tag-status-ux-ready  { background: #f5f3ff; color: #5b21b6; border: 1px solid #8b5cf6; font-weight: 700; }
 .tag-status-dev-ready { background: #eff6ff; color: #1d4ed8; border: 1px solid #3b82f6; font-weight: 700; }
+.tag-status-backend   { background: #ecfdf5; color: #065f46; border: 1px solid #6ee7b7; font-weight: 700; }
 
 /* ── Status picker (Sophie mode) ─────────────────────── */
 .sophie-status-btn {
@@ -429,14 +430,7 @@ body {
 }
 .nav-dashboard-link:hover { background: rgba(100,92,220,.14); }
 .nav-dashboard-link.is-visible { display: flex; }
-.sophie-backend-btn {
-  display:none; font-size:10px; font-weight:600; color:var(--hz-muted);
-  background:none; border:1px solid var(--hz-border); border-radius:5px;
-  padding:2px 7px; cursor:pointer; margin-left:6px; vertical-align:middle;
-}
-.sophie-mode .req-item:hover .sophie-backend-btn { display:inline-flex; align-items:center; gap:3px; }
-.sophie-backend-btn.is-tagged { color:#065f46; border-color:#6ee7b7; background:#ecfdf5; display:inline-flex !important; }
-.sophie-backend-btn.is-pending { color:#92400e; border-color:#fcd34d; background:#fef3c7; display:inline-flex !important; }
+.sophie-backend-btn { display:none !important; } /* Backend Only is now a standard status tag in the picker */
 .backend-confirm-row { display:flex; align-items:center; gap:6px; margin-top:6px; }
 .backend-confirm-yes { font-size:11px; font-weight:700; color:white; background:#059669; border:none; border-radius:5px; padding:3px 10px; cursor:pointer; }
 .backend-confirm-no  { font-size:11px; font-weight:700; color:#dc2626; background:none; border:1px solid #fca5a5; border-radius:5px; padding:3px 10px; cursor:pointer; }
@@ -1922,10 +1916,6 @@ body {
       <a href="#s7b" class="nav-link">
         7b · AP — Second student, existing account
         <span class="nav-sub">Add student to existing AP</span>
-      </a>
-      <a href="#s-how-to-pay-detail" class="nav-link">
-        How to Pay — Detail
-        <span class="nav-sub">Partial eligibility, scheduling, 1-payment rule</span>
       </a>
     </div>
 
@@ -5075,71 +5065,6 @@ body {
 
 
     <!-- ════════════════════════════════════════
-         HOW TO PAY — CROSS-SCENARIO REQUIREMENTS
-    ════════════════════════════════════════ -->
-    <section id="s-how-to-pay-detail" class="prd-section">
-      <div class="section-eyebrow">Scenarios — Cross-Cutting</div>
-      <h2 class="section-title">How to Pay — Detail Requirements</h2>
-      <hr class="section-divider"/>
-      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">These requirements apply across multiple onboarding scenarios and govern how the payment path decision is handled, particularly for edge cases around partial eligibility, scheduling, and combining multiple payment components into a single today-payment.</p>
-
-      <div class="subsection">
-        <div class="subsection-label">Partial Pay Over Time Eligibility</div>
-
-        <div class="req-item" data-modified="2026-05-05">
-          <p class="req-text"><strong>When only part of the balance is eligible for a Pay Over Time plan.</strong> Some charge types (e.g., certain fees, prior-term balances, specific course charges) may not be eligible to be included in a payment plan — the institution's plan configuration defines what is plan-eligible. When the user has both plan-eligible and non-plan-eligible charges, they must see both amounts clearly distinguished before making their payment path decision. The UI must show: "Amount eligible for Pay Over Time: $X" and "Amount not eligible for Pay Over Time: $Y" — never presenting a single blended balance without this distinction.</p>
-          <p class="req-why"><strong>Why:</strong> A user who selects Pay Over Time on a partial-eligibility balance needs to understand what is going on the plan and what is not. Hiding the non-eligible portion until the confirmation screen creates a surprise and drives confusion or cancellation.</p>
-          <div class="req-tags"><span class="tag tag-inst">Institution setting: plan-eligible charge types</span></div>
-        </div>
-
-        <div class="req-item" data-modified="2026-05-05">
-          <p class="req-text"><strong>Pay in Full — single payment for the whole balance.</strong> If the user wants to pay in full, they can pay both the plan-eligible and non-eligible portions together in one payment. No split needed — the full balance is collected as one amount today (or scheduled for one future date).</p>
-          <p class="req-why"><strong>Why:</strong> Paying in full is the simplest path. The distinction between eligible and non-eligible amounts is irrelevant when the user is paying everything — they just want to pay the total and be done.</p>
-        </div>
-
-        <div class="req-item" data-modified="2026-05-05">
-          <p class="req-text"><strong>Pay Over Time path with non-eligible remainder — two options for the non-eligible portion:</strong><br/>
-          <strong>Option A: Add to today's payment.</strong> The non-eligible amount is added to the total due today, alongside the plan's down payment. The user pays the down payment + non-eligible balance today; the remaining eligible balance is spread across installments.<br/>
-          <strong>Option B: Schedule it separately.</strong> The user selects a future date (before the charge due date) to pay the non-eligible amount. This creates a scheduled one-time payment in addition to the Pay Over Time plan — but still results in only one payment today (the down payment only).<br/>
-          In both options, the confirmation screen must show exactly how each component is being handled — nothing should be ambiguous.</p>
-          <p class="req-why"><strong>Why:</strong> Some users will have the cash to cover both amounts now; others prefer not to. Giving users control over the non-eligible portion avoids a forced lump-sum payment for users who otherwise would have chosen Pay Over Time specifically to spread costs.</p>
-        </div>
-      </div>
-
-      <div class="subsection">
-        <div class="subsection-label">Pay in Full — Scheduling</div>
-
-        <div class="req-item" data-modified="2026-05-05">
-          <p class="req-text"><strong>Pay in Full does not have to mean "pay right now."</strong> When a user selects Pay in Full, they can choose to pay immediately or schedule the payment for a future date — as long as the scheduled date is on or before the charges' due date. The user picks a date from a date selector; the system validates the selected date against the due date and prevents selection of dates after the due date.</p>
-          <p class="req-why"><strong>Why:</strong> Many users intend to pay in full but need a few days — they're waiting for a direct deposit, a transfer from a parent, or the end of the month. Scheduling removes the need to choose a payment plan just to defer by a week, which would be the wrong product choice for the user's actual situation.</p>
-        </div>
-      </div>
-
-      <div class="subsection">
-        <div class="subsection-label">One Payment Today — Universal Rule</div>
-
-        <div class="req-item" data-modified="2026-05-05">
-          <p class="req-text"><strong>Regardless of complexity, only one payment is collected today.</strong> This applies across all onboarding scenarios. A user who purchases tuition insurance, enrolls in a Pay Over Time plan, and has a non-plan-eligible charge they chose to pay today — all of these amounts must be combined into a single payment at the end of the flow. The confirmation screen shows each component as a line item, with a clear total. One charge, one receipt, one moment of "confirm."</p>
-          <p class="req-why"><strong>Why:</strong> Multiple separate charges within a single onboarding session confuse users, create duplicate-charge panic, and generate support contacts. Consolidation is both a UX requirement and a trust-building feature. The user has one total to compare against their bank account after sign-up.</p>
-          <div class="req-tags"><span class="tag tag-req">Required — all onboarding scenarios</span></div>
-        </div>
-
-        <div class="req-item" data-modified="2026-05-05">
-          <p class="req-text"><strong>Itemization on the confirmation screen.</strong> The single payment confirmation must display every component contributing to today's total as a separate line item. For a user who purchased insurance, enrolled in POT with a down payment, and added a non-eligible balance to today's payment, the breakdown would show:<br/>
-          &nbsp;· Pay Over Time down payment: $___<br/>
-          &nbsp;· Nelnet enrollment fee: $___<br/>
-          &nbsp;· Tuition insurance premium: $___<br/>
-          &nbsp;· Non-plan-eligible balance: $___<br/>
-          &nbsp;· <strong>Total due today: $___</strong><br/>
-          No component may be hidden in a subtotal. All line items visible before the user taps "Confirm."</p>
-          <p class="req-why"><strong>Why:</strong> Full transparency at the confirmation step is the last line of defense against accidental charges and subsequent disputes. A user who can see every line item has the context to understand and agree to what they're about to pay — or catch a mistake before it happens.</p>
-          <div class="req-tags"><span class="tag tag-req">Required — confirmation screen, all payment paths</span></div>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- ════════════════════════════════════════
          SCENARIOS — HOME SCREEN
     ════════════════════════════════════════ -->
     <section id="hs-intro" class="prd-section">
@@ -5445,10 +5370,12 @@ body {
       <div class="scenario-chips">
         <span class="scenario-chip sc-active">S1 · First Time Student</span>
         <span class="scenario-chip sc-pending">S2 · Returning Student</span>
-        <span class="scenario-chip sc-pending">S3–S4 · New AP (Payer)</span>
+        <span class="scenario-chip sc-pending">S3 · New AP — Single Payer</span>
+        <span class="scenario-chip sc-pending">S4 · New AP — Multi Payer</span>
+        <span class="scenario-chip sc-pending">S6 · Returning AP</span>
         <span class="scenario-chip sc-inst">Institution-configured</span>
       </div>
-      <div class="cross-note"><strong>Cross-scenario rule:</strong> Returning students may have a saved payment method and/or a prior POT plan. Their "How to Pay" step is abbreviated — confirm prior method still valid, present new-term plan options. APs can set up their own payment path independently of the student's — each payer has a distinct method on file.</div>
+      <div class="cross-note"><strong>Applies to all payers.</strong> Every user who is responsible for paying a balance — student or AP — goes through this step. The amount shown is always scoped to that payer's portion (100% for a sole payer; the assigned percentage for a split arrangement). Returning users confirm or update their prior payment method and plan structure rather than re-entering from scratch.</div>
 
       <div class="req-item" data-modified="2026-05-01">
         <p class="req-text"><strong>Two primary paths: Pay in Full or Pay Over Time (POT).</strong> The choice is presented clearly at the top of the payment step. The institution configures whether POT is offered, and may offer one or more distinct POT plans. If only one plan exists, the student is not shown a plan picker — they simply confirm the single plan.</p>
@@ -5478,6 +5405,45 @@ body {
         <p class="req-text"><strong>Supported payment methods: ACH (bank account) and credit/debit card.</strong> Additional methods (Apple Pay, PayPal, etc.) may be added in future iterations per the product vision. Institution may restrict available methods. If a method type is not configured by the institution, it is not shown.</p>
         <p class="req-why"><strong>Why:</strong> Showing payment method types the institution hasn't enabled — even as "coming soon" — creates confusion and support questions. The available set must exactly match what the institution has contracted and configured.</p>
         <div class="req-tags"><span class="tag tag-inst">Institution: allowed payment method types</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>Pay in Full does not require paying today.</strong> When a user selects Pay in Full, they may choose to pay immediately or schedule the payment for a future date — as long as the scheduled date is on or before the charges' due date. The user selects a date from a date picker; the system prevents selection of any date after the due date.</p>
+        <p class="req-why"><strong>Why:</strong> Many users intend to pay in full but need a few days — they're waiting for a direct deposit, a parent's transfer, or the end of the month. Scheduling removes the need to enroll in a payment plan just to defer by a week, which would be the wrong product choice for the user's actual situation.</p>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>Partial Pay Over Time eligibility must be disclosed before the payment path decision.</strong> Some charge types (institution-configured) are not eligible for inclusion in a payment plan. When the user has both plan-eligible and non-plan-eligible charges, the UI must show both amounts clearly separated — "Amount eligible for Pay Over Time: $X" and "Amount not eligible for Pay Over Time: $Y" — before the user picks their path. A single blended balance figure without this breakdown must never be shown when partial eligibility exists.</p>
+        <p class="req-why"><strong>Why:</strong> A user who selects Pay Over Time on a partial-eligibility balance must understand what goes on the plan and what does not. Hiding the non-eligible portion until confirmation creates a surprise charge, undermines trust, and drives abandonment or disputes.</p>
+        <div class="req-tags"><span class="tag tag-inst">Institution setting: plan-eligible charge types</span></div>
+      </div>
+
+      <div class="if-block">
+        <div class="if-label">IF: User selects Pay Over Time AND non-plan-eligible charges exist</div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text">Present two options for the non-eligible portion:<br/>
+          <strong>Option A — Add to today's payment:</strong> the non-eligible amount is combined with the POT down payment and collected as part of today's single payment. The user pays the down payment + non-eligible balance today; the remaining eligible balance is spread across installments.<br/>
+          <strong>Option B — Schedule separately:</strong> the user selects a future date (before the charge due date) to pay the non-eligible amount as a separate scheduled payment. Today's payment is the down payment only. The confirmation screen shows both the payment today and the scheduled future payment as distinct line items.</p>
+          <p class="req-why"><strong>Why:</strong> Some users will have cash available to cover both amounts today; others chose Pay Over Time specifically because they can't. Forcing the non-eligible balance into today's payment removes agency. Option B preserves the cost-spreading intent of POT for as much of the balance as possible.</p>
+        </div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>Only one payment is collected today, regardless of how many components are involved.</strong> A user who purchases tuition insurance, enrolls in Pay Over Time with a down payment, and has a non-plan-eligible charge they chose to add to today's total — all of those amounts are combined into a single charge at the end of the flow. The user is never charged more than once during a single onboarding session. The confirmation screen shows each component as a named line item with a clear total. One payment, one receipt, one "Confirm" action.</p>
+        <p class="req-why"><strong>Why:</strong> Multiple separate charges within one onboarding session cause confusion, trigger fraud alerts, and generate support contacts from users who think they were double-charged. Consolidating into one total is both better UX and a trust signal — the user has a single number to compare against their bank statement after setup.</p>
+        <div class="req-tags"><span class="tag tag-req">Required — all onboarding scenarios</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>The confirmation screen must fully itemize every component of today's payment before the user confirms.</strong> No component may be hidden in a subtotal. For a user who accepted insurance, enrolled in POT, and added the non-eligible balance to today, the breakdown shows:<br/>
+        &nbsp;· Pay Over Time down payment: $___<br/>
+        &nbsp;· Nelnet enrollment fee: $___<br/>
+        &nbsp;· Tuition insurance premium: $___<br/>
+        &nbsp;· Non-plan-eligible balance (if added to today): $___<br/>
+        &nbsp;· <strong>Total due today: $___</strong><br/>
+        All line items visible, all amounts resolved, before the user taps Confirm.</p>
+        <p class="req-why"><strong>Why:</strong> Full transparency at confirmation is the last opportunity for the user to catch a mistake before money moves. A user who can see every line item has the context to understand and agree to the total — or identify an error before it becomes a dispute.</p>
+        <div class="req-tags"><span class="tag tag-req">Required — confirmation screen, all payment paths</span></div>
       </div>
 
 
@@ -10327,6 +10293,7 @@ var STATUS_TAG_DEFS = [
   { key:'final',     label:'✅ Final',                    cls:'tag-status-final',     dot:'#34d399', filterLabel:'Final' },
   { key:'ux-ready',  label:'🎨 UX Ready',                 cls:'tag-status-ux-ready',  dot:'#8b5cf6', filterLabel:'UX Ready' },
   { key:'dev-ready', label:'⚙️ Dev Team Ready',           cls:'tag-status-dev-ready', dot:'#3b82f6', filterLabel:'Dev Team Ready' },
+  { key:'backend',   label:'🔧 Backend Only',             cls:'tag-status-backend',   dot:'#059669', filterLabel:'Backend Only' },
   { key:'product',   label:'📋 Product Review',           cls:'tag-status-product',   dot:'#93c5fd', filterLabel:'Product Review' },
   { key:'consumer',  label:'👤 Consumer Review',          cls:'tag-status-consumer',  dot:'#c4b5fd', filterLabel:'Consumer Review' },
   { key:'it',        label:'⚙️ IT Review',                cls:'tag-status-it',        dot:'#67e8f9', filterLabel:'IT Review' },
@@ -10350,7 +10317,7 @@ function applyStatusTagsToItem(item, isSophie) {
   var activeTags = data[reqId] || [];
 
   // Remove existing status tags and picker btn
-  item.querySelectorAll('.tag-status-final,.tag-status-ux-ready,.tag-status-dev-ready,.tag-status-product,.tag-status-consumer,.tag-status-it,.tag-status-inst,.tag-status-idea').forEach(function(el){el.remove();});
+  item.querySelectorAll('.tag-status-final,.tag-status-ux-ready,.tag-status-dev-ready,.tag-status-backend,.tag-status-product,.tag-status-consumer,.tag-status-it,.tag-status-inst,.tag-status-idea').forEach(function(el){el.remove();});
   item.querySelectorAll('.sophie-status-btn').forEach(function(el){el.remove();});
 
   var tagsEl = ensureReqTags(item);
@@ -10509,6 +10476,7 @@ var ALL_FILTER_DEFS = [
   { key:'final',     label:'✅ Final',              cls:'tag-status-final'     },
   { key:'ux-ready',  label:'🎨 UX Ready',           cls:'tag-status-ux-ready'  },
   { key:'dev-ready', label:'⚙️ Dev Team Ready',     cls:'tag-status-dev-ready' },
+  { key:'backend',   label:'🔧 Backend Only',       cls:'tag-status-backend'   },
   { key:'product',   label:'📋 Product Review',     cls:'tag-status-product'   },
   { key:'consumer',  label:'👤 Consumer Review',    cls:'tag-status-consumer'  },
   { key:'it',        label:'⚙️ IT Review',          cls:'tag-status-it'        },
