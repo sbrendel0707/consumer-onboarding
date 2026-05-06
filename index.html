@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Consumer Prototypes — Horizon</title>
+<title>Horizon Product</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="design-system/horizon.css"/>
 <style>
@@ -168,7 +168,7 @@ a.tile:hover::after { opacity: 1; right: 16px; }
 
   <div class="header">
     <div class="eyebrow">Nelnet · UX Prototypes</div>
-    <h1>Consumer Prototypes</h1>
+    <h1>Horizon Product</h1>
     <div class="context-block">
       <strong>Onboarding scenarios (a-series)</strong> represent students authenticating via <strong>SAML SSO</strong> directly from their university's portal, with <strong>full ERP integration</strong>. <strong>Home page scenarios (b-series)</strong> start from the consumer home page — the shared home page and all screens reachable from it are <strong>living components</strong>: editing <code style="font-family:monospace;font-size:11px;background:rgba(100,92,220,.08);padding:1px 5px;border-radius:4px;">consumer-home.html</code> propagates to all b-series prototypes.
     </div>
@@ -177,22 +177,59 @@ a.tile:hover::after { opacity: 1; right: 16px; }
   <div class="section-label">Documentation</div>
 
   <div class="grid" style="margin-bottom: 24px;">
-    <a class="tile hz-card" href="prd.html" aria-label="Product Requirements Document" style="border-left: 3px solid var(--hz-accent);">
+
+    <!-- Full PRD -->
+    <a class="tile hz-card" href="prd.html" aria-label="Full Product Requirements" style="border-left: 3px solid var(--hz-accent);">
       <div>
         <div class="tile-scenario" style="color:var(--hz-teal);">Living Document</div>
-        <div class="tile-name">Product Requirements</div>
+        <div class="tile-name">Full Product Requirements</div>
       </div>
       <div class="hz-divider"></div>
       <div>
         <div class="settings-label">Includes</div>
         <div class="settings-chips">
-          <span class="chip highlight">Product vision</span>
-          <span class="chip">All scenarios</span>
+          <span class="chip highlight">All requirements</span>
+          <span class="chip">Product vision</span>
           <span class="chip">Decision IF logic</span>
           <span class="chip">Change tracking by reviewer</span>
         </div>
       </div>
     </a>
+
+    <!-- UX Ready PRD -->
+    <a class="tile hz-card" href="prd.html?view=ux-ready" aria-label="UX Ready Product Requirements" style="border-left: 3px solid #8b5cf6;">
+      <div>
+        <div class="tile-scenario" style="color:#8b5cf6;">Living Document</div>
+        <div class="tile-name">UX Ready Product Requirements</div>
+      </div>
+      <div class="hz-divider"></div>
+      <div>
+        <div class="settings-label">Includes</div>
+        <div class="settings-chips">
+          <span class="chip" style="color:#6d28d9;background:#f5f3ff;border-color:#c4b5fd;">🎨 UX Ready requirements only</span>
+          <span class="chip">Comments synced</span>
+          <span class="chip">Change tracking</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Dev Ready PRD -->
+    <a class="tile hz-card" href="prd.html?view=dev-ready" aria-label="Development Ready Product Requirements" style="border-left: 3px solid #2563eb;">
+      <div>
+        <div class="tile-scenario" style="color:#2563eb;">Living Document</div>
+        <div class="tile-name">Development Ready Product Requirements</div>
+      </div>
+      <div class="hz-divider"></div>
+      <div>
+        <div class="settings-label">Includes</div>
+        <div class="settings-chips">
+          <span class="chip" style="color:#1d4ed8;background:#eff6ff;border-color:#93c5fd;">⚙️ Dev Team Ready requirements only</span>
+          <span class="chip">Comments synced</span>
+          <span class="chip">Change tracking</span>
+        </div>
+      </div>
+    </a>
+
   </div>
 
   <div class="section-label">Onboarding Scenarios</div>
@@ -232,8 +269,13 @@ a.tile:hover::after { opacity: 1; right: 16px; }
       </div>
       <div class="hz-divider"></div>
       <div>
-        <div class="settings-label">Institution Settings</div>
-        <div class="settings-chips"><span class="chip tbd">TBD</span></div>
+        <div class="settings-label">Scenario Setup</div>
+        <div class="settings-chips">
+          <span class="chip">SSO login — existing account</span>
+          <span class="chip">Saved payment method</span>
+          <span class="chip">Prior APs on file</span>
+          <span class="chip">Insurance re-present: yes</span>
+        </div>
       </div>
     </div>
 
@@ -249,8 +291,12 @@ a.tile:hover::after { opacity: 1; right: 16px; }
       </div>
       <div class="hz-divider"></div>
       <div>
-        <div class="settings-label">Institution Settings</div>
-        <div class="settings-chips"><span class="chip tbd">TBD</span></div>
+        <div class="settings-label">Scenario Setup</div>
+        <div class="settings-chips">
+          <span class="chip">Nelnet credentials (not SSO)</span>
+          <span class="chip">Full account access</span>
+          <span class="chip">Sets up POT plan</span>
+        </div>
       </div>
     </div>
 
@@ -266,8 +312,12 @@ a.tile:hover::after { opacity: 1; right: 16px; }
       </div>
       <div class="hz-divider"></div>
       <div>
-        <div class="settings-label">Institution Settings</div>
-        <div class="settings-chips"><span class="chip tbd">TBD</span></div>
+        <div class="settings-label">Scenario Setup</div>
+        <div class="settings-chips">
+          <span class="chip">2 APs on student account</span>
+          <span class="chip">Split payment responsibility</span>
+          <span class="chip">Separate POT plans</span>
+        </div>
       </div>
     </div>
 
@@ -283,8 +333,12 @@ a.tile:hover::after { opacity: 1; right: 16px; }
       </div>
       <div class="hz-divider"></div>
       <div>
-        <div class="settings-label">Institution Settings</div>
-        <div class="settings-chips"><span class="chip tbd">TBD</span></div>
+        <div class="settings-label">Scenario Setup</div>
+        <div class="settings-chips">
+          <span class="chip">View-only access</span>
+          <span class="chip">No payment setup</span>
+          <span class="chip">Monitoring only</span>
+        </div>
       </div>
     </div>
 
@@ -300,8 +354,12 @@ a.tile:hover::after { opacity: 1; right: 16px; }
       </div>
       <div class="hz-divider"></div>
       <div>
-        <div class="settings-label">Institution Settings</div>
-        <div class="settings-chips"><span class="chip tbd">TBD</span></div>
+        <div class="settings-label">Scenario Setup</div>
+        <div class="settings-chips">
+          <span class="chip">Existing Nelnet credentials</span>
+          <span class="chip">New term — prior plan expired</span>
+          <span class="chip">Re-enrolling in POT</span>
+        </div>
       </div>
     </div>
 

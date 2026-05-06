@@ -367,6 +367,8 @@ body {
 .tag-status-inst     { background: #fff7ed; color: #9a3412; border: 1px solid #fb923c; font-weight: 700; }
 .tag-status-idea     { background: #fafafa; color: #52525b; border: 1px dashed #a1a1aa; font-weight: 700; }
 .tag-status-devdone  { background: #f0fdf4; color: #166534; border: 1px solid #86efac; font-weight: 700; }
+.tag-status-ux-ready  { background: #f5f3ff; color: #5b21b6; border: 1px solid #8b5cf6; font-weight: 700; }
+.tag-status-dev-ready { background: #eff6ff; color: #1d4ed8; border: 1px solid #3b82f6; font-weight: 700; }
 
 /* ── Status picker (Sophie mode) ─────────────────────── */
 .sophie-status-btn {
@@ -1841,6 +1843,7 @@ body {
       <a href="#inst-payment-methods"   class="nav-link nav-sub-item">Payment Methods</a>
       <a href="#inst-pay-over-time"     class="nav-link nav-sub-item">Pay Over Time</a>
       <a href="#inst-insurance"         class="nav-link nav-sub-item">Tuition Insurance</a>
+      <a href="#inst-agreements"        class="nav-link nav-sub-item">School Agreements</a>
       <a href="#inst-auth-parties"      class="nav-link nav-sub-item">Authorized Parties</a>
       <a href="#inst-disclosures"       class="nav-link nav-sub-item">Disclosures</a>
       <a href="#inst-communications"    class="nav-link nav-sub-item">Communications</a>
@@ -1973,7 +1976,7 @@ body {
     <!-- Doc header -->
     <header class="doc-header">
       <div class="doc-eyebrow">Nelnet · Horizon</div>
-      <h1 class="doc-title">Consumer Onboarding — Product Requirements</h1>
+      <h1 class="doc-title" id="prd-main-title">Full Product Requirements</h1>
       <p class="doc-meta">Living document · updated alongside prototype iterations · Last updated <span id="doc-last-updated">May 5, 2026</span></p>
       <div class="share-tip">
         🔗 <span>This page can be shared directly. It contains no links to prototype files — recipients will only see requirements.</span>
@@ -3552,10 +3555,47 @@ body {
       <div class="section-eyebrow">Institution Process Flow · Phase 3</div>
       <h2 class="section-title">Student Account Access &amp; Onboarding — Detail</h2>
       <hr class="section-divider"/>
-      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">Deep-dive on how a student first reaches Horizon, how authentication works across SSO paths, and what the institution controls about the first-access experience.</p>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">How a student first reaches Horizon, how authentication works, and what the institution must configure for specific onboarding steps to appear in the flow.</p>
+
+      <div class="subsection">
+        <div class="subsection-label">Authentication Path</div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text">Students authenticate into Horizon exclusively via <strong>SAML SSO from their institution's SIS/ERP portal</strong>. There is no standalone Nelnet login screen for students. The institution's portal handles all identity verification — Horizon receives the authenticated identity via SSO assertion and either locates the student's existing Nelnet record or creates one automatically for first-time access.</p>
+          <p class="req-why"><strong>Why:</strong> Students are already authenticated by their institution. Re-authenticating with a separate Nelnet credential adds zero security value and creates a support driver. SSO ensures the student identity received by Horizon exactly matches the identity whose charges, aid, and enrollment are in the ERP.</p>
+          <div class="req-tags"><span class="tag tag-erp">ERP / SSO</span></div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-label">Institution Configuration — What Gates Which Onboarding Steps</div>
+        <p style="font-size:12.5px;color:var(--hz-muted);margin-bottom:12px;line-height:1.55;">Three categories of institution configuration determine which steps appear in the student onboarding flow. None of these features are active by default — each requires the school to complete a prerequisite setup before Horizon can include the step.</p>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>1. Tuition Insurance (GradGuard).</strong> The tuition insurance step only appears in onboarding if the institution has an active GradGuard contract with a configured plan rate. Nelnet cannot offer insurance on behalf of an institution that has not contracted with GradGuard directly. The school's GradGuard configuration (plan type, premium rate) feeds the per-student premium calculation. If not configured, the insurance step is silently skipped — no mention of insurance appears anywhere in the student's experience.</p>
+          <p class="req-why"><strong>Why:</strong> Insurance is a contractual offering — Nelnet is not the insurer. Only schools with an active GradGuard agreement can make the offer to students. Surfacing an insurance step without a valid contract would create a broken or misleading experience.</p>
+          <div class="req-tags"><span class="tag tag-inst">Requires: GradGuard contract + plan rate configured</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>2. School Agreements.</strong> The school agreements sign-off step only appears if the institution has configured at least one agreement within Horizon. Schools differ significantly in when and how they require students to accept financial responsibilities — some collect agreements through their own institutional processes entirely outside Nelnet, while others prefer to gate Horizon access on agreement acceptance. The best practice is to include agreements in Horizon because it creates a complete audit trail tied to the student's payment account. If GradGuard is enabled, a refund policy agreement is required as a GradGuard prerequisite and must be included in the school's configured agreements.</p>
+          <p class="req-why"><strong>Why:</strong> Some institutions have specific timing requirements for when agreements must be signed (e.g., before a certain date in the term, before a registration deadline). Horizon accommodates both in-system and out-of-system approaches, but in-system is the recommended path for operational completeness and audit compliance.</p>
+          <div class="req-tags">
+            <span class="tag tag-inst">Requires: agreements configured in Horizon admin</span>
+            <span class="tag tag-if">IF: GradGuard enabled → refund policy agreement required</span>
+          </div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>3. Payment Plan (Pay Over Time) Configuration.</strong> The "How to Pay" step presents students with pay-over-time options only if the institution has at least one active payment plan configured for the current term. This includes: plan type, down payment structure, installment count, payment frequency, start and end dates, and applicable fees. Schools must complete their payment plan setup before students begin onboarding for a term. If no plans are configured, students see only the Pay in Full path.</p>
+          <p class="req-why"><strong>Why:</strong> Payment plans are term-specific — their dates, amounts, and availability windows change each term. Horizon cannot present a plan to a student without a valid, term-matched plan configuration in place. Plan setup is a prerequisite that Nelnet implementation teams help institutions complete during onboarding and re-setup each term.</p>
+          <div class="req-tags"><span class="tag tag-inst">Requires: active payment plan configured for current term</span></div>
+        </div>
+      </div>
+
       <div class="sophie-flag">
-        <span class="sophie-flag-label">Sophie review needed</span>
-        <span>Add detail on: all authentication paths (SSO from SIS portal, direct link from email, deep-link to specific action), what the institution can configure about the onboarding flow (required disclosures, first-screen messaging, help text), how authorized parties are invited and authenticated, and what Horizon does when a student arrives but their RTAA data is not yet available (loading states, error states, retry logic).</span>
+        <span class="sophie-flag-label">Sophie — needs more detail</span>
+        <span>Still needed: all authentication paths beyond primary SSO (direct link from email, deep-link to specific action like a balance increase), what the institution can configure about first-screen messaging and help text, how authorized parties are invited and authenticated (AP has Nelnet credentials, not SSO), and what Horizon does when a student arrives but their RTAA data is not yet available (loading states, error states, retry logic).</span>
       </div>
     </section>
 
@@ -4208,7 +4248,8 @@ body {
         <div class="config-table">
           <div class="config-row"><span class="config-key">Authentication</span><span class="config-val">SAML SSO from university portal</span></div>
           <div class="config-row"><span class="config-key">ERP integration</span><span class="config-val">Full sync — charges, aid, enrollment</span></div>
-          <div class="config-row"><span class="config-key">Tuition insurance</span><span class="config-val">Enabled (GradGuard)</span></div>
+          <div class="config-row"><span class="config-key">Tuition insurance</span><span class="config-val">Enabled (GradGuard) — school has active GradGuard contract</span></div>
+          <div class="config-row"><span class="config-key">School agreements</span><span class="config-val">Enabled — includes GradGuard refund policy agreement (required when GradGuard is on)</span></div>
           <div class="config-row"><span class="config-key">Payment plan offers</span><span class="config-val">1 — Pay Over Time</span></div>
           <div class="config-row"><span class="config-key">Accepted payment methods</span><span class="config-val">ACH (bank) + Credit Card</span></div>
           <div class="config-row"><span class="config-key">University disclosures</span><span class="config-val">3 (individually acknowledged)</span></div>
@@ -4224,6 +4265,18 @@ body {
       <!-- Auth & data -->
       <div class="subsection">
         <div class="subsection-label">Authentication &amp; Data Pre-population</div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>First semester = no Nelnet history = full onboarding flow.</strong> A first-semester student has no existing payment methods, authorized parties, insurance decisions, or communication preferences on file anywhere in Nelnet's system. They must complete every step of the onboarding flow to establish their account state for this term. No steps can be skipped or pre-filled from prior decisions.</p>
+          <p class="req-why"><strong>Why:</strong> Unlike a returning student who can pick up where they left off, a first-semester student is establishing their account from scratch. Every decision — insurance, payment path, authorized parties, communications — is being made for the first time. The system must present the full flow without assumptions about what the student wants.</p>
+          <div class="req-tags"><span class="tag tag-if">First semester → full onboarding flow, no shortcuts</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>No account creation step.</strong> A first-semester student does not create a Nelnet account through Horizon — they authenticate exclusively via SAML SSO from their school's student information system (SIS/ERP portal). The student already has institutional credentials; Horizon receives their identity from the SSO assertion and creates an internal Nelnet record automatically. The student never sees a "Create an account" or "Set a password" screen for Nelnet.</p>
+          <p class="req-why"><strong>Why:</strong> Requiring a separate Nelnet account creation defeats the purpose of SSO integration. The institution has already authenticated this student — a second account setup flow creates unnecessary friction, abandonment risk, and a separate credential the student must manage. Nelnet's record is created automatically behind the scenes from the SSO handshake.</p>
+          <div class="req-tags"><span class="tag tag-erp">ERP / SSO</span></div>
+        </div>
 
         <div class="req-item" data-modified="2026-04-30">
           <p class="req-text">The student arrives exclusively via SAML SSO from the university portal. No Nelnet-specific username or password entry occurs within Horizon.</p>
@@ -4686,7 +4739,38 @@ body {
       <h2 class="section-title">Returning Student</h2>
       <hr class="section-divider"/>
       <div class="coming-soon">
-        Requirements coming soon. This scenario covers a student returning from a previous term with existing Nelnet history — saved payment methods, prior authorized parties, and previously set communication preferences — experiencing a streamlined re-onboarding that confirms only what may have changed.
+        <strong>Detailed requirements coming soon.</strong> Core scenario logic captured below — full step-by-step requirements will be added here.
+      </div>
+
+      <div class="scenario-desc" style="margin-top:16px;">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>A student returning for a subsequent term who has completed the full onboarding flow at least once before with Nelnet. They have existing history: at minimum a saved payment method, and potentially existing authorized parties and communication preferences. They authenticate via SAML SSO from their school's SIS portal — same as their first term. No account creation occurs.</p>
+        <p style="margin-top:8px;">The key distinction from Scenario 1 is that this student is <strong>not starting from zero</strong>. The system knows them and their prior decisions, and the flow adapts accordingly — presenting only what may need re-confirmation or updating rather than walking through every decision from scratch.</p>
+      </div>
+
+      <div class="subsection" style="margin-top:20px;">
+        <div class="subsection-label">Known Logic — What Changes for a Returning Student</div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>SSO authentication — no account creation, no login screen.</strong> A returning student authenticates through their school's SIS portal exactly as they did in their first term. Nelnet recognizes the returning student via their SSO identity and links them to their existing Nelnet record automatically. The student never sees a "Create account" screen.</p>
+          <p class="req-why"><strong>Why:</strong> The returning student should experience Horizon as an account they already have — not a new system. Forcing re-registration or re-login creates a jarring experience and a support contact driver.</p>
+          <div class="req-tags"><span class="tag tag-erp">ERP / SSO</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Streamlined re-onboarding.</strong> The returning student does not repeat the full first-time onboarding flow. Prior decisions that carry forward — saved payment method, authorized parties, communication preferences, security questions — are pre-populated and confirmed rather than re-collected. The student is only asked to make decisions that are new for this term (e.g., new balance, new insurance offer if re-presentation is configured, updated disclosures).</p>
+          <p class="req-why"><strong>Why:</strong> Requiring a returning student to re-enter information they already provided creates friction and signals that the system doesn't remember them. The set-it-and-forget-it goal applies here — if nothing changed, the student should need to do as little as possible.</p>
+          <div class="req-tags"><span class="tag tag-if">Returning student → pre-populate from prior decisions</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Tuition insurance re-presentation (institution-configured).</strong> Whether the insurance offer is shown to a returning student who previously declined depends on the institution's configuration. Some institutions re-present every term; others suppress the offer after a student has declined once. If the institution has set "re-present each term," the student will see the insurance step again with a new premium calculated on the current term's charges. If "never re-present after decline," the step is skipped.</p>
+          <p class="req-why"><strong>Why:</strong> Insurance decisions are term-specific (the policy covers a specific enrollment period), so re-presenting each term is academically correct. However, some institutions prefer not to prompt students who have previously opted out. Institution-configured behavior allows both approaches.</p>
+          <div class="req-tags">
+            <span class="tag tag-inst">Institution setting: insurance re-presentation</span>
+            <span class="tag tag-if">IF: Re-present each term → show step; ELSE → skip</span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -6483,6 +6567,68 @@ body {
             <span class="iopt iopt-off">Disabled</span>
           </div>
           <div class="inst-item-impact"><strong>Consumer impact:</strong> When enabled, students see a "Send guest payment link" option when managing their AP settings. When disabled, this option is hidden and the student's only option for involving a third party is to add a full authorized party.</div>
+        </div>
+      </div>
+
+
+      <!-- ── School Agreements ── -->
+      <div class="inst-group" id="inst-agreements">
+        <div class="inst-group-header">
+          <div class="inst-group-icon">🤝</div>
+          <div class="inst-group-title">School Agreements</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-05">
+          <div class="inst-item-name">School Agreements — Feature Toggle</div>
+          <div class="inst-item-desc">Master on/off for requiring students to formally sign school agreements within Horizon during onboarding. When enabled, a dedicated agreements sign-off step is included in the onboarding flow before final confirmation. When disabled, the school handles agreement collection outside of Nelnet — through their own processes and timing — and the step is skipped entirely inside Horizon.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">Enabled — agreements collected in Horizon</span>
+            <span class="iopt iopt-off">Disabled — school handles outside Nelnet</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> If disabled, students never see an agreement step — their school's agreements process happens through a separate institutional channel. If enabled, students must formally accept one or more agreements (with e-signature where required) before completing onboarding.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-05">
+          <div class="inst-item-name">Agreement Types Configured</div>
+          <div class="inst-item-desc">The specific agreements a school has set up within Horizon. Each agreement is a distinct document the student must acknowledge. Common types include: enrollment agreements, payment terms, refund policies, and financial responsibility statements. The number and content of agreements varies by institution and may differ by term.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-variable">1–N agreements configured by institution</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> Each configured agreement adds a sign-off step the student must complete. The onboarding progress indicator updates to reflect how many agreements are required. Students cannot proceed past this step until all agreements are accepted.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-05">
+          <div class="inst-item-name">GradGuard Refund Policy — Required Agreement</div>
+          <div class="inst-item-desc">If the institution has GradGuard tuition insurance enabled, they must also have a refund policy configured as a school agreement. The refund policy is a GradGuard prerequisite — it defines how the institution handles withdrawals and governs what the insurance covers. Schools with GradGuard who do not have a refund policy agreement set up in Horizon cannot complete the tuition insurance integration correctly.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Dependency</span>
+            <span class="iopt iopt-on">GradGuard enabled → Refund Policy agreement required</span>
+            <span class="iopt">GradGuard disabled → no requirement</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> Students at GradGuard schools will encounter the refund policy agreement as part of the agreements step. The policy must be reviewed and accepted before they can proceed. This is not optional — it is a GradGuard contractual requirement that the student acknowledge the school's refund terms before purchasing insurance.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-05">
+          <div class="inst-item-name">Agreement Signing Format</div>
+          <div class="inst-item-desc">Whether agreements require a typed e-signature or acknowledgment-only (checkbox). E-signature is recommended for agreements with legal or financial weight (e.g., enrollment agreements, financial responsibility statements). Acknowledgment-only may be appropriate for informational agreements.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Options</span>
+            <span class="iopt iopt-on">E-signature required (typed full name + confirmation)</span>
+            <span class="iopt">Acknowledgment only (checkbox)</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> E-signature agreements require the student to type their legal name and check a confirmation box. The submit button stays disabled until both conditions are met, preventing accidental acceptance. Acknowledgment-only agreements activate immediately when the checkbox is checked.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-05">
+          <div class="inst-item-name">Best Practice Recommendation</div>
+          <div class="inst-item-desc">Collecting school agreements within Horizon (rather than externally) is the recommended approach. In-system collection ensures there is a single audit trail, agreements are time-stamped and linked to the student's account, and re-signing is automatically triggered if agreement content changes. Schools that manage agreements outside Nelnet introduce timing gaps and risk agreements not being completed before a student's first payment.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Recommendation</span>
+            <span class="iopt iopt-on">In-system (Horizon) — best practice</span>
+          </div>
+          <div class="inst-item-impact"><strong>Operational impact:</strong> Schools using external agreement collection must ensure their process completes before students access the payment portal. Any gap between account access and agreement completion creates a compliance risk for the institution.</div>
         </div>
       </div>
 
@@ -9842,12 +9988,14 @@ function rebuildSophieBackendPanel() {
 var STATUS_TAGS_KEY = 'hz_status_tags';
 
 var STATUS_TAG_DEFS = [
-  { key:'final',    label:'✅ Final',              cls:'tag-status-final',    dot:'#34d399', filterLabel:'Final' },
-  { key:'product',  label:'📋 Product Review',     cls:'tag-status-product',  dot:'#93c5fd', filterLabel:'Product Review' },
-  { key:'consumer', label:'👤 Consumer Review',    cls:'tag-status-consumer', dot:'#c4b5fd', filterLabel:'Consumer Review' },
-  { key:'it',       label:'⚙️ IT Review',          cls:'tag-status-it',       dot:'#67e8f9', filterLabel:'IT Review' },
-  { key:'inst',     label:'🏫 Institution Review', cls:'tag-status-inst',     dot:'#fb923c', filterLabel:'Institution Review' },
-  { key:'idea',     label:'💡 Idea State',         cls:'tag-status-idea',     dot:'#a1a1aa', filterLabel:'Idea State' },
+  { key:'final',     label:'✅ Final',                    cls:'tag-status-final',     dot:'#34d399', filterLabel:'Final' },
+  { key:'ux-ready',  label:'🎨 UX Ready',                 cls:'tag-status-ux-ready',  dot:'#8b5cf6', filterLabel:'UX Ready' },
+  { key:'dev-ready', label:'⚙️ Dev Team Ready',           cls:'tag-status-dev-ready', dot:'#3b82f6', filterLabel:'Dev Team Ready' },
+  { key:'product',   label:'📋 Product Review',           cls:'tag-status-product',   dot:'#93c5fd', filterLabel:'Product Review' },
+  { key:'consumer',  label:'👤 Consumer Review',          cls:'tag-status-consumer',  dot:'#c4b5fd', filterLabel:'Consumer Review' },
+  { key:'it',        label:'⚙️ IT Review',                cls:'tag-status-it',        dot:'#67e8f9', filterLabel:'IT Review' },
+  { key:'inst',      label:'🏫 Institution Review',       cls:'tag-status-inst',      dot:'#fb923c', filterLabel:'Institution Review' },
+  { key:'idea',      label:'💡 Idea State',               cls:'tag-status-idea',      dot:'#a1a1aa', filterLabel:'Idea State' },
   { key:'devdone',  label:'✅ Dev Complete',        cls:'tag-status-devdone',  dot:'#86efac', filterLabel:'Dev Complete' },
 ];
 
@@ -9866,7 +10014,7 @@ function applyStatusTagsToItem(item, isSophie) {
   var activeTags = data[reqId] || [];
 
   // Remove existing status tags and picker btn
-  item.querySelectorAll('.tag-status-final,.tag-status-product,.tag-status-consumer,.tag-status-it,.tag-status-inst,.tag-status-idea').forEach(function(el){el.remove();});
+  item.querySelectorAll('.tag-status-final,.tag-status-ux-ready,.tag-status-dev-ready,.tag-status-product,.tag-status-consumer,.tag-status-it,.tag-status-inst,.tag-status-idea').forEach(function(el){el.remove();});
   item.querySelectorAll('.sophie-status-btn').forEach(function(el){el.remove();});
 
   var tagsEl = ensureReqTags(item);
@@ -10022,16 +10170,18 @@ var _activeFilters = [];
 
 var ALL_FILTER_DEFS = [
   // Status tags
-  { key:'final',    label:'✅ Final',              cls:'tag-status-final'    },
-  { key:'product',  label:'📋 Product Review',     cls:'tag-status-product'  },
-  { key:'consumer', label:'👤 Consumer Review',    cls:'tag-status-consumer' },
-  { key:'it',       label:'⚙️ IT Review',          cls:'tag-status-it'       },
-  { key:'inst',     label:'🏫 Institution Review', cls:'tag-status-inst'     },
-  { key:'idea',     label:'💡 Idea State',         cls:'tag-status-idea'     },
+  { key:'final',     label:'✅ Final',              cls:'tag-status-final'     },
+  { key:'ux-ready',  label:'🎨 UX Ready',           cls:'tag-status-ux-ready'  },
+  { key:'dev-ready', label:'⚙️ Dev Team Ready',     cls:'tag-status-dev-ready' },
+  { key:'product',   label:'📋 Product Review',     cls:'tag-status-product'   },
+  { key:'consumer',  label:'👤 Consumer Review',    cls:'tag-status-consumer'  },
+  { key:'it',        label:'⚙️ IT Review',          cls:'tag-status-it'        },
+  { key:'inst',      label:'🏫 Institution Review', cls:'tag-status-inst'      },
+  { key:'idea',      label:'💡 Idea State',         cls:'tag-status-idea'      },
   // Type tags
-  { key:'backend',  label:'🔧 Backend Only',  cls:'tag-backend'         },
-  { key:'erp',      label:'From ERP',         cls:'tag-erp'             },
-  { key:'devdone',  label:'✅ Dev Complete',   cls:'tag-status-devdone'  },
+  { key:'backend',   label:'🔧 Backend Only',       cls:'tag-backend'          },
+  { key:'erp',       label:'From ERP',              cls:'tag-erp'              },
+  { key:'devdone',   label:'✅ Dev Complete',        cls:'tag-status-devdone'   },
 ];
 
 function initTagFilter() {
@@ -11223,6 +11373,52 @@ function showLeaveSyncModal(dest) {
     window.location.href = dest;
   });
 }
+
+// ── Filtered view (UX Ready / Dev Ready) ─────────────────────────────────────
+// URL params: ?view=ux-ready  or  ?view=dev-ready
+// Applies a locked tag filter and changes the document title accordingly.
+(function initPRDView() {
+  var param = new URLSearchParams(window.location.search).get('view');
+  if (!param) return;
+
+  var VIEW_MAP = {
+    'ux-ready':  { title: 'UX Ready Product Requirements',          filterKey: 'ux-ready'  },
+    'dev-ready': { title: 'Development Ready Product Requirements',  filterKey: 'dev-ready' },
+  };
+  var cfg = VIEW_MAP[param];
+  if (!cfg) return;
+
+  // Update browser title and doc header
+  document.title = cfg.title + ' — Horizon';
+  document.addEventListener('DOMContentLoaded', function() {
+    var h = document.getElementById('prd-main-title');
+    if (h) h.textContent = cfg.title;
+
+    // Auto-apply filter after a short delay to let requirements render
+    setTimeout(function() {
+      // Activate the filter via existing filter system
+      var allDefs = typeof ALL_FILTER_DEFS !== 'undefined' ? ALL_FILTER_DEFS : [];
+      var def = allDefs.find(function(d) { return d.key === cfg.filterKey; });
+      if (def && typeof applyTagFilter === 'function') {
+        _activeFilters = [cfg.filterKey];
+        applyTagFilter();
+        // Visually activate the filter button in the filter bar
+        var filterBtn = document.querySelector('[data-filter-key="' + cfg.filterKey + '"]');
+        if (filterBtn) filterBtn.classList.add('is-active');
+      }
+      // Add a persistent banner so viewers know they're in a filtered view
+      var banner = document.createElement('div');
+      banner.style.cssText = 'position:sticky;top:37px;z-index:97;background:' +
+        (param === 'ux-ready' ? '#f5f3ff;border-bottom:1.5px solid #8b5cf6;color:#5b21b6;' : '#eff6ff;border-bottom:1.5px solid #3b82f6;color:#1d4ed8;') +
+        'font-size:12px;font-weight:600;padding:6px 20px;text-align:center;';
+      banner.innerHTML = (param === 'ux-ready' ? '🎨' : '⚙️') +
+        ' Showing only <strong>' + cfg.title + '</strong> — ' +
+        '<a href="prd.html" style="color:inherit;text-decoration:underline;">View Full PRD</a>';
+      var nav = document.querySelector('.visitor-bar') || document.body.firstElementChild;
+      if (nav && nav.parentNode) nav.parentNode.insertBefore(banner, nav.nextSibling);
+    }, 600);
+  });
+})();
 
 // ── Initial pull on page load — hydrate localStorage from GitHub ──
 // Runs early so applySophieEdits() (called later in openAsViewer) gets fresh data
