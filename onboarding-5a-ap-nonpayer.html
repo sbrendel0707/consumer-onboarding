@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>5a · AP Non-Payer Onboarding – Horizon Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        'hz-indigo':    '#2D1FA3',
+        'hz-mid':       '#4A4580',
+        'hz-accent':    '#645CDC',
+        'hz-cloud':     '#EEF0FF',
+        'hz-teal':      '#0D7A55',
+        'hz-teal-bg':   '#E1F5EE',
+        'hz-amber':     '#EF9F27',
+        'hz-amber-bg':  '#FAEEDA',
+        'hz-danger':    '#E24B4A',
+        'hz-danger-bg': '#F7C1C1',
+        'hz-bg':        '#F4F5FF',
+        'hz-card':      '#FFFFFF',
+        'hz-text':      '#1A1060',
+        'hz-muted':     '#57548D',
+        'hz-hint':      '#6B6899',
+        'hz-border':    'rgba(100,92,220,0.14)',
+      },
+      fontFamily: { sans: ["'Plus Jakarta Sans'", 'system-ui', 'sans-serif'] },
+      borderRadius: { 'hz':'18px', 'hz-sm':'12px', 'hz-pill':'99px' },
+    },
+  },
+}
+</script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-hz-bg">
+<div id="root"></div>
+<script type="text/babel">
+
+// ── Scenario data ──────────────────────────────────────────────────────────
+const STUDENT_NAME     = 'Zoe Park';
+const AP_FIRST         = 'Ellen';
+const AP_LAST          = 'Park';
+const SCHOOL_NAME      = 'Ridgemont University';
+const STUDENT_BALANCE  = 5200;
+const fmt = (n) => '$' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2});
+
+// ── Shared components ─────────────────────────────────────────────────────
+const Shell = ({children, step, totalSteps, showBack, onBack}) => (
+  <div className="min-h-screen bg-hz-bg flex flex-col items-center py-8 px-4">
+    <div className="w-full max-w-sm">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        {showBack
+          ? <button onClick={onBack} className="text-hz-accent font-semibold text-sm flex items-center gap-1">
+              <span>←</span> Back
+            </button>
+          : <a href="index.html" className="text-hz-accent font-semibold text-sm flex items-center gap-1">
+              <span>⌂</span> Home
+            </a>
+        }
+        <div className="text-xs text-hz-hint font-medium">{SCHOOL_NAME}</div>
+      </div>
+
+      {/* Progress */}
+      {totalSteps > 0 && (
+        <div className="mb-6">
+          <div className="flex justify-between text-xs text-hz-hint mb-1.5">
+            <span>Step {step} of {totalSteps}</span>
+          </div>
+          <div className="h-1 bg-hz-cloud rounded-full overflow-hidden">
+            <div className="h-full bg-hz-accent rounded-full transition-all duration-500"
+              style={{width: `${(step/totalSteps)*100}%`}} />
+          </div>
+        </div>
+      )}
+
+      {children}
+    </div>
+  </div>
+);
+
+const Btn = ({children, onClick, variant='primary', disabled=false, className=''}) => {
+  const v = {
+    primary: 'bg-hz-indigo text-white hover:opacity-90',
+    ghost:   'bg-hz-cloud text-hz-indigo hover:opacity-90',
+    outline: 'border border-[rgba(100,92,220,0.3)] text-hz-indigo hover:bg-hz-cloud',
+    teal:    'bg-hz-teal text-white hover:opacity-90',
+  };
+  return (
+    <button onClick={onClick} disabled={disabled}
+      className={`w-full py-3.5 rounded-hz-pill font-semibold text-[15px] transition-all active:scale-[0.97] ${v[variant]||v.primary} ${disabled?'opacity-40 cursor-not-allowed':''} ${className}`}>
+      {children}
+    </button>
+  );
+};
+
+const Card = ({children, className=''}) => (
+  <div className={`bg-white rounded-hz border border-hz-border shadow-sm ${className}`}>{children}</div>
+);
+
+const InfoBadge = ({children}) => (
+  <div className="flex gap-2 p-3 bg-hz-cloud rounded-hz-sm border border-[rgba(100,92,220,0.2)] text-xs text-hz-muted leading-relaxed">
+    <span className="mt-0.5 shrink-0">ℹ️</span>
+    <span>{children}</span>
+  </div>
+);
+
+// ── Screen 1: Invitation welcome ───────────────────────────────────────────
+const ScreenWelcome = ({onNext}) => (
+  <Shell step={0} totalSteps={0} showBack={false}>
+    <div className="text-center mb-8">
+      <div className="w-16 h-16 rounded-full bg-hz-cloud flex items-center justify-center mx-auto mb-4 text-3xl">👁️</div>
+      <div className="text-xs font-bold uppercase tracking-widest text-hz-accent mb-2">View Access Invitation</div>
+      <h1 className="text-2xl font-bold text-hz-text mb-3">You've been invited to view {STUDENT_NAME}'s account</h1>
+      <p className="text-hz-muted text-sm leading-relaxed">
+        {STUDENT_NAME} has granted you <strong className="text-hz-text">view-only access</strong> to their {SCHOOL_NAME} payment account on Horizon.
+      </p>
+    </div>
+
+    <Card className="p-4 mb-4">
+      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">What you can do</div>
+      <div className="space-y-3">
+        {[
+          {icon:'💳', label:'See the current balance and charges'},
+          {icon:'📊', label:'View account activity and payment history'},
+          {icon:'📅', label:'See upcoming payment dates if a plan is active'},
+        ].map((item,i) => (
+          <div key={i} className="flex items-start gap-3">
+            <span className="text-lg shrink-0">{item.icon}</span>
+            <span className="text-sm text-hz-text">{item.label}</span>
+          </div>
+        ))}
+      </div>
+    </Card>
+
+    <Card className="p-4 mb-6 border-amber-200 bg-amber-50">
+      <div className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">View only — not a payer</div>
+      <p className="text-xs text-amber-800 leading-relaxed">
+        You have not been assigned payment responsibility. You cannot make payments or change account settings. Only {STUDENT_NAME} can grant you payment access.
+      </p>
+    </Card>
+
+    <Btn onClick={onNext}>Create my view account →</Btn>
+  </Shell>
+);
+
+// ── Screen 2: Create account ───────────────────────────────────────────────
+const ScreenCreateAccount = ({onNext, onBack}) => {
+  const [firstName, setFirstName] = React.useState(AP_FIRST);
+  const [lastName, setLastName]   = React.useState(AP_LAST);
+  const [email, setEmail]         = React.useState('ellen.park@gmail.com');
+  const [username, setUsername]   = React.useState('');
+  const [pw, setPw]               = React.useState('');
+  const [showPw, setShowPw]       = React.useState(false);
+  const valid = firstName && lastName && email && username.length >= 6 && pw.length >= 8;
+
+  return (
+    <Shell step={1} totalSteps={3} showBack onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Create your Nelnet account</h2>
+      <p className="text-sm text-hz-muted mb-6">You'll use these credentials each time you log in to view {STUDENT_NAME}'s account.</p>
+
+      <div className="space-y-3 mb-6">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-hz-muted mb-1">First name</label>
+            <input value={firstName} onChange={e=>setFirstName(e.target.value)}
+              className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-hz-muted mb-1">Last name</label>
+            <input value={lastName} onChange={e=>setLastName(e.target.value)}
+              className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent" />
+          </div>
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-hz-muted mb-1">Email address</label>
+          <input type="email" value={email} onChange={e=>setEmail(e.target.value)}
+            className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent" />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-hz-muted mb-1">Username</label>
+          <input value={username} onChange={e=>setUsername(e.target.value)} placeholder="Min 6 characters"
+            className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent" />
+          {username.length > 0 && username.length < 6 && <p className="text-xs text-hz-danger mt-1">At least 6 characters required</p>}
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-hz-muted mb-1">Password</label>
+          <div className="relative">
+            <input type={showPw?'text':'password'} value={pw} onChange={e=>setPw(e.target.value)} placeholder="Min 8 characters"
+              className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 pr-10 text-hz-text text-sm outline-none focus:border-hz-accent" />
+            <button onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-2.5 text-hz-hint text-xs">{showPw?'Hide':'Show'}</button>
+          </div>
+          {pw.length > 0 && pw.length < 8 && <p className="text-xs text-hz-danger mt-1">At least 8 characters required</p>}
+        </div>
+      </div>
+
+      <Btn onClick={onNext} disabled={!valid}>Continue →</Btn>
+    </Shell>
+  );
+};
+
+// ── Screen 3: Security questions ───────────────────────────────────────────
+const ScreenSecurity = ({onNext, onBack}) => {
+  const [a1, setA1] = React.useState('');
+  const [a2, setA2] = React.useState('');
+  const valid = a1.trim().length > 2 && a2.trim().length > 2;
+  return (
+    <Shell step={2} totalSteps={3} showBack onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Security questions</h2>
+      <p className="text-sm text-hz-muted mb-6">Used to verify your identity if you need account recovery.</p>
+      <div className="space-y-4 mb-6">
+        <div>
+          <label className="block text-xs font-semibold text-hz-muted mb-1">What was the name of your first pet?</label>
+          <input value={a1} onChange={e=>setA1(e.target.value)} placeholder="Your answer"
+            className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent" />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-hz-muted mb-1">What city were you born in?</label>
+          <input value={a2} onChange={e=>setA2(e.target.value)} placeholder="Your answer"
+            className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent" />
+        </div>
+      </div>
+      <InfoBadge>Answers are not case-sensitive. Keep them somewhere safe — they're used for account recovery.</InfoBadge>
+      <div className="mt-6">
+        <Btn onClick={onNext} disabled={!valid}>Continue →</Btn>
+      </div>
+    </Shell>
+  );
+};
+
+// ── Screen 4: Ready — view dashboard ──────────────────────────────────────
+const ScreenViewReady = ({onNext, onBack}) => (
+  <Shell step={3} totalSteps={3} showBack onBack={onBack}>
+    <div className="text-center mb-8">
+      <div className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center mx-auto mb-4 text-3xl">✅</div>
+      <h2 className="text-xl font-bold text-hz-text mb-2">Account created!</h2>
+      <p className="text-sm text-hz-muted leading-relaxed">You now have view access to {STUDENT_NAME}'s Horizon account at {SCHOOL_NAME}.</p>
+    </div>
+
+    <Card className="p-4 mb-4">
+      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Your read-only view includes</div>
+      <div className="space-y-2.5">
+        {['Current balance and charges breakdown','Account activity from the last 30 days','Payment schedule (if an active plan exists)','Upcoming payment amounts and dates'].map((item,i) => (
+          <div key={i} className="flex items-start gap-2 text-sm text-hz-text">
+            <span className="text-hz-teal mt-0.5">✓</span>
+            <span>{item}</span>
+          </div>
+        ))}
+      </div>
+    </Card>
+
+    <Card className="p-4 mb-6 border-amber-200 bg-amber-50">
+      <div className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1.5">Reminder</div>
+      <p className="text-xs text-amber-800 leading-relaxed">
+        You cannot make payments or modify account settings. To become a payer, ask {STUDENT_NAME} to update your access.
+      </p>
+    </Card>
+
+    <Btn onClick={onNext} variant="teal">Go to my view →</Btn>
+  </Shell>
+);
+
+// ── Screen 5: View-only home ───────────────────────────────────────────────
+const ScreenViewHome = () => (
+  <div className="min-h-screen bg-hz-bg">
+    {/* Top bar */}
+    <div className="bg-white border-b border-hz-border px-4 py-3 flex items-center justify-between">
+      <div className="text-xs font-bold text-hz-accent tracking-wide">HORIZON</div>
+      <div className="text-xs text-hz-hint">View access</div>
+      <div className="w-8 h-8 rounded-full bg-hz-cloud flex items-center justify-center text-xs font-bold text-hz-accent">EP</div>
+    </div>
+
+    <div className="px-4 py-6 max-w-sm mx-auto">
+      {/* Greeting */}
+      <div className="mb-5">
+        <p className="text-sm text-hz-muted">Viewing account for</p>
+        <h1 className="text-2xl font-bold text-hz-text">{STUDENT_NAME}</h1>
+        <p className="text-xs text-hz-hint mt-0.5">{SCHOOL_NAME} · Fall 2026</p>
+      </div>
+
+      {/* View-only badge */}
+      <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-amber-50 border border-amber-200 rounded-hz-sm">
+        <span className="text-amber-600 text-sm">👁️</span>
+        <span className="text-xs font-semibold text-amber-700">View-only access — no payment authority</span>
+      </div>
+
+      {/* Balance card */}
+      <div className="bg-white rounded-hz border border-hz-border shadow-sm p-4 mb-4">
+        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Account summary</div>
+        <div className="text-3xl font-bold text-hz-text mb-1">{fmt(STUDENT_BALANCE)}</div>
+        <div className="text-xs text-hz-muted mb-3">Outstanding balance · Due Sep 1, 2026</div>
+
+        <div className="h-2 bg-hz-cloud rounded-full overflow-hidden mb-3">
+          <div className="h-full w-full bg-hz-danger rounded-full" />
+        </div>
+
+        <div className="space-y-1.5 text-xs text-hz-muted border-t border-hz-border pt-3 mt-2">
+          <div className="flex justify-between"><span>Total charges</span><span className="text-hz-text font-medium">$8,500.00</span></div>
+          <div className="flex justify-between"><span>Applied aid</span><span className="text-hz-text font-medium">−$2,300.00</span></div>
+          <div className="flex justify-between"><span>Anticipated aid</span><span className="text-hz-text font-medium">−$1,000.00</span></div>
+          <div className="flex justify-between font-semibold text-hz-text pt-1 border-t border-hz-border mt-1">
+            <span>Balance due</span><span>{fmt(STUDENT_BALANCE)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent activity */}
+      <div className="bg-white rounded-hz border border-hz-border shadow-sm p-4 mb-4">
+        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Recent activity</div>
+        <div className="space-y-2.5">
+          {[
+            {date:'Apr 28', desc:'Spring 2026 charges posted', amt:'+$8,500.00'},
+            {date:'Apr 29', desc:'Financial aid applied', amt:'−$2,300.00'},
+            {date:'Apr 30', desc:'Anticipated aid applied', amt:'−$1,000.00'},
+          ].map((item,i) => (
+            <div key={i} className="flex items-start justify-between gap-2">
+              <div>
+                <div className="text-sm text-hz-text">{item.desc}</div>
+                <div className="text-xs text-hz-hint">{item.date}</div>
+              </div>
+              <div className="text-sm font-medium text-hz-muted shrink-0">{item.amt}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* No payment actions */}
+      <div className="text-center py-4 text-xs text-hz-hint">
+        Payment actions are not available for view-only access
+      </div>
+    </div>
+  </div>
+);
+
+// ── App ────────────────────────────────────────────────────────────────────
+const App = () => {
+  const [screen, setScreen] = React.useState(0);
+  const go = (n) => { setScreen(n); window.scrollTo(0,0); };
+
+  const screens = [
+    <ScreenWelcome         onNext={()=>go(1)} />,
+    <ScreenCreateAccount   onNext={()=>go(2)} onBack={()=>go(0)} />,
+    <ScreenSecurity        onNext={()=>go(3)} onBack={()=>go(1)} />,
+    <ScreenViewReady       onNext={()=>go(4)} onBack={()=>go(2)} />,
+    <ScreenViewHome />,
+  ];
+
+  return screens[screen] || screens[0];
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

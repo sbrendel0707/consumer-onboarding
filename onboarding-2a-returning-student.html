@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>2a · Returning Student Onboarding – Horizon Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        'hz-indigo':'#2D1FA3','hz-mid':'#4A4580','hz-accent':'#645CDC','hz-cloud':'#EEF0FF',
+        'hz-teal':'#0D7A55','hz-teal-bg':'#E1F5EE','hz-amber':'#EF9F27','hz-amber-bg':'#FAEEDA',
+        'hz-danger':'#E24B4A','hz-danger-bg':'#F7C1C1','hz-bg':'#F4F5FF','hz-card':'#FFFFFF',
+        'hz-text':'#1A1060','hz-muted':'#57548D','hz-hint':'#6B6899','hz-border':'rgba(100,92,220,0.14)',
+      },
+      fontFamily: { sans: ["'Plus Jakarta Sans'", 'system-ui', 'sans-serif'] },
+      borderRadius: { 'hz':'18px','hz-sm':'12px','hz-pill':'99px' },
+    },
+  },
+}
+</script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-hz-bg">
+<div id="root"></div>
+<script type="text/babel">
+
+const STUDENT_FIRST  = 'Alex';
+const STUDENT_LAST   = 'Johnson';
+const SCHOOL_NAME    = 'Ridgemont University';
+const BALANCE        = 5400;
+const APPLIED_AID    = 2400;
+const ANTICIPATED    = 1100;
+const CHARGES        = 8900;
+const AP_NAME        = 'Sarah Johnson';
+const AP_PCT         = 40;
+const MY_PCT         = 60;
+const PRIOR_TERM     = 'Spring 2026';
+const CURRENT_TERM   = 'Fall 2026';
+const INSURANCE_PREM = 287;
+
+const fmt = (n) => '$' + Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+// ── Shared ─────────────────────────────────────────────────────────────────
+const Shell = ({children, step, totalSteps, showBack, onBack}) => (
+  <div className="min-h-screen bg-hz-bg flex flex-col items-center py-8 px-4">
+    <div className="w-full max-w-sm">
+      <div className="flex items-center justify-between mb-6">
+        {showBack
+          ? <button onClick={onBack} className="text-hz-accent font-semibold text-sm flex items-center gap-1">← Back</button>
+          : <a href="index.html" className="text-hz-accent font-semibold text-sm">⌂ Home</a>
+        }
+        <div className="text-xs text-hz-hint font-medium">{SCHOOL_NAME}</div>
+      </div>
+      {totalSteps > 0 && (
+        <div className="mb-6">
+          <div className="flex justify-between text-xs text-hz-hint mb-1.5">
+            <span>Step {step} of {totalSteps}</span>
+          </div>
+          <div className="h-1 bg-hz-cloud rounded-full overflow-hidden">
+            <div className="h-full bg-hz-accent rounded-full transition-all duration-500" style={{width:`${(step/totalSteps)*100}%`}} />
+          </div>
+        </div>
+      )}
+      {children}
+    </div>
+  </div>
+);
+
+const Btn = ({children,onClick,variant='primary',disabled=false,className=''}) => {
+  const v = {primary:'bg-hz-indigo text-white',ghost:'bg-hz-cloud text-hz-indigo',outline:'border border-[rgba(100,92,220,0.3)] text-hz-indigo hover:bg-hz-cloud',teal:'bg-hz-teal text-white'};
+  return <button onClick={onClick} disabled={disabled}
+    className={`w-full py-3.5 rounded-hz-pill font-semibold text-[15px] transition-all active:scale-[0.97] hover:opacity-90 ${v[variant]||v.primary} ${disabled?'opacity-40 cursor-not-allowed':''} ${className}`}>{children}</button>;
+};
+
+const Card = ({children,className=''}) => (
+  <div className={`bg-white rounded-hz border border-hz-border shadow-sm ${className}`}>{children}</div>
+);
+
+// "Confirm or change" card component
+const ConfirmCard = ({icon, label, lastTerm, onSame, onChange, confirmed, changedLabel}) => (
+  <Card className="p-4">
+    <div className="flex items-start gap-3 mb-3">
+      <span className="text-xl shrink-0">{icon}</span>
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-0.5">{label}</div>
+        <div className="text-sm text-hz-text">{confirmed ? (changedLabel || lastTerm) : lastTerm}</div>
+      </div>
+      {confirmed && <span className="text-hz-teal text-lg shrink-0">✓</span>}
+    </div>
+    {!confirmed && (
+      <div className="grid grid-cols-2 gap-2">
+        <button onClick={onSame} className="py-2 rounded-hz-sm text-sm font-semibold bg-hz-teal-bg text-hz-teal border border-hz-teal/20 hover:opacity-90 transition-opacity">
+          ✓ Same as before
+        </button>
+        <button onClick={onChange} className="py-2 rounded-hz-sm text-sm font-semibold bg-hz-cloud text-hz-indigo border border-hz-border hover:opacity-90 transition-opacity">
+          Make a change
+        </button>
+      </div>
+    )}
+    {confirmed && (
+      <button onClick={onChange} className="w-full py-1.5 text-xs font-semibold text-hz-accent border border-[rgba(100,92,220,0.2)] rounded-hz-sm hover:bg-hz-cloud transition-colors">
+        Edit
+      </button>
+    )}
+  </Card>
+);
+
+// ── Screen 1: SSO welcome back ─────────────────────────────────────────────
+const S1_WelcomeBack = ({onNext}) => (
+  <Shell step={0} totalSteps={0} showBack={false}>
+    <div className="text-center mb-8">
+      <div className="w-16 h-16 rounded-full bg-hz-cloud flex items-center justify-center mx-auto mb-4 text-3xl">🎓</div>
+      <div className="text-xs font-bold uppercase tracking-widest text-hz-teal mb-2">Returning Student</div>
+      <h1 className="text-2xl font-bold text-hz-text mb-2">Welcome back, {STUDENT_FIRST}!</h1>
+      <p className="text-hz-muted text-sm leading-relaxed">You've been authenticated via {SCHOOL_NAME}'s student portal. We've synced your new term charges.</p>
+    </div>
+
+    <Card className="p-4 mb-4">
+      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">What's new for {CURRENT_TERM}</div>
+      <div className="space-y-2.5">
+        {[
+          {icon:'💰', label:'New term balance', val: fmt(BALANCE)},
+          {icon:'🎓', label:'Institution', val: SCHOOL_NAME},
+          {icon:'📅', label:'Term', val: CURRENT_TERM},
+        ].map((r,i)=>(
+          <div key={i} className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-hz-muted"><span>{r.icon}</span>{r.label}</div>
+            <span className="text-sm font-semibold text-hz-text">{r.val}</span>
+          </div>
+        ))}
+      </div>
+    </Card>
+
+    <div className="bg-hz-cloud rounded-hz-sm border border-[rgba(100,92,220,0.2)] px-4 py-3 text-xs text-hz-muted mb-6 leading-relaxed">
+      ℹ️ We'll quickly confirm your prior setup for this new term. Anything that still works the same, you can approve with one tap.
+    </div>
+
+    <Btn onClick={onNext}>Review my setup for {CURRENT_TERM} →</Btn>
+  </Shell>
+);
+
+// ── Screen 2: Balance overview ─────────────────────────────────────────────
+const S2_Balance = ({onNext, onBack}) => (
+  <Shell step={1} totalSteps={5} showBack onBack={onBack}>
+    <h2 className="text-xl font-bold text-hz-text mb-1">{CURRENT_TERM} balance</h2>
+    <p className="text-sm text-hz-muted mb-5">Here's your account for the new term, synced from {SCHOOL_NAME}.</p>
+
+    <Card className="p-4 mb-5">
+      <div className="text-3xl font-bold text-hz-text mb-0.5">{fmt(BALANCE)}</div>
+      <div className="text-xs text-hz-muted mb-4">Balance due · {CURRENT_TERM}</div>
+      <div className="space-y-2 text-sm">
+        <div className="flex justify-between text-hz-muted"><span>Total charges</span><span className="text-hz-text font-medium">{fmt(CHARGES)}</span></div>
+        <div className="flex justify-between text-hz-muted"><span>Applied aid</span><span className="text-hz-text font-medium">−{fmt(APPLIED_AID)}</span></div>
+        <div className="flex justify-between text-hz-muted">
+          <span className="flex items-center gap-1">Anticipated aid <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-semibold cursor-pointer">Est.</span></span>
+          <span className="text-hz-text font-medium">−{fmt(ANTICIPATED)}</span>
+        </div>
+        <div className="flex justify-between font-bold text-hz-text pt-2 border-t border-hz-border"><span>Balance due</span><span>{fmt(BALANCE)}</span></div>
+      </div>
+    </Card>
+
+    <div className="bg-amber-50 border border-amber-200 rounded-hz-sm px-3 py-2.5 text-xs text-amber-800 mb-6 leading-relaxed">
+      ⚠️ Anticipated aid ({fmt(ANTICIPATED)}) is subtracted from your balance but not yet officially applied. If it doesn't finalize, you may owe that amount.
+    </div>
+
+    <Btn onClick={onNext}>Continue →</Btn>
+  </Shell>
+);
+
+// ── Screen 3: Insurance ────────────────────────────────────────────────────
+const S3_Insurance = ({onNext, onBack}) => {
+  const [choice, setChoice] = React.useState(null);
+  return (
+    <Shell step={2} totalSteps={5} showBack onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Tuition insurance</h2>
+      <p className="text-sm text-hz-muted mb-2">You declined this last semester. {SCHOOL_NAME} re-presents the offer each term.</p>
+
+      <Card className="p-4 mb-4">
+        <div className="flex items-start gap-3 mb-3">
+          <span className="text-2xl shrink-0">🛡️</span>
+          <div>
+            <div className="font-semibold text-hz-text mb-0.5">GradGuard Tuition Insurance</div>
+            <div className="text-xs text-hz-muted">Protect up to 100% of tuition if you must withdraw for a covered reason</div>
+          </div>
+        </div>
+        <div className="flex justify-between items-center py-2.5 border-t border-hz-border">
+          <span className="text-sm text-hz-muted">Premium (your portion)</span>
+          <span className="text-lg font-bold text-hz-text">{fmt(INSURANCE_PREM)}</span>
+        </div>
+        <div className="text-xs text-hz-hint mt-1">Based on your {CURRENT_TERM} balance · California rate</div>
+      </Card>
+
+      <div className="space-y-2 mb-6">
+        {[
+          {val:'accept', label:'✓ Yes, I want insurance', sub:`${fmt(INSURANCE_PREM)} added to today's payment`, color:'bg-hz-teal-bg text-hz-teal border-hz-teal/20'},
+          {val:'decline', label:'✗ No thanks, I'll decline', sub:'Coverage not applied', color:'bg-hz-cloud text-hz-muted border-hz-border'},
+          {val:'later', label:'⏸ Decide later', sub:'Becomes a to-do on your home screen', color:'bg-hz-cloud text-hz-muted border-hz-border'},
+        ].map(opt=>(
+          <button key={opt.val} onClick={()=>setChoice(opt.val)}
+            className={`w-full p-3.5 rounded-hz-sm border text-left transition-all ${choice===opt.val ? opt.color + ' ring-1 ring-inset ring-current' : 'bg-white border-hz-border hover:border-hz-accent'}`}>
+            <div className="font-semibold text-sm">{opt.label}</div>
+            <div className="text-xs mt-0.5 opacity-70">{opt.sub}</div>
+          </button>
+        ))}
+      </div>
+
+      {choice === 'later' && (
+        <div className="bg-hz-cloud border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-xs text-hz-muted mb-4 leading-relaxed">
+          ℹ️ You'll see a to-do on your home screen with a deadline to decide. We'll also send reminders. The decision option won't be obvious — look for it in your insurance to-do.
+        </div>
+      )}
+
+      <Btn onClick={onNext} disabled={!choice}>Continue →</Btn>
+    </Shell>
+  );
+};
+
+// ── Screen 4: Confirm setup ────────────────────────────────────────────────
+const S4_ConfirmSetup = ({onNext, onBack}) => {
+  const [payConfirmed, setPayConfirmed]   = React.useState(false);
+  const [methodConfirmed, setMethodConfirmed] = React.useState(false);
+  const [potConfirmed, setPotConfirmed]   = React.useState(false);
+  const [commsConfirmed, setCommsConfirmed] = React.useState(false);
+  const [payChanged, setPayChanged] = React.useState(false);
+
+  const allDone = payConfirmed && methodConfirmed && potConfirmed && commsConfirmed;
+
+  return (
+    <Shell step={3} totalSteps={5} showBack onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Confirm your setup</h2>
+      <p className="text-sm text-hz-muted mb-5">Review what's carrying over from {PRIOR_TERM}. Confirm or update each item.</p>
+
+      <div className="space-y-3 mb-6">
+
+        {/* Who's paying */}
+        <ConfirmCard
+          icon="👥" label="Who's paying"
+          lastTerm={payChanged ? 'You: 100% (AP removed)' : `You: ${MY_PCT}% · ${AP_NAME}: ${AP_PCT}%`}
+          changedLabel={payChanged ? 'You: 100% (AP removed)' : null}
+          confirmed={payConfirmed}
+          onSame={()=>setPayConfirmed(true)}
+          onChange={()=>{ setPayChanged(true); setPayConfirmed(true); }}
+        />
+
+        {/* Payment method */}
+        <ConfirmCard
+          icon="🏦" label="Payment method"
+          lastTerm="Chase Checking ···4521"
+          confirmed={methodConfirmed}
+          onSame={()=>setMethodConfirmed(true)}
+          onChange={()=>setMethodConfirmed(true)}
+        />
+
+        {/* Pay Over Time */}
+        <ConfirmCard
+          icon="📅" label="Pay Over Time plan"
+          lastTerm="Monthly · 9 installments · $480/mo"
+          confirmed={potConfirmed}
+          onSame={()=>setPotConfirmed(true)}
+          onChange={()=>setPotConfirmed(true)}
+        />
+
+        {/* Comms */}
+        <ConfirmCard
+          icon="📱" label="Communication preferences"
+          lastTerm="Transactional SMS: On · Marketing SMS: Off"
+          confirmed={commsConfirmed}
+          onSame={()=>setCommsConfirmed(true)}
+          onChange={()=>setCommsConfirmed(true)}
+        />
+
+      </div>
+
+      {payConfirmed && !payChanged && (
+        <div className="bg-hz-teal-bg border border-hz-teal/20 rounded-hz-sm px-3 py-2.5 text-xs text-hz-teal mb-4 leading-relaxed">
+          ✓ Reminder sent to {AP_NAME} — a new term has started and their payment commitment has been renewed.
+        </div>
+      )}
+
+      <Btn onClick={onNext} disabled={!allDone}>Continue →</Btn>
+    </Shell>
+  );
+};
+
+// ── Screen 5: Disclosures ──────────────────────────────────────────────────
+const S5_Disclosures = ({onNext, onBack}) => {
+  const [acked, setAcked] = React.useState([false,false,false]);
+  const toggle = (i) => setAcked(a => a.map((v,j)=>j===i?!v:v));
+  const allAcked = acked.every(Boolean);
+  const disclosures = [
+    {title:'Financial Responsibility Agreement',body:'I understand I am responsible for all tuition, fees, and charges incurred, and agree to pay by the stated due date.'},
+    {title:'GradGuard Refund Policy',body:'By enrolling in a tuition insurance plan, I acknowledge the GradGuard refund terms and agree to the policy terms for the current term.'},
+    {title:'Electronic Communication Consent',body:'I consent to receive account notifications, payment reminders, and required disclosures electronically to my email and phone on file.'},
+  ];
+  return (
+    <Shell step={4} totalSteps={5} showBack onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Updated disclosures</h2>
+      <p className="text-sm text-hz-muted mb-5">{SCHOOL_NAME} requires acknowledgment of these agreements each term. Please review and accept each one.</p>
+      <div className="space-y-3 mb-6">
+        {disclosures.map((d,i)=>(
+          <div key={i} className={`bg-white rounded-hz-sm border p-4 cursor-pointer transition-all ${acked[i]?'border-hz-teal/40 bg-hz-teal-bg/30':'border-hz-border'}`}
+            onClick={()=>toggle(i)}>
+            <div className="flex items-start gap-3">
+              <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-all ${acked[i]?'bg-hz-teal border-hz-teal':'border-hz-border bg-white'}`}>
+                {acked[i] && <span className="text-white text-xs font-bold">✓</span>}
+              </div>
+              <div>
+                <div className="font-semibold text-sm text-hz-text mb-1">{d.title}</div>
+                <div className="text-xs text-hz-muted leading-relaxed">{d.body}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Btn onClick={onNext} disabled={!allAcked}>I agree to all disclosures →</Btn>
+    </Shell>
+  );
+};
+
+// ── Screen 6: All set ──────────────────────────────────────────────────────
+const S6_AllSet = ({onNext, onBack}) => (
+  <Shell step={5} totalSteps={5} showBack onBack={onBack}>
+    <div className="text-center mb-8">
+      <div className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center mx-auto mb-4 text-3xl">🎉</div>
+      <h2 className="text-xl font-bold text-hz-text mb-2">You're all set for {CURRENT_TERM}!</h2>
+      <p className="text-sm text-hz-muted leading-relaxed">Your setup has been confirmed. Your Pay Over Time plan will begin on May 15, 2026.</p>
+    </div>
+    <Card className="p-4 mb-4">
+      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Confirmed for {CURRENT_TERM}</div>
+      <div className="space-y-2 text-sm">
+        {[
+          ['Balance',fmt(BALANCE)],
+          ['Your share (60%)', fmt(BALANCE * 0.6)],
+          ["Sarah's share (40%)", fmt(BALANCE * 0.4)],
+          ['Plan', 'Monthly · 9 installments · ~$360/mo'],
+          ['First payment', 'May 15, 2026'],
+        ].map(([k,v],i)=>(
+          <div key={i} className="flex justify-between">
+            <span className="text-hz-muted">{k}</span>
+            <span className="text-hz-text font-medium">{v}</span>
+          </div>
+        ))}
+      </div>
+    </Card>
+    <div className="bg-amber-50 border border-amber-200 rounded-hz-sm px-3 py-2.5 text-xs text-amber-800 mb-6 leading-relaxed">
+      Your Pay Over Time plan setup is confirmed — payment method already on file. A payment setup confirmation will be sent to your email.
+    </div>
+    <Btn onClick={onNext} variant="teal">Go to my home screen →</Btn>
+  </Shell>
+);
+
+// ── Screen 7: Home screen ──────────────────────────────────────────────────
+const S7_Home = () => (
+  <div className="min-h-screen bg-hz-bg">
+    <div className="bg-white border-b border-hz-border px-4 py-3 flex items-center justify-between">
+      <div className="text-xs font-bold text-hz-accent tracking-wide">HORIZON</div>
+      <div className="w-8 h-8 rounded-full bg-hz-cloud flex items-center justify-center text-xs font-bold text-hz-accent">AJ</div>
+    </div>
+    <div className="px-4 py-6 max-w-sm mx-auto">
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h1 className="text-2xl font-bold text-hz-text">Hi, {STUDENT_FIRST} 👋</h1>
+          <p className="text-xs text-hz-hint mt-0.5">{CURRENT_TERM} · {SCHOOL_NAME}</p>
+        </div>
+      </div>
+
+      {/* Balance card */}
+      <Card className="p-4 mb-4">
+        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Account summary</div>
+        <div className="flex items-end justify-between mb-3">
+          <div>
+            <div className="text-3xl font-bold text-hz-text">{fmt(BALANCE * 0.6)}</div>
+            <div className="text-xs text-hz-muted">Your share (60%)</div>
+          </div>
+          <button className="text-xs text-hz-accent font-semibold">View full breakdown</button>
+        </div>
+        <div className="h-2.5 bg-hz-cloud rounded-full overflow-hidden mb-2">
+          <div className="h-full w-4/5 bg-hz-teal rounded-full" />
+        </div>
+        <div className="flex justify-between text-xs text-hz-hint">
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-hz-teal inline-block"/>On plan {fmt(BALANCE * 0.6 * 0.8)}</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-hz-accent inline-block"/>Open {fmt(BALANCE * 0.6 * 0.2)}</span>
+        </div>
+      </Card>
+
+      {/* Quick actions */}
+      <div className="space-y-2.5">
+        {[
+          {icon:'📅',label:'My Pay Over Time Plan',sub:'Monthly · 9 installments remaining',highlight:true},
+          {icon:'👥',label:'Manage Authorized Parties',sub:'Sarah Johnson (40%)'},
+          {icon:'🔗',label:'Guest Payment Link',sub:'Send a one-time payment link'},
+          {icon:'💳',label:'Make a Payment',sub:'Open balance available'},
+          {icon:'📊',label:'Account History',sub:'Payments and activity'},
+        ].map((a,i)=>(
+          <Card key={i} className={`p-3.5 flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow ${a.highlight?'border-hz-accent/30':''}`}>
+            <span className="text-xl shrink-0">{a.icon}</span>
+            <div className="flex-1 min-w-0">
+              <div className={`text-sm font-semibold ${a.highlight?'text-hz-accent':'text-hz-text'}`}>{a.label}</div>
+              <div className="text-xs text-hz-hint truncate">{a.sub}</div>
+            </div>
+            <span className="text-hz-hint text-sm shrink-0">›</span>
+          </Card>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+// ── App ────────────────────────────────────────────────────────────────────
+const App = () => {
+  const [s, setS] = React.useState(0);
+  const go = (n) => { setS(n); window.scrollTo(0,0); };
+  return [
+    <S1_WelcomeBack onNext={()=>go(1)} />,
+    <S2_Balance     onNext={()=>go(2)} onBack={()=>go(0)} />,
+    <S3_Insurance   onNext={()=>go(3)} onBack={()=>go(1)} />,
+    <S4_ConfirmSetup onNext={()=>go(4)} onBack={()=>go(2)} />,
+    <S5_Disclosures  onNext={()=>go(5)} onBack={()=>go(3)} />,
+    <S6_AllSet       onNext={()=>go(6)} onBack={()=>go(4)} />,
+    <S7_Home />,
+  ][s] || null;
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

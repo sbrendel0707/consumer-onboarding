@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>6a · Returning AP Onboarding – Horizon Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{'hz-indigo':'#2D1FA3','hz-accent':'#645CDC','hz-cloud':'#EEF0FF','hz-teal':'#0D7A55','hz-teal-bg':'#E1F5EE','hz-bg':'#F4F5FF','hz-text':'#1A1060','hz-muted':'#57548D','hz-hint':'#6B6899','hz-border':'rgba(100,92,220,0.14)','hz-danger':'#E24B4A'},fontFamily:{sans:["'Plus Jakarta Sans'",'system-ui','sans-serif']},borderRadius:{'hz':'18px','hz-sm':'12px','hz-pill':'99px'}}}}
+</script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-hz-bg">
+<div id="root"></div>
+<script type="text/babel">
+
+const STUDENT      = 'Connor Walsh';
+const AP_FIRST     = 'Michael';
+const AP_LAST      = 'Walsh';
+const SCHOOL       = 'Ridgemont University';
+const NEW_BALANCE  = 5600;
+const OLD_BALANCE  = 5100;
+const AP_PCT       = 100;
+const OLD_INSTALL  = 9;
+const OLD_FREQ     = 'Monthly';
+const OLD_PMT      = fmt2(OLD_BALANCE / OLD_INSTALL);
+const NEW_PMT      = fmt2(NEW_BALANCE / OLD_INSTALL);
+const INSURANCE_PREM = 336;
+
+function fmt2(n){return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+const fmt = fmt2;
+
+const Shell = ({children,step,total,onBack,showBack=true}) => (
+  <div className="min-h-screen bg-hz-bg flex flex-col items-center py-8 px-4">
+    <div className="w-full max-w-sm">
+      <div className="flex items-center justify-between mb-6">
+        {showBack?<button onClick={onBack} className="text-hz-accent text-sm font-semibold">← Back</button>
+          :<a href="index.html" className="text-hz-accent text-sm font-semibold">⌂ Home</a>}
+        <span className="text-xs text-hz-hint">{SCHOOL}</span>
+      </div>
+      {total>0&&<div className="mb-6"><div className="text-xs text-hz-hint mb-1.5">Step {step} of {total}</div>
+        <div className="h-1 bg-hz-cloud rounded-full overflow-hidden"><div className="h-full bg-hz-accent rounded-full transition-all duration-500" style={{width:`${(step/total)*100}%`}}/></div></div>}
+      {children}
+    </div>
+  </div>
+);
+
+const Btn=({children,onClick,variant='primary',disabled=false,className=''})=>{
+  const v={primary:'bg-hz-indigo text-white',ghost:'bg-hz-cloud text-hz-indigo',teal:'bg-hz-teal text-white',outline:'border border-[rgba(100,92,220,0.3)] text-hz-indigo hover:bg-hz-cloud'};
+  return <button onClick={onClick} disabled={disabled} className={`w-full py-3.5 rounded-hz-pill font-semibold text-[15px] hover:opacity-90 active:scale-[0.97] transition-all ${v[variant]} ${disabled?'opacity-40 cursor-not-allowed':''} ${className}`}>{children}</button>;
+};
+const Card=({children,className=''})=><div className={`bg-white rounded-hz border border-hz-border shadow-sm ${className}`}>{children}</div>;
+const Info=({children})=><div className="flex gap-2 p-3 bg-hz-cloud rounded-hz-sm border border-[rgba(100,92,220,0.2)] text-xs text-hz-muted leading-relaxed"><span className="shrink-0 mt-0.5">ℹ️</span><span>{children}</span></div>;
+
+const ConfirmCard=({icon,label,prior,current,onSame,onChange,done,changedLabel})=>(
+  <Card className={`p-4 transition-all ${done?'border-hz-teal/30':''}`}>
+    <div className="flex items-start gap-3 mb-3">
+      <span className="text-xl shrink-0">{icon}</span>
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-0.5">{label}</div>
+        <div className="text-sm text-hz-muted">{prior}</div>
+        {changedLabel&&<div className="text-sm text-hz-teal font-semibold mt-0.5">→ {changedLabel}</div>}
+      </div>
+      {done&&<span className="text-hz-teal text-xl shrink-0">✓</span>}
+    </div>
+    {!done?(
+      <div className="grid grid-cols-2 gap-2">
+        <button onClick={onSame} className="py-2 rounded-hz-sm text-sm font-semibold bg-hz-teal-bg text-hz-teal border border-hz-teal/20 hover:opacity-90">✓ Same as before</button>
+        <button onClick={onChange} className="py-2 rounded-hz-sm text-sm font-semibold bg-hz-cloud text-hz-indigo border border-hz-border hover:opacity-90">Make a change</button>
+      </div>
+    ):(
+      <button onClick={onChange} className="w-full py-1.5 text-xs font-semibold text-hz-accent border border-[rgba(100,92,220,0.2)] rounded-hz-sm hover:bg-hz-cloud transition-colors">Edit</button>
+    )}
+  </Card>
+);
+
+// ── S1: Login ──────────────────────────────────────────────────────────────
+const S1=({onNext})=>{
+  const [em,setEm]=React.useState('michael.walsh@gmail.com');
+  const [pw,setPw]=React.useState('');
+  return (
+    <Shell step={0} total={0} showBack={false}>
+      <div className="text-center mb-8">
+        <div className="w-16 h-16 rounded-full bg-hz-cloud flex items-center justify-center mx-auto mb-4 text-3xl">🔑</div>
+        <div className="text-xs font-bold uppercase tracking-widest text-hz-accent mb-2">Returning Authorized Party</div>
+        <h1 className="text-2xl font-bold text-hz-text mb-2">Welcome back!</h1>
+        <p className="text-sm text-hz-muted">Log in with your existing Nelnet credentials.</p>
+      </div>
+      <div className="space-y-3 mb-5">
+        <div>
+          <label className="block text-xs font-semibold text-hz-muted mb-1">Username or email</label>
+          <input value={em} onChange={e=>setEm(e.target.value)} className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/>
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-hz-muted mb-1">Password</label>
+          <input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="Your password"
+            className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/>
+        </div>
+      </div>
+      <Btn onClick={onNext} disabled={!em||!pw}>Sign in →</Btn>
+      <div className="text-center mt-3 text-xs text-hz-hint">No new account creation needed — you already have an account.</div>
+    </Shell>
+  );
+};
+
+// ── S2: Welcome back + new term ────────────────────────────────────────────
+const S2=({onNext,onBack})=>(
+  <Shell step={1} total={4} onBack={onBack}>
+    <div className="text-center mb-6">
+      <div className="w-12 h-12 rounded-full bg-hz-teal-bg flex items-center justify-center mx-auto mb-3 text-2xl">👋</div>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Welcome back, {AP_FIRST}!</h2>
+      <p className="text-sm text-hz-muted">A new term has started for {STUDENT}. Here's what's changed.</p>
+    </div>
+    <Card className="p-4 mb-4">
+      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Fall 2026 — What's new</div>
+      <div className="space-y-3">
+        {[
+          {icon:'💰',label:'New term balance',old:fmt(OLD_BALANCE),new:fmt(NEW_BALANCE)},
+          {icon:'📅',label:'Term',old:'Spring 2026',new:'Fall 2026'},
+        ].map((r,i)=>(
+          <div key={i} className="flex items-start gap-2.5">
+            <span className="text-lg shrink-0 mt-0.5">{r.icon}</span>
+            <div className="flex-1">
+              <div className="text-xs text-hz-hint mb-0.5">{r.label}</div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-hz-muted line-through">{r.old}</span>
+                <span className="text-hz-text font-semibold">→ {r.new}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+    <Info>We'll confirm your prior setup quickly — tap "Same as before" for anything that stays the same, or make a change where needed.</Info>
+    <div className="mt-5"><Btn onClick={onNext}>Review my {SCHOOL.split(' ')[0]} setup →</Btn></div>
+  </Shell>
+);
+
+// ── S3: Confirm setup ──────────────────────────────────────────────────────
+const S3=({onNext,onBack})=>{
+  const [pctDone,setPctDone]=React.useState(false);
+  const [insDone,setInsDone]=React.useState(false);
+  const [insChoice,setInsChoice]=React.useState(null);
+  const [potDone,setPotDone]=React.useState(false);
+  const [potChanged,setPotChanged]=React.useState(false);
+  const [methodDone,setMethodDone]=React.useState(false);
+  const allDone=pctDone&&insDone&&potDone&&methodDone;
+  return (
+    <Shell step={2} total={4} onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Confirm your setup</h2>
+      <p className="text-sm text-hz-muted mb-5">Confirm or update each item for Fall 2026.</p>
+      <div className="space-y-3 mb-5">
+        {/* Payment split */}
+        <ConfirmCard icon="💯" label="Payment responsibility" prior={`You: ${AP_PCT}% of ${STUDENT}'s balance`}
+          done={pctDone} onSame={()=>setPctDone(true)} onChange={()=>setPctDone(true)}/>
+        {/* Insurance */}
+        <Card className={`p-4 transition-all ${insDone?'border-hz-teal/30':''}`}>
+          <div className="flex items-start gap-3 mb-3">
+            <span className="text-xl shrink-0">🛡️</span>
+            <div className="flex-1">
+              <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-0.5">Tuition insurance</div>
+              <div className="text-sm text-hz-muted">You purchased GradGuard last term — it expired.</div>
+              {insDone&&<div className="text-sm text-hz-teal font-semibold mt-0.5">→ {insChoice==='renew'?`Renewed — ${fmt(INSURANCE_PREM)} today`:'Declined for this term'}</div>}
+            </div>
+            {insDone&&<span className="text-hz-teal text-xl shrink-0">✓</span>}
+          </div>
+          {!insDone?(
+            <div className="space-y-2">
+              {[
+                {v:'renew',l:'🔄 Renew insurance',sub:`${fmt(INSURANCE_PREM)} for Fall 2026`},
+                {v:'decline',l:'✗ Decline this term',sub:'No coverage'},
+                {v:'later',l:'⏸ Decide later',sub:'Added as a to-do'},
+              ].map(opt=>(
+                <button key={opt.v} onClick={()=>{setInsChoice(opt.v);setInsDone(true);}}
+                  className="w-full p-3 rounded-hz-sm border border-hz-border bg-hz-cloud text-left text-sm hover:border-hz-accent transition-all">
+                  <div className="font-semibold text-hz-text">{opt.l}</div>
+                  <div className="text-xs text-hz-muted mt-0.5">{opt.sub}</div>
+                </button>
+              ))}
+            </div>
+          ):(
+            <button onClick={()=>setInsDone(false)} className="w-full py-1.5 text-xs font-semibold text-hz-accent border border-[rgba(100,92,220,0.2)] rounded-hz-sm hover:bg-hz-cloud">Edit</button>
+          )}
+        </Card>
+        {/* POT plan */}
+        <Card className={`p-4 transition-all ${potDone?'border-hz-teal/30':''}`}>
+          <div className="flex items-start gap-3 mb-3">
+            <span className="text-xl shrink-0">📅</span>
+            <div className="flex-1">
+              <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-0.5">Pay over time plan</div>
+              <div className="text-sm text-hz-muted">Last term: Monthly · {OLD_INSTALL} installments · ≈{OLD_PMT}/mo</div>
+              {potDone&&<div className="text-sm text-hz-teal font-semibold mt-0.5">→ {potChanged?`Same structure · new amounts — ≈${NEW_PMT}/mo`:`Same structure · ≈${NEW_PMT}/mo`}</div>}
+            </div>
+            {potDone&&<span className="text-hz-teal text-xl shrink-0">✓</span>}
+          </div>
+          {!potDone&&(
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={()=>{setPotDone(true);setPotChanged(false);}} className="py-2 rounded-hz-sm text-sm font-semibold bg-hz-teal-bg text-hz-teal border border-hz-teal/20 hover:opacity-90">✓ Same structure</button>
+              <button onClick={()=>{setPotDone(true);setPotChanged(true);}} className="py-2 rounded-hz-sm text-sm font-semibold bg-hz-cloud text-hz-indigo border border-hz-border hover:opacity-90">Adjust plan</button>
+            </div>
+          )}
+          {potDone&&<button onClick={()=>setPotDone(false)} className="w-full py-1.5 text-xs font-semibold text-hz-accent border border-[rgba(100,92,220,0.2)] rounded-hz-sm hover:bg-hz-cloud">Edit</button>}
+          {potDone&&(
+            <div className="mt-3 bg-hz-cloud rounded-hz-sm p-3 text-xs space-y-1">
+              <div className="text-hz-muted font-semibold mb-1">Recalculated for Fall 2026</div>
+              <div className="flex justify-between text-hz-muted"><span>New term balance</span><span>{fmt(NEW_BALANCE)}</span></div>
+              <div className="flex justify-between text-hz-muted"><span>Plan structure</span><span>Monthly · {OLD_INSTALL} payments</span></div>
+              <div className="flex justify-between font-bold text-hz-text border-t border-hz-border pt-1 mt-1"><span>New installment</span><span>≈{NEW_PMT}/mo</span></div>
+            </div>
+          )}
+        </Card>
+        {/* Payment method */}
+        <ConfirmCard icon="🏦" label="Payment method" prior="Chase Checking ···4521"
+          done={methodDone} onSame={()=>setMethodDone(true)} onChange={()=>setMethodDone(true)}/>
+      </div>
+      <Btn onClick={onNext} disabled={!allDone}>Continue →</Btn>
+    </Shell>
+  );
+};
+
+// ── S4: Disclosures ────────────────────────────────────────────────────────
+const S4=({onNext,onBack})=>{
+  const [acked,setAcked]=React.useState([false,false]);
+  const toggle=i=>setAcked(a=>a.map((v,j)=>j===i?!v:v));
+  return (
+    <Shell step={3} total={4} onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Disclosures</h2>
+      <p className="text-sm text-hz-muted mb-5">Required acknowledgment for the new term. Please review each.</p>
+      <div className="space-y-3 mb-5">
+        {[
+          {t:'Financial Responsibility — Fall 2026',b:'I agree to pay the balance assigned to me for Connor Walsh\'s account for the Fall 2026 term.'},
+          {t:'Updated GradGuard Terms',b:'I acknowledge the updated GradGuard refund policy terms for Fall 2026.'},
+        ].map((d,i)=>(
+          <div key={i} onClick={()=>toggle(i)} className={`bg-white rounded-hz-sm border p-4 cursor-pointer transition-all ${acked[i]?'border-hz-teal/40 bg-hz-teal-bg/20':'border-hz-border'}`}>
+            <div className="flex items-start gap-3">
+              <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 ${acked[i]?'bg-hz-teal border-hz-teal':'border-hz-border bg-white'}`}>
+                {acked[i]&&<span className="text-white text-xs font-bold">✓</span>}
+              </div>
+              <div>
+                <div className="font-semibold text-sm text-hz-text mb-1">{d.t}</div>
+                <div className="text-xs text-hz-muted leading-relaxed">{d.b}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Btn onClick={onNext} disabled={!acked.every(Boolean)}>I agree →</Btn>
+    </Shell>
+  );
+};
+
+// ── S5: All set ────────────────────────────────────────────────────────────
+const S5=({onNext,onBack})=>(
+  <Shell step={4} total={4} onBack={onBack}>
+    <div className="text-center mb-6">
+      <div className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center mx-auto mb-4 text-3xl">✅</div>
+      <h2 className="text-xl font-bold text-hz-text mb-2">All set for Fall 2026!</h2>
+      <p className="text-sm text-hz-muted leading-relaxed">Your plan has been renewed with updated amounts. First payment due May 15, 2026.</p>
+    </div>
+    <Card className="p-4 mb-4">
+      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Fall 2026 summary</div>
+      <div className="space-y-2 text-sm">
+        {[
+          ['Student',STUDENT],
+          ['Your share','100% · '+fmt(NEW_BALANCE)],
+          ['Plan','Monthly · 9 installments · ≈'+NEW_PMT+'/mo'],
+          ['Insurance','GradGuard renewed'],
+          ['Payment method','Chase Checking ···4521'],
+          ['First payment','May 15, 2026'],
+        ].map(([k,v],i)=>(
+          <div key={i} className="flex justify-between">
+            <span className="text-hz-muted">{k}</span>
+            <span className="font-medium text-hz-text">{v}</span>
+          </div>
+        ))}
+      </div>
+    </Card>
+    <Btn onClick={onNext} variant="teal">Go to my account →</Btn>
+  </Shell>
+);
+
+// ── S6: Home ───────────────────────────────────────────────────────────────
+const S6=()=>(
+  <div className="min-h-screen bg-hz-bg">
+    <div className="bg-white border-b border-hz-border px-4 py-3 flex items-center justify-between">
+      <div className="text-xs font-bold text-hz-accent tracking-wide">HORIZON</div>
+      <div className="w-8 h-8 rounded-full bg-hz-cloud flex items-center justify-center text-xs font-bold text-hz-accent">MW</div>
+    </div>
+    <div className="px-4 py-6 max-w-sm mx-auto">
+      <h1 className="text-2xl font-bold text-hz-text mb-0.5">Hi, {AP_FIRST} 👋</h1>
+      <p className="text-xs text-hz-hint mb-5">Authorized party for {STUDENT} · {SCHOOL} · Fall 2026</p>
+      <Card className="p-4 mb-4">
+        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Account summary</div>
+        <div className="text-3xl font-bold text-hz-text mb-0.5">{fmt(NEW_BALANCE)}</div>
+        <div className="text-xs text-hz-muted mb-3">Your share (100%) · Fall 2026 plan active</div>
+        <div className="h-2.5 bg-hz-cloud rounded-full overflow-hidden mb-2">
+          <div className="h-full w-0 bg-hz-teal rounded-full transition-all duration-1000"/>
+        </div>
+        <div className="text-xs text-hz-muted">First payment due May 15, 2026</div>
+      </Card>
+      <div className="space-y-2.5">
+        {[
+          {icon:'📅',l:'My Pay Over Time Plan',s:'Monthly · 9 installments · ≈'+NEW_PMT+'/mo',hi:true},
+          {icon:'💳',l:'Make a Payment',s:'Next payment May 15'},
+          {icon:'📊',l:'Account History',s:'View all activity'},
+        ].map((a,i)=>(
+          <Card key={i} className={`p-3.5 flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow ${a.hi?'border-hz-accent/30':''}`}>
+            <span className="text-xl shrink-0">{a.icon}</span>
+            <div className="flex-1 min-w-0">
+              <div className={`text-sm font-semibold ${a.hi?'text-hz-accent':'text-hz-text'}`}>{a.l}</div>
+              <div className="text-xs text-hz-hint truncate">{a.s}</div>
+            </div>
+            <span className="text-hz-hint text-sm">›</span>
+          </Card>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const App=()=>{
+  const [s,setS]=React.useState(0);
+  const go=n=>{setS(n);window.scrollTo(0,0);};
+  return [<S1 onNext={()=>go(1)}/>,<S2 onNext={()=>go(2)} onBack={()=>go(0)}/>,<S3 onNext={()=>go(3)} onBack={()=>go(1)}/>,<S4 onNext={()=>go(4)} onBack={()=>go(2)}/>,<S5 onNext={()=>go(5)} onBack={()=>go(3)}/>,<S6/>][s]||null;
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

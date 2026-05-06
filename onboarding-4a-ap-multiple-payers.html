@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>4a · New AP Multiple Payers – Horizon Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{'hz-indigo':'#2D1FA3','hz-accent':'#645CDC','hz-cloud':'#EEF0FF','hz-teal':'#0D7A55','hz-teal-bg':'#E1F5EE','hz-bg':'#F4F5FF','hz-text':'#1A1060','hz-muted':'#57548D','hz-hint':'#6B6899','hz-border':'rgba(100,92,220,0.14)','hz-danger':'#E24B4A'},fontFamily:{sans:["'Plus Jakarta Sans'",'system-ui','sans-serif']},borderRadius:{'hz':'18px','hz-sm':'12px','hz-pill':'99px'}}}}
+</script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-hz-bg">
+<div id="root"></div>
+<script type="text/babel">
+
+// Scenario: Marcus invited TWO parents (Dad 60%, Mom 40%)
+// This prototype = Dad's flow (David Williams, 60%)
+const STUDENT        = 'Marcus Williams';
+const AP_FIRST       = 'David';
+const AP_LAST        = 'Williams';
+const OTHER_AP       = 'Angela Williams (Mom)';
+const SCHOOL         = 'Ridgemont University';
+const TOTAL_BAL      = 6800;
+const THIS_PCT       = 60;
+const OTHER_PCT      = 40;
+const MY_BAL         = Math.round(TOTAL_BAL * THIS_PCT / 100);
+const INSURANCE_PREM = Math.round(MY_BAL * 0.06);
+const NELNET_FEE     = 25;
+const DOWN_MIN       = Math.round(MY_BAL * 0.05);
+
+const fmt = n => '$' + Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+const Shell=({children,step,total,onBack,showBack=true})=>(
+  <div className="min-h-screen bg-hz-bg flex flex-col items-center py-8 px-4">
+    <div className="w-full max-w-sm">
+      <div className="flex items-center justify-between mb-6">
+        {showBack?<button onClick={onBack} className="text-hz-accent text-sm font-semibold">← Back</button>
+          :<a href="index.html" className="text-hz-accent text-sm font-semibold">⌂ Home</a>}
+        <span className="text-xs text-hz-hint">{SCHOOL}</span>
+      </div>
+      {total>0&&<div className="mb-6"><div className="text-xs text-hz-hint mb-1.5">Step {step} of {total}</div>
+        <div className="h-1 bg-hz-cloud rounded-full overflow-hidden"><div className="h-full bg-hz-accent rounded-full transition-all duration-500" style={{width:`${(step/total)*100}%`}}/></div></div>}
+      {children}
+    </div>
+  </div>
+);
+const Btn=({children,onClick,variant='primary',disabled=false,className=''})=>{
+  const v={primary:'bg-hz-indigo text-white',ghost:'bg-hz-cloud text-hz-indigo',teal:'bg-hz-teal text-white'};
+  return <button onClick={onClick} disabled={disabled} className={`w-full py-3.5 rounded-hz-pill font-semibold text-[15px] hover:opacity-90 active:scale-[0.97] transition-all ${v[variant]} ${disabled?'opacity-40 cursor-not-allowed':''} ${className}`}>{children}</button>;
+};
+const Card=({children,className=''})=><div className={`bg-white rounded-hz border border-hz-border shadow-sm ${className}`}>{children}</div>;
+const Info=({children})=><div className="flex gap-2 p-3 bg-hz-cloud rounded-hz-sm border border-[rgba(100,92,220,0.2)] text-xs text-hz-muted leading-relaxed"><span className="shrink-0 mt-0.5">ℹ️</span><span>{children}</span></div>;
+
+// ── S1: Welcome ────────────────────────────────────────────────────────────
+const S1=({onNext})=>(
+  <Shell step={0} total={0} showBack={false}>
+    <div className="text-center mb-8">
+      <div className="w-16 h-16 rounded-full bg-hz-cloud flex items-center justify-center mx-auto mb-4 text-3xl">💌</div>
+      <div className="text-xs font-bold uppercase tracking-widest text-hz-accent mb-2">Authorized Party Invitation</div>
+      <h1 className="text-2xl font-bold text-hz-text mb-3">You're one of {STUDENT}'s payers</h1>
+      <p className="text-sm text-hz-muted leading-relaxed">{STUDENT} has set you up as a co-payer on their {SCHOOL} account alongside {OTHER_AP}.</p>
+    </div>
+    <Card className="p-4 mb-4">
+      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Your share</div>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-hz-indigo flex items-center justify-center text-white text-xs font-bold shrink-0">You</div>
+          <div className="flex-1">
+            <div className="text-sm font-bold text-hz-text">{AP_FIRST} {AP_LAST}</div>
+            <div className="text-xs text-hz-muted">Responsible for {THIS_PCT}% — {fmt(MY_BAL)}</div>
+          </div>
+          <div className="text-lg font-bold text-hz-indigo">{THIS_PCT}%</div>
+        </div>
+        <div className="h-1.5 bg-hz-cloud rounded-full overflow-hidden">
+          <div className="h-full rounded-full bg-hz-indigo" style={{width:`${THIS_PCT}%`}}/>
+        </div>
+        <div className="flex items-center gap-2 opacity-60">
+          <div className="w-8 h-8 rounded-full bg-hz-muted flex items-center justify-center text-white text-xs font-bold shrink-0">AW</div>
+          <div className="flex-1">
+            <div className="text-sm font-bold text-hz-text">{OTHER_AP}</div>
+            <div className="text-xs text-hz-muted">{OTHER_PCT}% — {fmt(TOTAL_BAL - MY_BAL)} (setting up separately)</div>
+          </div>
+          <div className="text-lg font-bold text-hz-muted">{OTHER_PCT}%</div>
+        </div>
+      </div>
+    </Card>
+    <Info>You only set up payment for your {THIS_PCT}% share ({fmt(MY_BAL)}). {OTHER_AP} has a separate onboarding flow for their {OTHER_PCT}%.</Info>
+    <div className="mt-5"><Btn onClick={onNext}>Get started →</Btn></div>
+  </Shell>
+);
+
+// ── S2: Create Account ─────────────────────────────────────────────────────
+const S2=({onNext,onBack})=>{
+  const [fn,setFn]=React.useState(AP_FIRST);
+  const [ln,setLn]=React.useState(AP_LAST);
+  const [em,setEm]=React.useState('david.williams@gmail.com');
+  const [un,setUn]=React.useState('');
+  const [pw,setPw]=React.useState('');
+  const ok=fn&&ln&&em&&un.length>=6&&pw.length>=8;
+  return (
+    <Shell step={1} total={6} onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Create your Nelnet account</h2>
+      <p className="text-sm text-hz-muted mb-5">Separate from {STUDENT}'s school login — these are your personal credentials.</p>
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        {[['First',fn,setFn],['Last',ln,setLn]].map(([l,v,s],i)=>(
+          <div key={i}><label className="block text-xs font-semibold text-hz-muted mb-1">{l} name</label>
+          <input value={v} onChange={e=>s(e.target.value)} className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/></div>
+        ))}
+      </div>
+      {[['Email',em,setEm,'email'],['Username (min 6 chars)',un,setUn,'text'],['Password (min 8 chars)',pw,setPw,'password']].map(([l,v,s,t],i)=>(
+        <div key={i} className="mb-3">
+          <label className="block text-xs font-semibold text-hz-muted mb-1">{l}</label>
+          <input type={t} value={v} onChange={e=>s(e.target.value)} className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/>
+        </div>
+      ))}
+      <Btn onClick={onNext} disabled={!ok} className="mt-1">Continue →</Btn>
+    </Shell>
+  );
+};
+
+// ── S3: Security ───────────────────────────────────────────────────────────
+const S3=({onNext,onBack})=>{
+  const [a1,setA1]=React.useState('');
+  const [a2,setA2]=React.useState('');
+  return (
+    <Shell step={2} total={6} onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Security questions</h2>
+      <p className="text-sm text-hz-muted mb-5">For account recovery.</p>
+      <div className="space-y-4 mb-5">
+        {[['What was your childhood nickname?',a1,setA1],['What is your mother\'s maiden name?',a2,setA2]].map(([q,v,s],i)=>(
+          <div key={i}><label className="block text-xs font-semibold text-hz-muted mb-1">{q}</label>
+          <input value={v} onChange={e=>s(e.target.value)} placeholder="Answer" className="w-full bg-white border border-hz-border rounded-hz-sm px-3 py-2.5 text-hz-text text-sm outline-none focus:border-hz-accent"/></div>
+        ))}
+      </div>
+      <Btn onClick={onNext} disabled={a1.trim().length<2||a2.trim().length<2}>Continue →</Btn>
+    </Shell>
+  );
+};
+
+// ── S4: Agreements ─────────────────────────────────────────────────────────
+const S4=({onNext,onBack})=>{
+  const [acked,setAcked]=React.useState([false,false]);
+  const toggle=i=>setAcked(a=>a.map((v,j)=>j===i?!v:v));
+  return (
+    <Shell step={3} total={6} onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">School agreements</h2>
+      <p className="text-sm text-hz-muted mb-5">{SCHOOL} requires acknowledgment before payment setup.</p>
+      <div className="space-y-3 mb-5">
+        {[
+          {t:'Authorized Co-Payer Responsibility',b:`I agree to pay ${THIS_PCT}% (${fmt(MY_BAL)}) of ${STUDENT}'s balance as assigned. My portion does not affect the other authorized party's obligation.`},
+          {t:'GradGuard Refund Policy',b:'I acknowledge GradGuard refund policy terms applicable to this institution.'},
+        ].map((d,i)=>(
+          <div key={i} onClick={()=>toggle(i)} className={`bg-white rounded-hz-sm border p-4 cursor-pointer transition-all ${acked[i]?'border-hz-teal/40 bg-hz-teal-bg/20':'border-hz-border'}`}>
+            <div className="flex items-start gap-3">
+              <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 ${acked[i]?'bg-hz-teal border-hz-teal':'border-hz-border bg-white'}`}>{acked[i]&&<span className="text-white text-xs font-bold">✓</span>}</div>
+              <div><div className="font-semibold text-sm text-hz-text mb-1">{d.t}</div><div className="text-xs text-hz-muted leading-relaxed">{d.b}</div></div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Btn onClick={onNext} disabled={!acked.every(Boolean)}>I agree →</Btn>
+    </Shell>
+  );
+};
+
+// ── S5: Balance + Insurance ────────────────────────────────────────────────
+const S5=({onNext,onBack,setInsurance})=>{
+  const [insChoice,setInsChoice]=React.useState(null);
+  const choose=v=>{setInsChoice(v);setInsurance(v==='accept');};
+  return (
+    <Shell step={4} total={6} onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">Your share &amp; insurance</h2>
+      <p className="text-sm text-hz-muted mb-4">Everything here is scoped to your {THIS_PCT}% of {STUDENT}'s balance.</p>
+      <Card className="p-4 mb-4">
+        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Your responsibility</div>
+        <div className="text-3xl font-bold text-hz-text mb-0.5">{fmt(MY_BAL)}</div>
+        <div className="text-xs text-hz-muted mb-3">{THIS_PCT}% of {fmt(TOTAL_BAL)} total balance · Fall 2026</div>
+        <div className="space-y-1.5 text-xs text-hz-muted border-t border-hz-border pt-3">
+          <div className="flex justify-between"><span>Total student balance</span><span className="text-hz-text font-medium">{fmt(TOTAL_BAL)}</span></div>
+          <div className="flex justify-between"><span>Your {THIS_PCT}%</span><span className="text-hz-text font-medium">{fmt(MY_BAL)}</span></div>
+          <div className="flex justify-between"><span>{OTHER_AP}'s {OTHER_PCT}%</span><span className="text-hz-muted">{fmt(TOTAL_BAL-MY_BAL)} (separate setup)</span></div>
+        </div>
+        <button className="mt-3 text-xs text-hz-accent font-semibold w-full text-center">View {STUDENT}'s full balance breakdown →</button>
+      </Card>
+      <Card className="p-4 mb-4">
+        <div className="flex items-center gap-2 mb-3"><span className="text-xl">🛡️</span>
+          <div><div className="font-semibold text-sm text-hz-text">GradGuard Tuition Insurance</div>
+          <div className="text-xs text-hz-muted">{STUDENT} declined — you can accept on their behalf</div></div>
+        </div>
+        <div className="flex justify-between items-center py-2 border-t border-hz-border">
+          <span className="text-sm text-hz-muted">Premium (your {THIS_PCT}% of tuition)</span>
+          <span className="text-xl font-bold text-hz-text">{fmt(INSURANCE_PREM)}</span>
+        </div>
+      </Card>
+      <div className="space-y-2 mb-4">
+        {[
+          {v:'accept',l:'✓ Accept insurance',sub:`${fmt(INSURANCE_PREM)} added today`,c:'bg-hz-teal-bg text-hz-teal border-hz-teal/20'},
+          {v:'decline',l:'✗ Decline',sub:'No coverage',c:'bg-hz-cloud text-hz-muted border-hz-border'},
+          {v:'later',l:'⏸ Decide later',sub:'To-do on home screen',c:'bg-hz-cloud text-hz-muted border-hz-border'},
+        ].map(opt=>(
+          <button key={opt.v} onClick={()=>choose(opt.v)}
+            className={`w-full p-3 rounded-hz-sm border text-left transition-all ${insChoice===opt.v?opt.c+' ring-1 ring-inset ring-current':'bg-white border-hz-border hover:border-hz-accent'}`}>
+            <div className="font-semibold text-sm">{opt.l}</div><div className="text-xs mt-0.5 opacity-70">{opt.sub}</div>
+          </button>
+        ))}
+      </div>
+      <Btn onClick={onNext} disabled={!insChoice}>Continue →</Btn>
+    </Shell>
+  );
+};
+
+// ── S6: How to Pay (simplified) ────────────────────────────────────────────
+const S6=({onNext,onBack,insurance})=>{
+  const [path,setPath]=React.useState('pot');
+  const [downSlider,setDownSlider]=React.useState(DOWN_MIN);
+  const totalToday=downSlider+NELNET_FEE+(insurance?INSURANCE_PREM:0);
+  return (
+    <Shell step={5} total={6} onBack={onBack}>
+      <h2 className="text-xl font-bold text-hz-text mb-1">How would you like to pay?</h2>
+      <p className="text-sm text-hz-muted mb-1">Your share: <strong className="text-hz-text">{fmt(MY_BAL)}</strong></p>
+      <div className="flex items-center justify-between px-3 py-2 bg-hz-cloud rounded-hz-sm border border-[rgba(100,92,220,0.2)] mb-4 text-xs text-hz-muted">
+        <span>Your balance</span><span className="font-bold text-hz-text">{fmt(MY_BAL)}</span>
+      </div>
+      {/* Quick path selection */}
+      <div className="space-y-2 mb-4">
+        {[
+          {v:'pot',icon:'📅',l:'Pay Over Time',s:'Split your '+fmt(MY_BAL)+' share into installments'},
+          {v:'full',icon:'💳',l:'Pay in Full',s:'Pay '+fmt(MY_BAL+(insurance?INSURANCE_PREM:0))+' today'},
+          {v:'schedule',icon:'🗓️',l:'Schedule a Payment',s:'Choose a future date'},
+        ].map(opt=>(
+          <button key={opt.v} onClick={()=>setPath(opt.v)}
+            className={`w-full p-4 rounded-hz-sm border text-left transition-all ${path===opt.v?'border-hz-indigo bg-hz-cloud':'border-hz-border bg-white hover:border-hz-accent'}`}>
+            <div className="flex items-center gap-3">
+              <span className="text-xl">{opt.icon}</span>
+              <div><div className={`font-semibold text-sm ${path===opt.v?'text-hz-indigo':'text-hz-text'}`}>{opt.l}</div>
+              <div className="text-xs text-hz-muted mt-0.5">{opt.s}</div></div>
+            </div>
+          </button>
+        ))}
+      </div>
+      {path==='pot'&&(
+        <Card className="p-4 mb-4">
+          <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Pay Over Time setup — down payment</div>
+          <div className="flex justify-between text-xs text-hz-muted mb-1">
+            <span>School min (5%) — {fmt(DOWN_MIN)}</span><span>{fmt(downSlider)} selected</span>
+          </div>
+          <input type="range" min={DOWN_MIN} max={MY_BAL} step={50} value={downSlider} onChange={e=>setDownSlider(+e.target.value)} className="w-full accent-hz-indigo mb-3"/>
+          <div className="bg-hz-cloud rounded-hz-sm p-3 space-y-1.5 text-xs">
+            <div className="flex justify-between text-hz-muted"><span>Down payment</span><span>{fmt(downSlider)}</span></div>
+            <div className="flex justify-between text-hz-muted"><span>Nelnet fee</span><span>{fmt(NELNET_FEE)}</span></div>
+            {insurance&&<div className="flex justify-between text-hz-muted"><span>GradGuard premium</span><span>{fmt(INSURANCE_PREM)}</span></div>}
+            <div className="flex justify-between font-bold text-hz-text border-t border-hz-border pt-1.5"><span>Total due today</span><span>{fmt(totalToday)}</span></div>
+            <div className="flex justify-between text-hz-muted border-t border-hz-border pt-1 mt-0.5"><span>Remaining in plan</span><span>≈{fmt((MY_BAL-downSlider)/9)}/mo × 9</span></div>
+          </div>
+          <Info className="mt-2">Frequency, start date, and installment count are configured next.</Info>
+        </Card>
+      )}
+      <Btn onClick={onNext}>Continue to plan finalization →</Btn>
+    </Shell>
+  );
+};
+
+// ── S7: Confirmation ───────────────────────────────────────────────────────
+const S7=({onNext,onBack,insurance})=>(
+  <Shell step={6} total={6} onBack={onBack}>
+    <div className="text-center mb-6">
+      <div className="w-16 h-16 rounded-full bg-hz-teal-bg flex items-center justify-center mx-auto mb-4 text-3xl">✅</div>
+      <h2 className="text-xl font-bold text-hz-text mb-2">Your share is set up!</h2>
+      <p className="text-sm text-hz-muted">{OTHER_AP} will complete their {OTHER_PCT}% setup separately.</p>
+    </div>
+    <Card className="p-4 mb-4">
+      <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-3">Your confirmed setup</div>
+      <div className="space-y-2 text-sm">
+        {[
+          ['Student',STUDENT],
+          ['Your share',`${THIS_PCT}% · ${fmt(MY_BAL)}`],
+          [`${OTHER_AP}`,`${OTHER_PCT}% · ${fmt(TOTAL_BAL-MY_BAL)} (pending setup)`],
+          ['Insurance',insurance?'GradGuard accepted':'Declined'],
+          ['Plan','Monthly · 9 installments · ≈'+fmt(MY_BAL/9)+'/mo'],
+        ].map(([k,v],i)=>(
+          <div key={i} className="flex justify-between">
+            <span className="text-hz-muted">{k}</span>
+            <span className="font-medium text-hz-text text-right max-w-[60%]">{v}</span>
+          </div>
+        ))}
+      </div>
+    </Card>
+    <div className="bg-amber-50 border border-amber-200 rounded-hz-sm px-3 py-2.5 text-xs text-amber-800 mb-5">
+      ⚠️ {TOTAL_BAL-MY_BAL} ({OTHER_PCT}%) is not yet set up. {OTHER_AP} will receive a reminder to complete their portion.
+    </div>
+    <Btn onClick={onNext} variant="teal">Go to my account →</Btn>
+  </Shell>
+);
+
+// ── S8: AP Home ────────────────────────────────────────────────────────────
+const S8=()=>(
+  <div className="min-h-screen bg-hz-bg">
+    <div className="bg-white border-b border-hz-border px-4 py-3 flex items-center justify-between">
+      <div className="text-xs font-bold text-hz-accent tracking-wide">HORIZON</div>
+      <div className="w-8 h-8 rounded-full bg-hz-cloud flex items-center justify-center text-xs font-bold text-hz-accent">DW</div>
+    </div>
+    <div className="px-4 py-6 max-w-sm mx-auto">
+      <h1 className="text-2xl font-bold text-hz-text mb-0.5">Hi, {AP_FIRST} 👋</h1>
+      <p className="text-xs text-hz-hint mb-4">Co-payer for {STUDENT} · {SCHOOL} · {THIS_PCT}% responsibility</p>
+      {/* To-do: other AP pending */}
+      <Card className="p-3.5 mb-4 border-amber-200 bg-amber-50">
+        <div className="flex items-start gap-2.5">
+          <span className="text-amber-500 text-lg shrink-0">⚠️</span>
+          <div>
+            <div className="font-semibold text-sm text-amber-800">Angela Williams hasn't completed setup</div>
+            <div className="text-xs text-amber-700 mt-0.5">{fmt(TOTAL_BAL-MY_BAL)} ({OTHER_PCT}%) of the balance is not yet covered. She's been sent a reminder.</div>
+          </div>
+        </div>
+      </Card>
+      <Card className="p-4 mb-4">
+        <div className="text-xs font-bold text-hz-hint uppercase tracking-wider mb-2">Your share ({THIS_PCT}%)</div>
+        <div className="text-3xl font-bold text-hz-text mb-0.5">{fmt(MY_BAL)}</div>
+        <div className="text-xs text-hz-muted mb-3">Your portion · Pay Over Time plan active</div>
+        <div className="h-2 bg-hz-cloud rounded-full overflow-hidden"><div className="h-full w-0 bg-hz-teal rounded-full"/></div>
+        <div className="text-xs text-hz-muted mt-2">First payment due May 15, 2026 · ≈{fmt(MY_BAL/9)}/mo</div>
+      </Card>
+      <div className="space-y-2.5">
+        {[
+          {icon:'📅',l:'My Pay Over Time Plan',s:'Monthly · 9 installments',hi:true},
+          {icon:'💳',l:'Make a Payment',s:'Next due May 15'},
+          {icon:'📊',l:'Account History',s:'View all activity'},
+        ].map((a,i)=>(
+          <Card key={i} className={`p-3.5 flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow ${a.hi?'border-hz-accent/30':''}`}>
+            <span className="text-xl shrink-0">{a.icon}</span>
+            <div className="flex-1 min-w-0">
+              <div className={`text-sm font-semibold ${a.hi?'text-hz-accent':'text-hz-text'}`}>{a.l}</div>
+              <div className="text-xs text-hz-hint">{a.s}</div>
+            </div>
+            <span className="text-hz-hint text-sm">›</span>
+          </Card>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const App=()=>{
+  const [s,setS]=React.useState(0);
+  const [insurance,setInsurance]=React.useState(false);
+  const go=n=>{setS(n);window.scrollTo(0,0);};
+  return [
+    <S1 onNext={()=>go(1)}/>,<S2 onNext={()=>go(2)} onBack={()=>go(0)}/>,
+    <S3 onNext={()=>go(3)} onBack={()=>go(1)}/>,<S4 onNext={()=>go(4)} onBack={()=>go(2)}/>,
+    <S5 onNext={()=>go(5)} onBack={()=>go(3)} setInsurance={setInsurance}/>,
+    <S6 onNext={()=>go(6)} onBack={()=>go(4)} insurance={insurance}/>,
+    <S7 onNext={()=>go(7)} onBack={()=>go(5)} insurance={insurance}/>,
+    <S8/>,
+  ][s]||null;
+};
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
