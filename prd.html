@@ -1895,25 +1895,37 @@ body {
         1 · First Time Student
         <span class="nav-sub">New student, full onboarding</span>
       </a>
-      <a href="#s2" class="nav-link soon">
+      <a href="#s2" class="nav-link">
         2 · Returning Student
-        <span class="nav-sub">Coming soon</span>
+        <span class="nav-sub">Confirm or change last term</span>
       </a>
-      <a href="#s3" class="nav-link soon">
+      <a href="#s3" class="nav-link">
         3 · New AP — Single Payer
-        <span class="nav-sub">Coming soon</span>
+        <span class="nav-sub">AP creates Nelnet account</span>
       </a>
-      <a href="#s4" class="nav-link soon">
-        4 · New AP — Multi Payer
-        <span class="nav-sub">Coming soon</span>
+      <a href="#s4" class="nav-link">
+        4 · New AP — Multiple Payers
+        <span class="nav-sub">Split balance among APs</span>
       </a>
-      <a href="#s5" class="nav-link soon">
+      <a href="#s5" class="nav-link">
         5 · AP — Non-Payer
-        <span class="nav-sub">Coming soon</span>
+        <span class="nav-sub">View-only access</span>
       </a>
-      <a href="#s6" class="nav-link soon">
+      <a href="#s6" class="nav-link">
         6 · Returning AP
-        <span class="nav-sub">Coming soon</span>
+        <span class="nav-sub">Confirm or change last term</span>
+      </a>
+      <a href="#s7a" class="nav-link">
+        7a · AP — Two students, same school
+        <span class="nav-sub">Combined onboarding</span>
+      </a>
+      <a href="#s7b" class="nav-link">
+        7b · AP — Second student, existing account
+        <span class="nav-sub">Add student to existing AP</span>
+      </a>
+      <a href="#s-how-to-pay-detail" class="nav-link">
+        How to Pay — Detail
+        <span class="nav-sub">Partial eligibility, scheduling, 1-payment rule</span>
       </a>
     </div>
 
@@ -4478,34 +4490,49 @@ body {
       <!-- ── STEP 5 ── -->
       <div class="step-header" id="s1-step5">
         <div class="step-num">5</div>
-        <div class="step-title">Authorized Parties</div>
+        <div class="step-title">Who Will Pay &amp; Payment Responsibility</div>
       </div>
 
-      <div class="req-item" data-modified="2026-04-30">
-        <p class="req-text">Allow the student to designate authorized parties — individuals who can access and pay on the student's behalf. Authorized parties are managed within Nelnet's system, not by the institution. The student controls who has access.</p>
-        <p class="req-why"><strong>Why:</strong> Many students have parents or guardians who manage payments. Capturing this during onboarding means the AP can be active immediately, without a separate re-entry loop later.</p>
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>The student must first decide who is responsible for paying their balance.</strong> Three paths: (1) <strong>I'm paying</strong> — the student handles everything themselves, no APs needed; (2) <strong>Someone else is paying</strong> — the student names one or more authorized parties who will handle the payment and must be invited; (3) <strong>We're splitting it</strong> — the student and one or more APs share the balance, with percentages assigned to each payer.</p>
+        <p class="req-why"><strong>Why:</strong> The payment responsibility decision drives the entire downstream experience. Which payment path is shown, whose portion is calculated, what the AP sees at login — all of this depends on who is paying. Capturing this decision explicitly up front ensures all subsequent steps are scoped correctly for both student and AP.</p>
       </div>
 
-      <div class="req-item" data-modified="2026-04-30">
-        <p class="req-text">Collect name and email for each authorized party. Send each AP an invitation email with their account setup link immediately upon submission.</p>
-        <p class="req-why"><strong>Why:</strong> The AP needs to complete their own account setup to access the student's account. An immediate invite ensures there is no delay between the student granting access and the AP being able to act — especially important if a parent needs to make the first payment.</p>
-      </div>
-
-      <div class="req-item" data-modified="2026-04-30">
-        <p class="req-text">The student can add multiple authorized parties, or skip this step entirely.</p>
-        <p class="req-why"><strong>Why:</strong> Not all students have parents or guardians who manage payments. Requiring AP setup to complete onboarding would block students who are self-paying. The step is optional and can be completed post-onboarding.</p>
+      <div class="req-item" data-modified="2026-05-05">
+        <p class="req-text"><strong>Inviting authorized parties.</strong> When the student indicates an AP will pay (in whole or in part), they invite each AP by providing name and email. Horizon sends each AP an invitation email with their account setup link immediately. The AP's onboarding is a separate flow (see Scenario 3 — New Authorized Party) which they complete on their own timeline. The student's onboarding can continue without waiting for APs to accept.</p>
+        <p class="req-why"><strong>Why:</strong> Blocking the student's onboarding until APs accept would freeze the process — a parent or guardian may not check email immediately. The student completing their onboarding independently of the AP accepting ensures the student's own setup is never stalled by someone else's timeline.</p>
+        <div class="req-tags"><span class="tag tag-if">Cascades to: AP invitation email → AP Scenario 3 / 4</span></div>
       </div>
 
       <div class="if-block">
-        <div class="if-label">IF: One or more authorized parties added</div>
-        <div class="req-item" data-modified="2026-04-30">
-          <p class="req-text">Post-onboarding: the Manage Authorized Parties quick action on the home screen must show the names of the APs added here, not just a generic label.</p>
-          <p class="req-why"><strong>Why:</strong> Showing names rather than a generic label confirms to the student that their APs were successfully added and makes the quick action more immediately meaningful — they can see who has access at a glance.</p>
+        <div class="if-label">IF: Student selects "splitting" between self + one AP, or among multiple APs</div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Percentage assignment — two options the student chooses between:</strong><br/>
+          <strong>Option A: Assign now.</strong> The student assigns a percentage of the balance to each payer. The percentages must add up to 100%. Each payer's portion is calculated from the current balance and surfaced during that payer's own payment setup — the AP sees only their slice, with a breakdown showing why their amount is what it is.<br/>
+          <strong>Option B: Let APs decide at login.</strong> The student does not assign percentages. Instead, each AP is prompted to agree on their percentage when they complete their own onboarding. This option is for situations where the APs (e.g., two parents) need to discuss the split amongst themselves before committing.</p>
+          <p class="req-why"><strong>Why:</strong> Two equally valid real-world situations. Some students know exactly what each party is covering; others are setting up APs whose split needs to be decided between the APs themselves. Forcing either approach on the other would create friction or incorrect setups.</p>
+        </div>
+      </div>
+
+      <div class="if-block">
+        <div class="if-label">IF: APs are assigned a percentage (Option A) AND the balance changes during the term</div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Student override for balance changes.</strong> When the total balance increases (e.g., a new charge is added mid-term), the student can choose to take responsibility for the overage rather than requiring APs to re-agree to new amounts. The student's override means: any balance increase beyond what each AP originally committed to is assigned to the student's portion. APs are not asked to renegotiate their commitment when new charges appear.</p>
+          <p class="req-why"><strong>Why:</strong> Mid-term balance changes are common (add/drop, new fees, aid changes). Requiring every AP to re-confirm their percentage for each change creates operational friction and support contacts. The student-override option gives the student a clear, simple way to absorb any overages themselves without disrupting what each AP set up.</p>
+          <div class="req-tags"><span class="tag tag-if">Cascades to: mid-term balance change handling</span></div>
+        </div>
+      </div>
+
+      <div class="if-block">
+        <div class="if-label">IF: One or more authorized parties are added (any path above)</div>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text">Post-onboarding: the Manage Authorized Parties quick action on the home screen must show the names of the APs added here, not just a generic label. Percentages (if assigned) are visible in the AP detail view.</p>
+          <p class="req-why"><strong>Why:</strong> Showing names (and percentages) rather than a generic label confirms to the student that their APs were successfully added and makes the quick action immediately meaningful — they can see who is responsible for what at a glance.</p>
           <div class="req-tags"><span class="tag tag-if">Cascades to: Home screen quick actions</span></div>
         </div>
-        <div class="req-item" data-modified="2026-04-30">
-          <p class="req-text">Post-onboarding: if any authorized party subsequently sets up a Pay Over Time plan, a new "AP Pay Over Time Plans" quick action must appear on the student's home screen.</p>
-          <p class="req-why"><strong>Why:</strong> The student is responsible for their account's total coverage. If a parent sets up a plan, the student needs visibility so they understand what portion of the balance is being covered by someone else's plan.</p>
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text">Post-onboarding: if any authorized party sets up a Pay Over Time plan, a new "AP Pay Over Time Plans" quick action must appear on the student's home screen.</p>
+          <p class="req-why"><strong>Why:</strong> The student is responsible for their account's total coverage. If a parent sets up a plan, the student needs visibility into what portion of the balance is covered by that plan so they understand their own remaining obligation.</p>
           <div class="req-tags"><span class="tag tag-if">Cascades to: Home screen · IF AP creates POT plan</span></div>
         </div>
       </div>
@@ -4764,42 +4791,351 @@ body {
         </div>
 
         <div class="req-item" data-modified="2026-05-05">
-          <p class="req-text"><strong>Tuition insurance re-presentation (institution-configured).</strong> Whether the insurance offer is shown to a returning student who previously declined depends on the institution's configuration. Some institutions re-present every term; others suppress the offer after a student has declined once. If the institution has set "re-present each term," the student will see the insurance step again with a new premium calculated on the current term's charges. If "never re-present after decline," the step is skipped.</p>
-          <p class="req-why"><strong>Why:</strong> Insurance decisions are term-specific (the policy covers a specific enrollment period), so re-presenting each term is academically correct. However, some institutions prefer not to prompt students who have previously opted out. Institution-configured behavior allows both approaches.</p>
+          <p class="req-text"><strong>Tuition insurance re-presentation (institution-configured).</strong> Whether the insurance offer is shown to a returning student who previously declined depends on the institution's configuration. Some institutions re-present every term; others suppress the offer after a student has declined once. If "re-present each term," the student sees the offer again with a new premium calculated on this term's charges. If "never re-present after decline," the step is skipped.</p>
+          <p class="req-why"><strong>Why:</strong> Insurance decisions are term-specific. Re-presenting each term is academically correct. Some institutions prefer not to prompt students who previously opted out.</p>
           <div class="req-tags">
             <span class="tag tag-inst">Institution setting: insurance re-presentation</span>
             <span class="tag tag-if">IF: Re-present each term → show step; ELSE → skip</span>
           </div>
         </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>"Same as last semester?" confirmation flow.</strong> For each major prior decision, present a confirmation card that shows what the student did last term and offers two choices: "Yes, do the same" or "Make a change." Categories to confirm:<br/>
+          &nbsp;· <strong>Who's paying</strong> — same AP(s) paying, same percentage split? If confirmed, send each prior AP a reminder notification (not a full re-invitation) that the new term's setup is underway and their payment commitment has been renewed.<br/>
+          &nbsp;· <strong>Payment method</strong> — same saved payment method?<br/>
+          &nbsp;· <strong>Pay Over Time structure</strong> — same plan type and structure? If yes, set it up now for the new term automatically. If they want changes (fewer installments, different down payment), surface only the specific sub-steps that need updating.<br/>
+          &nbsp;· <strong>Communication preferences</strong> — same SMS/email settings?</p>
+          <p class="req-why"><strong>Why:</strong> The returning student's primary mental model is "I already did this." Forcing them through the full flow again wastes their time and signals the system isn't learning. Confirmation cards with smart defaults reduce onboarding time for returning students dramatically while still giving them control to make changes.</p>
+          <div class="req-tags"><span class="tag tag-if">Returning student → confirm-or-change each prior decision</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>AP reminder notifications.</strong> When a returning student confirms the same AP(s) should continue paying, Horizon sends each confirmed AP a notification that a new term has started and their payment arrangement is expected to continue. The AP clicks through to confirm their commitment for the new term's balance — they do not go through the full AP onboarding flow again unless their payment setup details have changed.</p>
+          <p class="req-why"><strong>Why:</strong> The AP may have forgotten they set this up, or may want to change their payment method or percentage for the new term. A proactive reminder with a lightweight confirmation — rather than a passive assumption that last term's arrangement auto-continues — ensures the AP is aware and in agreement.</p>
+          <div class="req-tags"><span class="tag tag-if">Cascades to: AP returning scenario (Scenario 6)</span></div>
+        </div>
       </div>
     </section>
 
+
+    <!-- ════════════════════════════════════════
+         SCENARIO 3: NEW AUTHORIZED PARTY — SINGLE PAYER
+    ════════════════════════════════════════ -->
     <section id="s3" class="prd-section">
       <div class="section-eyebrow">Scenario 3 · Authorized Party</div>
       <h2 class="section-title">New Authorized Party — Single Payer</h2>
       <hr class="section-divider"/>
-      <div class="coming-soon">Requirements coming soon.</div>
+
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>A first-time authorized party who has received an invitation email from a student. They are the sole payer for that student — no split arrangement, no other APs on the account. They create a Nelnet account, complete agreements if applicable, decide on insurance, and set up their payment method for 100% of the student's balance.</p>
+        <p style="margin-top:8px;">Unlike the student, the AP authenticates with a <strong>Nelnet-specific username and password</strong> — not SSO. They are not a student at the institution, so the school's SIS portal is not their entry point.</p>
+      </div>
+
+      <div class="subsection" style="margin-top:20px;">
+        <div class="subsection-label">AP Onboarding Flow — Step by Step</div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Step 1 — Account creation (Nelnet credentials).</strong> The AP creates a Nelnet username and password. This is the only onboarding flow where account creation happens explicitly — unlike students who arrive via SSO. The AP's invitation link contains a token that ties their new account to the specific student(s) who invited them.</p>
+          <p class="req-why"><strong>Why:</strong> APs are not institutional users. They have no SIS portal to SSO through. Nelnet credentials are their login for every future visit — this step is unavoidable and must be smooth enough not to create abandonment.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Step 2 — School agreements (if applicable).</strong> If the institution has agreements that apply to authorized parties (which may be a different set than what the student must sign), the AP must acknowledge those agreements. Agreement requirements for APs vs. students may differ — some institutions require APs to sign a financial responsibility statement; others only require this from the student. If no AP-specific agreements exist, this step is skipped.</p>
+          <p class="req-why"><strong>Why:</strong> APs are often making binding financial commitments. Institutions may have specific agreement requirements for payers who are not the student themselves. AP agreements are a distinct configuration from student agreements.</p>
+          <div class="req-tags"><span class="tag tag-inst">Institution setting: AP-specific agreements</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Step 3 — Percentage assignment (if student deferred this decision).</strong> If the student selected "let APs decide at login" for their payment split, the AP is prompted to confirm their percentage of the balance during onboarding. In the single-payer scenario this is always 100% — no decision required. In a multi-AP "defer to login" scenario, each AP sets their own percentage and the system validates they add to 100% across all APs before any AP can proceed.</p>
+          <p class="req-why"><strong>Why:</strong> In the single-payer case, the AP is simply confirming they are covering the full balance — no percentage entry needed. The step exists as a confirmation, not an input.</p>
+          <div class="req-tags"><span class="tag tag-if">IF: Student deferred percentage → AP confirms at login</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Step 4 — Tuition insurance decision (if applicable).</strong> If the institution has GradGuard enabled and the student has not yet accepted insurance, the AP may be given the opportunity to purchase insurance on the student's behalf. If the student already accepted insurance, this step is skipped. Same three-option structure as the student flow: Accept, Decline, Decide Later.</p>
+          <p class="req-why"><strong>Why:</strong> Parents are often the ones making insurance decisions for students — it's appropriate to offer it during the AP flow if the student didn't take it. If the student already accepted, offering it again would create a duplicate purchase.</p>
+          <div class="req-tags">
+            <span class="tag tag-inst">Institution setting: GradGuard enabled</span>
+            <span class="tag tag-if">IF: Student already accepted → skip</span>
+          </div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Step 5 — How to pay.</strong> The AP decides their payment path: Pay Over Time, Pay in Full today, or Schedule a Payment. The balance shown is the AP's portion only — in the single-payer scenario this is 100% of the student's balance. A clear breakdown must be shown explaining how the amount was derived: total student balance, any credits applied, the AP's percentage (100% in this case), and the resulting amount the AP is responsible for.</p>
+          <p class="req-why"><strong>Why:</strong> The AP needs to understand why they are seeing the amount they see. If it equals the student's full balance, the breakdown still matters as a transparency signal. If a partial amount (from a percentage split), the breakdown is critical — the AP must see the math clearly to trust the number.</p>
+          <div class="req-tags"><span class="tag tag-if">IF: Percentage split → show AP's portion with breakdown</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>One payment today.</strong> Regardless of which combination of decisions the AP makes — tuition insurance acceptance, Pay Over Time down payment, any additional amount scheduled for today — all amounts must be combined into a single payment collected at the end of the flow. The AP should never be charged more than once during onboarding. The confirmation screen must show a complete itemized breakdown of every component adding up to the one total charged today.</p>
+          <p class="req-why"><strong>Why:</strong> Multiple separate charges for a single onboarding session are confusing and alarm-triggering. One clear charge with full line-item transparency builds trust and reduces disputes.</p>
+        </div>
+      </div>
     </section>
 
+
+    <!-- ════════════════════════════════════════
+         SCENARIO 4: NEW AUTHORIZED PARTY — MULTIPLE PAYERS
+    ════════════════════════════════════════ -->
     <section id="s4" class="prd-section">
       <div class="section-eyebrow">Scenario 4 · Authorized Party</div>
       <h2 class="section-title">New Authorized Party — Multiple Payers</h2>
       <hr class="section-divider"/>
-      <div class="coming-soon">Requirements coming soon.</div>
+
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>Two or more authorized parties have been invited by the student. The balance is split among them — either by percentages the student assigned, or by percentages the APs must agree on at login (if the student chose "let APs decide"). Each AP sees only their portion of the balance and sets up payment for their slice independently.</p>
+      </div>
+
+      <div class="subsection" style="margin-top:20px;">
+        <div class="subsection-label">Differences from Single Payer (Scenario 3)</div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Percentage assignment at AP login (when student deferred).</strong> If the student chose "let APs decide," each AP encounters a percentage assignment step during their onboarding. APs must collectively add up to 100%. The system cannot allow any AP to proceed to payment setup until all APs have logged in and the percentages have been confirmed to total 100%. If one AP has completed their setup but the others have not, the first AP's plan or payment is held in a pending state until the split is resolved.</p>
+          <p class="req-why"><strong>Why:</strong> It is mathematically impossible to set up payment for a portion of a balance until the portions are determined. This is a real coordination problem — two parents may need to discuss who covers what before either can commit. The system must hold the state cleanly without pushing either AP into an error state.</p>
+          <div class="req-tags"><span class="tag tag-if">IF: Student deferred → APs must coordinate percentage at login</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Each AP's payment setup is scoped to their portion only.</strong> Once percentages are established (whether pre-assigned by the student or agreed upon at AP login), every downstream step — insurance premium calculation, Pay Over Time plan amount, down payment slider, confirmation total — reflects only the individual AP's portion. The full student balance is visible as context when APs tap into the balance breakdown, but the primary number shown throughout is their own slice.</p>
+          <p class="req-why"><strong>Why:</strong> An AP responsible for 60% of a $10,000 balance is setting up a $6,000 payment arrangement — not a $10,000 one. Showing the full balance as the action amount would lead to incorrect plan setups and AP confusion.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Dual AP same-school combined view (Scenario 7a variant).</strong> If the same payer has been invited by two students at the same institution, they can complete a combined onboarding that shows the combined balance of both students as the headline number (with drilldown into each student's individual breakdown). See Scenario 7a for full requirements on this case.</p>
+          <div class="req-tags"><span class="tag tag-if">IF: AP invited by 2+ students at same institution → Scenario 7a</span></div>
+        </div>
+      </div>
     </section>
 
+
+    <!-- ════════════════════════════════════════
+         SCENARIO 5: AUTHORIZED PARTY — NON-PAYER (VIEW ONLY)
+    ════════════════════════════════════════ -->
     <section id="s5" class="prd-section">
       <div class="section-eyebrow">Scenario 5 · Authorized Party</div>
-      <h2 class="section-title">Authorized Party — Non-Payer</h2>
+      <h2 class="section-title">Authorized Party — Non-Payer (View Only)</h2>
       <hr class="section-divider"/>
-      <div class="coming-soon">Requirements coming soon.</div>
+
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>An authorized party who has been granted account visibility but is not responsible for making payments. This could be a grandparent who monitors the account, a second parent who wants to see the balance without being the payer, or any other party the student trusts with read access. They create a Nelnet account, complete any required agreements, but do not go through a payment setup flow.</p>
+      </div>
+
+      <div class="subsection" style="margin-top:20px;">
+        <div class="subsection-label">Non-Payer AP Flow</div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text">A non-payer AP completes account creation (username + password) and any required agreements. They skip the insurance, payment path, and payment method steps. Their post-onboarding home view shows the student's account summary, balance, and recent activity in read-only mode — no payment actions are available to them.</p>
+          <p class="req-why"><strong>Why:</strong> Some families want a secondary viewer who can monitor the account without having payment authority. Forcing them through a payment setup that results in zero payments creates confusion and support contacts.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text">The student explicitly designates this AP as "view only" when inviting them — distinguishing them from an AP who will pay. The invitation email confirms their access level: "You've been granted view access to [Student Name]'s Horizon account. You'll be able to see their balance and account activity, but will not be responsible for making payments."</p>
+          <p class="req-why"><strong>Why:</strong> The AP must understand what access they're being granted before they create an account. Discovering they have no payment authority after completing setup would create confusion about what the system is for.</p>
+        </div>
+      </div>
     </section>
 
+
+    <!-- ════════════════════════════════════════
+         SCENARIO 6: RETURNING AUTHORIZED PARTY
+    ════════════════════════════════════════ -->
     <section id="s6" class="prd-section">
       <div class="section-eyebrow">Scenario 6 · Authorized Party</div>
       <h2 class="section-title">Returning Authorized Party</h2>
       <hr class="section-divider"/>
-      <div class="coming-soon">Requirements coming soon.</div>
+
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>An authorized party returning for a new term with an existing Nelnet account. They log in with their Nelnet credentials (username + password). Their prior payment setup is on file. The student has already gone through the returning student flow and confirmed this AP should continue. The AP receives a reminder notification and clicks through to confirm their commitment for the new term.</p>
+      </div>
+
+      <div class="subsection" style="margin-top:20px;">
+        <div class="subsection-label">Returning AP Flow</div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Login with existing Nelnet credentials.</strong> The returning AP logs in using the username and password they created during their first onboarding. No account creation. No new invitation token needed — the student's "continue same AP" action triggers a reminder notification, not a new invitation link.</p>
+          <p class="req-why"><strong>Why:</strong> The AP already has a Nelnet account. Sending a new invitation link would create confusion about whether this is a new relationship or a continuation of the existing one.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Confirm or change prior setup.</strong> The returning AP sees the same "confirm or change" pattern as the returning student — each prior decision is surfaced as a confirmation card: same percentage split? same payment method? same Pay Over Time structure (if applicable)? If yes to all, the AP can confirm in one tap and their arrangement for the new term is established. If they want to change any individual element (e.g., update their payment method, adjust their percentage), they can drill into that specific card without repeating the entire setup.</p>
+          <p class="req-why"><strong>Why:</strong> Same rationale as the returning student — the AP already made these decisions. Forcing the full flow for a new term erodes trust and creates unnecessary work. Targeted confirmation cards with edit capability provide both efficiency and control.</p>
+          <div class="req-tags"><span class="tag tag-if">Returning AP → confirm-or-change each prior decision</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Pay Over Time re-enrollment.</strong> If the AP previously used a Pay Over Time plan, the new term's plan must be set up fresh — the prior plan expired at the end of last term. The confirmation flow pre-fills the plan structure from last term (same installment count, same frequency) but recalculates amounts based on the new term's balance. The AP can accept the pre-filled structure or edit specific parameters. They do not see the full plan setup wizard unless they explicitly choose to change parameters.</p>
+          <p class="req-why"><strong>Why:</strong> The plan structure is likely to repeat (parents tend to pay the same way term over term), but the amounts will differ because the student's balance changes each term. Pre-filling the structure while recalculating amounts is the right balance of efficiency and accuracy.</p>
+          <div class="req-tags"><span class="tag tag-if">Cascades to: Pay Over Time re-enrollment for new term</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Insurance re-decision (if applicable).</strong> If the AP previously purchased insurance, the prior policy has expired. The AP is offered the chance to renew for the new term, based on the new term's balance. If they previously declined, institution configuration determines whether the offer is shown again (same as student re-presentation logic).</p>
+          <p class="req-why"><strong>Why:</strong> Insurance is term-specific. A prior-term purchase does not roll forward — the AP must actively choose to renew or decline for the new term.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         SCENARIO 7a: AP INVITED BY TWO STUDENTS — SAME INSTITUTION
+    ════════════════════════════════════════ -->
+    <section id="s7a" class="prd-section">
+      <div class="section-eyebrow">Scenario 7a · Authorized Party</div>
+      <h2 class="section-title">New AP — Invited by Two Students at Same Institution</h2>
+      <hr class="section-divider"/>
+
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>A parent or guardian who has received invitation emails from two different students — both enrolled at the same institution. Rather than completing two separate onboarding flows (one per student), the AP goes through a single combined onboarding experience where both students' charges are visible together. The AP sees the combined total as the headline amount but can drill into each student's breakdown at any time.</p>
+        <p style="margin-top:8px;"><strong>Same-institution requirement:</strong> This combined flow only applies when both students attend the same university. If the students are at different institutions, the AP completes two entirely separate onboarding experiences — one per school — because plan configurations, agreements, insurance, and payment terms are institution-specific.</p>
+      </div>
+
+      <div class="subsection" style="margin-top:20px;">
+        <div class="subsection-label">Combined Onboarding Requirements</div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Combined balance presentation.</strong> The AP sees the combined balance of both students as the primary headline figure. Beneath the combined total, both students are listed with their individual balance amounts visible. The AP can tap into either student's balance to see the full charge breakdown for that student (charges, aid, anticipated aid, resulting balance). The payment setup ultimately applies to the combined total — one payment method, one Pay Over Time plan if applicable, covering both students' portions.</p>
+          <p class="req-why"><strong>Why:</strong> A parent covering both children's tuition at the same school is making one financial decision, not two. Forcing them through two sequential flows is operationally correct but practically terrible — they want to see the total picture and commit once.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Single Pay Over Time plan for both students (if desired).</strong> If the AP chooses Pay Over Time, they can enroll in one plan that covers the combined balance of both students. Alternatively, if they prefer separate plans per student (for budgeting or tracking purposes), they can choose to set up individual plans. The default presentation should be the combined plan — it is simpler for most payers.</p>
+          <p class="req-why"><strong>Why:</strong> One plan for both is the path of least resistance and most common preference. Separate plans are available but should not be the default — they add complexity most payers don't need.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Agreements, insurance, and one signature at the end.</strong> If either student's institution requires AP agreements, the AP reviews the applicable agreements during the flow. If both students are at the same institution (required for this scenario), there is one set of agreements — not duplicate copies. If tuition insurance is offered, the AP sees the combined premium for both students with the per-student breakdown visible on request. At the end of the flow, a single consolidated signature step covers all agreements, disclosures, and plan documents that require acknowledgment — the AP does not sign each document separately, though each document may require an individual acknowledgment touch (scroll, checkbox) before the final combined signature applies.</p>
+          <p class="req-why"><strong>Why:</strong> A parent signing up for two students should not feel like they are doing it twice. All the decisions and documents are real and must be completed — but the UX should feel like one contiguous process, not two sequential processes stitched together.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>One payment today.</strong> Regardless of how many components the AP is paying for — combined down payment, combined insurance premium, any additional amounts — all are collected in a single payment at the end of the flow. One itemized confirmation, one charge, one receipt.</p>
+          <p class="req-why"><strong>Why:</strong> Multiple charges for a single onboarding session create confusion and distrust, especially when the amounts are already higher due to covering two students.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Different institutions → separate flows.</strong> If the two students attend different schools, the AP must complete two separate onboarding sessions — one per institution. Plans, agreements, insurance terms, and payment configurations are school-specific and cannot be combined across institutions. The AP's invitation emails are institution-scoped and will launch separate onboarding contexts when clicked.</p>
+          <p class="req-why"><strong>Why:</strong> Institution configuration is not portable. A payment plan at University A has different terms, dates, fees, and agreements than a plan at University B. Combining them would require presenting mismatched terms as a single decision — which would be incorrect and potentially expose the AP to wrong agreements or wrong plan terms.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         SCENARIO 7b: EXISTING AP ADDING A SECOND STUDENT — SAME INSTITUTION
+    ════════════════════════════════════════ -->
+    <section id="s7b" class="prd-section">
+      <div class="section-eyebrow">Scenario 7b · Authorized Party</div>
+      <h2 class="section-title">Existing AP — Adding Second Student at Same Institution</h2>
+      <hr class="section-divider"/>
+
+      <div class="scenario-desc">
+        <div class="scenario-desc-label">Scenario Description</div>
+        <p>An authorized party who already has an active Nelnet account and completed onboarding for one student — and has now received an invitation from a second student at the same institution. Rather than starting from scratch, the AP logs in and is presented with an accelerated "do the same for this student?" flow, leveraging their existing decisions as defaults.</p>
+      </div>
+
+      <div class="subsection" style="margin-top:20px;">
+        <div class="subsection-label">Existing AP — Second Student Flow</div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Login, not account creation.</strong> The AP logs in with their existing Nelnet credentials. The new invitation token is recognized and linked to their existing account — no new account is created. After login, the system surfaces the new student's invitation and walks the AP through a confirmation-first flow for the new student.</p>
+          <p class="req-why"><strong>Why:</strong> The AP already exists in Nelnet's system. Creating a second account would be incorrect and confusing. The existing account must absorb the new student relationship.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>"Same as your other student?" confirmation flow.</strong> For each decision category, the AP is shown what they chose for their existing student and offered the option to apply the same choice to the new student, or to make a different selection. Categories:<br/>
+          &nbsp;· <strong>Pay Over Time</strong> — add the new student's charges to the existing Pay Over Time plan (if still active), OR set up a separate plan for this student, OR pay in full.<br/>
+          &nbsp;· <strong>Tuition insurance</strong> — accept for this student (if GradGuard enabled), decline, or decide later.<br/>
+          &nbsp;· <strong>Agreements</strong> — acknowledge applicable agreements for this student (same institution, so likely the same set, but requires acknowledgment for this student's account).<br/>
+          &nbsp;· <strong>Payment method</strong> — same method already on file? Confirm or update.<br/>
+          The AP can click into any individual category to change just that selection — they are never forced through the full setup wizard unless they choose to modify something.</p>
+          <p class="req-why"><strong>Why:</strong> Defaulting to "same as your other student" dramatically reduces onboarding time for a parent who is paying the same way for both children. One-tap confirmation per category, with the ability to override any specific item, is the right balance of efficiency and control.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Adding to an existing Pay Over Time plan.</strong> If the AP has an active Pay Over Time plan for their existing student and wants to add the new student's charges to it, the system recalculates the combined plan: new total balance, new installment amounts, updated schedule. The AP sees the before-and-after — existing plan terms vs. what the updated combined plan looks like — and confirms before the change is applied. Their existing plan is not modified until they explicitly confirm the update.</p>
+          <p class="req-why"><strong>Why:</strong> Automatically modifying an existing plan without explicit confirmation would be a significant financial action. The AP must see the impact before agreeing to it.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>One consolidated signature at the end.</strong> All agreements, plan documents, and disclosures that require acknowledgment for the new student — including any that are the same as what the AP already signed for their existing student — are presented in one final consolidated signature step. Disclosures may require individual acknowledgment (scroll or checkbox per document), but the final e-signature applies to all of them in one action. The AP does not need to re-sign documents they already signed for their existing student, unless the institution requires a fresh signature per student enrollment.</p>
+          <p class="req-why"><strong>Why:</strong> Asking an AP to re-sign the same university agreement they already signed, with no change to the content, is redundant and friction-generating. Where a fresh acknowledgment is legally required, it should be the minimum touch needed — not a full re-signing ceremony.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>One payment today.</strong> All amounts due today for the new student setup — any Pay Over Time down payment increment, insurance premium if accepted, any additional amounts scheduled for today — are collected in a single payment at the end of the flow. The AP's existing payment method is pre-selected. One itemized confirmation, one charge.</p>
+          <p class="req-why"><strong>Why:</strong> Consistent with all other onboarding flows — one payment today regardless of complexity. The AP should not be charged multiple times for a single setup session.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════
+         HOW TO PAY — CROSS-SCENARIO REQUIREMENTS
+    ════════════════════════════════════════ -->
+    <section id="s-how-to-pay-detail" class="prd-section">
+      <div class="section-eyebrow">Scenarios — Cross-Cutting</div>
+      <h2 class="section-title">How to Pay — Detail Requirements</h2>
+      <hr class="section-divider"/>
+      <p style="font-size:13px;color:var(--hz-muted);line-height:1.65;margin-bottom:16px;">These requirements apply across multiple onboarding scenarios and govern how the payment path decision is handled, particularly for edge cases around partial eligibility, scheduling, and combining multiple payment components into a single today-payment.</p>
+
+      <div class="subsection">
+        <div class="subsection-label">Partial Pay Over Time Eligibility</div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>When only part of the balance is eligible for a Pay Over Time plan.</strong> Some charge types (e.g., certain fees, prior-term balances, specific course charges) may not be eligible to be included in a payment plan — the institution's plan configuration defines what is plan-eligible. When the user has both plan-eligible and non-plan-eligible charges, they must see both amounts clearly distinguished before making their payment path decision. The UI must show: "Amount eligible for Pay Over Time: $X" and "Amount not eligible for Pay Over Time: $Y" — never presenting a single blended balance without this distinction.</p>
+          <p class="req-why"><strong>Why:</strong> A user who selects Pay Over Time on a partial-eligibility balance needs to understand what is going on the plan and what is not. Hiding the non-eligible portion until the confirmation screen creates a surprise and drives confusion or cancellation.</p>
+          <div class="req-tags"><span class="tag tag-inst">Institution setting: plan-eligible charge types</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Pay in Full — single payment for the whole balance.</strong> If the user wants to pay in full, they can pay both the plan-eligible and non-eligible portions together in one payment. No split needed — the full balance is collected as one amount today (or scheduled for one future date).</p>
+          <p class="req-why"><strong>Why:</strong> Paying in full is the simplest path. The distinction between eligible and non-eligible amounts is irrelevant when the user is paying everything — they just want to pay the total and be done.</p>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Pay Over Time path with non-eligible remainder — two options for the non-eligible portion:</strong><br/>
+          <strong>Option A: Add to today's payment.</strong> The non-eligible amount is added to the total due today, alongside the plan's down payment. The user pays the down payment + non-eligible balance today; the remaining eligible balance is spread across installments.<br/>
+          <strong>Option B: Schedule it separately.</strong> The user selects a future date (before the charge due date) to pay the non-eligible amount. This creates a scheduled one-time payment in addition to the Pay Over Time plan — but still results in only one payment today (the down payment only).<br/>
+          In both options, the confirmation screen must show exactly how each component is being handled — nothing should be ambiguous.</p>
+          <p class="req-why"><strong>Why:</strong> Some users will have the cash to cover both amounts now; others prefer not to. Giving users control over the non-eligible portion avoids a forced lump-sum payment for users who otherwise would have chosen Pay Over Time specifically to spread costs.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-label">Pay in Full — Scheduling</div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Pay in Full does not have to mean "pay right now."</strong> When a user selects Pay in Full, they can choose to pay immediately or schedule the payment for a future date — as long as the scheduled date is on or before the charges' due date. The user picks a date from a date selector; the system validates the selected date against the due date and prevents selection of dates after the due date.</p>
+          <p class="req-why"><strong>Why:</strong> Many users intend to pay in full but need a few days — they're waiting for a direct deposit, a transfer from a parent, or the end of the month. Scheduling removes the need to choose a payment plan just to defer by a week, which would be the wrong product choice for the user's actual situation.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-label">One Payment Today — Universal Rule</div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Regardless of complexity, only one payment is collected today.</strong> This applies across all onboarding scenarios. A user who purchases tuition insurance, enrolls in a Pay Over Time plan, and has a non-plan-eligible charge they chose to pay today — all of these amounts must be combined into a single payment at the end of the flow. The confirmation screen shows each component as a line item, with a clear total. One charge, one receipt, one moment of "confirm."</p>
+          <p class="req-why"><strong>Why:</strong> Multiple separate charges within a single onboarding session confuse users, create duplicate-charge panic, and generate support contacts. Consolidation is both a UX requirement and a trust-building feature. The user has one total to compare against their bank account after sign-up.</p>
+          <div class="req-tags"><span class="tag tag-req">Required — all onboarding scenarios</span></div>
+        </div>
+
+        <div class="req-item" data-modified="2026-05-05">
+          <p class="req-text"><strong>Itemization on the confirmation screen.</strong> The single payment confirmation must display every component contributing to today's total as a separate line item. For a user who purchased insurance, enrolled in POT with a down payment, and added a non-eligible balance to today's payment, the breakdown would show:<br/>
+          &nbsp;· Pay Over Time down payment: $___<br/>
+          &nbsp;· Nelnet enrollment fee: $___<br/>
+          &nbsp;· Tuition insurance premium: $___<br/>
+          &nbsp;· Non-plan-eligible balance: $___<br/>
+          &nbsp;· <strong>Total due today: $___</strong><br/>
+          No component may be hidden in a subtotal. All line items visible before the user taps "Confirm."</p>
+          <p class="req-why"><strong>Why:</strong> Full transparency at the confirmation step is the last line of defense against accidental charges and subsequent disputes. A user who can see every line item has the context to understand and agree to what they're about to pay — or catch a mistake before it happens.</p>
+          <div class="req-tags"><span class="tag tag-req">Required — confirmation screen, all payment paths</span></div>
+        </div>
+      </div>
     </section>
 
 
