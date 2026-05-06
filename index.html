@@ -437,5 +437,95 @@ a.tile:hover::after { opacity: 1; right: 16px; }
 
   </div>
 
+  <!-- ── Institution Pay Over Time Setup Scenarios ── -->
+  <div class="section-label" style="margin-top:48px;">Institution Pay Over Time Setup Scenarios</div>
+
+  <style>
+  .scenarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    max-width: 880px;
+    margin: 0 auto 60px;
+  }
+  a.scenario-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
+  }
+  a.scenario-card:hover {
+    border-color: rgba(100,92,220,.4);
+    box-shadow: 0 4px 20px rgba(45,31,163,.08);
+    transform: translateY(-2px);
+  }
+  </style>
+  <div id="pot-scenarios-grid" class="scenarios-grid"></div>
+
+<script>
+const potScenarios = [
+  {id:'1c',  title:'Standard Plans Only — 1 Plan', plans:['Standard'], note:'Single plan option available'},
+  {id:'2c',  title:'Standard Plans Only — 2 Plans', plans:['Standard'], note:'Two plan options available'},
+  {id:'3c',  title:'Standard + Past Due', plans:['Standard','Past Due']},
+  {id:'4c',  title:'Standard + Long-Term (LTPP)', plans:['Standard','Long-Term']},
+  {id:'5c',  title:'Standard + International', plans:['Standard','International']},
+  {id:'6c',  title:'Standard + Hidden', plans:['Standard','Hidden']},
+  {id:'7c',  title:'Standard + Custom', plans:['Standard','Custom']},
+  {id:'8c',  title:'Standard + Past Due + Custom', plans:['Standard','Past Due','Custom']},
+  {id:'9c',  title:'Standard + Past Due + Hidden', plans:['Standard','Past Due','Hidden']},
+  {id:'10c', title:'Standard + Hidden + Custom', plans:['Standard','Hidden','Custom']},
+  {id:'11c', title:'Standard + Past Due + Hidden + Custom', plans:['Standard','Past Due','Hidden','Custom']},
+  {id:'12c', title:'Standard + LTPP + Past Due', plans:['Standard','Long-Term','Past Due']},
+  {id:'13c', title:'Standard + LTPP + Custom', plans:['Standard','Long-Term','Custom']},
+  {id:'14c', title:'Standard + LTPP + Past Due + Custom', plans:['Standard','Long-Term','Past Due','Custom']},
+  {id:'15c', title:'Standard + LTPP + Past Due + Hidden + Custom', plans:['Standard','Long-Term','Past Due','Hidden','Custom']},
+  {id:'16c', title:'Standard + International + Past Due', plans:['Standard','International','Past Due']},
+  {id:'17c', title:'Standard + International + LTPP', plans:['Standard','International','Long-Term']},
+  {id:'18c', title:'All Standard-Compatible Plans', plans:['Standard','International','Long-Term','Past Due','Hidden','Custom'], note:'Maximum standard-family config'},
+  {id:'19c', title:'Past Due Only', plans:['Past Due']},
+  {id:'20c', title:'Long-Term (LTPP) Only', plans:['Long-Term']},
+  {id:'21c', title:'International Only', plans:['International']},
+  {id:'22c', title:'Hidden Only', plans:['Hidden']},
+  {id:'23c', title:'Custom Only', plans:['Custom']},
+  {id:'24c', title:'Past Due + Custom', plans:['Past Due','Custom']},
+  {id:'25c', title:'Past Due + Hidden', plans:['Past Due','Hidden']},
+  {id:'26c', title:'Past Due + Hidden + Custom', plans:['Past Due','Hidden','Custom']},
+  {id:'27c', title:'LTPP + Past Due', plans:['Long-Term','Past Due']},
+  {id:'28c', title:'LTPP + Custom', plans:['Long-Term','Custom']},
+  {id:'29c', title:'Guarantee Only', plans:['Guarantee']},
+  {id:'30c', title:'Guarantee + Past Due', plans:['Guarantee','Past Due']},
+  {id:'31c', title:'Guarantee + Long-Term (LTPP)', plans:['Guarantee','Long-Term']},
+  {id:'32c', title:'Guarantee + International', plans:['Guarantee','International']},
+  {id:'33c', title:'Guarantee + Hidden', plans:['Guarantee','Hidden']},
+  {id:'34c', title:'Guarantee + Custom', plans:['Guarantee','Custom']},
+  {id:'35c', title:'Guarantee + Past Due + Custom', plans:['Guarantee','Past Due','Custom']},
+  {id:'36c', title:'Guarantee + Past Due + Hidden', plans:['Guarantee','Past Due','Hidden']},
+  {id:'37c', title:'Guarantee + Hidden + Custom', plans:['Guarantee','Hidden','Custom']},
+  {id:'38c', title:'Guarantee + Past Due + Hidden + Custom', plans:['Guarantee','Past Due','Hidden','Custom']},
+  {id:'39c', title:'Guarantee + LTPP + Past Due', plans:['Guarantee','Long-Term','Past Due']},
+  {id:'40c', title:'Guarantee + LTPP + Custom', plans:['Guarantee','Long-Term','Custom']},
+  {id:'41c', title:'Guarantee + LTPP + Past Due + Hidden + Custom', plans:['Guarantee','Long-Term','Past Due','Hidden','Custom']},
+  {id:'42c', title:'All Guarantee-Compatible Plans', plans:['Guarantee','International','Long-Term','Past Due','Hidden','Custom'], note:'Maximum guarantee-family config'},
+];
+const potColors = {
+  'Standard':'#2563eb','Past Due':'#dc2626','Long-Term':'#7c3aed',
+  'International':'#0891b2','Hidden':'#6b7280','Custom':'#d97706','Guarantee':'#059669'
+};
+const potGrid = document.getElementById('pot-scenarios-grid');
+potScenarios.forEach(function(s) {
+  var tags = s.plans.map(function(p) {
+    return '<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;background:'+potColors[p]+'22;color:'+potColors[p]+';border:1px solid '+potColors[p]+'44;margin:2px 2px 0 0">'+p+'</span>';
+  }).join('');
+  var noteHtml = s.note ? '<div style="font-size:11px;color:var(--hz-hint);margin-top:6px">'+s.note+'</div>' : '';
+  var card = document.createElement('a');
+  card.className = 'hz-card scenario-card';
+  card.href = 'https://sbrendel0707.github.io/nelnet-prototypes/inst-pot-scenario.html?id=' + s.id;
+  card.innerHTML = '<div><div class="tile-scenario">Scenario '+s.id+'</div><div class="tile-name" style="font-size:14px">'+s.title+'</div></div><div>'+tags+'</div>'+noteHtml;
+  potGrid.appendChild(card);
+});
+</script>
+
 </body>
 </html>
