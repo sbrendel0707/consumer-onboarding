@@ -1849,8 +1849,9 @@ body {
       <a href="#feat-balance-overview"   class="nav-link nav-sub-item">Balance Overview</a>
       <a href="#feat-tuition-insurance"  class="nav-link nav-sub-item">Tuition Insurance</a>
       <a href="#feat-how-to-pay"         class="nav-link nav-sub-item">How to Pay</a>
-      <a href="#feat-authorized-parties" class="nav-link nav-sub-item">Authorized Parties</a>
-      <a href="#feat-communications"     class="nav-link nav-sub-item">Communications</a>
+      <a href="#feat-authorized-parties"        class="nav-link nav-sub-item">Authorized Parties</a>
+      <a href="#feat-multi-payer-reconciliation" class="nav-link nav-sub-item">Multi-Payer Reconciliation</a>
+      <a href="#feat-communications"             class="nav-link nav-sub-item">Communications</a>
       <a href="#feat-disclosures"        class="nav-link nav-sub-item">Disclosures</a>
     </div>
 
@@ -5637,6 +5638,66 @@ body {
           <span class="tag tag-if">IF: AP invited but setup incomplete → home screen to-do</span>
           <span class="tag tag-if">To-do clears when all payers have confirmed 100% coverage</span>
         </div>
+      </div>
+
+
+      <!-- ── Multi-Payer Balance Reconciliation ── -->
+      <div class="feature-header" id="feat-multi-payer-reconciliation">
+        <div class="feature-icon">⚖️</div>
+        <div>
+          <div class="feature-title">Multi-Payer Balance Reconciliation</div>
+          <div class="feature-meta">How split-payer arrangements handle mid-term balance changes and school-side plan management</div>
+        </div>
+      </div>
+      <div class="scenario-chips">
+        <span class="scenario-chip sc-pending">S4 · New AP — Multi Payer</span>
+        <span class="scenario-chip sc-pending">S6 · Returning AP</span>
+        <span class="scenario-chip sc-inst">School system dependency</span>
+      </div>
+      <div class="cross-note"><strong>Architectural context:</strong> Two distinct percentage splits exist in the product — (1) who is paying and at what percentage (set by the student during onboarding, Step 5), and (2) how each payer's slice is paid over time (each payer sets up their own POT plan for their assigned portion). These are independent decisions at different points in the flow and must never be conflated in requirements, UI, or school configuration. The complexity documented here concerns what happens <em>after</em> both are set — when the underlying balance changes mid-term.</div>
+
+      <div class="req-item" data-modified="2026-05-06">
+        <p class="req-text"><strong>Financial responsibility percentages are set by the student and are separate from payment plan setup.</strong> The student's Step 5 decision ("I cover 60%, Mom covers 40%") defines ownership of the balance. Each authorized payer then independently enrolls in a payment plan for their assigned slice. These two events happen at different times and involve different users — conflating them in the UI or data model creates confusion and incorrect billing.</p>
+        <p class="req-why"><strong>Why:</strong> If a payer believes they are negotiating their percentage while setting up a payment plan, they may under-commit or assume incorrectly that the student will adjust. The student must own percentage assignment; the payer owns payment plan setup. Keeping these distinct prevents blame disputes when payment shortfalls occur.</p>
+        <div class="req-tags"><span class="tag tag-req">Required — architectural constraint, all split-payer scenarios</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-06">
+        <p class="req-text"><strong>When the student's total balance changes mid-term, each payer's assigned dollar amount changes proportionally to their percentage.</strong> A 60/40 split on $6,000 becomes a 60/40 split on the revised balance — not a fixed dollar split. The system must recalculate each payer's slice in real time when any balance adjustment is applied (scholarship posted, charge added, withdrawal credit, late fee). The revised per-payer amounts must be surfaced to each payer via notification and visible on their home screen without requiring a login to find the change.</p>
+        <p class="req-why"><strong>Why:</strong> A fixed-dollar split breaks instantly the moment a scholarship posts or a class is dropped. Proportional recalculation is the only correct model for shared responsibility on a living balance. Passive notification is required because payers — especially APs who are not students — may not check the portal regularly.</p>
+        <div class="req-tags"><span class="tag tag-req">Required</span><span class="tag tag-if">IF: balance changes → all payers notified of revised slice amounts</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-06">
+        <p class="req-text"><strong>Each payer's POT plan is a separate record at the student account level — one plan per payer, each for their slice.</strong> The school's billing system sees these as distinct enrollment records on the student's account. Nelnet manages the per-payer plan records internally. If a balance change causes a payer's slice to shift, their plan must be adjusted individually — the other payer's plan is not touched unless their slice also changed.</p>
+        <p class="req-why"><strong>Why:</strong> Schools manage payment plans at the student account level, not at a combined household level. Each plan record belongs to a specific payer. Treating multi-payer arrangements as a single combined plan would conflict with how most SIS and billing systems store and reconcile enrollment records.</p>
+        <div class="req-tags"><span class="tag tag-inst">School system: must support multiple plan records per student account</span></div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-06">
+        <p class="req-text"><strong>When a mid-term balance change affects a payer's slice, their existing POT plan must be revised.</strong> Three options must be evaluated in priority order:<br/>
+        &nbsp;· <strong>Auto-recalculate:</strong> if the school's billing system supports plan adjustment without re-enrollment, the installment amounts are recalculated automatically and the payer is notified of the revised schedule.<br/>
+        &nbsp;· <strong>Payer action required:</strong> if auto-recalculation is not supported, the payer is notified and directed to log in to confirm the revised plan. Their home screen shows a to-do: "Your balance has changed — confirm your updated plan." The to-do must not clear until the payer has actively confirmed.<br/>
+        &nbsp;· <strong>School manual adjustment:</strong> if neither is possible, a task is generated for the school's billing staff to adjust the plan record. This is the fallback only.</p>
+        <p class="req-why"><strong>Why:</strong> A plan that continues drafting based on stale amounts will either under-collect (short payment risk) or over-collect (refund risk). Every balance change that shifts a payer's responsibility must trigger a clear resolution path — passive drift is not acceptable in a system handling real money.</p>
+        <div class="req-tags">
+          <span class="tag tag-inst">School configuration: auto-recalc supported? (Y/N)</span>
+          <span class="tag tag-if">IF: balance changes AND payer has active POT plan → trigger revision flow per priority order above</span>
+        </div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-06">
+        <p class="req-text"><strong>Account-level combined payment plans (one plan record for multiple payers' combined slice) are supported only if the school's billing system explicitly confirms compatibility.</strong> Combined plans simplify balance-change reconciliation — one plan revision covers all payers simultaneously. However, most SIS billing systems do not natively support multi-payer combined enrollment records. This must be treated as an institution-specific configuration flag, not an assumed default. If combined plans are enabled, the UI must clearly identify each payer's contribution within the combined plan view.</p>
+        <p class="req-why"><strong>Why:</strong> Deploying combined account-level plans on a school system that doesn't support them will cause reconciliation failures, incorrect reporting, and payment posting errors. The school must explicitly verify their system can handle this before it is offered as an option.</p>
+        <div class="req-tags">
+          <span class="tag tag-inst">School confirmation required before enabling combined account-level plans</span>
+          <span class="tag tag-req">Default: per-payer separate plan records</span>
+        </div>
+      </div>
+
+      <div class="req-item" data-modified="2026-05-06">
+        <p class="req-text"><strong>Open question for school validation:</strong> When a split-payer arrangement has active POT plans and the balance changes, does the school's system require both plans to be updated in the same billing cycle, or can they be updated independently? The answer determines whether Nelnet can process payer-by-payer adjustments or must batch them together. This must be resolved per school before multi-payer POT is enabled at that institution.</p>
+        <div class="req-tags"><span class="tag tag-inst">School confirmation required — per-institution, pre-launch</span></div>
       </div>
 
 
