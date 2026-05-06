@@ -1740,7 +1740,7 @@ body {
      VISITOR BAR
 ════════════════════════════════════════ -->
 <div id="visitor-bar" class="visitor-bar" role="status">
-  <a id="home-link" href="index.html" target="_top" style="display:none;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--hz-indigo);text-decoration:none;background:var(--hz-cloud);border:1px solid rgba(100,92,220,.2);border-radius:7px;padding:3px 10px;" aria-label="Back to prototypes">← Prototypes</a>
+  <a id="home-link" href="index.html" target="_top" style="display:none;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--hz-indigo);text-decoration:none;background:var(--hz-cloud);border:1px solid rgba(100,92,220,.2);border-radius:7px;padding:3px 10px;" aria-label="Back to home">⌂ Home</a>
   <span>Viewing as <span id="visitor-name" class="visitor-name"></span></span>
   <span id="visitor-change-pill" class="visitor-change-pill"></span>
   <button class="manage-prefs-btn" onclick="openPrefOverlay(true)" style="display:none" id="manage-prefs-btn">⚙ Preferences</button>
@@ -10308,11 +10308,13 @@ function openAsViewer(name) {
   bar.style.display = 'flex';
   document.getElementById('manage-prefs-btn').style.display = 'inline-block';
 
+  // Home link — always visible for all users
+  var hl = document.getElementById('home-link');
+  hl.href = 'index.html';
+  hl.style.display = 'flex';
+
   // Sophie mode
   if (name.toLowerCase() === 'sophie') {
-    var hl = document.getElementById('home-link');
-    hl.href = 'index.html'; // same repo — works on any host
-    hl.style.display = 'flex';
     initSophieMode();
     buildSophieDashboard();
     // Process any approve/reject URL action from email link
