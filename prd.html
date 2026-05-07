@@ -11823,11 +11823,22 @@ function ghGetDeviceId() {
   return window.location.hostname === 'localhost' ? 'localhost' : window.location.hostname;
 }
 
-// Sophie writes are only allowed from the locked device
+// Sophie writes are only allowed from the registered device or the live GitHub Pages site.
+// Always-approved users (sophie.brendel@nelnet.net) bypass the hostname check — their
+// GitHub token is the real auth. The hostname lock only guards against accidental writes
+// from a stranger's machine on localhost.
 function ghSophieWriteAllowed() {
-  // Localhost (dev server) is always allowed so testing works
   var h = window.location.hostname;
-  return h === 'localhost' || h === '127.0.0.1' || h === GH_SOPHIE_LOCK;
+  // Always allow localhost / dev server
+  if (h === 'localhost' || h === '127.0.0.1') return true;
+  // Always allow the canonical GitHub Pages domain for this repo
+  if (h === 'sbrendel0707.github.io') return true;
+  // Allow the corp machine lock (legacy)
+  if (h === GH_SOPHIE_LOCK) return true;
+  // Allow if the logged-in user is always-approved (Sophie herself) —
+  // their PAT provides the real security; hostname lock would be redundant
+  if (_authEmail && AUTH_ALWAYS_APPROVED.indexOf(_authEmail.toLowerCase()) !== -1) return true;
+  return false;
 }
 
 // ── Read a JSON file from the repo (public reads — no token needed) ──
