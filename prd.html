@@ -958,6 +958,8 @@ body {
 .sophie-btn:hover     { opacity: .82; }
 .sophie-btn-save      { background: var(--hz-indigo); color: #fff; }
 .sophie-btn-cancel    { background: var(--hz-bg); color: var(--hz-muted); border: 1px solid var(--hz-border); }
+.sophie-btn-delete    { background: transparent; color: #dc2626; border: 1px solid rgba(220,38,38,.3); margin-left: auto; }
+.sophie-btn-delete:hover { background: #fef2f2; opacity: 1; }
 .sophie-btn-add       { background: transparent; color: var(--hz-teal); border: 1px solid rgba(13,122,85,.3); margin-left: auto; }
 .sophie-btn-add:hover { background: var(--hz-teal-bg); opacity: 1; }
 
@@ -2046,6 +2048,12 @@ body {
         <h3 class="need-group-title">🏷️ Untagged Requirements — needs a status (<span id="sophie-untagged-count">0</span>)</h3>
         <p style="font-size:12px;color:var(--hz-muted);margin-bottom:12px">These requirements don't have a status tag yet. Add one by hovering the requirement in the document and clicking <strong>+ Status</strong>, or click the title below to scroll to it. Available tags: Final · Product Review · Consumer Review · IT Review · Institution Review · Idea State.</p>
         <div id="sophie-untagged-content" class="sd-content"></div>
+      </div>
+
+      <div class="need-group" id="sophie-deleted-group" style="display:none">
+        <h3 class="need-group-title">🗑 Deleted Requirements (<span id="sophie-deleted-count">0</span>)</h3>
+        <p style="font-size:12px;color:var(--hz-muted);margin-bottom:12px">These requirements have been deleted. Click Restore to bring them back.</p>
+        <div id="sophie-deleted-content" class="sd-content"></div>
       </div>
     </section>
 
@@ -10549,6 +10557,40 @@ function rebuildSophieBackendPanel() {
 // Items without a status tag appear in Sophie's "Untagged" dashboard panel.
 // ─────────────────────────────────────────────────────────────────────────────
 var STATUS_TAGS_KEY = 'hz_status_tags';
+var DELETED_REQS_KEY = 'hz_deleted_reqs';
+
+function loadDeletedReqs() {
+  try { return JSON.parse(localStorage.getItem(DELETED_REQS_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveDeletedReqs(arr) {
+  localStorage.setItem(DELETED_REQS_KEY, JSON.stringify(arr));
+}
+function deleteRequirement(el) {
+  var reqId = el.dataset.reqId;
+  if (!reqId) return;
+  var label = (el.querySelector('.req-text') || el).textContent.trim().substring(0, 60);
+  if (!confirm('Delete this requirement?\n\n"' + label + '…"\n\nThis can be undone from Sophie\'s panel.')) return;
+  var deleted = loadDeletedReqs();
+  if (deleted.indexOf(reqId) === -1) deleted.push(reqId);
+  saveDeletedReqs(deleted);
+  el.style.transition = 'opacity .25s';
+  el.style.opacity = '0';
+  setTimeout(function(){ el.style.display = 'none'; rebuildSophieStatusPanel(); }, 270);
+}
+function restoreRequirement(reqId) {
+  var deleted = loadDeletedReqs().filter(function(id){ return id !== reqId; });
+  saveDeletedReqs(deleted);
+  var el = document.querySelector('[data-req-id="' + reqId + '"]');
+  if (el) { el.style.display = ''; el.style.opacity = '1'; }
+  rebuildSophieStatusPanel();
+}
+function applyDeletedReqs() {
+  var deleted = loadDeletedReqs();
+  deleted.forEach(function(reqId) {
+    var el = document.querySelector('[data-req-id="' + reqId + '"]');
+    if (el) el.style.display = 'none';
+  });
+}
 
 var STATUS_TAG_DEFS = [
   { key:'final',     label:'✅ Final',                    cls:'tag-status-final',     dot:'#34d399', filterLabel:'Final' },
@@ -10648,7 +10690,11 @@ function toggleStatusPicker(item, reqId, btn) {
       }
       if (tags.length === 0) delete d[reqId]; else d[reqId] = tags;
       saveStatusTags(d);
+      // applyStatusTagsToItem destroys the picker (it removes the btn the picker lives in),
+      // so we re-open the picker on the new btn after rebuild.
       applyStatusTagsToItem(item, true);
+      var newBtn = item.querySelector('.sophie-status-btn');
+      if (newBtn) { toggleStatusPicker(item, reqId, newBtn); }
       rebuildSophieStatusPanel();
       updateTagFilterCounts();
     });
@@ -10678,14 +10724,43 @@ function initStatusTags(isSophie) {
 
 function rebuildSophieStatusPanel() {
   var data = loadStatusTags();
+  var deleted = loadDeletedReqs();
   var allItems = document.querySelectorAll('.req-item');
   var untagged = [];
   allItems.forEach(function(item) {
     var reqId = item.dataset.reqId;
     if (!reqId) return;
+    if (deleted.indexOf(reqId) > -1) return; // skip deleted items
     var tags = data[reqId] || [];
     if (tags.length === 0) untagged.push(item);
   });
+
+  // Rebuild deleted section
+  var deletedGroup = document.getElementById('sophie-deleted-group');
+  var deletedCountEl = document.getElementById('sophie-deleted-count');
+  var deletedContent = document.getElementById('sophie-deleted-content');
+  if (deletedGroup && deletedCountEl && deletedContent) {
+    deletedGroup.style.display = deleted.length > 0 ? '' : 'none';
+    deletedCountEl.textContent = deleted.length;
+    deletedContent.innerHTML = '';
+    deleted.forEach(function(reqId) {
+      var el = document.querySelector('[data-req-id="' + reqId + '"]');
+      var textContent = el ? (el.querySelector('.req-text') || el).textContent.trim().substring(0, 120) : reqId;
+      var wrap = document.createElement('div');
+      wrap.className = 'sd-item';
+      wrap.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;';
+      var preview = document.createElement('div');
+      preview.style.cssText = 'font-size:12px;color:#374151;flex:1;';
+      preview.textContent = textContent + (textContent.length >= 120 ? '…' : '');
+      var restoreBtn = document.createElement('button');
+      restoreBtn.textContent = 'Restore';
+      restoreBtn.style.cssText = 'font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid rgba(13,122,85,.4);background:var(--hz-teal-bg);color:#059669;cursor:pointer;flex-shrink:0;';
+      restoreBtn.addEventListener('click', function(){ restoreRequirement(reqId); });
+      wrap.appendChild(preview);
+      wrap.appendChild(restoreBtn);
+      deletedContent.appendChild(wrap);
+    });
+  }
 
   var countEl = document.getElementById('sophie-untagged-count');
   if (countEl) countEl.textContent = untagged.length;
@@ -10908,6 +10983,9 @@ function openAsViewer(name) {
 
   // Init backend-only tags (Sophie sees pending; others see confirmed only)
   initBackendTags(name.toLowerCase() === 'sophie');
+
+  // Apply any Sophie-deleted requirements
+  applyDeletedReqs();
 
   // Init status tags (Sophie can edit; others can see)
   initStatusTags(name.toLowerCase() === 'sophie');
@@ -11251,15 +11329,18 @@ function enterEditMode(el) {
   var btnSave   = mkBtn('Save',                     'sophie-btn-save');
   var btnCancel = mkBtn('Cancel',                   'sophie-btn-cancel');
   var btnAdd    = mkBtn('＋ Add requirement below', 'sophie-btn-add');
+  var btnDelete = mkBtn('🗑 Delete',               'sophie-btn-delete');
 
   controls.appendChild(btnSave);
   controls.appendChild(btnCancel);
   controls.appendChild(btnAdd);
+  controls.appendChild(btnDelete);
   el.appendChild(controls);
 
   btnSave.addEventListener('click',   function () { commitEdit(el, taText, taWhy, false); });
   btnAdd.addEventListener('click',    function () { commitEdit(el, taText, taWhy, true);  });
   btnCancel.addEventListener('click', function () { abortEdit(el); });
+  btnDelete.addEventListener('click', function () { abortEdit(el); deleteRequirement(el); });
 }
 
 function mkBtn(label, cls) {

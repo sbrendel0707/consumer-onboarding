@@ -48,7 +48,7 @@ const CB=({sel,onClick,title,sub})=>(
   </button>
 );
 
-export default function App(){
+function App(){
   const[sc,setSc]=useState(0);
   const go=n=>{setSc(n);window.scrollTo(0,0);};
   const[ins,setIns]=useState(null);
