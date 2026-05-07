@@ -143,6 +143,40 @@ body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: var(
 .method-chip { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid; transition: all .15s; }
 .method-chip.active { background: var(--hz-cloud); border-color: var(--hz-accent); color: var(--hz-indigo); }
 .method-chip.inactive { background: white; border-color: #D9D7F5; color: var(--hz-hint); }
+
+/* ── Wizard step indicator ── */
+.step-bar { background: white; border-bottom: 1px solid var(--hz-border); padding: 16px 28px; position: sticky; top: 52px; z-index: 90; }
+.step-bar-inner { display: flex; align-items: center; max-width: 640px; margin: 0 auto; }
+.step-dot-wrap { display: flex; align-items: center; gap: 8px; }
+.step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.step-dot-done { background: var(--hz-accent); color: white; }
+.step-dot-active { background: var(--hz-accent); color: white; }
+.step-dot-future { background: white; border: 2px solid #D9D7F5; color: var(--hz-hint); }
+.step-label-done { font-size: 13px; font-weight: 600; color: var(--hz-accent); }
+.step-label-active { font-size: 13px; font-weight: 700; color: var(--hz-indigo); }
+.step-label-future { font-size: 13px; font-weight: 500; color: var(--hz-hint); }
+.step-connector { flex: 1; height: 1px; background: #D9D7F5; margin: 0 12px; }
+.step-connector-done { background: var(--hz-accent); }
+
+/* ── Wizard choice cards ── */
+.choice-card { border: 2px solid var(--hz-border); border-radius: 14px; padding: 20px 24px; cursor: pointer; transition: all .15s; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 14px; }
+.choice-card:hover { border-color: #A09CE8; }
+.choice-card.selected { border-color: var(--hz-accent); background: var(--hz-cloud); }
+.choice-card-body { flex: 1; }
+.choice-card-title { font-size: 14px; font-weight: 700; color: var(--hz-text); margin-bottom: 4px; }
+.choice-card.selected .choice-card-title { color: var(--hz-indigo); }
+.choice-card-desc { font-size: 13px; color: var(--hz-hint); line-height: 1.6; }
+
+/* ── Wizard method pills (step 4) ── */
+.freq-pill { border: 2px solid; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; }
+.freq-pill-active { background: var(--hz-cloud); border-color: var(--hz-accent); color: var(--hz-indigo); }
+.freq-pill-inactive { background: white; border-color: #D9D7F5; color: var(--hz-hint); }
+
+/* ── Wizard nav bar ── */
+.wizard-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--hz-border); }
+
+/* ── Inline edit panel ── */
+.inline-edit-panel { background: #FAFAFE; border: 1.5px solid var(--hz-accent); border-radius: 12px; padding: 20px; margin-top: 12px; }
 </style>
 </head>
 <body>
@@ -164,6 +198,12 @@ body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: var(
 </script>
 <script type="text/babel">
 const {useState} = React;
+
+// ── Top-level helpers (used by Timeline step and Review) ──────
+const fmtDate = s => {
+  try { return new Date(s+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+  catch { return s; }
+};
 
 // ── Shared micro-components ───────────────────────────────────
 
@@ -201,9 +241,45 @@ const Banner=({type="info",icon,children})=>(
 
 const SectionDivider=()=><div className="section-divider"/>;
 
+// ── Step indicator ────────────────────────────────────────────
+const STEPS = [
+  {id:'basics', label:'Basics'},
+  {id:'scope',  label:'Balances'},
+  {id:'timeline', label:'Timeline'},
+  {id:'access', label:'Access'},
+];
+
+function StepIndicator({currentStep}) {
+  const idx = STEPS.findIndex(s=>s.id===currentStep);
+  return (
+    <div className="step-bar">
+      <div className="step-bar-inner">
+        {STEPS.map((s,i)=>{
+          const done = i < idx;
+          const active = i === idx;
+          const future = i > idx;
+          return (
+            <React.Fragment key={s.id}>
+              {i>0&&<div className={`step-connector${done?'-done':''}`}/>}
+              <div className="step-dot-wrap">
+                <div className={`step-dot ${done?'step-dot-done':active?'step-dot-active':'step-dot-future'}`}>
+                  {done ? '✓' : i+1}
+                </div>
+                <span className={done?'step-label-done':active?'step-label-active':'step-label-future'}>{s.label}</span>
+              </div>
+            </React.Fragment>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ── Main App ─────────────────────────────────────────────────
 export default function App(){
-  const[tab,setTab]=useState('settings');
+  const[currentStep,setCurrentStep]=useState('intro');
+  // 'intro' | 'basics' | 'scope' | 'timeline' | 'access' | 'review'
+
   const[planName,setPlanName]=useState('');
   const[planDesc,setPlanDesc]=useState('');
 
@@ -238,7 +314,7 @@ export default function App(){
   const[hiddenPayoffDate,setHiddenPayoffDate]=useState('');
   const[hiddenMaxMonths,setHiddenMaxMonths]=useState(3);
 
-  // Plan Parameters (Tab 2)
+  // Plan Parameters
   const[hasMinBal,setHasMinBal]=useState(false);
   const[minBal,setMinBal]=useState('');
   const[hasMaxBal,setHasMaxBal]=useState(false);
@@ -271,76 +347,12 @@ export default function App(){
   const setIntlProv=(k)=>setIntlProviders(p=>({...p,[k]:!p[k]}));
   const setMethod=(k)=>setGlobalMethods(m=>({...m,[k]:!m[k]}));
 
-  const FREQ_LABELS={weekly:'Weekly',biweekly:'Bi-Weekly',monthly:'Monthly'};
-  const termFreqLabel={
-    'fall-spring':'Fall & Spring',
-    'fall-spring-summer':'Fall, Spring & Summer',
-    'fall-spring-summer-winter':'Fall, Spring, Summer & Winter',
-    'monthly':'Monthly',
-    'custom':'Custom (every X months)',
-  }[termFreq]||termFreq;
-
-  const updateWindowNote = (() => {
-    const parts = [];
-    if(freqs.weekly) parts.push('Weekly plans: 5 days to update');
-    if(freqs.biweekly||freqs.monthly||freqs.customMonths) parts.push('All other plans: 10 days to update');
-    return parts.join(' · ') || '10 days to update';
-  })();
-
-  // ── Tabs ─────────────────────────────────────────────────
-
-  const tabContent = {
-    settings: <SettingsTab
-      planType={planType} setPlanType={setPlanType}
-      planName={planName} setPlanName={setPlanName}
-      planDesc={planDesc} setPlanDesc={setPlanDesc}
-      termFreq={termFreq} setTermFreq={setTermFreq}
-      customFreqMonths={customFreqMonths} setCustomFreqMonths={setCustomFreqMonths}
-      reminderDays={reminderDays} setReminderDays={setReminderDays}
-      termScope={termScope} setTermScope={setTermScope}
-      pastDueScope={pastDueScope} setPastDueScope={setPastDueScope}
-      showSubscribers={showSubscribers} setShowSubscribers={setShowSubscribers}
-      subscribers={subscribers}
-      hiddenEnabled={hiddenEnabled} setHiddenEnabled={setHiddenEnabled}
-      hiddenExtType={hiddenExtType} setHiddenExtType={setHiddenExtType}
-      hiddenExtDate={hiddenExtDate} setHiddenExtDate={setHiddenExtDate}
-      hiddenExtDays={hiddenExtDays} setHiddenExtDays={setHiddenExtDays}
-      hiddenPayoffDate={hiddenPayoffDate} setHiddenPayoffDate={setHiddenPayoffDate}
-      hiddenMaxMonths={hiddenMaxMonths} setHiddenMaxMonths={setHiddenMaxMonths}
-    />,
-    payment: <PaymentTab
-      methodMode={methodMode} setMethodMode={setMethodMode}
-      methodMode={methodMode} setMethodMode={setMethodMode}
-      globalMethods={globalMethods} setMethod={setMethod}
-      intlProviders={intlProviders} setIntlProv={setIntlProv}
-      eligRules={eligRules} setEligRules={setEligRules}
-      freqs={freqs} setFreqs={setFreqs}
-      remitDays={remitDays} setRemit={setRemit}
-      firstPaymentRule={firstPaymentRule} setFirstPaymentRule={setFirstPaymentRule}
-      firstPaymentDays={firstPaymentDays} setFirstPaymentDays={setFirstPaymentDays}
-      hasMinBal={hasMinBal} setHasMinBal={setHasMinBal} minBal={minBal} setMinBal={setMinBal}
-      hasMaxBal={hasMaxBal} setHasMaxBal={setHasMaxBal} maxBal={maxBal} setMaxBal={setMaxBal}
-      planParamMode={planParamMode} setPlanParamMode={setPlanParamMode}
-      planLengths={planLengths} setPlanLengths={setPlanLengths}
-      completionWindows={completionWindows} setCompletionWindows={setCompletionWindows}
-      downPmt={downPmt} setDownPmt={setDownPmt}
-      signupFees={signupFees} setSignupFees={setSignupFees}
-      cfiExists={cfiExists} cfiFee={cfiFee}
-    />,
-    rules: <RulesTab rules={rules} updateRule={updateRule} freqs={freqs}/>,
-    review: <ReviewTab
-      planName={planName} planType={planType} planDesc={planDesc}
-      termFreq={termFreqLabel} reminderDays={reminderDays}
-      termScope={termScope} pastDueScope={pastDueScope}
-      globalMethods={globalMethods} intlProviders={intlProviders} methodMode={methodMode}
-      freqs={freqs} remitDays={remitDays} rules={rules}
-      hasMinBal={hasMinBal} minBal={minBal} hasMaxBal={hasMaxBal} maxBal={maxBal}
-      planParamMode={planParamMode} planLengths={planLengths} completionWindows={completionWindows}
-      downPmt={downPmt} signupFees={signupFees} cfiFee={cfiFee}
-      hiddenEnabled={hiddenEnabled}
-      setTab={setTab}
-    />,
+  const navProtoIndex = e => {
+    e.preventDefault();
+    try { window.top.location.href='index.html'; } catch(_){ window.location.href='index.html'; }
   };
+
+  const showStepBar = ['basics','scope','timeline','access'].includes(currentStep);
 
   return (
     <div style={{minHeight:'100vh',background:'var(--hz-bg)'}}>
@@ -350,374 +362,390 @@ export default function App(){
         <div style={{display:'flex',alignItems:'center',gap:16}}>
           <div className="top-bar-logo">Nelnet</div>
           <div style={{width:1,height:20,background:'rgba(255,255,255,.25)'}}/>
-          <div className="top-bar-breadcrumb">
-            <span>Institution Admin</span>
-            <span>›</span>
-            <span>Payment Plans</span>
-            <span>›</span>
-            <strong>Create Master Plan</strong>
-          </div>
+          <span style={{fontSize:11,fontWeight:700,letterSpacing:.4,background:'rgba(100,92,220,.35)',color:'rgba(255,255,255,.9)',border:'1px solid rgba(255,255,255,.2)',borderRadius:20,padding:'3px 10px'}}>Standard Plan</span>
         </div>
-        <div style={{display:'flex',gap:10,alignItems:'center'}}>
-          <button className="btn btn-ghost" style={{color:'white',borderColor:'rgba(255,255,255,.3)',fontSize:12}}>Discard</button>
-          <button className="btn btn-primary" style={{background:'rgba(255,255,255,.15)',border:'1px solid rgba(255,255,255,.3)',fontSize:12}} onClick={()=>setTab('review')}>Review Plan</button>
-          <a href="index.html" onClick={e=>{e.preventDefault();try{window.top.location.href='index.html';}catch(_){window.location.href='index.html';}}} style={{fontSize:12,fontWeight:600,color:'rgba(255,255,255,0.85)',background:'rgba(255,255,255,0.12)',border:'1px solid rgba(255,255,255,0.25)',borderRadius:6,padding:'5px 14px',textDecoration:'none'}}>Prototype Index</a>
-        </div>
+        <a href="index.html" onClick={navProtoIndex} style={{fontSize:12,fontWeight:600,color:'rgba(255,255,255,0.85)',background:'rgba(255,255,255,0.12)',border:'1px solid rgba(255,255,255,0.25)',borderRadius:6,padding:'5px 14px',textDecoration:'none'}}>Prototype Index</a>
       </div>
 
-      {/* Plan header */}
-      <div className="plan-header">
-        <div className="plan-header-top">
-          <div className="plan-name-area">
-            <div className="plan-type-label">Standard Payment Plan · Master Template</div>
-            <input
-              className="plan-name-input"
-              value={planName}
-              onChange={e=>setPlanName(e.target.value)}
-              placeholder="Plan name (internal only)"
-            />
-            <div style={{fontSize:11,color:'var(--hz-hint)',marginTop:2}}>This name is for internal use only — it will not be shown to students or payers.</div>
+      {/* Step indicator (steps 1–4 only) */}
+      {showStepBar && <StepIndicator currentStep={currentStep}/>}
+
+      {/* Step content */}
+      {currentStep==='intro' && (
+        <IntroStep onStart={()=>setCurrentStep('basics')}/>
+      )}
+      {currentStep==='basics' && (
+        <BasicsStep
+          planName={planName} setPlanName={setPlanName}
+          planDesc={planDesc} setPlanDesc={setPlanDesc}
+          onBack={()=>setCurrentStep('intro')}
+          onContinue={()=>setCurrentStep('scope')}
+        />
+      )}
+      {currentStep==='scope' && (
+        <ScopeStep
+          termScope={termScope} setTermScope={setTermScope}
+          pastDueScope={pastDueScope} setPastDueScope={setPastDueScope}
+          termFreq={termFreq} setTermFreq={setTermFreq}
+          customFreqMonths={customFreqMonths} setCustomFreqMonths={setCustomFreqMonths}
+          reminderDays={reminderDays} setReminderDays={setReminderDays}
+          onBack={()=>setCurrentStep('basics')}
+          onContinue={()=>setCurrentStep('timeline')}
+        />
+      )}
+      {currentStep==='timeline' && (
+        <TimelineStep
+          planParamMode={planParamMode} setPlanParamMode={setPlanParamMode}
+          planLengths={planLengths} setPlanLengths={setPlanLengths}
+          completionWindows={completionWindows} setCompletionWindows={setCompletionWindows}
+          downPmt={downPmt} setDownPmt={setDownPmt}
+          onBack={()=>setCurrentStep('scope')}
+          onContinue={()=>setCurrentStep('access')}
+        />
+      )}
+      {currentStep==='access' && (
+        <AccessStep
+          globalMethods={globalMethods} setMethod={setMethod}
+          intlProviders={intlProviders} setIntlProv={setIntlProv}
+          freqs={freqs} setFreqs={setFreqs}
+          signupFees={signupFees} setSignupFees={setSignupFees}
+          hasMinBal={hasMinBal} setHasMinBal={setHasMinBal}
+          minBal={minBal} setMinBal={setMinBal}
+          hasMaxBal={hasMaxBal} setHasMaxBal={setHasMaxBal}
+          maxBal={maxBal} setMaxBal={setMaxBal}
+          hiddenEnabled={hiddenEnabled} setHiddenEnabled={setHiddenEnabled}
+          hiddenExtType={hiddenExtType} setHiddenExtType={setHiddenExtType}
+          hiddenExtDate={hiddenExtDate} setHiddenExtDate={setHiddenExtDate}
+          hiddenExtDays={hiddenExtDays} setHiddenExtDays={setHiddenExtDays}
+          hiddenPayoffDate={hiddenPayoffDate} setHiddenPayoffDate={setHiddenPayoffDate}
+          hiddenMaxMonths={hiddenMaxMonths} setHiddenMaxMonths={setHiddenMaxMonths}
+          onBack={()=>setCurrentStep('timeline')}
+          onContinue={()=>setCurrentStep('review')}
+        />
+      )}
+      {currentStep==='review' && (
+        <ReviewStep
+          planName={planName}
+          planDesc={planDesc}
+          termScope={termScope}
+          pastDueScope={pastDueScope}
+          termFreq={termFreq}
+          customFreqMonths={customFreqMonths}
+          reminderDays={reminderDays}
+          planParamMode={planParamMode}
+          planLengths={planLengths}
+          completionWindows={completionWindows}
+          downPmt={downPmt}
+          globalMethods={globalMethods}
+          intlProviders={intlProviders}
+          freqs={freqs}
+          signupFees={signupFees}
+          hasMinBal={hasMinBal} minBal={minBal}
+          hasMaxBal={hasMaxBal} maxBal={maxBal}
+          hiddenEnabled={hiddenEnabled}
+          rules={rules} updateRule={updateRule}
+          setCurrentStep={setCurrentStep}
+          navProtoIndex={navProtoIndex}
+        />
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// INTRO SCREEN
+// ══════════════════════════════════════════════════════════════
+function IntroStep({onStart}) {
+  return (
+    <div style={{display:'flex',justifyContent:'center',paddingTop:60,paddingBottom:80,paddingLeft:20,paddingRight:20}}>
+      <div style={{maxWidth:640,width:'100%',textAlign:'center'}}>
+        <div style={{fontSize:72,marginBottom:24,lineHeight:1}}>📋</div>
+        <h1 style={{fontSize:28,fontWeight:800,color:'var(--hz-text)',marginBottom:12}}>Set up your Standard master plan</h1>
+        <p style={{fontSize:14,color:'var(--hz-muted)',lineHeight:1.7,marginBottom:32,maxWidth:520,margin:'0 auto 32px'}}>
+          A master plan is a permanent configuration template for all Standard Payment Plans at your institution. Once published, you'll duplicate it each term — you'll never rebuild the fundamentals from scratch.
+        </p>
+
+        {/* Plan type card */}
+        <div style={{border:'1px solid var(--hz-border)',borderLeft:'3px solid var(--hz-accent)',borderRadius:14,padding:'20px 24px',textAlign:'left',marginBottom:32,background:'white'}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+            <span style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>📋 Standard Payment Plan</span>
+            <span style={{fontSize:11,fontWeight:700,background:'var(--hz-teal-bg)',color:'var(--hz-teal)',borderRadius:20,padding:'3px 10px',letterSpacing:.3}}>Purchased</span>
           </div>
-          <div className="plan-actions">
-            <span className="badge badge-master">Master Template</span>
-            <span className="badge badge-draft">Draft</span>
-            <button className="btn btn-ghost btn-sm">Save Draft</button>
-            <button className="btn btn-primary btn-sm" onClick={()=>setTab('review')}>Save &amp; Review →</button>
-          </div>
+          <p style={{fontSize:13,color:'var(--hz-hint)',lineHeight:1.6,margin:0}}>Academic-term plans for current and optional prior-term student balances. The most common Nelnet plan type.</p>
         </div>
 
-        {/* Tabs */}
-        <div className="tab-nav">
-          {[['settings','Plan Settings'],['payment','Payment Settings'],['rules','Plan Rules'],['review','Plan Review']].map(([id,label])=>(
-            <div key={id} className={`tab-item ${tab===id?'active':''}`} onClick={()=>setTab(id)}>{label}</div>
-          ))}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="content">
-        {tabContent[tab]}
+        <button
+          className="btn btn-primary"
+          style={{width:'100%',padding:'14px',fontSize:15,borderRadius:10,marginBottom:14}}
+          onClick={onStart}
+        >
+          Get started
+        </button>
+        <a href="#" onClick={e=>e.preventDefault()} style={{fontSize:13,color:'var(--hz-hint)',textDecoration:'underline'}}>What is a master plan?</a>
       </div>
     </div>
   );
 }
 
 // ══════════════════════════════════════════════════════════════
-// TAB 1: PLAN SETTINGS
+// STEP 1 — BASICS
 // ══════════════════════════════════════════════════════════════
-function SettingsTab({planType,setPlanType,planName,setPlanName,planDesc,setPlanDesc,termFreq,setTermFreq,customFreqMonths,setCustomFreqMonths,reminderDays,setReminderDays,termScope,setTermScope,pastDueScope,setPastDueScope,showSubscribers,setShowSubscribers,subscribers,hiddenEnabled,setHiddenEnabled,hiddenExtType,setHiddenExtType,hiddenExtDate,setHiddenExtDate,hiddenExtDays,setHiddenExtDays,hiddenPayoffDate,setHiddenPayoffDate,hiddenMaxMonths,setHiddenMaxMonths}){
+function BasicsStep({planName,setPlanName,planDesc,setPlanDesc,onBack,onContinue}) {
   return (
-    <>
-      {/* Master plan concept */}
-      <Banner type="info" icon="🗂">
-        <strong>You're creating a master plan template.</strong> This master plan captures all the structural rules and settings for this plan type. Once published, it will be automatically updated when you make changes — you never need to re-enter your configuration from scratch. When a new term is ready, duplicate this master plan, fill in the term-specific enrollment dates, and publish. The master itself stays evergreen.
+    <div style={{maxWidth:600,margin:'0 auto',padding:'48px 28px'}}>
+      <div style={{fontSize:12,fontWeight:600,color:'var(--hz-accent)',letterSpacing:.5,marginBottom:8,textTransform:'uppercase'}}>Step 1 of 4</div>
+      <h2 style={{fontSize:22,fontWeight:800,color:'var(--hz-text)',marginBottom:6}}>Give this plan an internal name</h2>
+      <p style={{fontSize:14,color:'var(--hz-muted)',marginBottom:28,lineHeight:1.6}}>This name is only visible to your admin team — payers never see it.</p>
+
+      <div className="form-group" style={{marginBottom:20}}>
+        <label style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:6,display:'flex',gap:4}}>
+          Plan name <span style={{color:'var(--hz-danger)'}}>*</span>
+        </label>
+        <input
+          type="text"
+          value={planName}
+          onChange={e=>setPlanName(e.target.value)}
+          placeholder="e.g. Standard Plan — Fall/Spring 2026"
+          style={{fontSize:16,padding:'12px 14px',border:'2px solid var(--hz-border)',borderRadius:10,width:'100%',fontFamily:'inherit',outline:'none',color:'var(--hz-text)',transition:'border-color .15s'}}
+          onFocus={e=>e.target.style.borderColor='var(--hz-accent)'}
+          onBlur={e=>e.target.style.borderColor='var(--hz-border)'}
+        />
+      </div>
+
+      <div className="form-group" style={{marginBottom:24}}>
+        <label style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:6,display:'block'}}>
+          Internal notes <span style={{fontWeight:400,textTransform:'none',letterSpacing:0,color:'var(--hz-hint)'}}>(optional)</span>
+        </label>
+        <textarea
+          rows={3}
+          value={planDesc}
+          onChange={e=>setPlanDesc(e.target.value)}
+          placeholder="Optional notes for your team about this plan's purpose"
+          style={{fontSize:14,padding:'12px 14px',border:'2px solid var(--hz-border)',borderRadius:10,width:'100%',fontFamily:'inherit',outline:'none',color:'var(--hz-text)',resize:'vertical',transition:'border-color .15s'}}
+          onFocus={e=>e.target.style.borderColor='var(--hz-accent)'}
+          onBlur={e=>e.target.style.borderColor='var(--hz-border)'}
+        />
+      </div>
+
+      <Banner type="info" icon="ℹ">
+        This master plan will apply to all Standard Payment Plans you create going forward. The name helps your team identify which configuration is which — especially once you have multiple term plans running.
       </Banner>
 
-      {/* Plan type */}
-      <div className="card">
-        <div className="card-title">Plan Type</div>
-        <div className="card-subtitle">Select the plan type you've purchased from Nelnet. Only plan types active on your account are available here.</div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>
-          {[
-            ['standard','Standard Payment Plan','Academic-term-based plans for current and optionally last-term balances. The most common plan type.'],
-            ['past-due','Past Due Plan','Accepts balances from prior terms. Configured to exclude the current and/or last term.','disabled'],
-            ['ltpp','Long-Term (LTPP)','Extended multi-year payment plans for large balances or graduate programs.','disabled'],
-          ].map(([id,label,desc,dis])=>(
-            <button key={id} disabled={!!dis} onClick={()=>!dis&&setPlanType(id)} style={{textAlign:'left',padding:'14px 16px',borderRadius:12,border:`2px solid ${planType===id?'var(--hz-accent)':'#D9D7F5'}`,background:planType===id?'var(--hz-cloud)':dis?'#F8F8FC':'white',cursor:dis?'not-allowed':'pointer',opacity:dis?.45:1,transition:'all .15s'}}>
-              <div style={{fontWeight:700,fontSize:13,color:planType===id?'var(--hz-indigo)':'var(--hz-text)',marginBottom:4}}>{label}</div>
-              <div style={{fontSize:11,color:'var(--hz-hint)',lineHeight:1.5}}>{desc}</div>
-              {dis&&<div style={{fontSize:10,fontWeight:700,color:'var(--hz-hint)',marginTop:6,textTransform:'uppercase',letterSpacing:.5}}>Not in your subscription</div>}
-            </button>
-          ))}
-        </div>
+      <div className="wizard-nav">
+        <a href="#" onClick={e=>{e.preventDefault();onBack();}} style={{fontSize:13,color:'var(--hz-hint)',textDecoration:'underline'}}>Back to intro</a>
+        <button
+          className="btn btn-primary"
+          style={{padding:'10px 28px',fontSize:14,opacity:planName.trim()?1:.45,cursor:planName.trim()?'pointer':'not-allowed'}}
+          onClick={()=>planName.trim()&&onContinue()}
+        >
+          Continue
+        </button>
       </div>
-
-      {/* Hidden plan add-on */}
-      <div className="card">
-        <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:20}}>
-          <div style={{flex:1}}>
-            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:4}}>
-              <div className="card-title" style={{marginBottom:0}}>Hidden Plan Option</div>
-              <span style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:.5,padding:'2px 8px',borderRadius:4,background:'#F3F0FF',color:'var(--hz-accent)'}}>Add-on</span>
-            </div>
-            <div className="card-subtitle" style={{marginBottom:0}}>A hidden version of this plan that payers can only access via a direct email invitation from your team. The hidden plan uses the same payment rules as this plan but can have a different enrollment window or payoff date. Useful for late enrollees, special arrangements, or exception-basis access.</div>
-          </div>
-          <Toggle on={hiddenEnabled} onToggle={v=>setHiddenEnabled(v)}/>
-        </div>
-        {hiddenEnabled&&<>
-          <SectionDivider/>
-          <Banner type="amber" icon="✉">
-            <strong>Hidden plans are invitation-only.</strong> Payers cannot discover or enroll in this plan on their own. Your team sends a direct enrollment link via email from this admin system. The payer sees a customized enrollment experience for this plan only.
-          </Banner>
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label form-label-req">Enrollment extension type</label>
-              <div className="radio-group">
-                <label className="radio-item">
-                  <input type="radio" name="hiddenExtType" value="date" checked={hiddenExtType==='date'} onChange={()=>setHiddenExtType('date')}/>
-                  <div><div className="radio-label">Extended enrollment through a specific date</div></div>
-                </label>
-                <label className="radio-item">
-                  <input type="radio" name="hiddenExtType" value="days" checked={hiddenExtType==='days'} onChange={()=>setHiddenExtType('days')}/>
-                  <div><div className="radio-label">Extend enrollment by a number of days past the main plan close</div></div>
-                </label>
-              </div>
-              {hiddenExtType==='date'&&<input type="date" className="form-input" style={{marginTop:8,maxWidth:240}} value={hiddenExtDate} onChange={e=>setHiddenExtDate(e.target.value)}/>}
-              {hiddenExtType==='days'&&<div style={{display:'flex',alignItems:'center',gap:8,marginTop:8}}>
-                <input type="number" min={1} max={180} className="form-input" style={{maxWidth:100}} value={hiddenExtDays} onChange={e=>setHiddenExtDays(Number(e.target.value))}/>
-                <span style={{fontSize:13,color:'var(--hz-muted)'}}>additional days after main plan closes</span>
-              </div>}
-            </div>
-            <div className="form-group">
-              <label className="form-label">Pay-off date for hidden plan</label>
-              <input type="date" className="form-input" value={hiddenPayoffDate} onChange={e=>setHiddenPayoffDate(e.target.value)}/>
-              <div className="form-hint">If different from the main plan's payoff date. Leave blank to use the same payoff date.</div>
-            </div>
-          </div>
-          <div style={{maxWidth:280}}>
-            <div className="form-group">
-              <label className="form-label">Maximum plan length (months)</label>
-              <input type="number" min={1} max={24} className="form-input" value={hiddenMaxMonths} onChange={e=>setHiddenMaxMonths(Number(e.target.value))}/>
-              <div className="form-hint">The longest plan a hidden payer can select (may be shorter than main plan options to ensure payoff).</div>
-            </div>
-          </div>
-          <div style={{marginTop:16,padding:'14px 16px',background:'var(--hz-cloud)',borderRadius:10,border:'1px solid rgba(100,92,220,.2)'}}>
-            <div style={{fontSize:12,fontWeight:700,color:'var(--hz-indigo)',marginBottom:6}}>📧 Sending hidden plan invitations</div>
-            <div style={{fontSize:12,color:'var(--hz-muted)',lineHeight:1.6}}>From the <strong>Payment Plans</strong> management page, select this plan and use <strong>Send Invitation</strong> to enter the payer's email address. They'll receive a personalized link that bypasses public enrollment and takes them directly into this hidden plan's enrollment flow.</div>
-          </div>
-        </>}
-      </div>
-
-      {/* Internal details */}
-      <div className="card">
-        <div className="card-title">Internal Plan Details</div>
-        <div className="card-subtitle">These details are for your team's use only. They will never be displayed to students or payers.</div>
-        <div className="form-row">
-          <FormInput label="Plan Name" req hint="Shown only in your admin dashboard (e.g. 'Fall/Spring Standard – Monthly Option')" value={planName} onChange={v=>setPlanName(v)} placeholder="Enter an internal plan name"/>
-          <FormInput label="Description" hint="Optional notes for your team about this plan's purpose or configuration" type="textarea" value={planDesc} onChange={v=>setPlanDesc(v)} placeholder="Optional notes"/>
-        </div>
-      </div>
-
-      {/* Standard plan: term scope */}
-      {planType==='standard'&&<>
-        <div className="card">
-          <div className="card-title">Balance Scope — Standard Plan</div>
-          <div className="card-subtitle">Define which term's balance(s) students can enroll in this plan for. These values will reference the current term configured in your institution settings.</div>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
-            <div>
-              <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:10}}>What charges are included?</div>
-              <div className="radio-group">
-                <label className="radio-item">
-                  <input type="radio" name="termScope" value="current-only" checked={termScope==='current-only'} onChange={e=>setTermScope(e.target.value)}/>
-                  <div><div className="radio-label">Current term only</div><div className="radio-desc">Only the active/current term's charges are eligible for this plan.</div></div>
-                </label>
-                <label className="radio-item">
-                  <input type="radio" name="termScope" value="current-and-last" checked={termScope==='current-and-last'} onChange={e=>setTermScope(e.target.value)}/>
-                  <div><div className="radio-label">Current term + last term</div><div className="radio-desc">Includes charges from both the current term and the immediately preceding term.</div></div>
-                </label>
-              </div>
-            </div>
-            <div>
-              <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:10}}>What is considered past due?</div>
-              <div className="radio-group">
-                <label className="radio-item">
-                  <input type="radio" name="pastDue" value="all-except-current" checked={pastDueScope==='all-except-current'} onChange={e=>setPastDueScope(e.target.value)}/>
-                  <div><div className="radio-label">Every term other than current</div><div className="radio-desc">Anything not in the current term is past due for this plan's purposes.</div></div>
-                </label>
-                <label className="radio-item">
-                  <input type="radio" name="pastDue" value="all-except-current-and-last" checked={pastDueScope==='all-except-current-and-last'} onChange={e=>setPastDueScope(e.target.value)}/>
-                  <div><div className="radio-label">Every term except current + last term</div><div className="radio-desc">Both the current and immediately prior term are excluded from past due classification.</div></div>
-                </label>
-              </div>
-            </div>
-          </div>
-          <Banner type="amber" icon="📌">
-            <strong>Term-specific values are not set here.</strong> The actual current term, last term identifiers, and enrollment period dates are configured when you duplicate this master plan for a specific term. This master plan remains generic so it can be reused every cycle.
-          </Banner>
-        </div>
-      </>}
-
-      {/* Term frequency & reminders */}
-      <div className="card">
-        <div className="card-title">Term Cadence &amp; Setup Reminders</div>
-        <div className="card-subtitle">Tell us how often you'll be creating a new term under this plan type so we can send your team timely reminders when it's time to set up the next one.</div>
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label form-label-req">How often do you create a new term for this plan?</label>
-            <select className="form-input form-select" value={termFreq} onChange={e=>setTermFreq(e.target.value)}>
-              <option value="fall-spring">Academic year — Fall &amp; Spring only</option>
-              <option value="fall-spring-summer">3 semesters — Fall, Spring &amp; Summer</option>
-              <option value="fall-spring-summer-winter">4 semesters — Fall, Spring, Summer &amp; Winter</option>
-              <option value="monthly">Monthly (continuing education)</option>
-              <option value="custom">Custom — every X months</option>
-            </select>
-            <div className="form-hint">This drives when reminder notifications go out to your team.</div>
-          </div>
-          {termFreq==='custom'&&<div className="form-group">
-            <label className="form-label form-label-req">Months between new term plans</label>
-            <input type="number" min={1} max={24} className="form-input" value={customFreqMonths} onChange={e=>setCustomFreqMonths(Number(e.target.value))}/>
-            <div className="form-hint">e.g. 3 = quarterly, 6 = semester</div>
-          </div>}
-          <div className="form-group">
-            <label className="form-label form-label-req">Send reminder this many days before a new term setup is needed</label>
-            <select className="form-input form-select" value={reminderDays} onChange={e=>setReminderDays(Number(e.target.value))}>
-              {[14,21,30,45,60,90].map(d=><option key={d} value={d}>{d} days before</option>)}
-            </select>
-            <div className="form-hint">A notification will be sent to all subscribers at this interval.</div>
-          </div>
-        </div>
-
-        <SectionDivider/>
-        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
-          <div>
-            <div style={{fontWeight:700,fontSize:13,color:'var(--hz-text)'}}>Setup Reminder Subscribers</div>
-            <div style={{fontSize:12,color:'var(--hz-hint)',marginTop:2}}>These users will receive a notification when it's time to set up the next term plan.</div>
-          </div>
-          <div style={{display:'flex',gap:8}}>
-            <button className="btn btn-ghost btn-sm" onClick={()=>setShowSubscribers(!showSubscribers)}>{showSubscribers?'Hide':'Manage Subscribers'}</button>
-          </div>
-        </div>
-        {showSubscribers&&<>
-          <div style={{border:'1px solid var(--hz-border)',borderRadius:10,padding:'4px 16px',marginBottom:10}}>
-            {subscribers.map(s=>(
-              <div key={s.name} className="subscriber-item">
-                <div className="subscriber-avatar">{s.initials}</div>
-                <div className="subscriber-info"><div className="subscriber-name">{s.name}</div><div className="subscriber-role">{s.role}</div></div>
-                <button className="btn btn-ghost btn-sm" style={{color:'var(--hz-danger)',fontSize:11}}>Remove</button>
-              </div>
-            ))}
-          </div>
-          <button className="btn btn-ghost btn-sm">+ Add subscriber</button>
-        </>}
-        {!showSubscribers&&<div style={{fontSize:12,color:'var(--hz-hint)'}}>
-          <strong style={{color:'var(--hz-text)'}}>{subscribers.length} subscriber{subscribers.length!==1?'s':''}</strong> will be notified {reminderDays} days before a new term plan is needed.
-        </div>}
-      </div>
-    </>
+    </div>
   );
 }
 
 // ══════════════════════════════════════════════════════════════
-// TAB 2: PAYMENT SETTINGS
+// STEP 2 — SCOPE
 // ══════════════════════════════════════════════════════════════
-function PaymentTab({methodMode,setMethodMode,globalMethods,setMethod,intlProviders,setIntlProv,eligRules,setEligRules,freqs,setFreqs,remitDays,setRemit,firstPaymentRule,setFirstPaymentRule,firstPaymentDays,setFirstPaymentDays,hasMinBal,setHasMinBal,minBal,setMinBal,hasMaxBal,setHasMaxBal,maxBal,setMaxBal,planParamMode,setPlanParamMode,planLengths,setPlanLengths,completionWindows,setCompletionWindows,downPmt,setDownPmt,signupFees,setSignupFees,cfiExists,cfiFee}){
-  const[addingElig,setAddingElig]=useState(false);
-  const[newEligChar,setNewEligChar]=useState('');
-  const[newEligMethods,setNewEligMethods]=useState({ach:true,cc:false,intl:false});
-
-  const saveElig=()=>{
-    if(!newEligChar) return;
-    setEligRules(r=>[...r,{char:newEligChar,methods:{...newEligMethods}}]);
-    setAddingElig(false);
-    setNewEligChar('');
-    setNewEligMethods({ach:true,cc:false,intl:false});
-  };
-  const removeElig=i=>setEligRules(r=>r.filter((_,idx)=>idx!==i));
-  const methodLabel={ach:'🏦 Bank (ACH)',cc:'💳 Credit Card',intl:'🌐 International'};
-
-  const fmtDate=s=>{try{return new Date(s+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch{return s;}};
-
+function ScopeStep({termScope,setTermScope,pastDueScope,setPastDueScope,termFreq,setTermFreq,customFreqMonths,setCustomFreqMonths,reminderDays,setReminderDays,onBack,onContinue}) {
   return (
-    <>
+    <div style={{maxWidth:600,margin:'0 auto',padding:'48px 28px'}}>
+      <div style={{fontSize:12,fontWeight:600,color:'var(--hz-accent)',letterSpacing:.5,marginBottom:8,textTransform:'uppercase'}}>Step 2 of 4</div>
+      <h2 style={{fontSize:22,fontWeight:800,color:'var(--hz-text)',marginBottom:6}}>Which student balances are eligible?</h2>
+      <p style={{fontSize:14,color:'var(--hz-muted)',marginBottom:28,lineHeight:1.6}}>Choose what charges can be enrolled in this plan.</p>
 
-      {/* ── Plan Balance Limitations ── */}
-      <div className="card">
-        <div className="card-title">Plan Balance Limitations</div>
-        <div className="card-subtitle">By default, payers with any balance can enroll in this plan. Add a minimum or maximum if your institution requires it.</div>
-        <Banner type="info" icon="ℹ"><strong>No minimum or maximum is required.</strong> Leave both unchecked to allow any balance to enroll. These limits are applied at the master level and apply to all term plans created from this template.</Banner>
-        <div style={{display:'flex',gap:24,margin:'12px 0'}}>
-          {[['hasMinBal','Minimum balance',minBal,setMinBal,hasMinBal,setHasMinBal],['hasMaxBal','Maximum balance',maxBal,setMaxBal,hasMaxBal,setHasMaxBal]].map(([k,lbl,val,setVal,on,setOn])=>(
-            <label key={k} style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer',fontSize:13}}>
-              <input type="checkbox" checked={on} onChange={e=>setOn(e.target.checked)} style={{width:15,height:15,accentColor:'var(--hz-accent)'}}/>
-              <span style={{fontWeight:600,color:'var(--hz-text)'}}>Set a {lbl.toLowerCase()}</span>
-            </label>
-          ))}
-        </div>
-        {(hasMinBal||hasMaxBal)&&<div className="form-row">
-          {hasMinBal&&<div className="form-group"><label className="form-label form-label-req">Minimum balance ($)</label><input type="number" className="form-input" value={minBal} onChange={e=>setMinBal(e.target.value)} placeholder="e.g. 100"/></div>}
-          {hasMaxBal&&<div className="form-group"><label className="form-label form-label-req">Maximum balance ($)</label><input type="number" className="form-input" value={maxBal} onChange={e=>setMaxBal(e.target.value)} placeholder="e.g. 35000"/></div>}
-        </div>}
+      {/* Current term always included */}
+      <div style={{border:'1px solid var(--hz-border)',borderRadius:12,padding:'16px 20px',background:'#FAFAFE',marginBottom:12}}>
+        <div style={{fontSize:13,fontWeight:700,color:'var(--hz-text)',marginBottom:4}}>Current term charges</div>
+        <div style={{fontSize:13,color:'var(--hz-hint)'}}>Current term charges are always included. Every standard plan covers the active semester.</div>
       </div>
 
-      {/* ── Plan Parameters ── */}
-      <div className="card">
-        <div className="card-title">Plan Parameters</div>
-        <div className="card-subtitle">Define the plan options available to payers and how available options change over the enrollment period. These parameters drive the choices a payer sees when enrolling.</div>
-        <div className="radio-group" style={{marginBottom:20}}>
+      {/* Include last term */}
+      <div style={{border:'1px solid var(--hz-border)',borderRadius:12,padding:'16px 20px',background:'white',marginBottom:12}}>
+        <div style={{fontSize:13,fontWeight:700,color:'var(--hz-text)',marginBottom:12}}>Include last term's charges?</div>
+        <div className="radio-group">
           <label className="radio-item">
-            <input type="radio" name="ppm" value="length" checked={planParamMode==='length'} onChange={()=>setPlanParamMode('length')}/>
-            <div><div className="radio-label">Length of plan</div><div className="radio-desc">Offer multiple plan lengths (e.g. 2, 4, or 6 months). Available options narrow as enrollment progresses — earlier payers have more choices.</div></div>
+            <input type="radio" name="termScope" value="current-only" checked={termScope==='current-only'} onChange={e=>setTermScope(e.target.value)}/>
+            <div><div className="radio-label">No — current term only</div></div>
           </label>
           <label className="radio-item">
-            <input type="radio" name="ppm" value="date" checked={planParamMode==='date'} onChange={()=>setPlanParamMode('date')}/>
-            <div><div className="radio-label">Completion date with rolling windows</div><div className="radio-desc">Payers enrolled in different date windows get different completion dates — the payoff date automatically shifts for later enrollees. No manual invitation required.</div></div>
+            <input type="radio" name="termScope" value="current-and-last" checked={termScope==='current-and-last'} onChange={e=>setTermScope(e.target.value)}/>
+            <div><div className="radio-label">Yes — include the prior term's balance too</div></div>
           </label>
         </div>
+      </div>
 
-        {planParamMode==='length'&&<>
-          <div style={{background:'var(--hz-cloud)',borderRadius:10,padding:'12px 14px',marginBottom:16}}>
-            <div style={{fontSize:12,fontWeight:700,color:'var(--hz-indigo)',marginBottom:6}}>📅 How plan length options work</div>
-            <div style={{fontSize:12,color:'var(--hz-muted)'}}>Each plan length you add has its own enrollment close date. Payers enrolling before the first close date see all options. As each option's enrollment window closes, that choice disappears — later enrollees see only plans with enough time remaining.</div>
-          </div>
-          <table style={{width:'100%',borderCollapse:'collapse',marginBottom:12}}>
-            <thead><tr style={{fontSize:11,fontWeight:700,color:'var(--hz-hint)',textTransform:'uppercase',letterSpacing:.4}}>
-              <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}>Length</td>
-              <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}>Enrollment closes</td>
-              <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)',color:'var(--hz-teal)'}}>This option shown to payers enrolling before...</td>
-              <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}></td>
-            </tr></thead>
-            <tbody>
-              {[...planLengths].sort((a,b)=>b.months-a.months).map((pl,idx,arr)=>{
-                const prev=arr[idx-1];
-                const note=idx===0?'Any date before enrollment closes':`After ${prev.enrollThrough?fmtDate(prev.enrollThrough):'prior close date'}`;
-                return(<tr key={pl.id} style={{background:idx%2===0?'white':'#FAFAFE'}}>
-                  <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)'}}>
-                    <div style={{display:'flex',alignItems:'center',gap:8}}>
-                      <input type="number" min={1} max={60} value={pl.months} onChange={e=>setPlanLengths(ls=>ls.map(l=>l.id===pl.id?{...l,months:Number(e.target.value)}:l))} style={{width:56,border:'1.5px solid #D9D7F5',borderRadius:6,padding:'4px 8px',fontSize:13,textAlign:'center',fontFamily:'inherit'}}/>
-                      <span style={{fontSize:13,color:'var(--hz-muted)'}}>months</span>
-                    </div>
-                  </td>
-                  <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)'}}><input type="date" value={pl.enrollThrough} onChange={e=>setPlanLengths(ls=>ls.map(l=>l.id===pl.id?{...l,enrollThrough:e.target.value}:l))} style={{border:'1.5px solid #D9D7F5',borderRadius:6,padding:'4px 8px',fontSize:13,fontFamily:'inherit'}}/></td>
-                  <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)',fontSize:12,color:'var(--hz-teal)'}}>{note}</td>
-                  <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)',textAlign:'right'}}><button onClick={()=>setPlanLengths(ls=>ls.filter(l=>l.id!==pl.id))} style={{fontSize:12,color:'var(--hz-danger)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>Remove</button></td>
-                </tr>);
-              })}
-            </tbody>
-          </table>
-          <button className="btn btn-ghost btn-sm" onClick={()=>setPlanLengths(ls=>[...ls,{id:Date.now(),months:1,enrollThrough:''}])}>+ Add plan length</button>
-        </>}
-
-        {planParamMode==='date'&&<>
-          <div style={{background:'var(--hz-cloud)',borderRadius:10,padding:'12px 14px',marginBottom:16}}>
-            <div style={{fontSize:12,fontWeight:700,color:'var(--hz-indigo)',marginBottom:6}}>📅 How rolling completion date windows work</div>
-            <div style={{fontSize:12,color:'var(--hz-muted)'}}>Each window has a completion date and an enrollment-through date. Payers enrolling during each window automatically get that window's completion date. When a window's enrollment-through date passes, the next window activates automatically — no manual action needed.</div>
-          </div>
-          <table style={{width:'100%',borderCollapse:'collapse',marginBottom:12}}>
-            <thead><tr style={{fontSize:11,fontWeight:700,color:'var(--hz-hint)',textTransform:'uppercase',letterSpacing:.4}}>
-              <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}>Window</td>
-              <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}>Completion date</td>
-              <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}>Available to payers enrolling through</td>
-              <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}></td>
-            </tr></thead>
-            <tbody>
-              {completionWindows.map((w,idx)=>(<tr key={w.id} style={{background:idx%2===0?'white':'#FAFAFE'}}>
-                <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)',fontSize:13,fontWeight:600,color:'var(--hz-muted)'}}>Window {idx+1}</td>
-                <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)'}}><input type="date" value={w.completionDate} onChange={e=>setCompletionWindows(ws=>ws.map(cw=>cw.id===w.id?{...cw,completionDate:e.target.value}:cw))} style={{border:'1.5px solid #D9D7F5',borderRadius:6,padding:'4px 8px',fontSize:13,fontFamily:'inherit'}}/></td>
-                <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)'}}>{idx<completionWindows.length-1?<input type="date" value={w.enrollThrough} onChange={e=>setCompletionWindows(ws=>ws.map(cw=>cw.id===w.id?{...cw,enrollThrough:e.target.value}:cw))} style={{border:'1.5px solid #D9D7F5',borderRadius:6,padding:'4px 8px',fontSize:13,fontFamily:'inherit'}}/>:<span style={{fontSize:12,color:'var(--hz-teal)'}}>Until enrollment closes (all remaining payers)</span>}</td>
-                <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)',textAlign:'right'}}>{completionWindows.length>1&&<button onClick={()=>setCompletionWindows(ws=>ws.filter(cw=>cw.id!==w.id))} style={{fontSize:12,color:'var(--hz-danger)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>Remove</button>}</td>
-              </tr>))}
-            </tbody>
-          </table>
-          <button className="btn btn-ghost btn-sm" onClick={()=>setCompletionWindows(ws=>[...ws.slice(0,-1),{...ws[ws.length-1],enrollThrough:''},{id:Date.now(),completionDate:'',enrollThrough:''}])}>+ Add another window</button>
-        </>}
-
-        <SectionDivider/>
-        {/* Down payment */}
-        <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:downPmt.enabled?16:0}}>
-          <div><div style={{fontWeight:700,fontSize:13,color:'var(--hz-text)'}}>Down Payment</div><div style={{fontSize:12,color:'var(--hz-hint)',marginTop:2}}>Optionally require a payment up front at enrollment. If not enabled, the first scheduled installment is the first amount due.</div></div>
-          <Toggle on={downPmt.enabled} onToggle={v=>setDownPmt(d=>({...d,enabled:v}))}/>
+      {/* Past due scope */}
+      <div style={{border:'1px solid var(--hz-border)',borderRadius:12,padding:'16px 20px',background:'white',marginBottom:20}}>
+        <div style={{fontSize:13,fontWeight:700,color:'var(--hz-text)',marginBottom:12}}>What counts as past due?</div>
+        <div className="radio-group">
+          <label className="radio-item">
+            <input type="radio" name="pastDue" value="all-except-current" checked={pastDueScope==='all-except-current'} onChange={e=>setPastDueScope(e.target.value)}/>
+            <div><div className="radio-label">All prior terms except current</div></div>
+          </label>
+          <label className="radio-item">
+            <input type="radio" name="pastDue" value="all-except-current-and-last" checked={pastDueScope==='all-except-current-and-last'} onChange={e=>setPastDueScope(e.target.value)}/>
+            <div><div className="radio-label">All prior terms except current and last term</div></div>
+          </label>
         </div>
-        {downPmt.enabled&&<>
+      </div>
+
+      <SectionDivider/>
+
+      {/* Term cadence */}
+      <div style={{marginBottom:20}}>
+        <div style={{fontSize:14,fontWeight:700,color:'var(--hz-text)',marginBottom:4}}>How often do you create new plans?</div>
+        <div style={{fontSize:13,color:'var(--hz-hint)',marginBottom:14}}>This controls when we remind your team to set up the next term plan.</div>
+        <select
+          className="form-input form-select"
+          value={termFreq}
+          onChange={e=>setTermFreq(e.target.value)}
+          style={{maxWidth:420,width:'100%'}}
+        >
+          <option value="fall-spring">Fall &amp; Spring</option>
+          <option value="fall-spring-summer">Fall, Spring &amp; Summer</option>
+          <option value="fall-spring-summer-winter">Fall, Spring, Summer &amp; Winter</option>
+          <option value="monthly">Monthly</option>
+          <option value="custom">Custom</option>
+        </select>
+        {termFreq==='custom'&&(
+          <div style={{display:'flex',alignItems:'center',gap:10,marginTop:12}}>
+            <span style={{fontSize:13,color:'var(--hz-muted)'}}>Every</span>
+            <input type="number" min={1} max={24} className="form-input" style={{width:72}} value={customFreqMonths} onChange={e=>setCustomFreqMonths(Number(e.target.value))}/>
+            <span style={{fontSize:13,color:'var(--hz-muted)'}}>months</span>
+          </div>
+        )}
+      </div>
+
+      <div style={{marginBottom:8}}>
+        <div style={{fontSize:13,fontWeight:600,color:'var(--hz-text)',marginBottom:8}}>
+          Setup reminder: <strong style={{color:'var(--hz-indigo)'}}>{reminderDays} days</strong> before a new term is needed
+        </div>
+        <select
+          className="form-input form-select"
+          value={reminderDays}
+          onChange={e=>setReminderDays(Number(e.target.value))}
+          style={{maxWidth:260,width:'100%'}}
+        >
+          {[14,21,30,45,60,90].map(d=><option key={d} value={d}>{d} days before</option>)}
+        </select>
+        <div className="form-hint" style={{marginTop:6}}>We'll remind you to set up the next term plan this many days in advance.</div>
+      </div>
+
+      <div className="wizard-nav">
+        <button className="btn btn-ghost" style={{padding:'10px 28px',fontSize:14}} onClick={onBack}>Back</button>
+        <button className="btn btn-primary" style={{padding:'10px 28px',fontSize:14}} onClick={onContinue}>Continue</button>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// STEP 3 — TIMELINE
+// ══════════════════════════════════════════════════════════════
+function TimelineStep({planParamMode,setPlanParamMode,planLengths,setPlanLengths,completionWindows,setCompletionWindows,downPmt,setDownPmt,onBack,onContinue}) {
+  return (
+    <div style={{maxWidth:700,margin:'0 auto',padding:'48px 28px'}}>
+      <div style={{fontSize:12,fontWeight:600,color:'var(--hz-accent)',letterSpacing:.5,marginBottom:8,textTransform:'uppercase'}}>Step 3 of 4</div>
+      <h2 style={{fontSize:22,fontWeight:800,color:'var(--hz-text)',marginBottom:6}}>How long can students take to pay?</h2>
+      <p style={{fontSize:14,color:'var(--hz-muted)',marginBottom:28,lineHeight:1.6}}>This is the most important structural decision. It controls what options payers see when they enroll.</p>
+
+      {/* Card A — Multiple plan lengths */}
+      <div
+        className={`choice-card ${planParamMode==='length'?'selected':''}`}
+        onClick={()=>setPlanParamMode('length')}
+      >
+        <input type="radio" name="ppm" checked={planParamMode==='length'} onChange={()=>setPlanParamMode('length')} style={{marginTop:3,accentColor:'var(--hz-accent)',flexShrink:0}}/>
+        <div className="choice-card-body">
+          <div className="choice-card-title">Multiple plan lengths</div>
+          <div className="choice-card-desc">Offer 2, 4, or 6 months — whatever fits. Earlier enrollees see more options; later ones see fewer as enrollment cutoffs pass.</div>
+          {planParamMode==='length'&&(
+            <div style={{marginTop:16}}>
+              <div style={{background:'var(--hz-cloud)',borderRadius:10,padding:'12px 14px',marginBottom:16}}>
+                <div style={{fontSize:12,fontWeight:700,color:'var(--hz-indigo)',marginBottom:6}}>📅 How plan length options work</div>
+                <div style={{fontSize:12,color:'var(--hz-muted)'}}>Each plan length you add has its own enrollment close date. Payers enrolling before the first close date see all options. As each option's enrollment window closes, that choice disappears.</div>
+              </div>
+              <table style={{width:'100%',borderCollapse:'collapse',marginBottom:12}}>
+                <thead><tr style={{fontSize:11,fontWeight:700,color:'var(--hz-hint)',textTransform:'uppercase',letterSpacing:.4}}>
+                  <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}>Length</td>
+                  <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}>Enrollment closes</td>
+                  <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)',color:'var(--hz-teal)'}}>Available to payers enrolling before...</td>
+                  <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}></td>
+                </tr></thead>
+                <tbody>
+                  {[...planLengths].sort((a,b)=>b.months-a.months).map((pl,idx,arr)=>{
+                    const prev=arr[idx-1];
+                    const note=idx===0?'Any date before enrollment closes':`After ${prev.enrollThrough?fmtDate(prev.enrollThrough):'prior close date'}`;
+                    return(<tr key={pl.id} style={{background:idx%2===0?'white':'#FAFAFE'}}>
+                      <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:8}}>
+                          <input type="number" min={1} max={60} value={pl.months} onChange={e=>setPlanLengths(ls=>ls.map(l=>l.id===pl.id?{...l,months:Number(e.target.value)}:l))} style={{width:56,border:'1.5px solid #D9D7F5',borderRadius:6,padding:'4px 8px',fontSize:13,textAlign:'center',fontFamily:'inherit'}}/>
+                          <span style={{fontSize:13,color:'var(--hz-muted)'}}>months</span>
+                        </div>
+                      </td>
+                      <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)'}}><input type="date" value={pl.enrollThrough} onChange={e=>setPlanLengths(ls=>ls.map(l=>l.id===pl.id?{...l,enrollThrough:e.target.value}:l))} style={{border:'1.5px solid #D9D7F5',borderRadius:6,padding:'4px 8px',fontSize:13,fontFamily:'inherit'}}/></td>
+                      <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)',fontSize:12,color:'var(--hz-teal)'}}>{note}</td>
+                      <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)',textAlign:'right'}}><button onClick={e=>{e.stopPropagation();setPlanLengths(ls=>ls.filter(l=>l.id!==pl.id));}} style={{fontSize:12,color:'var(--hz-danger)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>Remove</button></td>
+                    </tr>);
+                  })}
+                </tbody>
+              </table>
+              <button className="btn btn-ghost btn-sm" onClick={e=>{e.stopPropagation();setPlanLengths(ls=>[...ls,{id:Date.now(),months:1,enrollThrough:''}]);}}>+ Add plan length</button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Card B — Rolling completion dates */}
+      <div
+        className={`choice-card ${planParamMode==='date'?'selected':''}`}
+        onClick={()=>setPlanParamMode('date')}
+      >
+        <input type="radio" name="ppm" checked={planParamMode==='date'} onChange={()=>setPlanParamMode('date')} style={{marginTop:3,accentColor:'var(--hz-accent)',flexShrink:0}}/>
+        <div className="choice-card-body">
+          <div className="choice-card-title">Rolling completion dates</div>
+          <div className="choice-card-desc">Set a target payoff date per enrollment window. Later enrollees automatically get a later payoff date — no manual adjustments needed.</div>
+          {planParamMode==='date'&&(
+            <div style={{marginTop:16}}>
+              <div style={{background:'var(--hz-cloud)',borderRadius:10,padding:'12px 14px',marginBottom:16}}>
+                <div style={{fontSize:12,fontWeight:700,color:'var(--hz-indigo)',marginBottom:6}}>📅 How rolling completion date windows work</div>
+                <div style={{fontSize:12,color:'var(--hz-muted)'}}>Each window has a completion date and an enrollment-through date. When a window's enrollment-through date passes, the next window activates automatically.</div>
+              </div>
+              <table style={{width:'100%',borderCollapse:'collapse',marginBottom:12}}>
+                <thead><tr style={{fontSize:11,fontWeight:700,color:'var(--hz-hint)',textTransform:'uppercase',letterSpacing:.4}}>
+                  <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}>Window</td>
+                  <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}>Completion date</td>
+                  <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}>Available through</td>
+                  <td style={{padding:'6px 10px',borderBottom:'1px solid var(--hz-border)'}}></td>
+                </tr></thead>
+                <tbody>
+                  {completionWindows.map((w,idx)=>(<tr key={w.id} style={{background:idx%2===0?'white':'#FAFAFE'}}>
+                    <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)',fontSize:13,fontWeight:600,color:'var(--hz-muted)'}}>Window {idx+1}</td>
+                    <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)'}}><input type="date" value={w.completionDate} onChange={e=>setCompletionWindows(ws=>ws.map(cw=>cw.id===w.id?{...cw,completionDate:e.target.value}:cw))} style={{border:'1.5px solid #D9D7F5',borderRadius:6,padding:'4px 8px',fontSize:13,fontFamily:'inherit'}}/></td>
+                    <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)'}}>{idx<completionWindows.length-1?<input type="date" value={w.enrollThrough} onChange={e=>setCompletionWindows(ws=>ws.map(cw=>cw.id===w.id?{...cw,enrollThrough:e.target.value}:cw))} style={{border:'1.5px solid #D9D7F5',borderRadius:6,padding:'4px 8px',fontSize:13,fontFamily:'inherit'}}/>:<span style={{fontSize:12,color:'var(--hz-teal)'}}>Until enrollment closes</span>}</td>
+                    <td style={{padding:'10px',borderBottom:'1px solid var(--hz-border)',textAlign:'right'}}>{completionWindows.length>1&&<button onClick={e=>{e.stopPropagation();setCompletionWindows(ws=>ws.filter(cw=>cw.id!==w.id));}} style={{fontSize:12,color:'var(--hz-danger)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>Remove</button>}</td>
+                  </tr>))}
+                </tbody>
+              </table>
+              <button className="btn btn-ghost btn-sm" onClick={e=>{e.stopPropagation();setCompletionWindows(ws=>[...ws.slice(0,-1),{...ws[ws.length-1],enrollThrough:''},{id:Date.now(),completionDate:'',enrollThrough:''}]);}}>+ Add another window</button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <SectionDivider/>
+
+      {/* Down payment */}
+      <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:downPmt.enabled?16:0,padding:'4px 0'}}>
+        <div>
+          <div style={{fontWeight:700,fontSize:13,color:'var(--hz-text)'}}>Require a down payment?</div>
+          <div style={{fontSize:12,color:'var(--hz-hint)',marginTop:2}}>Optionally require a payment up front at enrollment.</div>
+        </div>
+        <Toggle on={downPmt.enabled} onToggle={v=>setDownPmt(d=>({...d,enabled:v}))}/>
+      </div>
+      {downPmt.enabled&&(
+        <>
           <div className="radio-group" style={{marginBottom:14}}>
             {[['pct','Fixed percentage of balance','e.g. 10% — dollar amount varies per payer'],['dollar','Fixed dollar amount','Same amount from every payer'],['by-date','Auto-calculate — 50% paid by a specific date','We calculate the required down payment so installments reach 50% by your date']].map(([v,l,d])=>(
               <label key={v} className="radio-item">
@@ -731,610 +759,375 @@ function PaymentTab({methodMode,setMethodMode,globalMethods,setMethod,intlProvid
             {downPmt.type==='dollar'&&<FormInput label="Down payment amount ($)" type="number" value={downPmt.value} onChange={v=>setDownPmt(d=>({...d,value:v}))} placeholder="e.g. 500"/>}
             {downPmt.type==='by-date'&&<FormInput label="50% paid by date" type="date" value={downPmt.halfByDate} onChange={v=>setDownPmt(d=>({...d,halfByDate:v}))} hint="We'll back-calculate the required down payment"/>}
           </div>
-          <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:10}}>Eligibility exceptions</div>
-          <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
-            {[['eligWaive','Waive down payment for specific eligibility group','eligWaiveChar'],['eligRequire','Require down payment only for specific eligibility group (otherwise optional)','eligRequireChar']].map(([k,lbl,charKey])=>(
-              <div key={k}><label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer',fontSize:13,background:'var(--hz-cloud)',border:'1px solid rgba(100,92,220,.2)',borderRadius:8,padding:'8px 12px'}}><input type="checkbox" checked={downPmt[k]} onChange={e=>setDownPmt(d=>({...d,[k]:e.target.checked}))} style={{width:15,height:15,accentColor:'var(--hz-accent)'}}/><span style={{color:'var(--hz-indigo)'}}>{lbl}</span></label>
-              {downPmt[k]&&<div style={{marginTop:8,maxWidth:340}}><input className="form-input" style={{fontSize:12}} placeholder="Eligibility characteristic name" value={downPmt[charKey]||''} onChange={e=>setDownPmt(d=>({...d,[charKey]:e.target.value}))}/></div>}</div>
-            ))}
-          </div>
-        </>}
+        </>
+      )}
+
+      <div className="wizard-nav">
+        <button className="btn btn-ghost" style={{padding:'10px 28px',fontSize:14}} onClick={onBack}>Back</button>
+        <button className="btn btn-primary" style={{padding:'10px 28px',fontSize:14}} onClick={onContinue}>Continue</button>
       </div>
+    </div>
+  );
+}
 
-      <Banner type="info" icon="📅">
-        <strong>Plan parameters define the schedule structure.</strong> In the sections below, you'll configure which payment frequencies payers can choose from. A payer with a 6-month plan can choose to pay bi-weekly or weekly toward those monthly amounts — frequency is layered on top of the plan length.
-      </Banner>
+// ══════════════════════════════════════════════════════════════
+// STEP 4 — ACCESS
+// ══════════════════════════════════════════════════════════════
+function AccessStep({globalMethods,setMethod,intlProviders,setIntlProv,freqs,setFreqs,signupFees,setSignupFees,hasMinBal,setHasMinBal,minBal,setMinBal,hasMaxBal,setHasMaxBal,maxBal,setMaxBal,hiddenEnabled,setHiddenEnabled,hiddenExtType,setHiddenExtType,hiddenExtDate,setHiddenExtDate,hiddenExtDays,setHiddenExtDays,hiddenPayoffDate,setHiddenPayoffDate,hiddenMaxMonths,setHiddenMaxMonths,onBack,onContinue}) {
+  const[limitsExpanded,setLimitsExpanded]=useState(false);
 
-      <Banner type="info" icon="ℹ">
-        <strong>All settings on this tab apply to every payer who enrolls in this plan</strong> — except payment methods accepted, which can optionally vary by eligibility characteristic. Eligibility filtering is never visible to the end payer.
-      </Banner>
+  return (
+    <div style={{maxWidth:640,margin:'0 auto',padding:'48px 28px'}}>
+      <div style={{fontSize:12,fontWeight:600,color:'var(--hz-accent)',letterSpacing:.5,marginBottom:8,textTransform:'uppercase'}}>Step 4 of 4</div>
+      <h2 style={{fontSize:22,fontWeight:800,color:'var(--hz-text)',marginBottom:28}}>How can students pay?</h2>
 
       {/* Payment methods */}
-      <div className="card">
-        <div className="card-title">Payment Methods Accepted</div>
-        <div className="card-subtitle">Configure which payment methods payers can use. This is the one setting that can be customized per eligibility group if needed.</div>
-
-        <div className="radio-group" style={{marginBottom:16}}>
-          <label className="radio-item">
-            <input type="radio" name="methodMode" value="all-same" checked={methodMode==='all-same'} onChange={()=>setMethodMode('all-same')}/>
-            <div><div className="radio-label">Same payment methods for all payers</div></div>
-          </label>
-          <label className="radio-item">
-            <input type="radio" name="methodMode" value="by-eligibility" checked={methodMode==='by-eligibility'} onChange={()=>setMethodMode('by-eligibility')}/>
-            <div><div className="radio-label">Different payment methods by eligibility characteristic</div><div className="radio-desc">e.g. international students get international payment option; domestic students get ACH + credit card only</div></div>
-          </label>
-        </div>
-
-        {methodMode==='all-same'&&<>
-          <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:10}}>Methods available to all payers</div>
-          <div className="method-chips" style={{marginBottom:globalMethods.intl?16:0}}>
-            {['ach','cc','intl'].map(m=>(
-              <button key={m} className={`method-chip ${globalMethods[m]?'active':'inactive'}`} onClick={()=>setMethod(m)}>{methodLabel[m]}</button>
-            ))}
-          </div>
-          {globalMethods.intl&&<>
-            <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,margin:'14px 0 8px'}}>International payment provider(s)</div>
-            <div className="method-chips">
-              {[['flywire','Flywire'],['convera','Convera'],['paymytuition','PayMyTuition']].map(([k,l])=>(
-                <button key={k} className={`method-chip ${intlProviders[k]?'active':'inactive'}`} onClick={()=>setIntlProv(k)}>{l}</button>
-              ))}
-            </div>
-            <div style={{fontSize:11,color:'var(--hz-hint)',marginTop:6}}>Select all providers you have active contracts with. Payers will choose between them during signup.</div>
-          </>}
-        </>}
-
-        {methodMode==='by-eligibility'&&<>
-          <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:10}}>Eligibility-based payment method rules</div>
-          {eligRules.map((r,i)=>(
-            <div key={i} className="elig-rule">
-              <div className="elig-char">If characteristic: {r.char}</div>
-              <div className="method-chips">
-                {['ach','cc','intl'].filter(m=>r.methods[m]).map(m=><span key={m} className="method-chip active" style={{fontSize:11,padding:'4px 10px'}}>{methodLabel[m]}</span>)}
-              </div>
-              <button onClick={()=>removeElig(i)} style={{position:'absolute',top:10,right:12,fontSize:11,color:'var(--hz-danger)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>Remove</button>
-            </div>
+      <div style={{marginBottom:28}}>
+        <div style={{fontSize:14,fontWeight:700,color:'var(--hz-text)',marginBottom:4}}>Payment methods</div>
+        <div style={{fontSize:13,color:'var(--hz-hint)',marginBottom:12}}>Toggle which payment methods payers can use.</div>
+        <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:globalMethods.intl?12:0}}>
+          {[['ach','Bank transfer (ACH)'],['cc','Credit card'],['intl','International']].map(([k,l])=>(
+            <button key={k} className={`freq-pill ${globalMethods[k]?'freq-pill-active':'freq-pill-inactive'}`} onClick={()=>setMethod(k)}>{l}</button>
           ))}
-          {eligRules.length>0&&<div className="elig-rule" style={{borderStyle:'dashed'}}>
-            <div className="elig-char">For all other payers (default)</div>
-            <div className="method-chips">
-              {['ach','cc','intl'].map(m=>(
-                <button key={m} className={`method-chip ${globalMethods[m]?'active':'inactive'}`} onClick={()=>setMethod(m)} style={{fontSize:11,padding:'4px 10px'}}>{methodLabel[m]}</button>
+        </div>
+        {globalMethods.intl&&(
+          <div style={{marginTop:10}}>
+            <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:8}}>International providers</div>
+            <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+              {[['flywire','Flywire'],['convera','Convera'],['paymytuition','PayMyTuition']].map(([k,l])=>(
+                <button key={k} className={`freq-pill ${intlProviders[k]?'freq-pill-active':'freq-pill-inactive'}`} onClick={()=>setIntlProv(k)}>{l}</button>
               ))}
             </div>
-          </div>}
-          {addingElig?(
-            <div style={{border:'1.5px solid var(--hz-accent)',borderRadius:10,padding:16,background:'var(--hz-cloud)',marginBottom:10}}>
-              <div style={{fontSize:13,fontWeight:600,color:'var(--hz-indigo)',marginBottom:10}}>New eligibility rule</div>
-              <div className="form-row">
-                <FormInput label="Characteristic" hint="e.g. 'International Student', 'Graduate', 'Scholarship Recipient'" value={newEligChar} onChange={v=>setNewEligChar(v)} placeholder="Enter characteristic name"/>
-                <div className="form-group">
-                  <label className="form-label">Payment methods for this group</label>
-                  <div className="method-chips">
-                    {['ach','cc','intl'].map(m=>(
-                      <button key={m} className={`method-chip ${newEligMethods[m]?'active':'inactive'}`} onClick={()=>setNewEligMethods(p=>({...p,[m]:!p[m]}))} style={{fontSize:11,padding:'4px 10px'}}>{methodLabel[m]}</button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <div style={{display:'flex',gap:8,marginTop:4}}>
-                <button className="btn btn-primary btn-sm" onClick={saveElig}>Save Rule</button>
-                <button className="btn btn-ghost btn-sm" onClick={()=>setAddingElig(false)}>Cancel</button>
-              </div>
-            </div>
-          ):(
-            <button className="btn btn-ghost btn-sm" onClick={()=>setAddingElig(true)} style={{marginTop:6}}>+ Add eligibility rule</button>
-          )}
-          <Banner type="amber" icon="👁">International payments require a provider selection. If you enable international for any group, you must also select at least one international payment provider on the "all-same" view, or configure it within each eligibility rule.</Banner>
-        </>}
+          </div>
+        )}
       </div>
 
       {/* Payment frequency */}
-      <div className="card">
-        <div className="card-title">Payment Frequency Options</div>
-        <div className="card-subtitle">Choose which installment frequencies you offer. Payers will select from the options you enable. All three standard frequencies are on by default.</div>
-
-        <div style={{border:'1px solid var(--hz-border)',borderRadius:10,overflow:'hidden',marginBottom:16}}>
-          {[
-            ['weekly','Weekly','Payers can schedule a payment every week.'],
-            ['biweekly','Bi-Weekly','Payers can schedule a payment every two weeks.'],
-            ['monthly','Monthly','Payers can schedule a payment every month.'],
-          ].map(([k,label,desc])=>(
-            <div key={k} className="toggle-row">
-              <div className="toggle-info"><div className="toggle-name">{label}</div><div className="toggle-sub">{desc}</div></div>
-              <Toggle on={freqs[k]} onToggle={v=>setFreqs(f=>({...f,[k]:v}))}/>
-            </div>
-          ))}
-          <div className="toggle-row">
-            <div className="toggle-info">
-              <div className="toggle-name">Custom — Every X months</div>
-              <div className="toggle-sub">Offer a non-standard frequency like quarterly (3 months) or semester-length (6 months).</div>
-            </div>
-            <Toggle on={freqs.customMonths} onToggle={v=>setFreqs(f=>({...f,customMonths:v}))}/>
-          </div>
-        </div>
-        {freqs.customMonths&&<div style={{maxWidth:320}}>
-          <FormInput label="Every how many months?" type="number" value={freqs.customMonthsVal} onChange={v=>setFreqs(f=>({...f,customMonthsVal:Math.max(1,Number(v))}))} hint="e.g. 3 = quarterly, 6 = twice a year"/>
-        </div>}
-        {!freqs.weekly&&!freqs.biweekly&&!freqs.monthly&&!freqs.customMonths&&<Banner type="amber" icon="⚠">You must enable at least one payment frequency option.</Banner>}
-      </div>
-
-      {/* Remittance days */}
-      <div className="card">
-        <div className="card-title">Remittance Days</div>
-        <div className="card-subtitle">
-          Select the days of the week on which you want Nelnet to run the remittance job and forward collected payments to your institution. Payers may choose <em>any</em> day of the week for their installment date — we will process their payment on their chosen day and remit to you on the next selected remittance day.
-        </div>
-        <div className="day-pills" style={{marginBottom:12}}>
-          {[['mon','Mon'],['tue','Tue'],['wed','Wed'],['thu','Thu'],['fri','Fri']].map(([k,l])=>(
-            <DayPill key={k} label={l} sel={remitDays[k]} onClick={()=>setRemit(k)}/>
+      <div style={{marginBottom:28}}>
+        <div style={{fontSize:14,fontWeight:700,color:'var(--hz-text)',marginBottom:4}}>Payment frequency</div>
+        <div style={{fontSize:13,color:'var(--hz-hint)',marginBottom:12}}>Students choose their preferred frequency at enrollment. Monthly is available to all plans.</div>
+        <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+          {[['monthly','Monthly'],['biweekly','Bi-weekly'],['weekly','Weekly']].map(([k,l])=>(
+            <button key={k} className={`freq-pill ${freqs[k]?'freq-pill-active':'freq-pill-inactive'}`} onClick={()=>setFreqs(f=>({...f,[k]:!f[k]}))}>{l}</button>
           ))}
         </div>
-        <div style={{fontSize:12,color:'var(--hz-hint)'}}>Weekends and holidays: payments automatically shift to the next business day.</div>
       </div>
 
-      {/* First payment rule */}
-      <div className="card">
-        <div className="card-title">First Payment Due Date Rule</div>
-        <div className="card-subtitle">Set how the first installment date is determined for payers enrolling in this plan.</div>
-        <div className="radio-group">
-          <label className="radio-item">
-            <input type="radio" name="fpr" value="days" checked={firstPaymentRule==='days'} onChange={()=>setFirstPaymentRule('days')}/>
-            <div><div className="radio-label">First payment due within X days of enrollment</div><div className="radio-desc">Payer selects a date within the number of days you specify from their signup date.</div></div>
+      {/* Enrollment fee */}
+      <div style={{marginBottom:28}}>
+        <div style={{fontSize:14,fontWeight:700,color:'var(--hz-text)',marginBottom:8}}>Enrollment fee</div>
+        <div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
+          <span style={{fontSize:13,color:'var(--hz-muted)'}}>$10 Nelnet enrollment fee —</span>
+          <label className="radio-item" style={{gap:6}}>
+            <input type="radio" name="nelnetPayer" value="consumer" checked={signupFees.nelnetPayer==='consumer'} onChange={()=>setSignupFees(f=>({...f,nelnetPayer:'consumer'}))} style={{accentColor:'var(--hz-accent)'}}/>
+            <span style={{fontSize:13,fontWeight:500,color:'var(--hz-text)'}}>Student pays (default)</span>
           </label>
-          <label className="radio-item">
-            <input type="radio" name="fpr" value="date" checked={firstPaymentRule==='date'} onChange={()=>setFirstPaymentRule('date')}/>
-            <div><div className="radio-label">Set first payment due by a specific date</div><div className="radio-desc">Payer must choose a date on or before a fixed deadline you configure at the term plan level.</div></div>
+          <label className="radio-item" style={{gap:6}}>
+            <input type="radio" name="nelnetPayer" value="school" checked={signupFees.nelnetPayer==='school'} onChange={()=>setSignupFees(f=>({...f,nelnetPayer:'school'}))} style={{accentColor:'var(--hz-accent)'}}/>
+            <span style={{fontSize:13,fontWeight:500,color:'var(--hz-text)'}}>School absorbs</span>
           </label>
         </div>
-        {firstPaymentRule==='days'&&<div style={{marginTop:16,maxWidth:280}}>
-          <FormInput label="Days from enrollment" type="number" value={firstPaymentDays} onChange={v=>setFirstPaymentDays(Number(v))} hint="Payer picks any date within this window from their signup date"/>
-        </div>}
-        {firstPaymentRule==='date'&&<Banner type="info" icon="📅">The specific deadline date will be configured when you set up each term plan. The master plan does not store a fixed calendar date.</Banner>}
+        {signupFees.nelnetPayer==='school'&&<div style={{fontSize:12,color:'var(--hz-teal)',marginTop:6}}>Your institution covers this cost.</div>}
       </div>
 
-      <Banner type="info" icon="📋">
-        <strong>Enrollment period is set at the term plan level, not here.</strong> When you duplicate this master plan for a specific term (e.g. Fall 2026), you'll fill in the enrollment open and close dates at that time. The master template stays date-agnostic.
-      </Banner>
-
-      {/* ── Signup Fees ── */}
-      <div className="card">
-        <div className="card-title">Signup Fees</div>
-        <div className="card-subtitle">One-time fees collected at enrollment. Non-refundable.</div>
-
-        <div style={{border:'1px solid var(--hz-border)',borderRadius:10,overflow:'hidden',marginBottom:14}}>
-          <div style={{background:'#FAFAFE',padding:'12px 16px',borderBottom:'1px solid var(--hz-border)',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <div><div style={{fontWeight:700,fontSize:13,color:'var(--hz-text)'}}>Nelnet Service Fee</div><div style={{fontSize:11,color:'var(--hz-hint)',marginTop:1}}>Fixed — not editable</div></div>
-            <span style={{fontWeight:800,fontSize:15,color:'var(--hz-indigo)'}}>$10.00</span>
-          </div>
-          <div style={{padding:'14px 16px'}}>
-            <div style={{fontSize:12,color:'var(--hz-hint)',marginBottom:14}}>This fee covers Nelnet's payment plan administration. The amount is fixed per your contract.</div>
-            <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:8}}>Who pays this fee?</div>
-            <div className="radio-group" style={{marginBottom:14}}>
-              <label className="radio-item"><input type="radio" name="nelnetPayer" value="consumer" checked={signupFees.nelnetPayer==='consumer'} onChange={()=>setSignupFees(f=>({...f,nelnetPayer:'consumer'}))}/><div><div className="radio-label">Consumer pays (default)</div><div className="radio-desc">Added to the payer's amount due at enrollment</div></div></label>
-              <label className="radio-item"><input type="radio" name="nelnetPayer" value="school" checked={signupFees.nelnetPayer==='school'} onChange={()=>setSignupFees(f=>({...f,nelnetPayer:'school'}))}/><div><div className="radio-label">Institution pays</div><div className="radio-desc">Your institution absorbs the $10 — payers are not charged</div></div></label>
+      {/* Balance limits */}
+      <div style={{marginBottom:28}}>
+        <div style={{fontSize:14,fontWeight:700,color:'var(--hz-text)',marginBottom:4}}>Balance limits</div>
+        {!limitsExpanded&&!(hasMinBal||hasMaxBal)&&(
+          <div style={{fontSize:13,color:'var(--hz-hint)'}}>No minimum or maximum by default. <a href="#" onClick={e=>{e.preventDefault();setLimitsExpanded(true);}} style={{color:'var(--hz-accent)',textDecoration:'underline',fontSize:13}}>Set limits</a></div>
+        )}
+        {(limitsExpanded||hasMinBal||hasMaxBal)&&(
+          <div>
+            <div style={{display:'flex',gap:20,marginBottom:12,flexWrap:'wrap'}}>
+              {[['hasMinBal','Minimum balance',minBal,setMinBal,hasMinBal,setHasMinBal],['hasMaxBal','Maximum balance',maxBal,setMaxBal,hasMaxBal,setHasMaxBal]].map(([k,lbl,val,setVal,on,setOn])=>(
+                <label key={k} style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer',fontSize:13}}>
+                  <input type="checkbox" checked={on} onChange={e=>setOn(e.target.checked)} style={{width:15,height:15,accentColor:'var(--hz-accent)'}}/>
+                  <span style={{fontWeight:600,color:'var(--hz-text)'}}>Set a {lbl.toLowerCase()}</span>
+                </label>
+              ))}
             </div>
-            {signupFees.nelnetPayer==='consumer'&&<>
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:signupFees.waiverEnabled?12:0}}>
-                <div style={{fontSize:13,fontWeight:600,color:'var(--hz-text)'}}>Waive for specific eligibility groups</div>
-                <Toggle on={signupFees.waiverEnabled} onToggle={v=>setSignupFees(f=>({...f,waiverEnabled:v}))}/>
-              </div>
-              {signupFees.waiverEnabled&&<>
-                <div style={{fontSize:12,color:'var(--hz-hint)',marginBottom:8}}>Payers with these characteristics won't be charged. Your institution absorbs the fee for those payers.</div>
-                {signupFees.waiverRules.map((r,i)=><div key={i} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 12px',background:'var(--hz-teal-bg)',borderRadius:8,marginBottom:6}}>
-                  <span style={{fontSize:13,color:'var(--hz-teal)',fontWeight:600}}>Waived for: {r}</span>
-                  <button onClick={()=>setSignupFees(f=>({...f,waiverRules:f.waiverRules.filter((_,idx)=>idx!==i)}))} style={{fontSize:11,color:'var(--hz-danger)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>Remove</button>
-                </div>)}
-                <div style={{display:'flex',gap:8,marginTop:8}}>
-                  <input className="form-input" style={{flex:1,fontSize:12}} placeholder="Eligibility characteristic (e.g. Pell Grant Recipient)" onKeyDown={e=>{if(e.key==='Enter'&&e.target.value){setSignupFees(f=>({...f,waiverRules:[...f.waiverRules,e.target.value]}));e.target.value='';}}}/>
-                  <span style={{fontSize:11,color:'var(--hz-hint)',alignSelf:'center'}}>Press Enter to add</span>
+            {(hasMinBal||hasMaxBal)&&<div className="form-row" style={{maxWidth:400}}>
+              {hasMinBal&&<div className="form-group"><label className="form-label form-label-req">Minimum ($)</label><input type="number" className="form-input" value={minBal} onChange={e=>setMinBal(e.target.value)} placeholder="e.g. 100"/></div>}
+              {hasMaxBal&&<div className="form-group"><label className="form-label form-label-req">Maximum ($)</label><input type="number" className="form-input" value={maxBal} onChange={e=>setMaxBal(e.target.value)} placeholder="e.g. 35000"/></div>}
+            </div>}
+          </div>
+        )}
+      </div>
+
+      {/* Hidden plan */}
+      <div style={{marginBottom:8}}>
+        <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:20}}>
+          <div>
+            <div style={{fontSize:14,fontWeight:700,color:'var(--hz-text)',marginBottom:2}}>Invitation-only hidden plan add-on</div>
+            <div style={{fontSize:13,color:'var(--hz-hint)'}}>A version of this plan accessible only via direct email invitation.</div>
+          </div>
+          <Toggle on={hiddenEnabled} onToggle={v=>setHiddenEnabled(v)}/>
+        </div>
+        {hiddenEnabled&&(
+          <div style={{marginTop:16,border:'1px solid var(--hz-border)',borderRadius:12,padding:'16px 20px',background:'#FAFAFE'}}>
+            <Banner type="amber" icon="✉">
+              <strong>Hidden plans are invitation-only.</strong> Payers cannot discover or enroll on their own — your team sends a direct enrollment link via email.
+            </Banner>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label form-label-req">Enrollment extension type</label>
+                <div className="radio-group">
+                  <label className="radio-item">
+                    <input type="radio" name="hiddenExtType" value="date" checked={hiddenExtType==='date'} onChange={()=>setHiddenExtType('date')}/>
+                    <div><div className="radio-label">Extended through a specific date</div></div>
+                  </label>
+                  <label className="radio-item">
+                    <input type="radio" name="hiddenExtType" value="days" checked={hiddenExtType==='days'} onChange={()=>setHiddenExtType('days')}/>
+                    <div><div className="radio-label">Extend by days past main plan close</div></div>
+                  </label>
                 </div>
-              </>}
-            </>}
-          </div>
-        </div>
-
-        {cfiExists&&<div style={{border:'1px solid var(--hz-border)',borderRadius:10,overflow:'hidden'}}>
-          <div style={{background:'#FAFAFE',padding:'12px 16px',borderBottom:'1px solid var(--hz-border)',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <div><div style={{fontWeight:700,fontSize:13,color:'var(--hz-text)'}}>Institution Signup Fee (CFI)</div><div style={{fontSize:11,color:'var(--hz-hint)',marginTop:1}}>From your institutional Nelnet contract · not editable</div></div>
-            <span style={{fontWeight:800,fontSize:15,color:'var(--hz-indigo)'}}>${cfiFee}.00</span>
-          </div>
-          <div style={{padding:'12px 16px',fontSize:12,color:'var(--hz-hint)'}}>This fee is defined in your Nelnet contract and is always paid by the consumer. Contact your Nelnet account manager to adjust. The CFI fee is automatically waived for any eligibility group where the Nelnet fee is also waived.</div>
-        </div>}
-      </div>
-    </>
-  );
-}
-
-// ══════════════════════════════════════════════════════════════
-// TAB 3: PLAN RULES
-// ══════════════════════════════════════════════════════════════
-function RulesTab({rules,updateRule,freqs}){
-  const onMaxOptions=[
-    {value:'rebalance',label:'Rebalance remaining payments',desc:'The returned amount is spread evenly across all remaining installments, increasing each one proportionally.'},
-    {value:'cancel',label:'Cancel agreement',desc:'The payment plan is permanently cancelled. The full outstanding balance becomes immediately due as a one-time payment.'},
-    {value:'deactivate',label:'Deactivate agreement',desc:'The plan is suspended — automatic drafts stop. The payer can log in to resolve the issue and reactivate. Outstanding balance is not accelerated immediately.'},
-    {value:'terminate',label:'Terminate agreement',desc:'Similar to cancel, but specifically used for the final installment case. The remaining balance is converted to a one-time payment due immediately.'},
-  ];
-
-  const hasWeekly=freqs.weekly;
-  const hasBiweekly=freqs.biweekly;
-  const hasOther=freqs.monthly||freqs.customMonths;
-
-  return (
-    <>
-      <Banner type="info" icon="📋">
-        These rules are shown in plain language so your team understands exactly what will happen in each failure scenario. Click <strong>Edit</strong> on any rule to change the defaults. Changes here apply to all new enrollments in this plan type.
-      </Banner>
-
-      {/* Return Payment Fee toggle */}
-      <div className="hz-card" style={{padding:'18px 24px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:16}}>
-        <div>
-          <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)',marginBottom:3}}>Return Payment Fee</div>
-          <div style={{fontSize:13,color:'var(--hz-muted)'}}>When enabled, a $30 return fee is assessed to the payer each time a scheduled payment is returned by their bank. This is disclosed to payers during enrollment.</div>
-        </div>
-        <label style={{display:'flex',alignItems:'center',gap:10,cursor:'pointer',flexShrink:0}}>
-          <div style={{position:'relative',width:44,height:24}} onClick={()=>updateRule('returnFeeEnabled',!rules.returnFeeEnabled)}>
-            <div style={{position:'absolute',inset:0,borderRadius:12,background:rules.returnFeeEnabled?'var(--hz-indigo)':'#CBD5E1',transition:'background 0.2s'}}/>
-            <div style={{position:'absolute',top:3,left:rules.returnFeeEnabled?22:3,width:18,height:18,borderRadius:'50%',background:'#fff',boxShadow:'0 1px 3px rgba(0,0,0,0.2)',transition:'left 0.2s'}}/>
-          </div>
-          <span style={{fontSize:13,fontWeight:600,color:rules.returnFeeEnabled?'var(--hz-indigo)':'var(--hz-hint)'}}>{rules.returnFeeEnabled?'Enabled':'Disabled'}</span>
-        </label>
-      </div>
-
-      {/* Rule 1: Standard Return */}
-      <div className="rule-card">
-        <div className="rule-card-header">
-          <div style={{flex:1}}>
-            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
-              <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>Standard Return</div>
-              <span className={`rule-tag ${rules.standard.editing?'rule-tag-modified':'rule-tag-default'}`}>{rules.standard.editing?'Editing':'Default'}</span>
-            </div>
-            <div className="rule-plain">
-              If a scheduled payment fails, Nelnet will automatically <strong>retry up to {rules.standard.maxRetry} time{rules.standard.maxRetry!==1?'s':''}</strong>. If all retries fail, the plan will <strong>{onMaxOptions.find(o=>o.value===rules.standard.onMax)?.label.toLowerCase()}</strong>.
-            </div>
-          </div>
-          <button className="btn btn-ghost btn-sm" style={{marginLeft:16}} onClick={()=>updateRule('standard',{editing:!rules.standard.editing})}>
-            {rules.standard.editing?'Done':'Edit'}
-          </button>
-        </div>
-        {rules.standard.editing&&<div className="rule-card-body">
-          <div className="rule-edit-form">
-            <div className="form-group">
-              <label className="form-label">Max retries</label>
-              <select className="form-input form-select" value={rules.standard.maxRetry} onChange={e=>updateRule('standard',{maxRetry:Number(e.target.value)})}>
-                <option value={1}>1 retry</option>
-                <option value={2}>2 retries (default)</option>
-                <option value={3}>3 retries</option>
-              </select>
-            </div>
-            <div className="form-group" style={{gridColumn:'span 2'}}>
-              <label className="form-label">If max retries exceeded</label>
-              <select className="form-input form-select" value={rules.standard.onMax} onChange={e=>updateRule('standard',{onMax:e.target.value})}>
-                <option value="cancel">Cancel agreement (default)</option>
-                <option value="rebalance">Rebalance remaining payments</option>
-                <option value="deactivate">Deactivate agreement</option>
-              </select>
-              <div className="form-hint">{onMaxOptions.find(o=>o.value===rules.standard.onMax)?.desc}</div>
-            </div>
-          </div>
-        </div>}
-      </div>
-
-      {/* Rule 2: Flexible Payment Options */}
-      <div className="rule-card">
-        <div className="rule-card-header">
-          <div style={{flex:1}}>
-            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
-              <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>Flexible Payment Options</div>
-              <span className="rule-tag" style={{background:rules.flexible.enabled?'#E1F5EE':undefined,color:rules.flexible.enabled?'var(--hz-teal)':undefined}}>{rules.flexible.enabled?'Enabled':'Off'}</span>
-            </div>
-            <div className="rule-plain">
-              {rules.flexible.enabled
-                ? <>When payers choose weekly or bi-weekly frequency, their payment amounts may flex up or down between payment cycles. Rules below control how much rebalancing is allowed and when a failed flexible payment triggers a retry.</>
-                : <>Optional add-on that allows payers on weekly or bi-weekly schedules to have their individual payment amounts rebalance between cycles. When off, all payments are equal fixed installments.</>
-              }
-            </div>
-          </div>
-          <div style={{display:'flex',gap:8,alignItems:'center',marginLeft:16}}>
-            <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
-              <div style={{position:'relative',width:40,height:22}} onClick={()=>updateRule('flexible',{enabled:!rules.flexible.enabled})}>
-                <div style={{position:'absolute',inset:0,borderRadius:11,background:rules.flexible.enabled?'var(--hz-indigo)':'#CBD5E1',transition:'background 0.2s'}}/>
-                <div style={{position:'absolute',top:2,left:rules.flexible.enabled?20:2,width:18,height:18,borderRadius:'50%',background:'#fff',boxShadow:'0 1px 3px rgba(0,0,0,0.2)',transition:'left 0.2s'}}/>
+                {hiddenExtType==='date'&&<input type="date" className="form-input" style={{marginTop:8,maxWidth:240}} value={hiddenExtDate} onChange={e=>setHiddenExtDate(e.target.value)}/>}
+                {hiddenExtType==='days'&&<div style={{display:'flex',alignItems:'center',gap:8,marginTop:8}}>
+                  <input type="number" min={1} max={180} className="form-input" style={{maxWidth:100}} value={hiddenExtDays} onChange={e=>setHiddenExtDays(Number(e.target.value))}/>
+                  <span style={{fontSize:13,color:'var(--hz-muted)'}}>additional days</span>
+                </div>}
               </div>
-              <span style={{fontSize:12,fontWeight:600,color:rules.flexible.enabled?'var(--hz-indigo)':'var(--hz-hint)'}}>{rules.flexible.enabled?'On':'Off'}</span>
-            </label>
-            {rules.flexible.enabled&&<button className="btn btn-ghost btn-sm" onClick={()=>updateRule('flexible',{editing:!rules.flexible.editing})}>
-              {rules.flexible.editing?'Done':'Edit'}
-            </button>}
-          </div>
-        </div>
-        {rules.flexible.enabled&&rules.flexible.editing&&<div className="rule-card-body">
-          <div style={{fontSize:12,fontWeight:700,color:'var(--hz-hint)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:12}}>Weekly Flexibility Rules</div>
-          <div className="rule-edit-form" style={{marginBottom:20}}>
-            <div className="form-group">
-              <label className="form-label">Max rebalances per payment</label>
-              <select className="form-input form-select" value={rules.flexible.weeklyMaxRebalance} onChange={e=>updateRule('flexible',{weeklyMaxRebalance:Number(e.target.value)})}>
-                <option value={1}>1 rebalance</option>
-                <option value={2}>2 rebalances (default)</option>
-                <option value={3}>3 rebalances</option>
-              </select>
-              <div className="form-hint">How many times a single payment can be rebalanced before it is finalized.</div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Min remaining payments to rebalance</label>
-              <select className="form-input form-select" value={rules.flexible.weeklyMinRemaining} onChange={e=>updateRule('flexible',{weeklyMinRemaining:Number(e.target.value)})}>
-                <option value={2}>2 payments</option>
-                <option value={3}>3 payments (default)</option>
-                <option value={4}>4 payments</option>
-              </select>
-              <div className="form-hint">Rebalancing is not allowed if fewer than this many payments remain.</div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Retry window after failed flex payment</label>
-              <select className="form-input form-select" value={rules.flexible.weeklyRetryDays} onChange={e=>updateRule('flexible',{weeklyRetryDays:Number(e.target.value)})}>
-                <option value={3}>3 days</option>
-                <option value={4}>4 days (default)</option>
-                <option value={5}>5 days</option>
-              </select>
-              <div className="form-hint">Days the system waits before retrying a failed weekly flexible payment.</div>
-            </div>
-          </div>
-          <div style={{fontSize:12,fontWeight:700,color:'var(--hz-hint)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:12}}>Bi-Weekly Flexibility Rules</div>
-          <div className="rule-edit-form">
-            <div className="form-group">
-              <label className="form-label">Max rebalances per payment</label>
-              <select className="form-input form-select" value={rules.flexible.biweeklyMaxRebalance} onChange={e=>updateRule('flexible',{biweeklyMaxRebalance:Number(e.target.value)})}>
-                <option value={1}>1 rebalance</option>
-                <option value={2}>2 rebalances (default)</option>
-                <option value={3}>3 rebalances</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Min remaining payments to rebalance</label>
-              <select className="form-input form-select" value={rules.flexible.biweeklyMinRemaining} onChange={e=>updateRule('flexible',{biweeklyMinRemaining:Number(e.target.value)})}>
-                <option value={1}>1 payment</option>
-                <option value={2}>2 payments (default)</option>
-                <option value={3}>3 payments</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Retry window after failed bi-weekly flex payment</label>
-              <select className="form-input form-select" value={rules.flexible.biweeklyRetryDays} onChange={e=>updateRule('flexible',{biweeklyRetryDays:Number(e.target.value)})}>
-                <option value={7}>7 days</option>
-                <option value={10}>10 days (default)</option>
-                <option value={14}>14 days</option>
-              </select>
-            </div>
-          </div>
-          <Banner type="info" icon="ℹ️" style={{marginTop:16}}>
-            Flexible payments operate <em>on top of</em> the monthly checkpoint schedule — payers must still meet their monthly required amounts at each monthly checkpoint regardless of how they distribute payments week-to-week.
-          </Banner>
-        </div>}
-      </div>
-
-      {/* Rule 3: Last Payment Exception */}
-      <div className="rule-card">
-        <div className="rule-card-header">
-          <div style={{flex:1}}>
-            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
-              <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>Last Payment Exception</div>
-              <span className="rule-tag rule-tag-default">Default</span>
-            </div>
-            <div className="rule-plain">
-              When the <strong>final payment</strong> of a plan fails, a stricter rule applies: Nelnet will retry up to <strong>{rules.lastInstall.maxRetry} time{rules.lastInstall.maxRetry!==1?'s':''}</strong>. If it still fails, the agreement is <strong>terminated</strong> and the remaining amount is immediately due as a one-time payment — there are no remaining installments to rebalance onto.
-            </div>
-          </div>
-          <button className="btn btn-ghost btn-sm" style={{marginLeft:16}} onClick={()=>updateRule('lastInstall',{editing:!rules.lastInstall.editing})}>
-            {rules.lastInstall.editing?'Done':'Edit'}
-          </button>
-        </div>
-        {rules.lastInstall.editing&&<div className="rule-card-body">
-          <div className="rule-edit-form">
-            <div className="form-group">
-              <label className="form-label">Max retries for last payment</label>
-              <select className="form-input form-select" value={rules.lastInstall.maxRetry} onChange={e=>updateRule('lastInstall',{maxRetry:Number(e.target.value)})}>
-                <option value={1}>1 retry</option>
-                <option value={2}>2 retries (default)</option>
-              </select>
-            </div>
-            <div className="form-group" style={{gridColumn:'span 2'}}>
-              <label className="form-label">Outcome if max retries exceeded</label>
-              <select className="form-input form-select" disabled value="terminate">
-                <option value="terminate">Terminate — balance due immediately</option>
-              </select>
-              <div className="form-hint">Rebalance is not available for the last payment since there are no remaining installments.</div>
-            </div>
-          </div>
-        </div>}
-      </div>
-
-      {/* Rule 4: Invalid Payment Method */}
-      <div className="rule-card">
-        <div className="rule-card-header">
-          <div style={{flex:1}}>
-            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
-              <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>Invalid Payment Method — Update Window</div>
-              <span className="rule-tag" style={{background:'#F0F4F8',color:'var(--hz-hint)'}}>System-Determined</span>
-            </div>
-            <div className="rule-plain">
-              When a payer's payment method is flagged as invalid, they have a limited window to update it before their agreement is cancelled. The window length is automatically determined by their payment frequency.
-            </div>
-          </div>
-          <div style={{marginLeft:16,fontSize:11,color:'var(--hz-hint)',textAlign:'right',minWidth:80}}>Auto-configured<br/>by frequency</div>
-        </div>
-        <div className="rule-card-body">
-          <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
-            {hasWeekly&&<div style={{background:'var(--hz-cloud)',borderRadius:8,padding:'12px 20px',textAlign:'center',minWidth:100}}>
-              <div style={{fontSize:26,fontWeight:800,color:'var(--hz-indigo)',lineHeight:1}}>5</div>
-              <div style={{fontSize:11,color:'var(--hz-hint)',marginTop:4}}>days</div>
-              <div style={{fontSize:11,fontWeight:600,color:'var(--hz-muted)',marginTop:2}}>Weekly plans</div>
-            </div>}
-            {hasBiweekly&&<div style={{background:'var(--hz-cloud)',borderRadius:8,padding:'12px 20px',textAlign:'center',minWidth:100}}>
-              <div style={{fontSize:26,fontWeight:800,color:'var(--hz-indigo)',lineHeight:1}}>7</div>
-              <div style={{fontSize:11,color:'var(--hz-hint)',marginTop:4}}>days</div>
-              <div style={{fontSize:11,fontWeight:600,color:'var(--hz-muted)',marginTop:2}}>Bi-weekly plans</div>
-            </div>}
-            {hasOther&&<div style={{background:'var(--hz-cloud)',borderRadius:8,padding:'12px 20px',textAlign:'center',minWidth:100}}>
-              <div style={{fontSize:26,fontWeight:800,color:'var(--hz-indigo)',lineHeight:1}}>10</div>
-              <div style={{fontSize:11,color:'var(--hz-hint)',marginTop:4}}>days</div>
-              <div style={{fontSize:11,fontWeight:600,color:'var(--hz-muted)',marginTop:2}}>Monthly / custom</div>
-            </div>}
-          </div>
-        </div>
-      </div>
-
-      {/* Rule 5: Balance Reconciliation */}
-      <div className="rule-card">
-        <div className="rule-card-header">
-          <div style={{flex:1}}>
-            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
-              <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>Balance Reconciliation</div>
-              <span className="rule-tag" style={{background:rules.recon.enabled?'#E1F5EE':undefined,color:rules.recon.enabled?'var(--hz-teal)':undefined}}>{rules.recon.enabled?'Enabled':'Off'}</span>
-            </div>
-            <div className="rule-plain">
-              {rules.recon.enabled
-                ? <>Nelnet compares the payer's billed balance against their school balance <strong>{rules.recon.frequency}</strong>. When the balance <strong>decreases</strong>, the difference is <strong>{rules.recon.onDecrease==='spread'?'spread evenly across remaining payments':'held until next payment cycle'}</strong>. When the balance <strong>increases</strong>, {rules.recon.onIncrease==='spread'?'the difference is spread across eligible remaining payments (at least 10 days before the payment date)':rules.recon.onIncrease==='ask'?'payers are notified and choose to add to plan or make a one-time payment':'auto-increases are not applied — payers are notified separately'}.</>
-                : <>Balance reconciliation is off — payer plan amounts will not automatically adjust if the school balance changes after enrollment.</>
-              }
-            </div>
-          </div>
-          <div style={{display:'flex',gap:8,alignItems:'center',marginLeft:16}}>
-            <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
-              <div style={{position:'relative',width:40,height:22}} onClick={()=>updateRule('recon',{enabled:!rules.recon.enabled})}>
-                <div style={{position:'absolute',inset:0,borderRadius:11,background:rules.recon.enabled?'var(--hz-indigo)':'#CBD5E1',transition:'background 0.2s'}}/>
-                <div style={{position:'absolute',top:2,left:rules.recon.enabled?20:2,width:18,height:18,borderRadius:'50%',background:'#fff',boxShadow:'0 1px 3px rgba(0,0,0,0.2)',transition:'left 0.2s'}}/>
+              <div className="form-group">
+                <label className="form-label">Pay-off date for hidden plan</label>
+                <input type="date" className="form-input" value={hiddenPayoffDate} onChange={e=>setHiddenPayoffDate(e.target.value)}/>
+                <div className="form-hint">Leave blank to use same payoff date as main plan.</div>
               </div>
-              <span style={{fontSize:12,fontWeight:600,color:rules.recon.enabled?'var(--hz-indigo)':'var(--hz-hint)'}}>{rules.recon.enabled?'On':'Off'}</span>
-            </label>
-            {rules.recon.enabled&&<button className="btn btn-ghost btn-sm" onClick={()=>updateRule('recon',{editing:!rules.recon.editing})}>
-              {rules.recon.editing?'Done':'Edit'}
-            </button>}
-          </div>
-        </div>
-        {rules.recon.enabled&&rules.recon.editing&&<div className="rule-card-body">
-          <div className="rule-edit-form">
-            <div className="form-group">
-              <label className="form-label">How often to run balance comparison</label>
-              <select className="form-input form-select" value={rules.recon.frequency} onChange={e=>updateRule('recon',{frequency:e.target.value})}>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly (default)</option>
-                <option value="biweekly">Bi-weekly</option>
-                <option value="monthly">Monthly</option>
-              </select>
             </div>
-            <div className="form-group">
-              <label className="form-label">When balance decreases</label>
-              <select className="form-input form-select" value={rules.recon.onDecrease} onChange={e=>updateRule('recon',{onDecrease:e.target.value})}>
-                <option value="spread">Spread evenly across remaining payments (default)</option>
-                <option value="hold">Hold — apply at next payment cycle</option>
-              </select>
-              <div className="form-hint">A decrease means the school owes less than expected — payer's future payments are reduced.</div>
-            </div>
-            <div className="form-group" style={{gridColumn:'span 2'}}>
-              <label className="form-label">When balance increases</label>
-              <select className="form-input form-select" value={rules.recon.onIncrease} onChange={e=>updateRule('recon',{onIncrease:e.target.value})}>
-                <option value="spread">Spread across eligible remaining payments (default)</option>
-                <option value="ask">Ask payer — add to plan or make one-time payment</option>
-                <option value="none">Don't auto-add — notify payer separately</option>
-              </select>
-              <div className="form-hint">
-                {rules.recon.onIncrease==='spread'&&'Eligible payments are those at least 10 calendar days away. If no eligible payments exist, payer is notified to make a one-time payment.'}
-                {rules.recon.onIncrease==='ask'&&'Payer receives a notification and must choose: distribute the increase across their remaining payments, or pay the difference as a one-time payment now.'}
-                {rules.recon.onIncrease==='none'&&'Nelnet will notify the payer that their school balance increased, but no automatic plan change occurs. The school handles the difference.'}
+            <div style={{maxWidth:280}}>
+              <div className="form-group">
+                <label className="form-label">Maximum plan length (months)</label>
+                <input type="number" min={1} max={24} className="form-input" value={hiddenMaxMonths} onChange={e=>setHiddenMaxMonths(Number(e.target.value))}/>
+                <div className="form-hint">The longest plan a hidden payer can select.</div>
               </div>
             </div>
           </div>
-          <Banner type="info" icon="📅">
-            Eligible remaining payments for increases must be <strong>at least 10 calendar days</strong> before the payment date. If all remaining payments are too close, the payer is automatically asked to make a one-time payment regardless of this setting.
-          </Banner>
-        </div>}
+        )}
       </div>
-    </>
-  );
-}
 
-// ══════════════════════════════════════════════════════════════
-// TAB 4: PLAN REVIEW
-// ══════════════════════════════════════════════════════════════
-function ReviewTab({planName,planType,planDesc,termFreq,reminderDays,termScope,pastDueScope,globalMethods,intlProviders,methodMode,freqs,remitDays,rules,hasMinBal,minBal,hasMaxBal,maxBal,planParamMode,planLengths,completionWindows,downPmt,signupFees,cfiFee,hiddenEnabled,setTab}){
-  const remitList = ['mon','tue','wed','thu','fri'].filter(d=>remitDays[d]).map(d=>({mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri'}[d])).join(', ');
-  const freqList = [freqs.weekly&&'Weekly',freqs.biweekly&&'Bi-Weekly',freqs.monthly&&'Monthly',freqs.customMonths&&`Every ${freqs.customMonthsVal} months`].filter(Boolean).join(', ');
-  const methodList = [globalMethods.ach&&'ACH',globalMethods.cc&&'Credit Card',globalMethods.intl&&'International'].filter(Boolean).join(', ');
-  const updateWindowStr = [freqs.weekly&&'Weekly: 5 days',freqs.biweekly&&'Bi-weekly: 7 days',(freqs.monthly||freqs.customMonths)&&'Other: 10 days'].filter(Boolean).join(' · ');
-
-  const ReviewRow=({k,v,edit})=>(
-    <div className="review-row">
-      <div className="review-key">{k}</div>
-      <div className="review-val">{v||<span style={{color:'var(--hz-hint)'}}>Not set</span>}</div>
-      {edit&&<div className="review-edit" onClick={()=>setTab(edit)}>Edit</div>}
+      <div className="wizard-nav">
+        <button className="btn btn-ghost" style={{padding:'10px 28px',fontSize:14}} onClick={onBack}>Back</button>
+        <button className="btn btn-primary" style={{padding:'10px 28px',fontSize:14}} onClick={onContinue}>Review &amp; Publish</button>
+      </div>
     </div>
   );
+}
 
-  const incomplete = !planName;
+// ══════════════════════════════════════════════════════════════
+// REVIEW SCREEN
+// ══════════════════════════════════════════════════════════════
+function ReviewStep({planName,planDesc,termScope,pastDueScope,termFreq,customFreqMonths,reminderDays,planParamMode,planLengths,completionWindows,downPmt,globalMethods,intlProviders,freqs,signupFees,hasMinBal,minBal,hasMaxBal,maxBal,hiddenEnabled,rules,updateRule,setCurrentStep,navProtoIndex}) {
+  const[expandedDefault,setExpandedDefault]=useState(null);
+
+  const incomplete = !planName.trim();
+
+  const TERM_FREQ_LABELS = {
+    'fall-spring':'Fall & Spring',
+    'fall-spring-summer':'Fall, Spring & Summer',
+    'fall-spring-summer-winter':'Fall, Spring, Summer & Winter',
+    'monthly':'Monthly',
+    'custom':`Custom (every ${customFreqMonths} months)`,
+  };
+
+  const termFreqLabel = TERM_FREQ_LABELS[termFreq] || termFreq;
 
   const planParamSummary = planParamMode==='length'
     ? `${planLengths.length} plan length${planLengths.length!==1?'s':''} (${planLengths.map(l=>l.months+'mo').join(', ')})`
     : `${completionWindows.length} rolling window${completionWindows.length!==1?'s':''}`;
 
+  const downPmtSummary = downPmt.enabled
+    ? (downPmt.type==='pct'?`${downPmt.value}% of balance`:downPmt.type==='dollar'?`$${downPmt.value} fixed`:`50% by ${downPmt.halfByDate||'date'}`)
+    : 'None';
+
+  const methodList = [globalMethods.ach&&'Bank transfer (ACH)',globalMethods.cc&&'Credit card',globalMethods.intl&&'International'].filter(Boolean).join(', ');
+  const freqList = [freqs.monthly&&'Monthly',freqs.biweekly&&'Bi-weekly',freqs.weekly&&'Weekly'].filter(Boolean).join(', ');
+  const hasWeekly=freqs.weekly;
+  const hasBiweekly=freqs.biweekly;
+  const hasOther=freqs.monthly||freqs.customMonths;
+
+  const ReviewRow = ({label,value,onEdit}) => (
+    <div className="review-row">
+      <div className="review-key">{label}</div>
+      <div className="review-val">{value||<span style={{color:'var(--hz-hint)'}}>Not set</span>}</div>
+      {onEdit&&<div className="review-edit" onClick={onEdit}>Edit</div>}
+    </div>
+  );
+
   return (
-    <>
+    <div style={{maxWidth:800,margin:'0 auto',padding:'48px 28px 80px'}}>
+      <div style={{fontSize:12,fontWeight:600,color:'var(--hz-accent)',letterSpacing:.5,marginBottom:8,textTransform:'uppercase'}}>Almost done</div>
+      <h1 style={{fontSize:26,fontWeight:800,color:'var(--hz-text)',marginBottom:6}}>Review your master plan</h1>
+      <p style={{fontSize:14,color:'var(--hz-muted)',marginBottom:32,lineHeight:1.6}}>Here's everything we'll use to configure your Standard Payment Plans.</p>
+
       {incomplete&&<Banner type="amber" icon="⚠">
-        <strong>Required items incomplete.</strong> Please complete all required fields before publishing. Plan name is required.
+        <strong>Required items incomplete.</strong> Plan name is required before publishing.
       </Banner>}
 
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24,marginBottom:24}}>
-        <div style={{display:'flex',flexDirection:'column',gap:0}}>
-          <div className="card">
-            <div className="review-section-title">Plan Settings</div>
-            <ReviewRow k="Plan type" v="Standard Payment Plan" edit="settings"/>
-            <ReviewRow k="Plan name" v={planName} edit="settings"/>
-            <ReviewRow k="Description" v={planDesc||'—'} edit="settings"/>
-            <ReviewRow k="Balance scope" v={termScope==='current-only'?'Current term only':'Current term + last term'} edit="settings"/>
-            <ReviewRow k="Past due scope" v={pastDueScope==='all-except-current'?'All terms except current':'All terms except current + last'} edit="settings"/>
-            <ReviewRow k="Term cadence" v={termFreq} edit="settings"/>
-            <ReviewRow k="Setup reminder" v={`${reminderDays} days before next term`} edit="settings"/>
-            <ReviewRow k="Hidden plan add-on" v={hiddenEnabled?'Enabled — invitation-only enrollment':'Off'} edit="settings"/>
-          </div>
-          <div className="card">
-            <div className="review-section-title">Plan Parameters</div>
-            <ReviewRow k="Mode" v={planParamMode==='length'?'Plan lengths':'Rolling completion dates'} edit="payment"/>
-            <ReviewRow k="Configuration" v={planParamSummary} edit="payment"/>
-            <ReviewRow k="Balance limits" v={[hasMinBal&&`Min $${minBal}`,hasMaxBal&&`Max $${maxBal}`].filter(Boolean).join(', ')||'None'} edit="payment"/>
-            <ReviewRow k="Down payment" v={downPmt.enabled?(downPmt.type==='pct'?`${downPmt.value}% of balance`:downPmt.type==='dollar'?`$${downPmt.value} fixed`:`50% by ${downPmt.halfByDate||'date'}`):'None'} edit="payment"/>
-            <ReviewRow k="Signup fee (Nelnet)" v={signupFees.nelnetPayer==='consumer'?'Charged to payer ($10)':'School absorbs ($10)'} edit="payment"/>
-            {cfiFee>0&&<ReviewRow k="Signup fee (institution)" v={`$${cfiFee} — charged to payer (contract)`} edit="payment"/>}
-          </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24,marginBottom:28}}>
+
+        {/* Left — Your choices */}
+        <div className="card" style={{margin:0}}>
+          <div className="review-section-title">Your choices</div>
+          <ReviewRow label="Plan name" value={planName} onEdit={()=>setCurrentStep('basics')}/>
+          <ReviewRow label="Balance scope" value={termScope==='current-only'?'Current term only':'Current + prior term'} onEdit={()=>setCurrentStep('scope')}/>
+          <ReviewRow label="Term cadence" value={termFreqLabel} onEdit={()=>setCurrentStep('scope')}/>
+          <ReviewRow label="Plan structure" value={planParamSummary} onEdit={()=>setCurrentStep('timeline')}/>
+          <ReviewRow label="Down payment" value={downPmtSummary} onEdit={()=>setCurrentStep('timeline')}/>
+          <ReviewRow label="Payment methods" value={methodList||'None selected'} onEdit={()=>setCurrentStep('access')}/>
+          <ReviewRow label="Frequencies" value={freqList||'None enabled'} onEdit={()=>setCurrentStep('access')}/>
+          <ReviewRow label="Enrollment fee" value={signupFees.nelnetPayer==='consumer'?'Student pays $10':'School absorbs $10'} onEdit={()=>setCurrentStep('access')}/>
+          {(hasMinBal||hasMaxBal)&&<ReviewRow label="Balance limits" value={[hasMinBal&&`Min $${minBal}`,hasMaxBal&&`Max $${maxBal}`].filter(Boolean).join(', ')} onEdit={()=>setCurrentStep('access')}/>}
+          <ReviewRow label="Hidden plan" value={hiddenEnabled?'Enabled — invitation-only':'Off'} onEdit={()=>setCurrentStep('access')}/>
         </div>
-        <div style={{display:'flex',flexDirection:'column',gap:0}}>
-          <div className="card">
-            <div className="review-section-title">Payment Settings</div>
-            <ReviewRow k="Payment methods" v={methodMode==='all-same'?methodList:'Per eligibility characteristic'} edit="payment"/>
-            {globalMethods.intl&&<ReviewRow k="International providers" v={['flywire','convera','paymytuition'].filter(k=>intlProviders[k]).map(k=>k==='paymytuition'?'PayMyTuition':k.charAt(0).toUpperCase()+k.slice(1)).join(', ')||'None selected'} edit="payment"/>}
-            <ReviewRow k="Frequencies offered" v={freqList||'None enabled'} edit="payment"/>
-            <ReviewRow k="Remittance days" v={remitList||'None selected'} edit="payment"/>
+
+        {/* Right — Plan defaults */}
+        <div className="card" style={{margin:0}}>
+          <div className="review-section-title">Plan defaults</div>
+
+          {/* Return payment handling */}
+          <div style={{padding:'10px 0',borderBottom:'1px solid var(--hz-border)'}}>
+            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8}}>
+              <div style={{flex:1}}>
+                <div style={{fontSize:12,fontWeight:700,color:'var(--hz-text)',marginBottom:3}}>Return payment handling</div>
+                <div style={{fontSize:12,color:'var(--hz-hint)',lineHeight:1.6}}>
+                  If a payment fails, retry up to <strong style={{color:'var(--hz-indigo)'}}>{rules.standard.maxRetry}</strong> times. If all retries fail, the plan is <strong style={{color:'var(--hz-indigo)'}}>{rules.standard.onMax==='cancel'?'cancelled':''+rules.standard.onMax}</strong>.
+                </div>
+              </div>
+              <span className="review-edit" onClick={()=>setExpandedDefault(expandedDefault==='standard'?null:'standard')}>Edit</span>
+            </div>
+            {expandedDefault==='standard'&&(
+              <div className="inline-edit-panel">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Max retries</label>
+                    <select className="form-input form-select" value={rules.standard.maxRetry} onChange={e=>updateRule('standard',{maxRetry:Number(e.target.value)})}>
+                      <option value={1}>1 retry</option>
+                      <option value={2}>2 retries (default)</option>
+                      <option value={3}>3 retries</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">If max exceeded</label>
+                    <select className="form-input form-select" value={rules.standard.onMax} onChange={e=>updateRule('standard',{onMax:e.target.value})}>
+                      <option value="cancel">Cancel agreement</option>
+                      <option value="rebalance">Rebalance payments</option>
+                      <option value="deactivate">Deactivate agreement</option>
+                    </select>
+                  </div>
+                </div>
+                <button className="btn btn-primary btn-sm" onClick={()=>setExpandedDefault(null)}>Done</button>
+              </div>
+            )}
           </div>
-          <div className="card">
-            <div className="review-section-title">Plan Rules</div>
-            <ReviewRow k="Return fee" v={rules.returnFeeEnabled?'$30 assessed to payer':'Disabled'} edit="rules"/>
-            <ReviewRow k="Standard return" v={`Retry ${rules.standard.maxRetry}× then ${rules.standard.onMax}`} edit="rules"/>
-            <ReviewRow k="Flexible payments" v={rules.flexible.enabled?'Enabled (weekly/bi-weekly)':'Off'} edit="rules"/>
-            <ReviewRow k="Last payment" v={`Retry ${rules.lastInstall.maxRetry}× then terminate`} edit="rules"/>
-            <ReviewRow k="Invalid method window" v={updateWindowStr||'—'} edit="rules"/>
-            <ReviewRow k="Balance reconciliation" v={rules.recon.enabled?`${rules.recon.frequency.charAt(0).toUpperCase()+rules.recon.frequency.slice(1)} · ↓${rules.recon.onDecrease==='spread'?'spread':'hold'} · ↑${rules.recon.onIncrease}`:'Off'} edit="rules"/>
+
+          {/* Balance reconciliation */}
+          <div style={{padding:'10px 0',borderBottom:'1px solid var(--hz-border)'}}>
+            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8}}>
+              <div style={{flex:1}}>
+                <div style={{fontSize:12,fontWeight:700,color:'var(--hz-text)',marginBottom:3}}>Balance reconciliation</div>
+                <div style={{fontSize:12,color:'var(--hz-hint)',lineHeight:1.6}}>
+                  {rules.recon.enabled
+                    ? <>Balances compared <strong style={{color:'var(--hz-indigo)'}}>{rules.recon.frequency}</strong>. Decreases spread evenly; increases spread to eligible payments or requested as one-time catch-up.</>
+                    : 'Balance reconciliation is off.'
+                  }
+                </div>
+              </div>
+              <span className="review-edit" onClick={()=>setExpandedDefault(expandedDefault==='recon'?null:'recon')}>Edit</span>
+            </div>
+            {expandedDefault==='recon'&&(
+              <div className="inline-edit-panel">
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+                  <span style={{fontSize:13,fontWeight:600,color:'var(--hz-text)'}}>Enable reconciliation</span>
+                  <Toggle on={rules.recon.enabled} onToggle={v=>updateRule('recon',{enabled:v})}/>
+                </div>
+                {rules.recon.enabled&&(
+                  <div className="form-group">
+                    <label className="form-label">Frequency</label>
+                    <select className="form-input form-select" value={rules.recon.frequency} onChange={e=>updateRule('recon',{frequency:e.target.value})}>
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly (default)</option>
+                      <option value="biweekly">Bi-weekly</option>
+                      <option value="monthly">Monthly</option>
+                    </select>
+                  </div>
+                )}
+                <button className="btn btn-primary btn-sm" style={{marginTop:12}} onClick={()=>setExpandedDefault(null)}>Done</button>
+              </div>
+            )}
+          </div>
+
+          {/* Last payment rule */}
+          <div style={{padding:'10px 0',borderBottom:'1px solid var(--hz-border)'}}>
+            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8}}>
+              <div style={{flex:1}}>
+                <div style={{fontSize:12,fontWeight:700,color:'var(--hz-text)',marginBottom:3}}>Last payment rule</div>
+                <div style={{fontSize:12,color:'var(--hz-hint)',lineHeight:1.6}}>
+                  If the final payment fails after <strong style={{color:'var(--hz-indigo)'}}>{rules.lastInstall.maxRetry}</strong> retries, the plan terminates and remaining balance is due immediately.
+                </div>
+              </div>
+              <span className="review-edit" onClick={()=>setExpandedDefault(expandedDefault==='lastInstall'?null:'lastInstall')}>Edit</span>
+            </div>
+            {expandedDefault==='lastInstall'&&(
+              <div className="inline-edit-panel">
+                <div className="form-group" style={{marginBottom:12}}>
+                  <label className="form-label">Max retries for last payment</label>
+                  <select className="form-input form-select" value={rules.lastInstall.maxRetry} onChange={e=>updateRule('lastInstall',{maxRetry:Number(e.target.value)})}>
+                    <option value={1}>1 retry</option>
+                    <option value={2}>2 retries (default)</option>
+                  </select>
+                </div>
+                <button className="btn btn-primary btn-sm" onClick={()=>setExpandedDefault(null)}>Done</button>
+              </div>
+            )}
+          </div>
+
+          {/* Flexible payment option */}
+          <div style={{padding:'10px 0',borderBottom:'1px solid var(--hz-border)'}}>
+            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8}}>
+              <div style={{flex:1}}>
+                <div style={{fontSize:12,fontWeight:700,color:'var(--hz-text)',marginBottom:3}}>Flexible payment option</div>
+                <div style={{fontSize:12,color:'var(--hz-hint)',lineHeight:1.6}}>
+                  {rules.flexible.enabled
+                    ? 'Enabled — weekly/bi-weekly payers can rebalance between cycles.'
+                    : 'Off — all payments are equal fixed installments regardless of frequency.'
+                  }
+                </div>
+              </div>
+              <span className="review-edit" onClick={()=>setExpandedDefault(expandedDefault==='flexible'?null:'flexible')}>Edit</span>
+            </div>
+            {expandedDefault==='flexible'&&(
+              <div className="inline-edit-panel">
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+                  <span style={{fontSize:13,fontWeight:600,color:'var(--hz-text)'}}>Enable flexible payments</span>
+                  <Toggle on={rules.flexible.enabled} onToggle={v=>updateRule('flexible',{enabled:v})}/>
+                </div>
+                <button className="btn btn-primary btn-sm" style={{marginTop:8}} onClick={()=>setExpandedDefault(null)}>Done</button>
+              </div>
+            )}
+          </div>
+
+          {/* Invalid payment method window */}
+          <div style={{padding:'10px 0'}}>
+            <div style={{fontSize:12,fontWeight:700,color:'var(--hz-text)',marginBottom:3}}>Invalid payment method window</div>
+            <div style={{fontSize:12,color:'var(--hz-hint)',lineHeight:1.6}}>
+              If a payment method is flagged as invalid:{hasWeekly?' 5 days for weekly,':''}{hasBiweekly?' 7 days for bi-weekly,':''} 10 days for monthly plans to update before the plan cancels.
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="card">
-        <div style={{fontWeight:700,fontSize:15,color:'var(--hz-text)',marginBottom:6}}>Ready to publish this master plan?</div>
-        <div style={{fontSize:13,color:'var(--hz-hint)',marginBottom:20}}>Publishing this master plan makes it available to duplicate for specific terms. It will not create any active enrollment periods — those are configured when you set up a term plan from this master.</div>
-        <div style={{display:'flex',gap:12,alignItems:'center'}}>
-          <button className="btn btn-primary" disabled={incomplete} style={{opacity:incomplete?.5:1,width:'auto',padding:'10px 32px',fontSize:14}}>Publish Master Plan</button>
-          <button className="btn btn-ghost" style={{width:'auto',padding:'10px 20px',fontSize:13}}>Save as Draft</button>
-          <a href="index.html" onClick={e=>{e.preventDefault();try{window.top.location.href='index.html';}catch(_){window.location.href='index.html';}}} style={{fontSize:12,color:'var(--hz-hint)',textDecoration:'underline',marginLeft:8}}>Prototype Index</a>
-        </div>
+      {/* Bottom action bar */}
+      <div style={{display:'flex',alignItems:'center',gap:12,paddingTop:20,borderTop:'1px solid var(--hz-border)'}}>
+        <button className="btn btn-ghost" style={{padding:'10px 20px',fontSize:13}}>Save as Draft</button>
+        <button
+          className="btn btn-primary"
+          disabled={incomplete}
+          style={{padding:'10px 32px',fontSize:14,opacity:incomplete?.5:1,cursor:incomplete?'not-allowed':'pointer'}}
+        >
+          Publish Master Plan
+        </button>
+        <a href="index.html" onClick={navProtoIndex} style={{fontSize:12,color:'var(--hz-hint)',textDecoration:'underline',marginLeft:8}}>Prototype Index</a>
       </div>
-    </>
+    </div>
   );
 }
 
