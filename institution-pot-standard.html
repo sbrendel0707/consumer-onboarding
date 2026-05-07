@@ -147,16 +147,8 @@ body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: var(
 </head>
 <body>
 <div id="root"></div>
-<script>
-window.onerror = function(msg, src, line, col, err) {
-  document.getElementById('root').innerHTML =
-    '<div style="padding:40px;font-family:monospace;background:#fff0f0;border:2px solid red;margin:20px;border-radius:8px;font-size:13px">' +
-    '<strong style="font-size:16px;color:red">⚠ JavaScript Error</strong><br><br>' +
-    (msg||'') + '<br><br>Line: ' + line + ', Col: ' + col + '<br>Source: ' + src +
-    (err && err.stack ? '<br><br>' + err.stack.replace(/</g,'&lt;') : '') + '</div>';
-};
-</script>
-<script type="text/babel">
+<script>window.exports={};</script>
+<script type="text/babel" data-presets="react">
 const {useState} = React;
 
 // ── Shared micro-components ───────────────────────────────────
@@ -345,16 +337,17 @@ export default function App(){
           <div className="top-bar-logo">Nelnet</div>
           <div style={{width:1,height:20,background:'rgba(255,255,255,.25)'}}/>
           <div className="top-bar-breadcrumb">
-            <a href="index.html" onClick={e=>{e.preventDefault();try{window.top.location.href='index.html';}catch(_){window.location.href='index.html';}}} style={{color:'rgba(255,255,255,.7)',textDecoration:'none',cursor:'pointer'}}>Institution Admin</a>
+            <span>Institution Admin</span>
             <span>›</span>
             <span>Payment Plans</span>
             <span>›</span>
             <strong>Create Master Plan</strong>
           </div>
         </div>
-        <div style={{display:'flex',gap:10}}>
+        <div style={{display:'flex',gap:10,alignItems:'center'}}>
           <button className="btn btn-ghost" style={{color:'white',borderColor:'rgba(255,255,255,.3)',fontSize:12}}>Discard</button>
-          <button className="btn btn-primary" style={{background:'rgba(255,255,255,.15)',border:'1px solid rgba(255,255,255,.3)',fontSize:12}} onClick={()=>setTab('review')}>Review →</button>
+          <button className="btn btn-primary" style={{background:'rgba(255,255,255,.15)',border:'1px solid rgba(255,255,255,.3)',fontSize:12}} onClick={()=>setTab('review')}>Review Plan</button>
+          <a href="index.html" onClick={e=>{e.preventDefault();try{window.top.location.href='index.html';}catch(_){window.location.href='index.html';}}} style={{fontSize:12,fontWeight:600,color:'rgba(255,255,255,0.85)',background:'rgba(255,255,255,0.12)',border:'1px solid rgba(255,255,255,0.25)',borderRadius:6,padding:'5px 14px',textDecoration:'none'}}>Prototype Index</a>
         </div>
       </div>
 
@@ -1324,7 +1317,7 @@ function ReviewTab({planName,planType,planDesc,termFreq,reminderDays,termScope,p
         <div style={{display:'flex',gap:12,alignItems:'center'}}>
           <button className="btn btn-primary" disabled={incomplete} style={{opacity:incomplete?.5:1,width:'auto',padding:'10px 32px',fontSize:14}}>Publish Master Plan</button>
           <button className="btn btn-ghost" style={{width:'auto',padding:'10px 20px',fontSize:13}}>Save as Draft</button>
-          <a href="index.html" onClick={e=>{e.preventDefault();try{window.top.location.href='index.html';}catch(_){window.location.href='index.html';}}} style={{fontSize:12,color:'var(--hz-hint)',textDecoration:'underline',marginLeft:8}}>⌂ Back to index</a>
+          <a href="index.html" onClick={e=>{e.preventDefault();try{window.top.location.href='index.html';}catch(_){window.location.href='index.html';}}} style={{fontSize:12,color:'var(--hz-hint)',textDecoration:'underline',marginLeft:8}}>Prototype Index</a>
         </div>
       </div>
     </>
