@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Institution · Guarantee Payment Plan Setup</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {
+  --hz-indigo: #2D1FA3; --hz-accent: #645CDC; --hz-cloud: #EEF0FF;
+  --hz-teal: #0D7A55; --hz-teal-bg: #E1F5EE;
+  --hz-amber: #EF9F27; --hz-amber-bg: #FAEEDA;
+  --hz-danger: #E24B4A; --hz-bg: #F4F5FF; --hz-card: #FFFFFF;
+  --hz-border: rgba(100,92,220,0.14); --hz-text: #1A1060;
+  --hz-muted: #57548D; --hz-hint: #6B6899;
+  --hz-green: #059669; --hz-green-bg: #D1FAE5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: var(--hz-bg); color: var(--hz-text); font-size: 14px; line-height: 1.6; }
+
+/* ── Top chrome ── */
+.top-bar { background: var(--hz-indigo); color: white; padding: 0 28px; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.top-bar-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; opacity: .85; }
+.top-bar-breadcrumb span { opacity: .5; }
+.top-bar-breadcrumb strong { opacity: 1; }
+.top-bar-logo { font-weight: 800; font-size: 15px; letter-spacing: -.3px; }
+
+/* ── Plan header ── */
+.plan-header { background: white; border-bottom: 1px solid var(--hz-border); padding: 20px 28px 0; }
+.plan-header-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; gap: 24px; }
+.plan-name-area { flex: 1; min-width: 0; }
+.plan-type-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--hz-hint); margin-bottom: 4px; }
+.plan-name-input { font-size: 22px; font-weight: 800; color: var(--hz-text); border: none; outline: none; background: transparent; width: 100%; padding: 0; }
+.plan-name-input::placeholder { color: #C0BCEE; }
+.plan-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: .3px; }
+.badge-draft { background: var(--hz-amber-bg); color: #966010; }
+.badge-master { background: var(--hz-cloud); color: var(--hz-accent); }
+.badge-guarantee { background: var(--hz-green-bg); color: var(--hz-green); }
+.btn { padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all .15s; font-family: inherit; }
+.btn-primary { background: var(--hz-accent); color: white; }
+.btn-primary:hover { background: var(--hz-indigo); }
+.btn-ghost { background: transparent; color: var(--hz-accent); border: 1.5px solid var(--hz-border); }
+.btn-ghost:hover { background: var(--hz-cloud); }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-danger { background: #FEE2E2; color: var(--hz-danger); }
+
+/* ── Tab nav ── */
+.tab-nav { display: flex; gap: 0; border-top: 1px solid var(--hz-border); }
+.tab-item { padding: 12px 20px; font-size: 13px; font-weight: 600; color: var(--hz-hint); cursor: pointer; border-bottom: 3px solid transparent; transition: all .15s; user-select: none; }
+.tab-item:hover { color: var(--hz-green); }
+.tab-item.active { color: #065f46; border-bottom-color: var(--hz-green); }
+
+/* ── Content ── */
+.content { max-width: 1040px; margin: 0 auto; padding: 32px 28px 80px; }
+
+/* ── Cards ── */
+.card { background: white; border: 1px solid var(--hz-border); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+.card-title { font-size: 15px; font-weight: 700; color: var(--hz-text); margin-bottom: 4px; }
+.card-subtitle { font-size: 12px; color: var(--hz-hint); margin-bottom: 20px; }
+.section-divider { height: 1px; background: var(--hz-border); margin: 20px 0; }
+
+/* ── Form elements ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; font-weight: 700; color: var(--hz-muted); text-transform: uppercase; letter-spacing: .5px; }
+.form-label-req::after { content: ' *'; color: var(--hz-danger); }
+.form-input { border: 1.5px solid #D9D7F5; border-radius: 8px; padding: 9px 12px; font-size: 13px; color: var(--hz-text); font-family: inherit; outline: none; background: white; transition: border-color .15s; }
+.form-input:focus { border-color: var(--hz-green); box-shadow: 0 0 0 3px rgba(5,150,105,.1); }
+.form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6899' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-hint { font-size: 11px; color: var(--hz-hint); margin-top: 2px; }
+.form-input-readonly { background: #F8F8FC; color: var(--hz-muted); cursor: not-allowed; border-color: #E8E6F5; }
+
+/* ── Radio / Checkbox ── */
+.radio-group { display: flex; flex-direction: column; gap: 10px; }
+.radio-item { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.radio-item input[type=radio], .radio-item input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--hz-green); margin-top: 2px; flex-shrink: 0; cursor: pointer; }
+.radio-label { font-size: 13px; color: var(--hz-text); font-weight: 500; }
+.radio-desc { font-size: 12px; color: var(--hz-hint); margin-top: 1px; }
+
+/* ── Toggle switch ── */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--hz-border); }
+.toggle-row:last-child { border-bottom: none; }
+.toggle-info { flex: 1; min-width: 0; }
+.toggle-name { font-size: 13px; font-weight: 600; color: var(--hz-text); }
+.toggle-sub { font-size: 12px; color: var(--hz-hint); margin-top: 1px; }
+.toggle-switch { width: 44px; height: 24px; border-radius: 12px; border: none; cursor: pointer; position: relative; transition: background .2s; flex-shrink: 0; margin-left: 16px; }
+.toggle-switch.on { background: var(--hz-green); }
+.toggle-switch.off { background: #D1CFE8; }
+.toggle-knob { position: absolute; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; transition: transform .2s; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+.toggle-switch.on .toggle-knob { transform: translateX(22px); }
+.toggle-switch.off .toggle-knob { transform: translateX(3px); }
+
+/* ── Day selector ── */
+.day-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.day-pill { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #D9D7F5; color: var(--hz-muted); background: white; transition: all .15s; }
+.day-pill.selected { background: var(--hz-green-bg); border-color: var(--hz-green); color: #065f46; }
+
+/* ── Info banners ── */
+.banner { border-radius: 10px; padding: 12px 16px; font-size: 13px; margin-bottom: 16px; display: flex; gap: 10px; align-items: flex-start; }
+.banner-info { background: var(--hz-cloud); border: 1px solid rgba(100,92,220,.2); color: var(--hz-indigo); }
+.banner-amber { background: var(--hz-amber-bg); border: 1px solid rgba(239,159,39,.3); color: #7A4F00; }
+.banner-green { background: var(--hz-teal-bg); border: 1px solid rgba(13,122,85,.2); color: var(--hz-teal); }
+.banner-danger { background: #FEE2E2; border: 1px solid rgba(226,75,74,.2); color: #8B1A1A; }
+.banner-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── Rule cards ── */
+.rule-card { border: 1.5px solid var(--hz-border); border-radius: 12px; overflow: hidden; margin-bottom: 14px; }
+.rule-card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: white; }
+.rule-card-body { padding: 16px 20px; background: #FAFAFE; border-top: 1px solid var(--hz-border); }
+.rule-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 2px 8px; border-radius: 4px; }
+.rule-tag-default { background: var(--hz-cloud); color: var(--hz-accent); }
+.rule-tag-fixed { background: var(--hz-amber-bg); color: #7A4F00; }
+.rule-tag-modified { background: var(--hz-teal-bg); color: var(--hz-teal); }
+.rule-plain { font-size: 13px; color: var(--hz-text); line-height: 1.6; }
+.rule-plain strong { color: var(--hz-indigo); }
+
+/* ── Stat boxes ── */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.stat-box { border-radius: 12px; padding: 18px 20px; border: 1.5px solid; }
+.stat-box-teal { background: var(--hz-teal-bg); border-color: rgba(13,122,85,.25); }
+.stat-box-blue { background: #EEF4FF; border-color: rgba(59,130,246,.2); }
+.stat-box-green { background: var(--hz-green-bg); border-color: rgba(5,150,105,.25); }
+.stat-box-amber { background: var(--hz-amber-bg); border-color: rgba(239,159,39,.3); }
+.stat-box-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; }
+.stat-box-teal .stat-box-label { color: var(--hz-teal); }
+.stat-box-blue .stat-box-label { color: #3B82F6; }
+.stat-box-green .stat-box-label { color: var(--hz-green); }
+.stat-box-amber .stat-box-label { color: #966010; }
+.stat-box-rule { font-size: 12px; font-weight: 700; color: var(--hz-text); margin-bottom: 4px; }
+.stat-box-desc { font-size: 11px; color: var(--hz-hint); line-height: 1.5; }
+
+/* ── Subscriber list ── */
+.subscriber-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--hz-border); }
+.subscriber-item:last-child { border-bottom: none; }
+.subscriber-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--hz-cloud); color: var(--hz-accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.subscriber-info { flex: 1; }
+.subscriber-name { font-size: 13px; font-weight: 600; color: var(--hz-text); }
+.subscriber-role { font-size: 11px; color: var(--hz-hint); }
+
+/* ── Review ── */
+.review-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--hz-hint); margin-bottom: 10px; }
+.review-row { display: flex; align-items: flex-start; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--hz-border); }
+.review-row:last-child { border-bottom: none; }
+.review-key { font-size: 12px; color: var(--hz-hint); width: 220px; flex-shrink: 0; padding-top: 1px; }
+.review-val { font-size: 13px; font-weight: 600; color: var(--hz-text); flex: 1; }
+.review-edit { font-size: 11px; color: var(--hz-accent); cursor: pointer; text-decoration: underline; flex-shrink: 0; }
+
+/* ── Eligibility builder ── */
+.elig-rule { border: 1px solid var(--hz-border); border-radius: 10px; padding: 16px; margin-bottom: 10px; background: #FAFAFE; position: relative; }
+.elig-char { font-size: 11px; font-weight: 700; color: var(--hz-hint); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+
+/* ── Payment method chips ── */
+.method-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.method-chip { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid; transition: all .15s; }
+.method-chip.active { background: var(--hz-cloud); border-color: var(--hz-accent); color: var(--hz-indigo); }
+.method-chip.inactive { background: white; border-color: #D9D7F5; color: var(--hz-hint); }
+
+/* ── Fixed-value display ── */
+.fixed-value { background: #F8F8FC; border: 1.5px solid #E8E6F5; border-radius: 8px; padding: 9px 12px; font-size: 13px; color: var(--hz-muted); display: flex; align-items: center; gap: 8px; }
+.fixed-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; background: var(--hz-amber-bg); color: #7A4F00; padding: 2px 6px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState} = React;
+
+// ── Shared micro-components ───────────────────────────────────
+
+const Toggle=({on,onToggle})=>(
+  <button className={`toggle-switch ${on?'on':'off'}`} onClick={()=>onToggle(!on)}>
+    <div className="toggle-knob"/>
+  </button>
+);
+
+const DayPill=({label,sel,onClick})=>(
+  <button className={`day-pill ${sel?'selected':''}`} onClick={onClick}>{label}</button>
+);
+
+const FormInput=({label,req,hint,type="text",value,onChange,placeholder,readOnly,className=""})=>(
+  <div className="form-group">
+    <label className={`form-label${req?' form-label-req':''}`}>{label}</label>
+    {type==='textarea'
+      ?<textarea className={`form-input form-textarea ${readOnly?'form-input-readonly':''} ${className}`} value={value} onChange={e=>onChange&&onChange(e.target.value)} placeholder={placeholder} readOnly={readOnly}/>
+      :<input type={type} className={`form-input ${readOnly?'form-input-readonly':''} ${className}`} value={value} onChange={e=>onChange&&onChange(e.target.value)} placeholder={placeholder} readOnly={readOnly}/>}
+    {hint&&<div className="form-hint">{hint}</div>}
+  </div>
+);
+
+const FormSelect=({label,req,hint,value,onChange,children,className=""})=>(
+  <div className="form-group">
+    <label className={`form-label${req?' form-label-req':''}`}>{label}</label>
+    <select className={`form-input form-select ${className}`} value={value} onChange={e=>onChange(e.target.value)}>{children}</select>
+    {hint&&<div className="form-hint">{hint}</div>}
+  </div>
+);
+
+const Banner=({type="info",icon,children})=>(
+  <div className={`banner banner-${type}`}><div className="banner-icon">{icon||'ℹ'}</div><div>{children}</div></div>
+);
+
+const SectionDivider=()=><div className="section-divider"/>;
+
+const FixedField=({label,value,hint})=>(
+  <div className="form-group">
+    <label className="form-label">{label}</label>
+    <div className="fixed-value">
+      <span style={{flex:1}}>{value}</span>
+      <span className="fixed-badge">Fixed · Non-Editable</span>
+    </div>
+    {hint&&<div className="form-hint">{hint}</div>}
+  </div>
+);
+
+// ── Main App ─────────────────────────────────────────────────
+export default function App(){
+  const[tab,setTab]=useState('settings');
+  const[planName,setPlanName]=useState('');
+  const[planDesc,setPlanDesc]=useState('');
+
+  // Plan Settings
+  const[termFreq,setTermFreq]=useState('fall-spring');
+  const[customFreqMonths,setCustomFreqMonths]=useState(3);
+  const[reminderDays,setReminderDays]=useState(30);
+  const[showSubscribers,setShowSubscribers]=useState(false);
+  const[subscribers]=useState([
+    {name:'Lisa Garrett',role:'Bursar Admin',initials:'LG'},
+    {name:'Ryan Campos',role:'IT — Nelnet Config',initials:'RC'},
+  ]);
+
+  // Guarantee Dates
+  const[enrollOpen,setEnrollOpen]=useState('');
+  const[enrollClose,setEnrollClose]=useState('');
+  const[secondDepositDays,setSecondDepositDays]=useState('30');
+
+  // Payment Settings
+  const[methodMode,setMethodMode]=useState('all-same');
+  const[globalMethods,setGlobalMethods]=useState({ach:true,cc:true,intl:false});
+  const[intlProviders,setIntlProviders]=useState({flywire:false,convera:false,paymytuition:false});
+  const[eligRules,setEligRules]=useState([]);
+  const[defaultPlanLength,setDefaultPlanLength]=useState('3');
+  const[allowFlexible,setAllowFlexible]=useState(false);
+  const[flexOptions,setFlexOptions]=useState({biweekly:false,weekly:false});
+  const[remitDays,setRemitDays]=useState({mon:false,tue:false,wed:true,thu:false,fri:true});
+
+  // Plan Rules
+  const[runBalComparisons,setRunBalComparisons]=useState(true);
+  const[balCompFreq,setBalCompFreq]=useState('weekly');
+
+  const setRemit=(d)=>setRemitDays(r=>({...r,[d]:!r[d]}));
+  const setIntlProv=(k)=>setIntlProviders(p=>({...p,[k]:!p[k]}));
+  const setMethod=(k)=>setGlobalMethods(m=>({...m,[k]:!m[k]}));
+  const setFlex=(k)=>setFlexOptions(f=>({...f,[k]:!f[k]}));
+
+  const termFreqLabel={
+    'fall-spring':'Fall & Spring',
+    'fall-spring-summer':'Fall, Spring & Summer',
+    'fall-spring-summer-winter':'Fall, Spring, Summer & Winter',
+    'monthly':'Monthly',
+    'custom':'Custom (every X months)',
+  }[termFreq]||termFreq;
+
+  const TABS=[
+    ['settings','Plan Settings'],
+    ['dates','Guarantee Dates'],
+    ['payment','Payment Settings'],
+    ['rules','Plan Rules'],
+    ['review','Plan Review'],
+  ];
+
+  const tabContent={
+    settings:<SettingsTab
+      planName={planName} setPlanName={setPlanName}
+      planDesc={planDesc} setPlanDesc={setPlanDesc}
+      termFreq={termFreq} setTermFreq={setTermFreq}
+      customFreqMonths={customFreqMonths} setCustomFreqMonths={setCustomFreqMonths}
+      reminderDays={reminderDays} setReminderDays={setReminderDays}
+      showSubscribers={showSubscribers} setShowSubscribers={setShowSubscribers}
+      subscribers={subscribers}
+    />,
+    dates:<DatesTab
+      enrollOpen={enrollOpen} setEnrollOpen={setEnrollOpen}
+      enrollClose={enrollClose} setEnrollClose={setEnrollClose}
+      secondDepositDays={secondDepositDays} setSecondDepositDays={setSecondDepositDays}
+    />,
+    payment:<PaymentTab
+      methodMode={methodMode} setMethodMode={setMethodMode}
+      globalMethods={globalMethods} setMethod={setMethod}
+      intlProviders={intlProviders} setIntlProv={setIntlProv}
+      eligRules={eligRules} setEligRules={setEligRules}
+      defaultPlanLength={defaultPlanLength} setDefaultPlanLength={setDefaultPlanLength}
+      allowFlexible={allowFlexible} setAllowFlexible={setAllowFlexible}
+      flexOptions={flexOptions} setFlex={setFlex}
+      remitDays={remitDays} setRemit={setRemit}
+    />,
+    rules:<RulesTab
+      runBalComparisons={runBalComparisons} setRunBalComparisons={setRunBalComparisons}
+      balCompFreq={balCompFreq} setBalCompFreq={setBalCompFreq}
+    />,
+    review:<ReviewTab
+      planName={planName} planDesc={planDesc}
+      termFreq={termFreqLabel} reminderDays={reminderDays}
+      enrollOpen={enrollOpen} enrollClose={enrollClose}
+      secondDepositDays={secondDepositDays}
+      globalMethods={globalMethods} intlProviders={intlProviders} methodMode={methodMode}
+      defaultPlanLength={defaultPlanLength}
+      allowFlexible={allowFlexible} flexOptions={flexOptions}
+      remitDays={remitDays}
+      runBalComparisons={runBalComparisons} balCompFreq={balCompFreq}
+      setTab={setTab}
+    />,
+  };
+
+  return (
+    <div style={{minHeight:'100vh',background:'var(--hz-bg)'}}>
+
+      {/* Top bar */}
+      <div className="top-bar">
+        <div style={{display:'flex',alignItems:'center',gap:16}}>
+          <div className="top-bar-logo">Nelnet</div>
+          <div style={{width:1,height:20,background:'rgba(255,255,255,.25)'}}/>
+          <div className="top-bar-breadcrumb">
+            <a href="index.html" onClick={e=>{e.preventDefault();try{window.top.location.href='index.html';}catch(_){window.location.href='index.html';}}} style={{color:'rgba(255,255,255,.7)',textDecoration:'none',cursor:'pointer'}}>Institution Admin</a>
+            <span>&#8250;</span>
+            <span>Payment Plans</span>
+            <span>&#8250;</span>
+            <strong>Create Guarantee Master Plan</strong>
+          </div>
+        </div>
+        <div style={{display:'flex',gap:10}}>
+          <button className="btn btn-ghost" style={{color:'white',borderColor:'rgba(255,255,255,.3)',fontSize:12}}>Discard</button>
+          <button className="btn btn-primary" style={{background:'rgba(255,255,255,.15)',border:'1px solid rgba(255,255,255,.3)',fontSize:12}} onClick={()=>setTab('review')}>Review &rarr;</button>
+        </div>
+      </div>
+
+      {/* Plan header */}
+      <div className="plan-header">
+        <div className="plan-header-top">
+          <div className="plan-name-area">
+            <div className="plan-type-label" style={{color:'#059669'}}>Guarantee Payment Plan &middot; Master Template</div>
+            <input
+              className="plan-name-input"
+              value={planName}
+              onChange={e=>setPlanName(e.target.value)}
+              placeholder="Plan name (internal only)"
+            />
+            <div style={{fontSize:11,color:'var(--hz-hint)',marginTop:2}}>This name is for internal use only &mdash; it will not be shown to students or payers.</div>
+          </div>
+          <div className="plan-actions">
+            <span className="badge badge-guarantee">Guarantee</span>
+            <span className="badge badge-master">Master Template</span>
+            <span className="badge badge-draft">Draft</span>
+            <button className="btn btn-ghost btn-sm">Save Draft</button>
+            <button className="btn btn-primary btn-sm" style={{background:'#059669'}} onClick={()=>setTab('review')}>Save &amp; Review &rarr;</button>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="tab-nav">
+          {TABS.map(([id,label])=>(
+            <div key={id} className={`tab-item ${tab===id?'active':''}`} onClick={()=>setTab(id)}>{label}</div>
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="content">
+        {tabContent[tab]}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// TAB 1: PLAN SETTINGS
+// ══════════════════════════════════════════════════════════════
+function SettingsTab({planName,setPlanName,planDesc,setPlanDesc,termFreq,setTermFreq,customFreqMonths,setCustomFreqMonths,reminderDays,setReminderDays,showSubscribers,setShowSubscribers,subscribers}){
+  return (
+    <>
+      {/* Guarantee program guidelines banner */}
+      <Banner type="amber" icon="&#x1F4CB;">
+        <div>
+          <strong>Guarantee Program Guidelines</strong> &mdash; These rules are defined in your Nelnet contract and govern how this plan type operates.
+          <ul style={{marginTop:8,paddingLeft:18,display:'flex',flexDirection:'column',gap:5}}>
+            <li>If a payment plan is current on the guarantee date (all payments processed successfully), Nelnet will guarantee the full tuition balance minus adjustments and deposit to the school</li>
+            <li>Payment plans cannot exceed 4 monthly payments</li>
+            <li>If not current on the guarantee date, Nelnet terminates the plan and remits collected payments (less NBS fees) to the institution</li>
+            <li>Nelnet&apos;s goal is to have 50&ndash;60% of tuition collected by the guarantee date</li>
+            <li>Institutions using this program must maintain a default rate of 1.5% or below each term (calculated after the last attempt of the last payment)</li>
+          </ul>
+        </div>
+      </Banner>
+
+      {/* Plan type selector */}
+      <div className="card">
+        <div className="card-title">Plan Type</div>
+        <div className="card-subtitle">Your account includes the Guarantee plan type. Other plan types shown below are not part of your current subscription.</div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>
+          {[
+            ['guarantee','Guarantee Payment Plan','Nelnet guarantees the full tuition balance to the school if the payer is current on the guarantee date. Max 4 monthly payments.',false],
+            ['standard','Standard Payment Plan','Academic-term-based plans for current and optionally last-term balances. The most common plan type.',true],
+            ['ltpp','Long-Term (LTPP)','Extended multi-year payment plans for large balances or graduate programs.',true],
+          ].map(([id,label,desc,dis])=>(
+            <button key={id} disabled={dis} style={{textAlign:'left',padding:'14px 16px',borderRadius:12,border:`2px solid ${!dis?'#059669':'#D9D7F5'}`,background:!dis?'#F0FDF9':dis?'#F8F8FC':'white',cursor:dis?'not-allowed':'default',opacity:dis?.45:1,transition:'all .15s'}}>
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
+                {!dis&&<div style={{width:8,height:8,borderRadius:'50%',background:'#059669',flexShrink:0}}/>}
+                <div style={{fontWeight:700,fontSize:13,color:!dis?'#059669':'var(--hz-text)'}}>{label}</div>
+              </div>
+              <div style={{fontSize:11,color:'var(--hz-hint)',lineHeight:1.5}}>{desc}</div>
+              {dis&&<div style={{fontSize:10,fontWeight:700,color:'var(--hz-hint)',marginTop:6,textTransform:'uppercase',letterSpacing:.5}}>Not in your subscription</div>}
+              {!dis&&<div style={{fontSize:10,fontWeight:700,color:'#059669',marginTop:6,textTransform:'uppercase',letterSpacing:.5}}>Active on your account</div>}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Internal details */}
+      <div className="card">
+        <div className="card-title">Internal Plan Details</div>
+        <div className="card-subtitle">These details are for your team&apos;s use only. They will never be displayed to students or payers.</div>
+        <div className="form-row">
+          <FormInput label="Plan Name" req hint="Shown only in your admin dashboard (e.g. 'Fall/Spring Guarantee – Master')" value={planName} onChange={v=>setPlanName(v)} placeholder="Enter an internal plan name"/>
+          <FormInput label="Description" hint="Optional notes for your team about this plan's purpose or configuration" type="textarea" value={planDesc} onChange={v=>setPlanDesc(v)} placeholder="Optional notes"/>
+        </div>
+      </div>
+
+      {/* Term frequency & reminders */}
+      <div className="card">
+        <div className="card-title">Term Cadence &amp; Setup Reminders</div>
+        <div className="card-subtitle">Tell us how often you&apos;ll be creating a new term under this plan type so we can send your team timely reminders when it&apos;s time to set up the next one.</div>
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label form-label-req">How often do you create a new term for this plan?</label>
+            <select className="form-input form-select" value={termFreq} onChange={e=>setTermFreq(e.target.value)}>
+              <option value="fall-spring">Academic year &mdash; Fall &amp; Spring only</option>
+              <option value="fall-spring-summer">3 semesters &mdash; Fall, Spring &amp; Summer</option>
+              <option value="fall-spring-summer-winter">4 semesters &mdash; Fall, Spring, Summer &amp; Winter</option>
+              <option value="monthly">Monthly (continuing education)</option>
+              <option value="custom">Custom &mdash; every X months</option>
+            </select>
+            <div className="form-hint">This drives when reminder notifications go out to your team.</div>
+          </div>
+          {termFreq==='custom'&&<div className="form-group">
+            <label className="form-label form-label-req">Months between new term plans</label>
+            <input type="number" min={1} max={24} className="form-input" value={customFreqMonths} onChange={e=>setCustomFreqMonths(Number(e.target.value))}/>
+            <div className="form-hint">e.g. 3 = quarterly, 6 = semester</div>
+          </div>}
+          <div className="form-group">
+            <label className="form-label form-label-req">Send reminder this many days before a new term setup is needed</label>
+            <select className="form-input form-select" value={reminderDays} onChange={e=>setReminderDays(Number(e.target.value))}>
+              {[14,21,30,45,60,90].map(d=><option key={d} value={d}>{d} days before</option>)}
+            </select>
+            <div className="form-hint">A notification will be sent to all subscribers at this interval.</div>
+          </div>
+        </div>
+
+        <SectionDivider/>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+          <div>
+            <div style={{fontWeight:700,fontSize:13,color:'var(--hz-text)'}}>Setup Reminder Subscribers</div>
+            <div style={{fontSize:12,color:'var(--hz-hint)',marginTop:2}}>These users will receive a notification when it&apos;s time to set up the next term plan.</div>
+          </div>
+          <div style={{display:'flex',gap:8}}>
+            <button className="btn btn-ghost btn-sm" onClick={()=>setShowSubscribers(!showSubscribers)}>{showSubscribers?'Hide':'Manage Subscribers'}</button>
+          </div>
+        </div>
+        {showSubscribers&&<>
+          <div style={{border:'1px solid var(--hz-border)',borderRadius:10,padding:'4px 16px',marginBottom:10}}>
+            {subscribers.map(s=>(
+              <div key={s.name} className="subscriber-item">
+                <div className="subscriber-avatar">{s.initials}</div>
+                <div className="subscriber-info"><div className="subscriber-name">{s.name}</div><div className="subscriber-role">{s.role}</div></div>
+                <button className="btn btn-ghost btn-sm" style={{color:'var(--hz-danger)',fontSize:11}}>Remove</button>
+              </div>
+            ))}
+          </div>
+          <button className="btn btn-ghost btn-sm">+ Add subscriber</button>
+        </>}
+        {!showSubscribers&&<div style={{fontSize:12,color:'var(--hz-hint)'}}>
+          <strong style={{color:'var(--hz-text)'}}>{subscribers.length} subscriber{subscribers.length!==1?'s':''}</strong> will be notified {reminderDays} days before a new term plan is needed.
+        </div>}
+      </div>
+    </>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// TAB 2: GUARANTEE DATES
+// ══════════════════════════════════════════════════════════════
+function DatesTab({enrollOpen,setEnrollOpen,enrollClose,setEnrollClose,secondDepositDays,setSecondDepositDays}){
+  return (
+    <>
+      <div style={{marginBottom:20}}>
+        <div style={{fontSize:18,fontWeight:800,color:'var(--hz-text)',marginBottom:4}}>Guarantee Dates &amp; Deposit Schedule</div>
+        <div style={{fontSize:13,color:'var(--hz-hint)',lineHeight:1.6,maxWidth:740}}>The guarantee date is the most important date in this plan. All other key dates are automatically calculated from it. Set your enrollment end date &mdash; the guarantee date and deposit schedule follow automatically.</div>
+      </div>
+
+      {/* Enrollment dates */}
+      <div className="card">
+        <div className="card-title">Enrollment Dates</div>
+        <div className="card-subtitle">Set when payers can enroll in this plan. These dates are specific to each term and are entered when you set up a new term plan from this master.</div>
+        <div className="form-row">
+          <FormInput
+            label="Enrollment Open Date" req
+            type="date"
+            value={enrollOpen}
+            onChange={v=>setEnrollOpen(v)}
+            hint="The first day payers can begin enrolling in this payment plan"
+          />
+          <FormInput
+            label="Enrollment Close Date" req
+            type="date"
+            value={enrollClose}
+            onChange={v=>setEnrollClose(v)}
+            hint="The last day to enroll in a payment plan. The guarantee date is set 5 business days after this date."
+          />
+        </div>
+        <Banner type="info" icon="&#x1F4C5;">
+          <strong>Guarantee date calculation:</strong> The guarantee date will be set to <strong>5 business days after your enrollment close date</strong>. This is calculated automatically and cannot be modified independently &mdash; it is defined by your Nelnet contract.
+        </Banner>
+      </div>
+
+      {/* Calculated dates stat boxes */}
+      <div className="card">
+        <div className="card-title">Calculated Dates</div>
+        <div className="card-subtitle">These dates are derived automatically from your enrollment close date. They are shown here for your reference &mdash; you do not configure them directly.</div>
+
+        <div className="stat-grid">
+          <div className="stat-box stat-box-teal">
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+              <span style={{fontSize:20}}>&#x1F3E6;</span>
+              <div className="stat-box-label">Guarantee Date</div>
+            </div>
+            <div className="stat-box-rule">Enrollment close + 5 business days</div>
+            <div className="stat-box-desc">The date Nelnet guarantees the tuition balance to your institution &mdash; if the payer&apos;s plan is fully current on this date.</div>
+          </div>
+
+          <div className="stat-box stat-box-blue">
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+              <span style={{fontSize:20}}>&#x1F4DD;</span>
+              <div className="stat-box-label">Last Day to Increase Plan</div>
+            </div>
+            <div className="stat-box-rule">Same as enrollment close date</div>
+            <div className="stat-box-desc">The final day a payer&apos;s plan balance can be increased. After enrollment closes, balance increases are not accepted &mdash; a new plan would be required.</div>
+          </div>
+
+          <div className="stat-box stat-box-green">
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+              <span style={{fontSize:20}}>&#x1F4B5;</span>
+              <div className="stat-box-label">1st Deposit Date</div>
+            </div>
+            <div className="stat-box-rule">Within 2 weeks of guarantee date, on a Friday</div>
+            <div className="stat-box-desc">Nelnet remits the first deposit (guaranteed tuition balance) to your institution on the first Friday within 2 weeks of the guarantee date.</div>
+          </div>
+
+          <div className="stat-box stat-box-amber">
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+              <span style={{fontSize:20}}>&#x1F4C6;</span>
+              <div className="stat-box-label">2nd Deposit Date</div>
+            </div>
+            <div className="stat-box-rule">{secondDepositDays} calendar days after guarantee date</div>
+            <div className="stat-box-desc">The second and final remittance from Nelnet, representing any adjustments or reconciliation after the guarantee date. Your contract determines whether this is 30 or 60 days.</div>
+          </div>
+        </div>
+
+        {/* 2nd deposit config */}
+        <SectionDivider/>
+        <div style={{fontWeight:700,fontSize:13,color:'var(--hz-text)',marginBottom:4}}>2nd Deposit Configuration</div>
+        <div style={{fontSize:12,color:'var(--hz-hint)',marginBottom:14}}>Select the 2nd deposit window as defined in your Nelnet contract.</div>
+        <div className="radio-group">
+          <label className="radio-item">
+            <input type="radio" name="deposit2" value="30" checked={secondDepositDays==='30'} onChange={()=>setSecondDepositDays('30')}/>
+            <div>
+              <div className="radio-label">30 calendar days after guarantee date</div>
+              <div className="radio-desc">Standard option for most institutions. Reconciliation is completed and remitted one month after the guarantee date.</div>
+            </div>
+          </label>
+          <label className="radio-item">
+            <input type="radio" name="deposit2" value="60" checked={secondDepositDays==='60'} onChange={()=>setSecondDepositDays('60')}/>
+            <div>
+              <div className="radio-label">60 calendar days after guarantee date</div>
+              <div className="radio-desc">Extended option for institutions that require a longer reconciliation window. Confirm this matches your Nelnet contract.</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      {/* Key rules */}
+      <div className="card">
+        <div className="card-title">Key Date Rules</div>
+        <div className="card-subtitle">These rules govern how the guarantee date and related dates are managed. They are defined in your Nelnet contract and are not configurable.</div>
+
+        <div className="rule-card">
+          <div className="rule-card-header">
+            <div style={{flex:1}}>
+              <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
+                <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>50% Collected by Guarantee Date</div>
+                <span className="rule-tag rule-tag-fixed">Contract-Defined &middot; Fixed</span>
+              </div>
+              <div className="rule-plain">
+                Nelnet configures the payment schedule so <strong>50% of each payment plan is collected prior to the guarantee date</strong>. This ensures Nelnet has collected sufficient funds before guaranteeing the full tuition balance to the institution. This rule is not configurable &mdash; it is automatically applied to all guarantee plan payment schedules.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="rule-card">
+          <div className="rule-card-header">
+            <div style={{flex:1}}>
+              <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
+                <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>Last Day to Decrease or Terminate</div>
+                <span className="rule-tag rule-tag-fixed">Auto-Calculated</span>
+              </div>
+              <div className="rule-plain">
+                The last day to decrease a plan balance or terminate an agreement is <strong>3 business days before the 2nd deposit date</strong>. This is calculated automatically from your 2nd deposit date configuration above. Formula: <strong>2nd deposit date &minus; 3 business days</strong>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="rule-card">
+          <div className="rule-card-header">
+            <div style={{flex:1}}>
+              <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
+                <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>Last Day to Enroll</div>
+                <span className="rule-tag rule-tag-fixed">Auto-Calculated</span>
+              </div>
+              <div className="rule-plain">
+                The last day to enroll in a guarantee plan is always the <strong>enrollment close date</strong>, which is exactly <strong>5 business days before the guarantee date</strong>. These two dates are always synchronized &mdash; adjusting the enrollment close date automatically moves the guarantee date forward accordingly.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Banner type="amber" icon="&#x26A0;">
+        <strong>These guarantee date rules are defined in your Nelnet contract and cannot be changed.</strong> Contact your Nelnet account manager for modifications to the guarantee date offset, deposit schedule, or collection percentage requirements.
+      </Banner>
+    </>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// TAB 3: PAYMENT SETTINGS
+// ══════════════════════════════════════════════════════════════
+function PaymentTab({methodMode,setMethodMode,globalMethods,setMethod,intlProviders,setIntlProv,eligRules,setEligRules,defaultPlanLength,setDefaultPlanLength,allowFlexible,setAllowFlexible,flexOptions,setFlex,remitDays,setRemit}){
+  const[addingElig,setAddingElig]=useState(false);
+  const[newEligChar,setNewEligChar]=useState('');
+  const[newEligMethods,setNewEligMethods]=useState({ach:true,cc:false,intl:false});
+
+  const saveElig=()=>{
+    if(!newEligChar) return;
+    setEligRules(r=>[...r,{char:newEligChar,methods:{...newEligMethods}}]);
+    setAddingElig(false);
+    setNewEligChar('');
+    setNewEligMethods({ach:true,cc:false,intl:false});
+  };
+  const removeElig=i=>setEligRules(r=>r.filter((_,idx)=>idx!==i));
+  const methodLabel={ach:'🏦 Bank (ACH)',cc:'💳 Credit Card',intl:'🌐 International'};
+
+  return (
+    <>
+      {/* Payment methods */}
+      <div className="card">
+        <div className="card-title">Payment Methods Accepted</div>
+        <div className="card-subtitle">Configure which payment methods payers can use. This is the one setting that can be customized per eligibility group if needed.</div>
+
+        <div className="radio-group" style={{marginBottom:16}}>
+          <label className="radio-item">
+            <input type="radio" name="methodMode" value="all-same" checked={methodMode==='all-same'} onChange={()=>setMethodMode('all-same')}/>
+            <div><div className="radio-label">Same payment methods for all payers</div></div>
+          </label>
+          <label className="radio-item">
+            <input type="radio" name="methodMode" value="by-eligibility" checked={methodMode==='by-eligibility'} onChange={()=>setMethodMode('by-eligibility')}/>
+            <div><div className="radio-label">Different payment methods by eligibility characteristic</div><div className="radio-desc">e.g. international students get international payment option; domestic students get ACH + credit card only</div></div>
+          </label>
+        </div>
+
+        {methodMode==='all-same'&&<>
+          <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:10}}>Methods available to all payers</div>
+          <div className="method-chips" style={{marginBottom:globalMethods.intl?16:0}}>
+            {['ach','cc','intl'].map(m=>(
+              <button key={m} className={`method-chip ${globalMethods[m]?'active':'inactive'}`} onClick={()=>setMethod(m)}>{methodLabel[m]}</button>
+            ))}
+          </div>
+          {globalMethods.intl&&<>
+            <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,margin:'14px 0 8px'}}>International payment provider(s)</div>
+            <div className="method-chips">
+              {[['flywire','Flywire'],['convera','Convera'],['paymytuition','PayMyTuition']].map(([k,l])=>(
+                <button key={k} className={`method-chip ${intlProviders[k]?'active':'inactive'}`} onClick={()=>setIntlProv(k)}>{l}</button>
+              ))}
+            </div>
+            <div style={{fontSize:11,color:'var(--hz-hint)',marginTop:6}}>Select all providers you have active contracts with. Payers will choose between them during signup.</div>
+          </>}
+        </>}
+
+        {methodMode==='by-eligibility'&&<>
+          <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:10}}>Eligibility-based payment method rules</div>
+          {eligRules.map((r,i)=>(
+            <div key={i} className="elig-rule">
+              <div className="elig-char">If characteristic: {r.char}</div>
+              <div className="method-chips">
+                {['ach','cc','intl'].filter(m=>r.methods[m]).map(m=><span key={m} className="method-chip active" style={{fontSize:11,padding:'4px 10px'}}>{methodLabel[m]}</span>)}
+              </div>
+              <button onClick={()=>removeElig(i)} style={{position:'absolute',top:10,right:12,fontSize:11,color:'var(--hz-danger)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>Remove</button>
+            </div>
+          ))}
+          {eligRules.length>0&&<div className="elig-rule" style={{borderStyle:'dashed'}}>
+            <div className="elig-char">For all other payers (default)</div>
+            <div className="method-chips">
+              {['ach','cc','intl'].map(m=>(
+                <button key={m} className={`method-chip ${globalMethods[m]?'active':'inactive'}`} onClick={()=>setMethod(m)} style={{fontSize:11,padding:'4px 10px'}}>{methodLabel[m]}</button>
+              ))}
+            </div>
+          </div>}
+          {addingElig?(
+            <div style={{border:'1.5px solid var(--hz-accent)',borderRadius:10,padding:16,background:'var(--hz-cloud)',marginBottom:10}}>
+              <div style={{fontSize:13,fontWeight:600,color:'var(--hz-indigo)',marginBottom:10}}>New eligibility rule</div>
+              <div className="form-row">
+                <FormInput label="Characteristic" hint="e.g. 'International Student', 'Graduate'" value={newEligChar} onChange={v=>setNewEligChar(v)} placeholder="Enter characteristic name"/>
+                <div className="form-group">
+                  <label className="form-label">Payment methods for this group</label>
+                  <div className="method-chips">
+                    {['ach','cc','intl'].map(m=>(
+                      <button key={m} className={`method-chip ${newEligMethods[m]?'active':'inactive'}`} onClick={()=>setNewEligMethods(p=>({...p,[m]:!p[m]}))} style={{fontSize:11,padding:'4px 10px'}}>{methodLabel[m]}</button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div style={{display:'flex',gap:8,marginTop:4}}>
+                <button className="btn btn-primary btn-sm" style={{background:'#059669'}} onClick={saveElig}>Save Rule</button>
+                <button className="btn btn-ghost btn-sm" onClick={()=>setAddingElig(false)}>Cancel</button>
+              </div>
+            </div>
+          ):(
+            <button className="btn btn-ghost btn-sm" onClick={()=>setAddingElig(true)} style={{marginTop:6}}>+ Add eligibility rule</button>
+          )}
+        </>}
+      </div>
+
+      {/* Payment Structure */}
+      <div className="card">
+        <div className="card-title">Payment Structure</div>
+        <div className="card-subtitle">Guarantee plan payment structure is defined by the program rules. Configure the options available to your institution within those constraints.</div>
+
+        <Banner type="info" icon="&#x1F4D0;">
+          <strong>Guarantee plans use a fixed monthly payment structure as the core baseline.</strong> Payers may optionally pay more frequently (bi-weekly or weekly), but the monthly payment amounts must still be met at each monthly checkpoint.
+        </Banner>
+
+        {/* Core monthly schedule */}
+        <div style={{fontWeight:700,fontSize:13,color:'var(--hz-text)',marginBottom:4}}>Core Monthly Schedule</div>
+        <div style={{fontSize:12,color:'var(--hz-hint)',marginBottom:14}}>Your plan can have 1, 2, 3, or 4 monthly payments. Select the default plan length offered to payers:</div>
+
+        <div style={{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap'}}>
+          {[['2','2 monthly payments'],['3','3 monthly payments'],['4','4 monthly payments (max)']].map(([val,label])=>(
+            <label key={val} style={{display:'flex',alignItems:'center',gap:8,padding:'10px 16px',border:`1.5px solid ${defaultPlanLength===val?'#059669':'#D9D7F5'}`,borderRadius:10,background:defaultPlanLength===val?'#F0FDF9':'white',cursor:'pointer',transition:'all .15s'}}>
+              <input type="radio" name="planLength" value={val} checked={defaultPlanLength===val} onChange={()=>setDefaultPlanLength(val)} style={{accentColor:'#059669'}}/>
+              <div style={{fontWeight:600,fontSize:13,color:defaultPlanLength===val?'#059669':'var(--hz-text)'}}>{label}</div>
+            </label>
+          ))}
+        </div>
+
+        <div style={{border:'1px solid #E8E6F5',borderRadius:8,padding:'10px 14px',display:'flex',alignItems:'center',gap:12,marginBottom:16,background:'#F8F8FC'}}>
+          <span style={{fontSize:11,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5}}>Contract Maximum</span>
+          <span style={{fontSize:22,fontWeight:800,color:'#059669'}}>4</span>
+          <span style={{fontSize:12,color:'var(--hz-hint)'}}>monthly payments &mdash; plans cannot exceed this limit</span>
+          <span className="fixed-badge" style={{marginLeft:'auto'}}>Fixed &middot; Non-Editable</span>
+        </div>
+
+        <Banner type="amber" icon="&#x2696;">
+          <strong>50% checkpoint:</strong> Your payment schedule will be automatically configured so 50% is paid by the guarantee date &mdash; Nelnet handles this calculation. You do not need to manually configure payment amounts or timing.
+        </Banner>
+
+        <SectionDivider/>
+
+        {/* Payment Flexibility */}
+        <div className="toggle-row" style={{paddingTop:0}}>
+          <div className="toggle-info">
+            <div className="toggle-name">Allow payers to make more frequent payments</div>
+            <div className="toggle-sub">Payers can optionally choose bi-weekly or weekly installments on top of the monthly baseline. Monthly checkpoint amounts must still be met.</div>
+          </div>
+          <Toggle on={allowFlexible} onToggle={setAllowFlexible}/>
+        </div>
+
+        {allowFlexible&&<div style={{marginTop:16,padding:16,background:'#F8F8FC',borderRadius:10,border:'1px solid var(--hz-border)'}}>
+          <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:12}}>Flexible payment options to offer</div>
+          <div style={{display:'flex',flexDirection:'column',gap:10,marginBottom:16}}>
+            <label className="radio-item">
+              <input type="checkbox" checked={flexOptions.biweekly} onChange={()=>setFlex('biweekly')} style={{accentColor:'#059669'}}/>
+              <div>
+                <div className="radio-label">Bi-weekly payments</div>
+                <div className="radio-desc">Paying bi-weekly toward monthly amounts &mdash; 2 bi-weekly payments = 1 monthly payment</div>
+              </div>
+            </label>
+            <label className="radio-item">
+              <input type="checkbox" checked={flexOptions.weekly} onChange={()=>setFlex('weekly')} style={{accentColor:'#059669'}}/>
+              <div>
+                <div className="radio-label">Weekly payments</div>
+                <div className="radio-desc">Paying weekly toward monthly amounts &mdash; 4 weekly payments = 1 monthly payment</div>
+              </div>
+            </label>
+          </div>
+          <Banner type="info" icon="&#x2139;">
+            If a payer chooses bi-weekly or weekly payments, they must still meet the monthly payment amounts at each monthly checkpoint. Flexibility is on top of &mdash; not instead of &mdash; the monthly baseline.
+          </Banner>
+          <div style={{background:'var(--hz-cloud)',borderRadius:8,padding:'10px 14px',fontSize:12,color:'var(--hz-indigo)',marginTop:8}}>
+            <strong>Example:</strong> A 3-month plan with bi-weekly payments means 6 bi-weekly payments, but the payer must have paid the full 1st month&apos;s amount by their 4th bi-weekly payment, and the full 2nd month&apos;s amount by their 6th bi-weekly payment.
+          </div>
+        </div>}
+      </div>
+
+      {/* Remittance days */}
+      <div className="card">
+        <div className="card-title">Remittance Days</div>
+        <div className="card-subtitle">
+          Select the days of the week on which you want Nelnet to run the remittance job and forward collected payments to your institution. Payers may choose <em>any</em> day of the week for their installment date &mdash; we will process their payment on their chosen day and remit to you on the next selected remittance day.
+        </div>
+        <div className="day-pills" style={{marginBottom:12}}>
+          {[['mon','Mon'],['tue','Tue'],['wed','Wed'],['thu','Thu'],['fri','Fri']].map(([k,l])=>(
+            <DayPill key={k} label={l} sel={remitDays[k]} onClick={()=>setRemit(k)}/>
+          ))}
+        </div>
+        <div style={{fontSize:12,color:'var(--hz-hint)'}}>Weekends and holidays: payments automatically shift to the next business day.</div>
+      </div>
+    </>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// TAB 4: PLAN RULES
+// ══════════════════════════════════════════════════════════════
+function RulesTab({runBalComparisons,setRunBalComparisons,balCompFreq,setBalCompFreq}){
+  return (
+    <>
+      <Banner type="amber" icon="&#x1F4CB;">
+        <strong>Guarantee plan rules are largely defined by your Nelnet contract.</strong> Most rules are fixed and shown here for your reference. A limited set of operational settings can be configured by your institution.
+      </Banner>
+
+      {/* Rule 1: Failed Payment */}
+      <div className="rule-card">
+        <div className="rule-card-header">
+          <div style={{flex:1}}>
+            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
+              <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>Failed Payment Recovery &mdash; Guarantee Rule</div>
+              <span className="rule-tag rule-tag-fixed">Contract-Defined &middot; Non-Editable</span>
+            </div>
+            <div className="rule-plain">
+              If a scheduled payment fails, Nelnet will retry up to <strong>2 times</strong>. If all attempts fail, <strong>the agreement is terminated</strong> &mdash; the payer&apos;s tuition is not guaranteed. Any payments collected to date, less NBS fees, will be remitted to the institution.
+            </div>
+          </div>
+        </div>
+        <div className="rule-card-body">
+          <div style={{fontSize:12,color:'var(--hz-muted)',marginBottom:12}}>Because the guarantee program has strict current-payment requirements, there is no rebalancing option. Failed payments that cannot be recovered result in plan termination. This rule cannot be modified.</div>
+          <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
+            <div style={{background:'var(--hz-amber-bg)',borderRadius:8,padding:'10px 16px',textAlign:'center',minWidth:80}}>
+              <div style={{fontSize:22,fontWeight:800,color:'#966010'}}>2</div>
+              <div style={{fontSize:11,color:'#7A4F00'}}>max retries</div>
+            </div>
+            <div style={{background:'#FEE2E2',borderRadius:8,padding:'10px 16px',textAlign:'center',minWidth:80}}>
+              <div style={{fontSize:13,fontWeight:800,color:'var(--hz-danger)'}}>Terminate</div>
+              <div style={{fontSize:11,color:'var(--hz-danger)'}}>if all fail</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Rule 2: Last Installment */}
+      <div className="rule-card">
+        <div className="rule-card-header">
+          <div style={{flex:1}}>
+            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
+              <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>Last Installment Exception</div>
+              <span className="rule-tag rule-tag-fixed">Contract-Defined &middot; Non-Editable</span>
+            </div>
+            <div className="rule-plain">
+              When the <strong>final installment</strong> of a guarantee plan fails, Nelnet will retry up to <strong>2 times</strong>. If the payment still fails after all attempts, the agreement is <strong>terminated</strong>. Since there are no remaining installments to rebalance onto, any collected funds (less NBS fees) are remitted to the institution.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Rule 3: Plan Currency Requirement */}
+      <div className="rule-card">
+        <div className="rule-card-header">
+          <div style={{flex:1}}>
+            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
+              <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>Plan Currency Requirement</div>
+              <span className="rule-tag rule-tag-fixed">Contract-Defined &middot; Non-Editable</span>
+            </div>
+            <div className="rule-plain">
+              The payer&apos;s plan must be <strong>current</strong> (all payments processed) on the guarantee date. If any payment is past due or has failed as of the guarantee date, <strong>the guarantee is forfeited and the plan is terminated</strong>. Payments collected to date, less NBS fees, will be remitted to the institution. There are no exceptions to this requirement.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Rule 4: Balance Reconciliation */}
+      <div className="rule-card">
+        <div className="rule-card-header">
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%'}}>
+            <div style={{display:'flex',flexDirection:'column',gap:8,flex:1}}>
+              <div style={{display:'flex',alignItems:'center',gap:10}}>
+                <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>Balance Reconciliation</div>
+                <span className="rule-tag rule-tag-default">Configurable</span>
+              </div>
+              <div className="rule-plain">
+                {runBalComparisons
+                  ? 'Balance comparisons are enabled. Nelnet will periodically compare each payer\'s plan amount against the balance on file in your student information system.'
+                  : 'Balance comparisons are currently disabled. Nelnet will not automatically check for balance changes during the plan term.'}
+              </div>
+            </div>
+            <Toggle on={runBalComparisons} onToggle={setRunBalComparisons}/>
+          </div>
+        </div>
+        {runBalComparisons&&<div className="rule-card-body">
+          <div style={{marginBottom:16,maxWidth:320}}>
+            <div className="form-group">
+              <label className="form-label">Comparison frequency</label>
+              <select className="form-input form-select" value={balCompFreq} onChange={e=>setBalCompFreq(e.target.value)}>
+                <option value="weekly">Weekly</option>
+                <option value="biweekly">Every 2 weeks</option>
+                <option value="monthly">Monthly</option>
+              </select>
+              <div className="form-hint">How often Nelnet checks for balance changes in your SIS</div>
+            </div>
+          </div>
+
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+            <div>
+              <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:8}}>If balance decreases</div>
+              <div className="fixed-value" style={{marginBottom:6}}>
+                <span style={{flex:1}}>Spread evenly across remaining payments</span>
+                <span className="fixed-badge">Fixed</span>
+              </div>
+              <div style={{fontSize:11,color:'var(--hz-hint)'}}>If a payer&apos;s balance decreases (e.g. scholarship applied), the reduction is distributed proportionally across all remaining installments. This is required by the guarantee program contract.</div>
+            </div>
+            <div>
+              <div style={{fontSize:12,fontWeight:700,color:'var(--hz-muted)',textTransform:'uppercase',letterSpacing:.5,marginBottom:8}}>If balance increases</div>
+              <div className="fixed-value" style={{marginBottom:6}}>
+                <span style={{flex:1}}>Plan terminated &mdash; new enrollment required</span>
+                <span className="fixed-badge">Fixed</span>
+              </div>
+              <div style={{fontSize:11,color:'var(--hz-hint)'}}>If a payer&apos;s balance increases, the existing guarantee plan is terminated and the student must enroll in a new plan. Balance increases are not added to existing guarantee plans &mdash; this is a contract requirement.</div>
+            </div>
+          </div>
+        </div>}
+      </div>
+
+      {/* Rule 5: Invalid Payment Method Update Window */}
+      <div className="rule-card">
+        <div className="rule-card-header">
+          <div style={{flex:1}}>
+            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
+              <div style={{fontWeight:700,fontSize:14,color:'var(--hz-text)'}}>Invalid Payment Method &mdash; Update Window</div>
+              <span className="rule-tag rule-tag-default">System-Determined</span>
+            </div>
+            <div className="rule-plain">
+              When a payer&apos;s payment method is flagged as invalid, they have a limited window to update it before the agreement is terminated. The window is automatically set based on payment frequency: <strong>weekly plans get 5 days &middot; bi-weekly plans get 7 days &middot; monthly plans get 10 days</strong>. Because guarantee plans require all payments to be current on the guarantee date, terminated plans result in forfeiture of the guarantee.
+            </div>
+          </div>
+          <div style={{marginLeft:16,fontSize:11,color:'var(--hz-hint)',textAlign:'right',minWidth:100}}>Auto-configured<br/>based on frequency</div>
+        </div>
+        <div className="rule-card-body">
+          <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
+            {[['5','days','weekly plans'],['7','days','bi-weekly plans'],['10','days','monthly plans']].map(([n,unit,label])=>(
+              <div key={label} style={{background:'var(--hz-cloud)',borderRadius:8,padding:'10px 16px',textAlign:'center'}}>
+                <div style={{fontSize:22,fontWeight:800,color:'var(--hz-indigo)'}}>{n}</div>
+                <div style={{fontSize:11,color:'var(--hz-hint)'}}>{unit} &middot; {label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// TAB 5: PLAN REVIEW
+// ══════════════════════════════════════════════════════════════
+function ReviewTab({planName,planDesc,termFreq,reminderDays,enrollOpen,enrollClose,secondDepositDays,globalMethods,intlProviders,methodMode,defaultPlanLength,allowFlexible,flexOptions,remitDays,runBalComparisons,balCompFreq,setTab}){
+  const remitList=['mon','tue','wed','thu','fri'].filter(d=>remitDays[d]).map(d=>({mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri'}[d])).join(', ');
+  const methodList=[globalMethods.ach&&'ACH',globalMethods.cc&&'Credit Card',globalMethods.intl&&'International'].filter(Boolean).join(', ');
+  const flexList=[allowFlexible&&flexOptions.biweekly&&'Bi-weekly',allowFlexible&&flexOptions.weekly&&'Weekly'].filter(Boolean).join(', ');
+
+  const ReviewRow=({k,v,edit})=>(
+    <div className="review-row">
+      <div className="review-key">{k}</div>
+      <div className="review-val">{v||<span style={{color:'var(--hz-hint)'}}>Not set</span>}</div>
+      {edit&&<div className="review-edit" onClick={()=>setTab(edit)}>Edit</div>}
+    </div>
+  );
+
+  const incomplete=!planName;
+
+  return (
+    <>
+      {incomplete&&<Banner type="amber" icon="&#x26A0;">
+        <strong>Required items incomplete.</strong> Please complete all required fields before publishing. Plan name is required.
+      </Banner>}
+
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24,marginBottom:24}}>
+        <div>
+          <div className="card">
+            <div className="review-section-title">Plan Settings</div>
+            <ReviewRow k="Plan type" v="Guarantee Payment Plan" edit="settings"/>
+            <ReviewRow k="Plan name" v={planName} edit="settings"/>
+            <ReviewRow k="Description" v={planDesc||'—'} edit="settings"/>
+            <ReviewRow k="Term cadence" v={termFreq} edit="settings"/>
+            <ReviewRow k="Setup reminder" v={`${reminderDays} days before next term`} edit="settings"/>
+          </div>
+
+          <div className="card">
+            <div className="review-section-title">Guarantee Dates</div>
+            <ReviewRow k="Enrollment open" v={enrollOpen||'—'} edit="dates"/>
+            <ReviewRow k="Enrollment close" v={enrollClose||'—'} edit="dates"/>
+            <ReviewRow k="Guarantee date" v={enrollClose?`5 business days after ${enrollClose}`:'Calculated from enrollment close'} edit="dates"/>
+            <ReviewRow k="1st deposit" v="Within 2 weeks of guarantee date (Friday)" edit="dates"/>
+            <ReviewRow k="2nd deposit" v={`${secondDepositDays} calendar days after guarantee date`} edit="dates"/>
+          </div>
+        </div>
+
+        <div>
+          <div className="card">
+            <div className="review-section-title">Payment Settings</div>
+            <ReviewRow k="Payment methods" v={methodMode==='all-same'?methodList:'Per eligibility characteristic'} edit="payment"/>
+            {globalMethods.intl&&<ReviewRow k="International providers" v={['flywire','convera','paymytuition'].filter(k=>intlProviders[k]).map(k=>k==='paymytuition'?'PayMyTuition':k.charAt(0).toUpperCase()+k.slice(1)).join(', ')||'None selected'} edit="payment"/>}
+            <ReviewRow k="Default plan length" v={`${defaultPlanLength} monthly payments`} edit="payment"/>
+            <ReviewRow k="Max payments" v="4 monthly payments (contract maximum)" edit="payment"/>
+            <ReviewRow k="50% by guarantee date" v="Yes — auto-configured by Nelnet" edit="payment"/>
+            <ReviewRow k="Flexible payments" v={allowFlexible?(flexList||'None selected'):'Disabled — monthly only'} edit="payment"/>
+            <ReviewRow k="Remittance days" v={remitList||'None selected'} edit="payment"/>
+          </div>
+
+          <div className="card">
+            <div className="review-section-title">Plan Rules (Contract-Defined)</div>
+            <ReviewRow k="Failed payment retries" v="2 retries, then terminate" edit="rules"/>
+            <ReviewRow k="Plan currency requirement" v="Must be current on guarantee date" edit="rules"/>
+            <ReviewRow k="Balance decrease" v="Spread evenly across remaining payments" edit="rules"/>
+            <ReviewRow k="Balance increase" v="Plan terminated — new enrollment required" edit="rules"/>
+            <ReviewRow k="Balance comparisons" v={runBalComparisons?`Enabled — ${balCompFreq}`:'Disabled'} edit="rules"/>
+            <ReviewRow k="Update window" v="5 days (weekly) · 7 days (bi-weekly) · 10 days (monthly)" edit="rules"/>
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <div style={{fontWeight:700,fontSize:15,color:'var(--hz-text)',marginBottom:6}}>Ready to publish this guarantee master plan?</div>
+        <div style={{fontSize:13,color:'var(--hz-hint)',marginBottom:20}}>Publishing this master plan makes it available to duplicate for specific terms. It will not create any active enrollment periods &mdash; those are configured when you set up a term plan from this master. All guarantee rules defined by your Nelnet contract will be applied automatically.</div>
+        <div style={{display:'flex',gap:12,alignItems:'center'}}>
+          <button className="btn btn-primary" disabled={incomplete} style={{opacity:incomplete?.5:1,background:'#059669',width:'auto',padding:'10px 32px',fontSize:14}}>Publish Guarantee Master Plan</button>
+          <button className="btn btn-ghost" style={{width:'auto',padding:'10px 20px',fontSize:13}}>Save as Draft</button>
+          <a href="index.html" onClick={e=>{e.preventDefault();try{window.top.location.href='index.html';}catch(_){window.location.href='index.html';}}} style={{fontSize:12,color:'var(--hz-hint)',textDecoration:'underline',marginLeft:8}}>&#x2302; Back to index</a>
+        </div>
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
