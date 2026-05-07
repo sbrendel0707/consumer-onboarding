@@ -703,8 +703,40 @@ a.tile:hover::after { opacity: 1; right: 16px; }
 
   </div>
 
+  <!-- ── Institution Plan Management ── -->
+  <div class="section-label" style="margin-top:0;">Institution Plan Management</div>
+
+  <div class="context-block" style="max-width:880px;margin:0 auto 20px;">
+    <strong>After plan types are configured</strong>, institutions use the Plan Management dashboard to create term plans, track enrollment and payment status, and manage custom one-off plans. This is the operational hub once master plans exist.
+  </div>
+
+  <div class="grid" style="margin-bottom:48px;">
+    <a class="tile hz-card" href="institution-plans.html" aria-label="Plan Management Dashboard prototype" style="border-left: 3px solid #2D1FA3;">
+      <div>
+        <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;font-weight:800;background:#EEF0FF;color:#2D1FA3;padding:2px 7px;border-radius:5px;letter-spacing:.3px;">Dashboard</span>
+          <span style="color:#2D1FA3;">Institution · Full Desktop</span>
+        </div>
+        <div class="tile-name">Plan Management Dashboard</div>
+      </div>
+      <div class="hz-divider"></div>
+      <div>
+        <div class="settings-label">Covers</div>
+        <div class="settings-chips">
+          <span class="chip highlight">Master plans as starting point</span>
+          <span class="chip">Create term plans from master</span>
+          <span class="chip">Enrollment Open vs Payments in Progress states</span>
+          <span class="chip">Future &amp; Historical plan sections</span>
+          <span class="chip">Custom one-off plan creation</span>
+          <span class="chip">3-step custom plan wizard (payer → schedule → send)</span>
+          <span class="chip">Hidden plan email invitations</span>
+        </div>
+      </div>
+    </a>
+  </div>
+
   <!-- ── Institution Pay Over Time Setup ── -->
-  <div class="section-label" style="margin-top:0;">Institution Pay Over Time Setup</div>
+  <div class="section-label">Institution Pay Over Time Setup</div>
 
   <div class="context-block" style="max-width:880px;margin:0 auto 20px;">
     <strong>One setup prototype per plan type.</strong> Each prototype is a full desktop experience — no phone frame — using the Horizon design system. Plans reflect the institution's purchased solutions. Settings defined at the <strong>master plan</strong> level become a template; term-specific plans inherit from the master and add enrollment dates.
@@ -726,13 +758,15 @@ a.tile:hover::after { opacity: 1; right: 16px; }
         <div class="settings-label">Covers</div>
         <div class="settings-chips">
           <span class="chip highlight">Master plan template concept</span>
-          <span class="chip">Current term + past due balance scope</span>
+          <span class="chip">Plan lengths · rolling completion windows</span>
+          <span class="chip">Balance limits · down payment</span>
+          <span class="chip">Hidden plan add-on (invitation-only)</span>
           <span class="chip">ACH / CC / International methods</span>
           <span class="chip">Eligibility-based payment methods</span>
           <span class="chip">Weekly / biweekly / monthly frequency</span>
-          <span class="chip">Remittance day selection</span>
-          <span class="chip">Return payment rules · plain language</span>
-          <span class="chip">Deactivate vs. Cancel explained</span>
+          <span class="chip">Flexible payment options (rebalancing)</span>
+          <span class="chip">Balance reconciliation rules</span>
+          <span class="chip">Signup fees configuration</span>
           <span class="chip">Full plan review tab</span>
         </div>
       </div>
@@ -781,25 +815,29 @@ a.tile:hover::after { opacity: 1; right: 16px; }
     </div>
 
     <!-- ── Guarantee Plan ── -->
-    <div class="tile hz-card tile-soon" aria-hidden="true">
-      <span class="soon-badge">Coming soon</span>
+    <a class="tile hz-card" href="institution-pot-guarantee.html" aria-label="Guarantee Plan Setup prototype" style="border-left: 3px solid #059669;">
       <div>
         <div class="tile-scenario" style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:11px;font-weight:800;background:#d1fae5;color:#059669;padding:2px 7px;border-radius:5px;letter-spacing:.3px;">Guarantee</span>
-          <span style="color:var(--hz-muted);">Institution · Full Desktop</span>
+          <span style="color:#059669;">Institution · Full Desktop</span>
         </div>
         <div class="tile-name">Guarantee Plan Setup</div>
       </div>
       <div class="hz-divider"></div>
       <div>
-        <div class="settings-label">Key Differences from Standard</div>
+        <div class="settings-label">Covers</div>
         <div class="settings-chips">
-          <span class="chip">Guarantee provider configuration</span>
-          <span class="chip">Institution risk settings</span>
-          <span class="chip">Approval workflow rules</span>
+          <span class="chip highlight">Contract-derived guarantee date cascade</span>
+          <span class="chip">1st &amp; 2nd deposit date calculation</span>
+          <span class="chip">50% collection by guarantee date</span>
+          <span class="chip">Last day to increase / decrease / terminate</span>
+          <span class="chip">Fixed max 4 monthly payments</span>
+          <span class="chip">Optional bi-weekly / weekly flexibility</span>
+          <span class="chip">Contract-defined rules · non-editable</span>
+          <span class="chip">Balance reconciliation (configurable)</span>
         </div>
       </div>
-    </div>
+    </a>
 
     <!-- ── International Plan ── -->
     <div class="tile hz-card tile-soon" aria-hidden="true">
