@@ -147,8 +147,22 @@ body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: var(
 </head>
 <body>
 <div id="root"></div>
-<script>window.exports={};</script>
-<script type="text/babel" data-presets="react">
+<script>
+  // Polyfill CommonJS globals so Babel standalone doesn't throw "exports is not defined"
+  window.exports = {};
+  window.module  = window.module  || { exports: {} };
+  window.require = window.require || function(){ return {}; };
+  // Show any uncaught errors on screen instead of blank page
+  window.addEventListener('error', function(e) {
+    var d = document.getElementById('root');
+    if (d && !d.hasChildNodes()) {
+      d.innerHTML = '<div style="padding:40px;font-family:monospace;font-size:13px;background:#fff0f0;border:2px solid red;margin:20px;border-radius:8px;white-space:pre-wrap">'
+        + '<b style="font-size:16px;color:red">⚠ Error (line ' + e.lineno + ')</b>\n\n'
+        + (e.message || '') + '\n\nSource: ' + (e.filename || '') + (e.error && e.error.stack ? '\n\n' + e.error.stack : '') + '</div>';
+    }
+  });
+</script>
+<script type="text/babel">
 const {useState} = React;
 
 // ── Shared micro-components ───────────────────────────────────
