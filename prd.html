@@ -6996,39 +6996,82 @@ body {
       <div class="inst-group" id="inst-insurance">
         <div class="inst-group-header">
           <div class="inst-group-icon">🛡️</div>
-          <div class="inst-group-title">Tuition Insurance (GradGuard)</div>
+          <div class="inst-group-title">Tuition Insurance</div>
         </div>
 
-        <div class="inst-item" data-modified="2026-05-01">
-          <div class="inst-item-name">GradGuard — Feature Toggle</div>
-          <div class="inst-item-desc">Master on/off for the tuition insurance offering. When enabled, students are presented an insurance offer during onboarding with their calculated premium.</div>
+        <div class="inst-item" data-modified="2026-05-05">
+          <div class="inst-item-name">Tuition Insurance — Feature Toggle</div>
+          <div class="inst-item-desc">Master on/off for the tuition insurance offering. When enabled, the insurance step is presented to eligible payers during onboarding. When disabled, the step is skipped entirely — no insurance mention appears anywhere in the experience.</div>
           <div class="inst-options-row">
             <span class="inst-options-label">Options</span>
             <span class="iopt iopt-on">Enabled <span class="iopt-proto">Prototype default</span></span>
             <span class="iopt iopt-off">Disabled</span>
           </div>
-          <div class="inst-item-impact"><strong>Consumer impact:</strong> If disabled, the insurance step is skipped entirely — no mention of GradGuard anywhere in the experience. The "Add Tuition Insurance" and "Tuition Insurance" quick actions are also suppressed. The insurance card on the home screen never appears.</div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> If disabled, the insurance step is skipped entirely. The "Add Tuition Insurance" quick action and home screen insurance card are also suppressed.</div>
         </div>
 
-        <div class="inst-item" data-modified="2026-05-01">
-          <div class="inst-item-name">GradGuard Plan / Premium Calculation</div>
-          <div class="inst-item-desc">The specific GradGuard plan the institution has contracted, which determines the premium percentage applied to the student's total enrollment charges to produce their individual premium quote.</div>
+        <div class="inst-item" data-modified="2026-05-05">
+          <div class="inst-item-name">Insurance Provider</div>
+          <div class="inst-item-desc">Which tuition insurance provider the institution has contracted with. Two providers are supported: <strong>GradGuard</strong> and <strong>Dewar</strong>. The provider selection controls which questions are asked during the insurance step, how the premium is calculated, and which payment processor handles the insurance premium at checkout.</div>
           <div class="inst-options-row">
             <span class="inst-options-label">Options</span>
-            <span class="iopt iopt-variable">Institution-specific plan rate (applied to total charges)</span>
+            <span class="iopt iopt-variable">GradGuard <span class="iopt-proto">Prototype default</span></span>
+            <span class="iopt iopt-variable">Dewar</span>
           </div>
-          <div class="inst-item-impact"><strong>Consumer impact:</strong> The dollar amount of the premium shown to the student is entirely determined by this rate × their total charges. Two students at the same institution with different enrollment amounts will see different premium quotes for the same plan.</div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> GradGuard requires the payer to enter their state of residence during the school year before a premium can be calculated. Dewar does not require state entry — the premium is calculated from tuition charges only. The provider logo and plan name shown on the insurance offer card also differ by provider.</div>
         </div>
 
-        <div class="inst-item" data-modified="2026-05-01">
+        <div class="inst-item" data-modified="2026-05-05">
+          <div class="inst-item-name">State of Residence — GradGuard Only</div>
+          <div class="inst-item-desc">GradGuard premiums vary by the payer's state of residence during the school year. Before showing an offer, the system must confirm the payer's state — either by asking "Do you live in [institution state]?" (Yes/No) and revealing a state picker if No. This question and state picker do not appear at all for Dewar, whose premium is state-independent.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Applies to</span>
+            <span class="iopt iopt-on">GradGuard → state of residence required before premium shown</span>
+            <span class="iopt iopt-off">Dewar → no state entry, skip directly to offer</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> GradGuard payers see a state question first; Dewar payers see the offer directly. Out-of-state GradGuard payers must select their state from a picker before seeing their quote. In-state GradGuard payers confirm in one tap.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-05">
+          <div class="inst-item-name">Premium Calculation Basis — Payer's Portion</div>
+          <div class="inst-item-desc">The insurance premium is calculated against the payer's covered portion of tuition — not necessarily the full tuition balance. If a payer is responsible for a percentage of the balance (split arrangement), their premium is calculated on that percentage of tuition charges only. Multiple payers on the same student account may each purchase their own policy, covering their respective portion. The result is that multiple insurance policies may exist for a single student at the end of onboarding.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Applies to</span>
+            <span class="iopt iopt-variable">Both GradGuard and Dewar</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> A parent covering 60% of tuition sees an insurance offer calculated on 60% of total charges — not 100%. The offer is presented as covering their share, with clear labeling of the amount their policy covers. If a second payer also wants coverage, they receive a separate offer for their portion. Separate policies per payer, each scoped to that payer's financial responsibility.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-05">
+          <div class="inst-item-name">Payment Processor — Provider-Dependent</div>
+          <div class="inst-item-desc">The insurance premium is processed through a different payment system depending on provider. <strong>GradGuard</strong>: the premium is submitted directly to GradGuard's own payment processor — not Nelnet's. The API call, response handling, and error scenarios follow GradGuard's processing contract. <strong>Dewar</strong>: the premium is processed through Nelnet's standard payment processor, the same as all other charges at checkout.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Payment processor</span>
+            <span class="iopt iopt-variable">GradGuard → GradGuard processor (separate from Nelnet's)</span>
+            <span class="iopt iopt-variable">Dewar → Nelnet processor</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> At the end of onboarding, when the payer confirms their single payment, if GradGuard insurance is part of that payment, the system must coordinate two separate processor calls — one to GradGuard for the premium, one to Nelnet for everything else. Each call can independently succeed or fail. The confirmation screen and error handling must reflect the actual status of each processor response, not a single combined result. See the feature-level requirements for the full confirmation and error state specification.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-05">
           <div class="inst-item-name">Insurance Offer Re-presentation</div>
-          <div class="inst-item-desc">Whether the insurance offer is re-surfaced to a returning student in a new term if they previously declined (or if it's a new term's policy year).</div>
+          <div class="inst-item-desc">Whether the insurance offer is re-surfaced to a returning payer in a new term if they previously declined.</div>
           <div class="inst-options-row">
             <span class="inst-options-label">Options</span>
             <span class="iopt iopt-variable">Re-present each term</span>
             <span class="iopt">Never re-present after decline</span>
           </div>
-          <div class="inst-item-impact"><strong>Consumer impact:</strong> A student who declined insurance last term will either see the offer again at the start of this term (re-present) or proceed past the step automatically (never re-present). This setting is most relevant for Scenario 2 (Returning Student) and will be documented further there.</div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> A payer who declined last term either sees the offer again (re-present) or skips the step automatically (never re-present). Applies identically to both GradGuard and Dewar.</div>
+        </div>
+
+        <div class="inst-item" data-modified="2026-05-05">
+          <div class="inst-item-name">Payer Eligibility — Payers Only</div>
+          <div class="inst-item-desc">Tuition insurance is offered only to users who are responsible for paying a portion of the balance. Students or APs who have no payment responsibility for this account (non-payer APs, or students whose balance is 100% covered by APs) do not see the insurance step. Insurance covers financial loss — it is only relevant to the person who stands to lose the money they paid.</div>
+          <div class="inst-options-row">
+            <span class="inst-options-label">Rule</span>
+            <span class="iopt iopt-variable">Show only to users with a payment responsibility &gt; 0%</span>
+          </div>
+          <div class="inst-item-impact"><strong>Consumer impact:</strong> Non-paying APs (view-only) never see an insurance offer. A student whose entire balance is being paid by their parents will not be offered insurance during their own onboarding flow — the payer APs will each receive the offer during their own setup, scoped to their respective portions.</div>
         </div>
       </div>
 

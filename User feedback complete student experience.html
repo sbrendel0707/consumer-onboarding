@@ -1865,6 +1865,9 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
   const [planOk,      setPlanOk]      = React.useState(false); // payment type collapsed
   const [showDL,      setShowDL]      = React.useState(false);
   const [showAntInfo, setShowAntInfo] = React.useState(false);
+  const [payWhen,     setPayWhen]    = React.useState(''); // 'now' | 'later'
+  const [payWhenDate, setPayWhenDate] = React.useState('');
+  const payWhenRef = React.useRef(null);
 
   // ── POT inline setup state ───────────────────────────────────────────────
   const FREQ_OPTIONS = [
@@ -1946,6 +1949,11 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
       setTimeout(() => downStepRef.current.scrollIntoView({behavior:'smooth', block:'nearest'}), 80);
     }
   }, [dateOk]);
+  React.useEffect(() => {
+    if (plan === 'full' && planOk && payWhenRef.current) {
+      setTimeout(() => payWhenRef.current.scrollIntoView({behavior:'smooth', block:'nearest'}), 80);
+    }
+  }, [plan, planOk]);
 
   // ── Sub-components ───────────────────────────────────────────────────────
   const ConfirmBtn = ({onClick, disabled, label}) => (
@@ -1978,16 +1986,18 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
       nav('pot-confirm');
     } else if (plan === 'full') {
       setS(p=>({...p, payPlan:'full'}));
-      nav('pay-confirm-full');
-    } else if (plan === 'later') {
-      setS(p=>({...p, payPlan:'later'}));
-      nav('pay-sched');
+      if (payWhen === 'now') {
+        nav('pay-confirm-full');
+      } else if (payWhen === 'later' && payWhenDate) {
+        setS(p=>({...p, schedDate: payWhenDate}));
+        nav('pay-sched');
+      }
     }
   };
 
-  const selectPlan = (p) => { setPlan(p); setPlanOk(false); setFreqOk(false); setDateOk(false); setDownOk(false); };
+  const selectPlan = (p) => { setPlan(p); setPlanOk(false); setFreqOk(false); setDateOk(false); setDownOk(false); setPayWhen(''); setPayWhenDate(''); };
   const confirmPlan = () => setPlanOk(true);
-  const editPlan = () => { setPlanOk(false); setPlan(''); setFreqOk(false); setDateOk(false); setDownOk(false); };
+  const editPlan = () => { setPlanOk(false); setPlan(''); setFreqOk(false); setDateOk(false); setDownOk(false); setPayWhen(''); setPayWhenDate(''); };
 
   // Student's portion label for balance card
   const balanceLabel = S.studentPct
@@ -2042,7 +2052,7 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
         {planOk ? (
           <SummaryStep
             label="How would you like to pay?"
-            value={plan==='pot' ? 'Pay over time' : plan==='full' ? 'Pay in full' : 'Schedule a payment'}
+            value={plan==='pot' ? 'Pay over time' : 'Pay in full'}
             onEdit={editPlan}/>
         ) : (
           <div className="space-y-2">
@@ -2056,16 +2066,37 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
               <p className="text-[14px] font-semibold text-hz-text">Pay in full</p>
               <p className="text-[12px] text-hz-muted mt-0.5">Pay {fmt(myBalance)} now and you're done</p>
             </RadioCard>
-            <RadioCard selected={plan==='later'} onClick={()=>selectPlan('later')}
-              aria-label="Schedule a payment — choose a date before May 1">
-              <p className="text-[14px] font-semibold text-hz-text">Schedule a payment</p>
-              <p className="text-[12px] text-hz-muted mt-0.5">Choose a date before May 1 to pay in full</p>
-            </RadioCard>
-            {plan && plan !== 'pot' && (
-              <ConfirmBtn onClick={confirmPlan} label="Confirm payment type"/>
+            {plan === 'full' && (
+              <ConfirmBtn onClick={confirmPlan} label="Confirm: Pay in full"/>
             )}
             {plan === 'pot' && (
               <ConfirmBtn onClick={confirmPlan} label="Continue — set up Pay Over Time"/>
+            )}
+          </div>
+        )}
+
+        {/* ── Pay in full timing — reveals after plan confirmed ── */}
+        {plan === 'full' && planOk && (
+          <div ref={payWhenRef} className="space-y-2">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint px-1 pt-1">When would you like to pay?</p>
+            <RadioCard selected={payWhen==='now'} onClick={()=>setPayWhen('now')}
+              aria-label="Pay now — complete your payment today">
+              <p className="text-[14px] font-semibold text-hz-text">Pay now</p>
+              <p className="text-[12px] text-hz-muted mt-0.5">Complete your {fmt(myBalance)} payment today</p>
+            </RadioCard>
+            <RadioCard selected={payWhen==='later'} onClick={()=>setPayWhen('later')}
+              aria-label="Schedule for a later date">
+              <p className="text-[14px] font-semibold text-hz-text">Schedule for a later date</p>
+              <p className="text-[12px] text-hz-muted mt-0.5">Choose a date before May 1 to pay your full balance</p>
+            </RadioCard>
+            {payWhen === 'later' && (
+              <div className="bg-hz-card border border-hz-accent/25 rounded-hz px-4 py-4 space-y-3">
+                <label className="block text-[13px] font-semibold text-hz-text">Choose your payment date</label>
+                <input type="date" value={payWhenDate} min="2026-04-07" max="2026-04-30"
+                  onChange={e=>setPayWhenDate(e.target.value)}
+                  className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[14px] text-hz-text focus:outline-none focus:border-hz-accent"/>
+                <p className="text-[11px] text-hz-muted">Must be on or before May 1, 2026 (the due date)</p>
+              </div>
             )}
           </div>
         )}
@@ -2129,12 +2160,11 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
 
             {/* Installments view-only summary (auto-calculated) */}
             {freqOk && dateOk && (
-              <div className="bg-hz-teal-bg/60 border border-hz-teal/20 rounded-hz px-4 py-3 flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-hz-teal">Your plan</p>
-                  <p className="text-[13px] font-semibold text-hz-text mt-0.5">{potInstalls} installments · {FREQ_LABEL[potFreq].toLowerCase()} · ends {lastPayDate}</p>
-                </div>
-                <span className="text-[20px]" aria-hidden="true">📆</span>
+              <div className="bg-hz-cloud border border-hz-accent/20 rounded-hz px-4 py-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-hz-hint mb-2">Your plan</p>
+                <p className="text-[14px] font-semibold text-hz-text leading-relaxed">
+                  Starting <span className="text-hz-indigo">{new Date(potDate+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</span>, you'll be charged <span className="text-hz-indigo">{FREQ_LABEL[potFreq].toLowerCase()}</span> — <span className="text-hz-indigo">{potInstalls} payments of {fmt(installAmt)}</span> each — until <span className="text-hz-indigo">{lastPayDate}</span>.
+                </p>
               </div>
             )}
 
@@ -2197,7 +2227,7 @@ const HowPayScreen = ({nav, goBack, S, setS}) => {
         )}
 
         {/* Continue + Decide Later */}
-        {(plan && plan !== 'pot') && planOk && (
+        {plan === 'full' && planOk && (payWhen === 'now' || (payWhen === 'later' && payWhenDate)) && (
           <Btn onClick={next}>Continue</Btn>
         )}
         {plan === 'pot' && potComplete && (
@@ -2347,7 +2377,6 @@ const PotSetupScreen = ({nav, goBack, S, setS}) => {
 
 // ─── PotConfirmScreen ─────────────────────────────────────────────────────
 const PotConfirmScreen = ({nav, goBack, S, setS}) => {
-  const [method, setMethod] = React.useState(S.methodSaved ? 'saved' : 'ach');
   const [routing, setRouting] = React.useState('');
   const [acct, setAcct] = React.useState('');
 
@@ -2355,6 +2384,11 @@ const PotConfirmScreen = ({nav, goBack, S, setS}) => {
   const [discAcked, setDiscAcked] = React.useState([false, false, false, false]);
   const [sig, setSig] = React.useState('');
   const [sigChecked, setSigChecked] = React.useState(false);
+  const [enrolled, setEnrolled] = React.useState(false);
+  const [method, setMethod] = React.useState('');
+  const [refundSameAcct, setRefundSameAcct] = React.useState(true);
+  const [refundRouting, setRefundRouting] = React.useState('');
+  const [refundAcct2, setRefundAcct2] = React.useState('');
 
   const todayDown  = S.potDown       || POT_DOWN;
   const todayTotal = S.potTotalToday || POT_DOWN_TOTAL;
@@ -2371,8 +2405,8 @@ const PotConfirmScreen = ({nav, goBack, S, setS}) => {
   const endDateFmt = new Date(POT_PLAN_END_DATE + 'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
 
   const allDiscAcked = discAcked.every(Boolean);
-  const canSubmit = allDiscAcked && sig.trim().length > 2 && sigChecked &&
-    (S.methodSaved || (routing.length >= 9 && acct.length >= 8));
+  const canEnroll  = allDiscAcked && sig.trim().length > 2 && sigChecked;
+  const canSubmit  = enrolled && method && (S.methodSaved || (routing.length >= 9 && acct.length >= 8));
 
   const activeDisc = allDiscAcked ? 4 : discAcked.findIndex(v => !v);
   const ackDisc = (i) => setDiscAcked(prev => prev.map((v,j) => j===i ? true : v));
@@ -2402,191 +2436,256 @@ const PotConfirmScreen = ({nav, goBack, S, setS}) => {
     },
   ];
 
+  const enroll = () => {
+    if (!canEnroll) return;
+    setEnrolled(true);
+    // scroll to top of screen after a brief delay
+    setTimeout(() => window.scrollTo({top:0}), 80);
+  };
   const submit = () => {
     if (!canSubmit) return;
     if (!S.methodSaved) setS(p=>({...p, methodSaved:true, methodType: method}));
-    nav('pay-success');
+    setS(p=>({...p, potEnrolled: true}));
+    nav('complete');
   };
 
   return (
     <ScreenWrap>
-      <Header title="Confirm Your Plan" onBack={goBack}/>
+      <Header title={enrolled ? "Today's Payment" : "Confirm Your Plan"} onBack={enrolled ? ()=>setEnrolled(false) : goBack}/>
       <div className="px-5 pb-8 space-y-5">
 
-        {/* ── Paid Today Breakdown ── */}
-        <Card>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-3">Paid today</p>
-          <Row label="Down payment" value={fmt(todayDown)}/>
-          <Row label="School enrollment fee" value={fmt(SCHOOL_ENROLLMENT_FEE)}/>
-          <Row label="Nelnet plan enrollment fee" value={fmt(NELNET_FEE)}/>
-          {S.insAccepted && S.insPremium > 0 && <Row label="Tuition insurance premium" value={fmt(S.insPremium)}/>}
-          <Divider/>
-          <Row label="Total due today" value={fmt(todayTotal)} bold/>
-        </Card>
-
-        {/* ── Plan Summary — natural language ── */}
-        <div className="bg-hz-cloud border border-hz-accent/20 rounded-hz px-4 py-4">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-2">Your plan</p>
-          <p className="text-[14px] font-semibold text-hz-text leading-relaxed">
-            {firstDate
-              ? <>Starting <span className="text-hz-indigo">{firstDate}</span>, you'll be charged <span className="text-hz-indigo">{freqLabel}</span> — <span className="text-hz-indigo">{S.potCount || '—'} payments of {fmt(S.potInstall || 0)}</span> each — until{' '}<span className="text-hz-indigo">{endDateFmt}</span>.</>
-              : <>{freqLabelCap} — <span className="text-hz-indigo">{S.potCount || '—'} payments of {fmt(S.potInstall || 0)}</span> each until <span className="text-hz-indigo">{endDateFmt}</span>.</>
-            }
-          </p>
-          <div className="mt-3 pt-3 border-t border-hz-accent/15 flex items-center justify-between">
-            <span className="text-[12px] text-hz-muted">Remaining balance on plan</span>
-            <span className="text-[14px] font-bold text-hz-text">{fmt(remaining)}</span>
-          </div>
-        </div>
-
-        {/* ── Payment Method ── */}
-        <div>
-          <p className="text-[13px] font-semibold text-hz-text mb-1">Payment method</p>
-          <p className="text-[12px] text-hz-muted mb-3 leading-relaxed">
-            This method will be used for today's payment <em>and</em> all future plan installments (auto-pay).
-            {!S.methodSaved && <span className="block mt-1 text-hz-hint">Card payments include a <strong className="text-hz-text">{CARD_FEE_PCT}% service fee</strong>. Bank (ACH) payments have no service fee.</span>}
-          </p>
-
-          {S.methodSaved ? (
-            <div className="bg-hz-teal-bg/50 border border-hz-teal/30 rounded-hz px-4 py-3 flex items-center gap-3">
-              <span aria-hidden="true" className="text-xl">🏦</span>
-              <div>
-                <p className="text-[13px] font-semibold text-hz-text">Checking ••••4521</p>
-                <p className="text-[11px] text-hz-muted">Chase Bank · ACH</p>
+        {!enrolled ? (
+          <>
+            {/* ── Plan Summary — natural language ── */}
+            <div className="bg-hz-cloud border border-hz-accent/20 rounded-hz px-4 py-4 mt-4">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-2">Your plan</p>
+              <p className="text-[14px] font-semibold text-hz-text leading-relaxed">
+                {firstDate
+                  ? <>Starting <span className="text-hz-indigo">{firstDate}</span>, you'll be charged <span className="text-hz-indigo">{freqLabel}</span> — <span className="text-hz-indigo">{S.potCount || '—'} payments of {fmt(S.potInstall || 0)}</span> each — until{' '}<span className="text-hz-indigo">{endDateFmt}</span>.</>
+                  : <>{freqLabelCap} — <span className="text-hz-indigo">{S.potCount || '—'} payments of {fmt(S.potInstall || 0)}</span> each until <span className="text-hz-indigo">{endDateFmt}</span>.</>
+                }
+              </p>
+              <div className="mt-3 pt-3 border-t border-hz-accent/15 flex items-center justify-between">
+                <span className="text-[12px] text-hz-muted">Balance on plan</span>
+                <span className="text-[14px] font-bold text-hz-text">{fmt(remaining)}</span>
               </div>
-              <Badge color="green" className="ml-auto">Saved</Badge>
             </div>
-          ) : (
-            <>
-              <div className="flex gap-2 mb-3" role="group" aria-label="Payment method selection">
-                {[
-                  {id:'ach',  label:'Bank (ACH)', sub:'No service fee'},
-                  {id:'card', label:'Card',       sub:`+${CARD_FEE_PCT}% fee`},
-                ].map(m=>(
-                  <button key={m.id} onClick={()=>setMethod(m.id)} aria-pressed={method===m.id}
-                    className={'flex-1 py-2.5 rounded-hz-sm border text-[13px] font-medium transition-all flex flex-col items-center gap-0.5 '+(method===m.id?'border-hz-accent bg-hz-cloud text-hz-indigo':'border-[rgba(100,92,220,0.14)] text-hz-muted')}>
-                    <span>{m.label}</span>
-                    <span className={'text-[10px] font-semibold '+(method===m.id?'text-hz-accent':'text-hz-hint')}>{m.sub}</span>
-                  </button>
-                ))}
+
+            {/* ── Today's breakdown preview ── */}
+            <Card>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-3">Due today at enrollment</p>
+              <Row label="Down payment" value={fmt(todayDown)}/>
+              <Row label="School enrollment fee" value={fmt(SCHOOL_ENROLLMENT_FEE)}/>
+              <Row label="Nelnet plan enrollment fee" value={fmt(NELNET_FEE)}/>
+              {S.insAccepted && S.insPremium > 0 && <Row label="Tuition insurance premium" value={fmt(S.insPremium)}/>}
+              <Divider/>
+              <Row label="Total due today" value={fmt(todayTotal)} bold/>
+            </Card>
+
+            {/* ── Multi-part Disclosures ── */}
+            <div>
+              <p className="text-[13px] font-semibold text-hz-text mb-1">Plan disclosures</p>
+              <p className="text-[12px] text-hz-muted mb-3">Read and acknowledge each item to continue.</p>
+              <div className="space-y-2">
+                {disclosures.map((d, i) => {
+                  const done = discAcked[i];
+                  const open = activeDisc === i;
+                  const locked = !done && !open;
+                  return (
+                    <div key={d.id} className={`rounded-hz border overflow-hidden transition-all ${
+                      done   ? 'border-hz-teal/40 bg-hz-card'
+                      : open ? 'border-hz-accent/40 bg-hz-card'
+                             : 'border-[rgba(100,92,220,0.1)] bg-hz-card opacity-50'
+                    }`}>
+                      <div className={`px-4 py-3 flex items-center gap-3 ${
+                        done ? 'bg-[#E1F5EE]' : open ? 'bg-hz-cloud' : 'bg-hz-bg'
+                      }`}>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[11px] font-bold ${
+                          done ? 'bg-hz-teal text-white' : open ? 'bg-hz-indigo text-white' : 'bg-[rgba(100,92,220,0.15)] text-hz-hint'
+                        }`}>{done ? '✓' : i+1}</div>
+                        <p className={`text-[13px] font-semibold flex-1 ${done ? 'text-hz-teal' : open ? 'text-hz-text' : 'text-hz-hint'}`}>{d.title}</p>
+                        {done && <span className="text-[10px] font-bold uppercase tracking-wide text-hz-teal">Done</span>}
+                        {locked && <span className="text-[10px] font-bold uppercase tracking-wide text-hz-hint">Upcoming</span>}
+                      </div>
+                      {open && (
+                        <div className="px-4 pt-3 pb-4 space-y-3">
+                          <div className="max-h-28 overflow-y-auto pr-1">
+                            <p className="text-[12px] text-hz-muted leading-relaxed">{d.body}</p>
+                          </div>
+                          <div className="flex items-start gap-2.5 pt-1">
+                            <input type="checkbox" id={`disc-${d.id}`} checked={false}
+                              onChange={()=>ackDisc(i)}
+                              aria-label={`I have read and acknowledge: ${d.title}`}
+                              className="mt-0.5 w-4 h-4 accent-hz-indigo flex-shrink-0 cursor-pointer"/>
+                            <label htmlFor={`disc-${d.id}`} className="text-[12px] text-hz-muted leading-relaxed cursor-pointer">
+                              I have read and acknowledge this disclosure.
+                            </label>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-              {method === 'ach' ? (
-                <>
-                  <Input label="Routing number" id="pot-routing" value={routing} onChange={setRouting} placeholder="9 digits"/>
-                  <Input label="Account number" id="pot-acct" value={acct} onChange={setAcct} placeholder="Account number"/>
-                </>
+            </div>
+
+            {/* ── E-Signature — appears after all disclosures acked ── */}
+            {allDiscAcked && (
+              <div className="bg-hz-card border border-[rgba(100,92,220,0.2)] rounded-hz px-4 py-4 space-y-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span aria-hidden="true" className="text-base">✍️</span>
+                  <p className="text-[13px] font-semibold text-hz-text">Electronic Signature</p>
+                </div>
+                <p className="text-[12px] text-hz-muted leading-relaxed">
+                  By typing your full legal name below, you confirm you have read and agree to all disclosures above and authorize this payment plan.
+                </p>
+                <div>
+                  <label htmlFor="pot-sig" className="text-[12px] font-semibold text-hz-text block mb-1.5">
+                    Full legal name <span aria-hidden="true" className="text-hz-danger">*</span>
+                  </label>
+                  <input id="pot-sig" type="text" value={sig} onChange={e=>setSig(e.target.value)}
+                    placeholder="e.g. Alex Johnson" aria-required="true"
+                    className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[14px] font-medium text-hz-indigo placeholder-hz-hint focus:outline-none focus:border-hz-accent italic"
+                    style={{fontFamily:"'Georgia', serif"}}/>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <input type="checkbox" id="pot-sig-confirm" checked={sigChecked}
+                    onChange={e=>setSigChecked(e.target.checked)} aria-required="true"
+                    className="mt-0.5 w-4 h-4 accent-hz-indigo flex-shrink-0 cursor-pointer"/>
+                  <label htmlFor="pot-sig-confirm" className="text-[12px] text-hz-muted leading-relaxed cursor-pointer">
+                    I agree to be bound by all disclosures above and authorize this payment plan.
+                  </label>
+                </div>
+                <div className="flex justify-between items-center pt-1">
+                  <div>
+                    <p className="text-[10px] text-hz-hint uppercase tracking-wide font-semibold">Date signed</p>
+                    <p className="text-[12px] text-hz-text font-medium">{today}</p>
+                  </div>
+                  {sig.trim().length > 0 && (
+                    <div className="text-right">
+                      <p className="text-[10px] text-hz-hint uppercase tracking-wide font-semibold">Signature</p>
+                      <p className="text-[15px] text-hz-indigo" style={{fontFamily:"'Georgia', serif",fontStyle:'italic'}}>{sig}</p>
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={()=>alert('In production, this would download a PDF copy of your plan disclosures.')}
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-hz-sm border border-[rgba(100,92,220,0.2)] text-[12px] font-medium text-hz-indigo hover:bg-hz-cloud transition-colors mt-1">
+                  <span aria-hidden="true">⬇</span> Download disclosures (PDF)
+                </button>
+              </div>
+            )}
+
+            <Btn onClick={enroll} disabled={!canEnroll} aria-label="Enroll in Pay Over Time plan">
+              Enroll in Pay Over Time
+            </Btn>
+          </>
+        ) : (
+          <>
+            {/* ── Enrolled banner ── */}
+            <div className="bg-hz-teal-bg border border-hz-teal/30 rounded-hz px-4 py-3 flex items-center gap-3 mt-4">
+              <span aria-hidden="true" className="text-xl">✅</span>
+              <div>
+                <p className="text-[13px] font-semibold text-hz-teal">Plan accepted!</p>
+                <p className="text-[11px] text-hz-muted">Now let's process today's payment to complete enrollment.</p>
+              </div>
+            </div>
+
+            {/* ── Today's breakdown ── */}
+            <Card>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-hz-hint mb-3">Today's payment</p>
+              <Row label="Down payment" value={fmt(todayDown)}/>
+              <Row label="School enrollment fee" value={fmt(SCHOOL_ENROLLMENT_FEE)}/>
+              <Row label="Nelnet plan enrollment fee" value={fmt(NELNET_FEE)}/>
+              {S.insAccepted && S.insPremium > 0 && <Row label="Tuition insurance premium" value={fmt(S.insPremium)}/>}
+              <Divider/>
+              <Row label="Total due today" value={fmt(todayTotal)} bold/>
+            </Card>
+
+            {/* ── Payment Method ── */}
+            <div>
+              <p className="text-[13px] font-semibold text-hz-text mb-0.5">Payment method</p>
+              <p className="text-[12px] text-hz-muted mb-3 leading-relaxed">
+                <strong className="text-hz-indigo">Important:</strong> The method you choose here will be used for today's payment <em>and</em> all future plan installments (auto-pay).
+              </p>
+
+              {S.methodSaved ? (
+                <div className="bg-hz-teal-bg/50 border border-hz-teal/30 rounded-hz px-4 py-3 flex items-center gap-3">
+                  <span aria-hidden="true" className="text-xl">🏦</span>
+                  <div>
+                    <p className="text-[13px] font-semibold text-hz-text">Checking ••••4521</p>
+                    <p className="text-[11px] text-hz-muted">Chase Bank · ACH</p>
+                  </div>
+                  <Badge color="green" className="ml-auto">Saved</Badge>
+                </div>
               ) : (
                 <>
-                  <Input label="Card number" id="pot-card" value={acct} onChange={setAcct} placeholder="1234 5678 9012 3456"/>
-                  {acct.length > 0 && (
-                    <div className="bg-hz-amber-bg border border-hz-amber/30 rounded-hz-sm px-3 py-2 mt-1 mb-3">
-                      <p className="text-[11px] text-hz-muted">Service fee: <span className="font-semibold text-hz-text">{fmt(Math.round(todayTotal * CARD_FEE_PCT) / 100)}</span> will be added to today's payment ({CARD_FEE_PCT}% of {fmt(todayTotal)})</p>
-                    </div>
+                  {!method && (
+                    <p className="text-[12px] text-hz-hint mb-2 italic">Select a payment method to continue.</p>
+                  )}
+                  <div className="flex gap-2 mb-3" role="group" aria-label="Payment method selection">
+                    {[
+                      {id:'ach',  label:'Bank (ACH)', sub:'No service fee'},
+                      {id:'card', label:'Card',       sub:`+${CARD_FEE_PCT}% fee`, subClass:'text-hz-amber'},
+                    ].map(m=>(
+                      <button key={m.id} onClick={()=>setMethod(m.id)} aria-pressed={method===m.id}
+                        className={'flex-1 py-2.5 rounded-hz-sm border text-[13px] font-medium transition-all flex flex-col items-center gap-0.5 '+(method===m.id?'border-hz-accent bg-hz-cloud text-hz-indigo':'border-[rgba(100,92,220,0.14)] text-hz-muted hover:border-hz-accent/40')}>
+                        <span>{m.label}</span>
+                        <span className={'text-[10px] font-semibold '+(method===m.id?(m.id==='card'?'text-hz-amber':'text-hz-accent'):'text-hz-hint')}>{m.sub}</span>
+                      </button>
+                    ))}
+                  </div>
+                  {method === 'ach' && (
+                    <>
+                      <Input label="Routing number" id="pot-routing" value={routing} onChange={setRouting} placeholder="9 digits"/>
+                      <Input label="Account number" id="pot-acct" value={acct} onChange={setAcct} placeholder="Account number"/>
+                      {/* Refund account section */}
+                      {routing.length >= 9 && acct.length >= 8 && (
+                        <div className="mt-4 bg-hz-cloud rounded-hz px-4 py-4 space-y-3">
+                          <div className="flex items-center gap-2">
+                            <span aria-hidden="true">↩️</span>
+                            <p className="text-[13px] font-semibold text-hz-text">Refund account</p>
+                          </div>
+                          <p className="text-[12px] text-hz-muted leading-relaxed">If a credit balance or refund is issued to your account, where should it be deposited?</p>
+                          <div className="space-y-2">
+                            <button onClick={()=>setRefundSameAcct(true)} aria-pressed={refundSameAcct}
+                              className={'w-full py-2.5 px-4 rounded-hz-sm border text-left text-[13px] font-medium transition-colors '+(refundSameAcct?'bg-hz-indigo text-white border-hz-indigo':'text-hz-muted border-[rgba(100,92,220,0.2)] hover:border-hz-accent/40')}>
+                              Same account as my payments
+                            </button>
+                            <button onClick={()=>setRefundSameAcct(false)} aria-pressed={!refundSameAcct}
+                              className={'w-full py-2.5 px-4 rounded-hz-sm border text-left text-[13px] font-medium transition-colors '+(!refundSameAcct?'bg-hz-indigo text-white border-hz-indigo':'text-hz-muted border-[rgba(100,92,220,0.2)] hover:border-hz-accent/40')}>
+                              A different account
+                            </button>
+                          </div>
+                          {!refundSameAcct && (
+                            <>
+                              <Input label="Refund routing number" id="pot-ref-routing" value={refundRouting} onChange={setRefundRouting} placeholder="9 digits"/>
+                              <Input label="Refund account number" id="pot-ref-acct" value={refundAcct2} onChange={setRefundAcct2} placeholder="Account number"/>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {method === 'card' && (
+                    <>
+                      <Input label="Card number" id="pot-card" value={acct} onChange={setAcct} placeholder="1234 5678 9012 3456"/>
+                      {acct.length > 0 && (
+                        <div className="bg-hz-amber-bg border border-hz-amber/30 rounded-hz-sm px-3 py-2 mt-1 mb-3">
+                          <p className="text-[11px] text-hz-muted">Service fee: <span className="font-semibold text-hz-text">{fmt(Math.round(todayTotal * CARD_FEE_PCT) / 100)}</span> will be added ({CARD_FEE_PCT}% of {fmt(todayTotal)})</p>
+                        </div>
+                      )}
+                    </>
                   )}
                 </>
               )}
-            </>
-          )}
-        </div>
+            </div>
 
-        {/* ── Multi-part Disclosures ── */}
-        <div>
-          <p className="text-[13px] font-semibold text-hz-text mb-1">Plan disclosures</p>
-          <p className="text-[12px] text-hz-muted mb-3">Read and acknowledge each item to continue.</p>
-          <div className="space-y-2">
-            {disclosures.map((d, i) => {
-              const done = discAcked[i];
-              const open = activeDisc === i;
-              const locked = !done && !open;
-              return (
-                <div key={d.id} className={`rounded-hz border overflow-hidden transition-all ${
-                  done   ? 'border-hz-teal/40 bg-hz-card'
-                  : open ? 'border-hz-accent/40 bg-hz-card'
-                         : 'border-[rgba(100,92,220,0.1)] bg-hz-card opacity-50'
-                }`}>
-                  <div className={`px-4 py-3 flex items-center gap-3 ${
-                    done ? 'bg-[#E1F5EE]' : open ? 'bg-hz-cloud' : 'bg-hz-bg'
-                  }`}>
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[11px] font-bold ${
-                      done ? 'bg-hz-teal text-white' : open ? 'bg-hz-indigo text-white' : 'bg-[rgba(100,92,220,0.15)] text-hz-hint'
-                    }`}>{done ? '✓' : i+1}</div>
-                    <p className={`text-[13px] font-semibold flex-1 ${done ? 'text-hz-teal' : open ? 'text-hz-text' : 'text-hz-hint'}`}>{d.title}</p>
-                    {done && <span className="text-[10px] font-bold uppercase tracking-wide text-hz-teal">Done</span>}
-                    {locked && <span className="text-[10px] font-bold uppercase tracking-wide text-hz-hint">Upcoming</span>}
-                  </div>
-                  {open && (
-                    <div className="px-4 pt-3 pb-4 space-y-3">
-                      <div className="max-h-28 overflow-y-auto pr-1">
-                        <p className="text-[12px] text-hz-muted leading-relaxed">{d.body}</p>
-                      </div>
-                      <div className="flex items-start gap-2.5 pt-1">
-                        <input type="checkbox" id={`disc-${d.id}`} checked={false}
-                          onChange={()=>ackDisc(i)}
-                          aria-label={`I have read and acknowledge: ${d.title}`}
-                          className="mt-0.5 w-4 h-4 accent-hz-indigo flex-shrink-0 cursor-pointer"/>
-                        <label htmlFor={`disc-${d.id}`} className="text-[12px] text-hz-muted leading-relaxed cursor-pointer">
-                          I have read and acknowledge this disclosure.
-                        </label>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* ── E-Signature — appears after all disclosures acked ── */}
-        {allDiscAcked && (
-          <div className="bg-hz-card border border-[rgba(100,92,220,0.2)] rounded-hz px-4 py-4 space-y-3">
-            <div className="flex items-center gap-2 mb-1">
-              <span aria-hidden="true" className="text-base">✍️</span>
-              <p className="text-[13px] font-semibold text-hz-text">Electronic Signature</p>
-            </div>
-            <p className="text-[12px] text-hz-muted leading-relaxed">
-              By typing your full legal name below, you confirm you have read and agree to all disclosures above. This constitutes your electronic signature under the ESIGN Act and UETA.
-            </p>
-            <div>
-              <label htmlFor="pot-sig" className="text-[12px] font-semibold text-hz-text block mb-1.5">
-                Full legal name <span aria-hidden="true" className="text-hz-danger">*</span>
-              </label>
-              <input id="pot-sig" type="text" value={sig} onChange={e=>setSig(e.target.value)}
-                placeholder="e.g. Alex Johnson" aria-required="true"
-                className="w-full border border-[rgba(100,92,220,0.2)] rounded-hz-sm px-3 py-2.5 text-[14px] font-medium text-hz-indigo placeholder-hz-hint focus:outline-none focus:border-hz-accent italic"
-                style={{fontFamily:"'Georgia', serif"}}/>
-            </div>
-            <div className="flex items-start gap-2.5">
-              <input type="checkbox" id="pot-sig-confirm" checked={sigChecked}
-                onChange={e=>setSigChecked(e.target.checked)} aria-required="true"
-                className="mt-0.5 w-4 h-4 accent-hz-indigo flex-shrink-0 cursor-pointer"/>
-              <label htmlFor="pot-sig-confirm" className="text-[12px] text-hz-muted leading-relaxed cursor-pointer">
-                I agree to be bound by all disclosures above and authorize this payment plan.
-              </label>
-            </div>
-            <div className="flex justify-between items-center pt-1">
-              <div>
-                <p className="text-[10px] text-hz-hint uppercase tracking-wide font-semibold">Date signed</p>
-                <p className="text-[12px] text-hz-text font-medium">{today}</p>
-              </div>
-              {sig.trim().length > 0 && (
-                <div className="text-right">
-                  <p className="text-[10px] text-hz-hint uppercase tracking-wide font-semibold">Signature</p>
-                  <p className="text-[15px] text-hz-indigo" style={{fontFamily:"'Georgia', serif",fontStyle:'italic'}}>{sig}</p>
-                </div>
-              )}
-            </div>
-            {/* Download disclosures */}
-            <button
-              onClick={()=>alert('In production, this would download a PDF copy of your plan disclosures.')}
-              className="w-full flex items-center justify-center gap-2 py-2 rounded-hz-sm border border-[rgba(100,92,220,0.2)] text-[12px] font-medium text-hz-indigo hover:bg-hz-cloud transition-colors mt-1">
-              <span aria-hidden="true">⬇</span> Download disclosures (PDF)
-            </button>
-          </div>
+            <Btn onClick={submit} disabled={!canSubmit} aria-label={`Pay ${fmt(todayTotal)} and complete enrollment`}>
+              Pay {fmt(todayTotal)} &amp; Complete Enrollment
+            </Btn>
+          </>
         )}
-
-        <Btn onClick={submit} disabled={!canSubmit} aria-label={`Pay ${fmt(todayTotal)} and enroll in Pay Over Time`}>
-          Pay {fmt(todayTotal)} &amp; Enroll
-        </Btn>
       </div>
     </ScreenWrap>
   );
@@ -2594,11 +2693,14 @@ const PotConfirmScreen = ({nav, goBack, S, setS}) => {
 
 // ─── PayConfirmFullScreen ─────────────────────────────────────────────────
 const PayConfirmFullScreen = ({nav, goBack, S, setS}) => {
-  const [method, setMethod] = React.useState('ach');
+  const [method, setMethod] = React.useState('');
   const [routing, setRouting] = React.useState('');
   const [acct, setAcct] = React.useState('');
+  const [refundSameAcct, setRefundSameAcct] = React.useState(true);
+  const [refundRouting, setRefundRouting] = React.useState('');
+  const [refundAcct2, setRefundAcct2] = React.useState('');
 
-  const canSubmit = S.methodSaved || (routing.length >= 9 && acct.length >= 8);
+  const canSubmit = method && (S.methodSaved || (routing.length >= 9 && acct.length >= 8));
 
   const submit = () => {
     if (!S.methodSaved) setS(p=>({...p, methodSaved:true, methodType:'ach'}));
@@ -2633,11 +2735,18 @@ const PayConfirmFullScreen = ({nav, goBack, S, setS}) => {
           </Card>
         ) : (
           <>
+            {!method && (
+              <p className="text-[12px] text-hz-hint mb-2 italic">Select a payment method to continue.</p>
+            )}
             <div className="flex gap-2 mb-4" role="group" aria-label="Payment method selection">
-              {['ach','card'].map(m=>(
-                <button key={m} onClick={()=>setMethod(m)} aria-pressed={method===m}
-                  className={'flex-1 py-2 rounded-hz-sm border text-[13px] font-medium transition-all '+(method===m?'border-hz-accent bg-hz-cloud text-hz-indigo':'border-[rgba(100,92,220,0.14)] text-hz-muted')}>
-                  {m==='ach'?'Bank (ACH)':'Card'}
+              {[
+                {id:'ach',  label:'Bank (ACH)', sub:'No service fee'},
+                {id:'card', label:'Card',       sub:`+${CARD_FEE_PCT}% fee`},
+              ].map(m=>(
+                <button key={m.id} onClick={()=>setMethod(m.id)} aria-pressed={method===m.id}
+                  className={'flex-1 py-2.5 rounded-hz-sm border text-[13px] font-medium transition-all flex flex-col items-center gap-0.5 '+(method===m.id?'border-hz-accent bg-hz-cloud text-hz-indigo':'border-[rgba(100,92,220,0.14)] text-hz-muted hover:border-hz-accent/40')}>
+                  <span>{m.label}</span>
+                  <span className={'text-[10px] font-semibold '+(method===m.id?(m.id==='card'?'text-hz-amber':'text-hz-accent'):'text-hz-hint')}>{m.sub}</span>
                 </button>
               ))}
             </div>
@@ -2645,6 +2754,31 @@ const PayConfirmFullScreen = ({nav, goBack, S, setS}) => {
               <>
                 <Input label="Routing number" id="full-routing" value={routing} onChange={setRouting} placeholder="9 digits"/>
                 <Input label="Account number" id="full-acct" value={acct} onChange={setAcct} placeholder="Account number"/>
+                {routing.length >= 9 && acct.length >= 8 && (
+                  <div className="mt-4 bg-hz-cloud rounded-hz px-4 py-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span aria-hidden="true">↩️</span>
+                      <p className="text-[13px] font-semibold text-hz-text">Refund account</p>
+                    </div>
+                    <p className="text-[12px] text-hz-muted leading-relaxed">If a credit balance or refund is issued, where should it be deposited?</p>
+                    <div className="space-y-2">
+                      <button onClick={()=>setRefundSameAcct(true)} aria-pressed={refundSameAcct}
+                        className={'w-full py-2.5 px-4 rounded-hz-sm border text-left text-[13px] font-medium transition-colors '+(refundSameAcct?'bg-hz-indigo text-white border-hz-indigo':'text-hz-muted border-[rgba(100,92,220,0.2)] hover:border-hz-accent/40')}>
+                        Same account as my payment
+                      </button>
+                      <button onClick={()=>setRefundSameAcct(false)} aria-pressed={!refundSameAcct}
+                        className={'w-full py-2.5 px-4 rounded-hz-sm border text-left text-[13px] font-medium transition-colors '+(!refundSameAcct?'bg-hz-indigo text-white border-hz-indigo':'text-hz-muted border-[rgba(100,92,220,0.2)] hover:border-hz-accent/40')}>
+                        A different account
+                      </button>
+                    </div>
+                    {!refundSameAcct && (
+                      <>
+                        <Input label="Refund routing number" id="full-ref-routing" value={refundRouting} onChange={setRefundRouting} placeholder="9 digits"/>
+                        <Input label="Refund account number" id="full-ref-acct" value={refundAcct2} onChange={setRefundAcct2} placeholder="Account number"/>
+                      </>
+                    )}
+                  </div>
+                )}
               </>
             ) : (
               <Input label="Card number" id="full-card" value={acct} onChange={setAcct} placeholder="1234 5678 9012 3456"/>
@@ -2662,41 +2796,27 @@ const PayConfirmFullScreen = ({nav, goBack, S, setS}) => {
 const PaySuccessScreen = ({nav, goBack, S, setS}) => (
   <ScreenWrap>
     <div className="flex flex-col items-center justify-center px-8 text-center py-8">
-    <div className="w-20 h-20 rounded-full bg-hz-teal-bg flex items-center justify-center text-4xl mb-5" aria-hidden="true">✅</div>
-    <h2 className="text-2xl font-bold text-hz-text mb-2">
-      {S.payPlan === 'pot' ? 'Enrolled in Pay Over Time!' : 'Payment Successful!'}
-    </h2>
-    <p className="text-hz-muted text-[13px] mb-6">
-      {S.payPlan === 'pot'
-        ? `${fmt(S.potTotalToday || POT_DOWN_TOTAL)} paid today. Your first installment will be drafted on schedule.`
-        : `${fmt(BALANCE_DUE)} has been submitted. You'll receive a confirmation email shortly.`}
-    </p>
-    <Card className="w-full mb-8">
-      {S.payPlan === 'pot' ? (
-        <>
-          <Row label="Paid today" value={fmt(S.potTotalToday || POT_DOWN_TOTAL)}/>
-          <Row label="Remaining" value={fmt(BALANCE_DUE - (S.potDown || POT_DOWN))}/>
-          <Row label="Installments" value={`${S.potCount} × ${fmt(S.potInstall)}`}/>
-        </>
-      ) : (
+      <div className="w-20 h-20 rounded-full bg-hz-teal-bg flex items-center justify-center text-4xl mb-5" aria-hidden="true">✅</div>
+      <h2 className="text-2xl font-bold text-hz-text mb-2">Payment Successful!</h2>
+      <p className="text-hz-muted text-[13px] mb-6">{fmt(BALANCE_DUE)} has been submitted. You'll receive a confirmation email shortly.</p>
+      <Card className="w-full mb-8">
         <Row label="Amount paid" value={fmt(BALANCE_DUE)}/>
-      )}
-    </Card>
-    <Btn onClick={()=>nav('comms')} variant="success">Continue Account Setup</Btn>
-  </div>
+      </Card>
+      <Btn onClick={()=>nav('complete')} variant="success">Continue Setup</Btn>
+    </div>
   </ScreenWrap>
 );
 
 
 // ─── PaySchedScreen ───────────────────────────────────────────────────────
 const PaySchedScreen = ({nav, goBack, S, setS}) => {
-  const [date, setDate] = React.useState('');
-  const [method, setMethod] = React.useState('ach');
+  const [date, setDate] = React.useState(S.schedDate || '');
+  const [method, setMethod] = React.useState('');
   const [routing, setRouting] = React.useState('');
   const [acct, setAcct] = React.useState('');
   const [done, setDone] = React.useState(false);
 
-  const canSubmit = date && (S.methodSaved || (routing.length >= 9 && acct.length >= 8));
+  const canSubmit = date && method && (S.methodSaved || (routing.length >= 9 && acct.length >= 8));
 
   const submit = () => {
     if (!S.methodSaved) setS(p=>({...p, methodSaved:true, methodType:'ach'}));
@@ -2709,7 +2829,7 @@ const PaySchedScreen = ({nav, goBack, S, setS}) => {
       <div className="w-20 h-20 rounded-full bg-hz-cloud flex items-center justify-center text-4xl mb-5" aria-hidden="true">📅</div>
       <h2 className="text-2xl font-bold text-hz-text mb-2">Payment Scheduled</h2>
       <p className="text-hz-muted text-[13px] mb-6">{fmt(BALANCE_DUE)} will be drafted on {date}.</p>
-      <Btn onClick={()=>nav('comms')}>Continue Account Setup</Btn>
+      <Btn onClick={()=>nav('complete')}>Continue Setup</Btn>
       </div>
     </ScreenWrap>
   );
