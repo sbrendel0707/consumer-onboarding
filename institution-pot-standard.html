@@ -147,6 +147,15 @@ body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: var(
 </head>
 <body>
 <div id="root"></div>
+<script>
+window.onerror = function(msg, src, line, col, err) {
+  document.getElementById('root').innerHTML =
+    '<div style="padding:40px;font-family:monospace;background:#fff0f0;border:2px solid red;margin:20px;border-radius:8px;font-size:13px">' +
+    '<strong style="font-size:16px;color:red">⚠ JavaScript Error</strong><br><br>' +
+    (msg||'') + '<br><br>Line: ' + line + ', Col: ' + col + '<br>Source: ' + src +
+    (err && err.stack ? '<br><br>' + err.stack.replace(/</g,'&lt;') : '') + '</div>';
+};
+</script>
 <script type="text/babel">
 const {useState} = React;
 
@@ -1322,7 +1331,23 @@ function ReviewTab({planName,planType,planDesc,termFreq,reminderDays,termScope,p
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+class ErrorBoundary extends React.Component {
+  constructor(props){super(props);this.state={error:null};}
+  static getDerivedStateFromError(e){return{error:e};}
+  render(){
+    if(this.state.error){
+      return <div style={{padding:40,fontFamily:'monospace',background:'#fff0f0',border:'2px solid red',margin:20,borderRadius:8,whiteSpace:'pre-wrap',fontSize:13}}>
+        <strong style={{fontSize:16,color:'red'}}>⚠ Render Error</strong>{'\n\n'}{String(this.state.error)}{'\n'}{this.state.error?.stack}
+      </div>;
+    }
+    return this.props.children;
+  }
+}
+try {
+  ReactDOM.createRoot(document.getElementById('root')).render(<ErrorBoundary><App/></ErrorBoundary>);
+} catch(e) {
+  document.getElementById('root').innerHTML = '<div style="padding:40px;font-family:monospace;background:#fff0f0;border:2px solid red;margin:20px;border-radius:8px;white-space:pre-wrap;font-size:13px"><strong style=\'font-size:16px;color:red\'>⚠ Mount Error</strong>\n\n'+String(e)+'\n'+(e.stack||'')+'</div>';
+}
 </script>
 </body>
 </html>

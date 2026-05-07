@@ -683,15 +683,17 @@ const CreateCustomModal = ({onClose}) => {
 const App = () => {
   const [activeTab, setActiveTab] = useState('enrollment-open');
   const [showHistory, setShowHistory] = useState(false);
-  const [showCustom, setShowCustom] = useState(false);
   const [showCreateTerm, setShowCreateTerm] = useState(false);
   const [selectedMaster, setSelectedMaster] = useState(null);
   const [showCreateCustom, setShowCreateCustom] = useState(false);
 
   const openCreateTerm = (master) => { setSelectedMaster(master); setShowCreateTerm(true); };
 
-  const activeCount = TERM_PLANS.enrollmentOpen.length + TERM_PLANS.paymentsInProgress.length;
-  const activeTabPlans = activeTab === 'enrollment-open' ? TERM_PLANS.enrollmentOpen : TERM_PLANS.paymentsInProgress;
+  const totalCount = TERM_PLANS.enrollmentOpen.length + TERM_PLANS.paymentsInProgress.length + FUTURE_PLANS.length + (hasCustomPlans ? CUSTOM_PLANS.length : 0);
+  const activeTabPlans = activeTab === 'enrollment-open' ? TERM_PLANS.enrollmentOpen
+    : activeTab === 'payments-in-progress' ? TERM_PLANS.paymentsInProgress
+    : activeTab === 'future' ? FUTURE_PLANS
+    : [];
 
   return (
     <div style={{minHeight:'100vh'}}>
@@ -718,11 +720,6 @@ const App = () => {
         </div>
         <div className="page-header-right">
           <a href="index.html" style={{fontSize:13,color:'var(--hz-hint)',textDecoration:'none'}}>← All prototypes</a>
-          {hasCustomPlans && (
-            <button className="btn btn-primary" onClick={() => setShowCreateCustom(true)}>
-              + New Custom Plan
-            </button>
-          )}
         </div>
       </div>
 
@@ -744,47 +741,85 @@ const App = () => {
           </div>
         </div>
 
-        {/* ── ACTIVE PLANS ── */}
+        {/* ── PLANS ── */}
         <div className="section-wrap">
           <div className="section-header" style={{marginBottom:0}}>
-            <div className="section-title">Active Plans</div>
-            <span className="section-count">{activeCount}</span>
+            <div className="section-title">Plans</div>
+            <span className="section-count">{totalCount}</span>
           </div>
           <hr className="section-line" style={{marginTop:14}}/>
           <div className="sub-tabs">
-            <div
-              className={`sub-tab ${activeTab === 'enrollment-open' ? 'active' : ''}`}
-              onClick={() => setActiveTab('enrollment-open')}
-            >
+            <div className={`sub-tab ${activeTab === 'enrollment-open' ? 'active' : ''}`} onClick={() => setActiveTab('enrollment-open')}>
               📅 Enrollment Open
               <span className="section-count" style={{fontSize:11,minWidth:18,height:18}}>{TERM_PLANS.enrollmentOpen.length}</span>
             </div>
-            <div
-              className={`sub-tab ${activeTab === 'payments-in-progress' ? 'active' : ''}`}
-              onClick={() => setActiveTab('payments-in-progress')}
-            >
+            <div className={`sub-tab ${activeTab === 'payments-in-progress' ? 'active' : ''}`} onClick={() => setActiveTab('payments-in-progress')}>
               💳 Payments in Progress
               <span className="section-count" style={{fontSize:11,minWidth:18,height:18}}>{TERM_PLANS.paymentsInProgress.length}</span>
             </div>
+            <div className={`sub-tab ${activeTab === 'future' ? 'active' : ''}`} onClick={() => setActiveTab('future')}>
+              🗓 Future
+              <span className="section-count" style={{fontSize:11,minWidth:18,height:18}}>{FUTURE_PLANS.length}</span>
+            </div>
+            {hasCustomPlans && (
+              <div className={`sub-tab ${activeTab === 'custom' ? 'active' : ''}`} onClick={() => setActiveTab('custom')}>
+                ✏️ Custom
+                <span className="section-count" style={{fontSize:11,minWidth:18,height:18}}>{CUSTOM_PLANS.length}</span>
+                <span style={{fontSize:9,fontWeight:700,background:'var(--hz-amber-bg)',color:'#92400E',borderRadius:4,padding:'1px 5px',marginLeft:2}}>Add-on</span>
+              </div>
+            )}
           </div>
-          <div className="plan-grid">
-            {activeTabPlans.map(plan => (
-              <TermPlanCard key={plan.id} plan={plan} />
-            ))}
-          </div>
-        </div>
 
-        {/* ── FUTURE PLANS ── */}
-        <div className="section-wrap">
-          <div className="section-header" style={{marginBottom:12}}>
-            <div className="section-title">Future Plans</div>
-            <span className="section-count">{FUTURE_PLANS.length}</span>
-          </div>
-          <div className="plan-grid">
-            {FUTURE_PLANS.map(plan => (
-              <TermPlanCard key={plan.id} plan={plan} />
-            ))}
-          </div>
+          {/* Enrollment Open / Payments in Progress / Future tabs */}
+          {activeTab !== 'custom' && (
+            <>
+              {activeTabPlans.length > 0 ? (
+                <div className="plan-grid" style={{marginTop:4}}>
+                  {activeTabPlans.map(plan => (
+                    <TermPlanCard key={plan.id} plan={plan} />
+                  ))}
+                </div>
+              ) : (
+                <div style={{padding:'40px 0',textAlign:'center',color:'var(--hz-hint)',fontSize:13}}>
+                  No plans in this state yet.
+                </div>
+              )}
+              {activeTab === 'future' && (
+                <div style={{marginTop:16,display:'flex',gap:10}}>
+                  <button className="btn btn-ghost btn-sm" onClick={() => openCreateTerm(MASTER_PLANS[0])}>+ Create future plan from master</button>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Custom tab */}
+          {activeTab === 'custom' && (
+            <div style={{marginTop:4}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 0 12px'}}>
+                <div style={{fontSize:13,color:'var(--hz-muted)'}}>Individual payment arrangements sent directly to specific students. The student receives a link and pays on the schedule you define.</div>
+                <button className="btn btn-primary btn-sm" onClick={() => setShowCreateCustom(true)} style={{flexShrink:0,marginLeft:24}}>+ New Custom Plan</button>
+              </div>
+              {CUSTOM_PLANS.map(cp => (
+                <div key={cp.id} className="custom-card">
+                  <div className="custom-avatar">{cp.initials}</div>
+                  <div className="custom-info">
+                    <div className="custom-name">{cp.studentName}</div>
+                    <div className="custom-detail">{cp.payments} payments · Pay-off {cp.payEnd}</div>
+                  </div>
+                  <div className="custom-balance">
+                    <div className="custom-balance-amt">{fmt(cp.balance)}</div>
+                    <div className="custom-balance-label">balance</div>
+                  </div>
+                  <StatusBadge status={cp.status} />
+                  <div className="custom-actions">
+                    <button className="btn btn-ghost btn-xs">Duplicate</button>
+                    <button className="btn btn-ghost btn-xs" style={{color:'var(--hz-indigo)'}}>Edit</button>
+                    <button className="btn btn-ghost btn-xs" style={{color:'var(--hz-teal)'}}>Send Invitation</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ── HISTORICAL PLANS ── */}
@@ -810,59 +845,6 @@ const App = () => {
             </div>
           )}
         </div>
-
-        {/* ── CUSTOM PLANS ── */}
-        {hasCustomPlans && (
-          <div className="section-wrap">
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}>
-              <div style={{display:'flex',alignItems:'center',gap:10}}>
-                <div className="section-title">Custom Plans</div>
-                <span className="section-count">{CUSTOM_PLANS.length}</span>
-                <span className="badge" style={{background:'var(--hz-amber-bg)',color:'#92400E',fontSize:10}}>✦ Add-on</span>
-              </div>
-              <button className="btn btn-ghost btn-sm" onClick={() => setShowCreateCustom(true)}>+ New Custom Plan</button>
-            </div>
-
-            <div
-              className="custom-toggle-row"
-              onClick={() => setShowCustom(v => !v)}
-            >
-              <div className="custom-toggle-left">
-                <span style={{fontSize:18}}>✏️</span>
-                <div>
-                  <div className="custom-toggle-title">Individual Payment Arrangements</div>
-                  <div className="custom-toggle-sub">{CUSTOM_PLANS.length} active custom plans · One-off payment schedules for specific students</div>
-                </div>
-              </div>
-              <span className={`custom-toggle-chevron ${showCustom ? 'open' : ''}`}>⌄</span>
-            </div>
-
-            {showCustom && (
-              <div>
-                {CUSTOM_PLANS.map(cp => (
-                  <div key={cp.id} className="custom-card">
-                    <div className="custom-avatar">{cp.initials}</div>
-                    <div className="custom-info">
-                      <div className="custom-name">{cp.studentName}</div>
-                      <div className="custom-detail">
-                        {cp.payments} payments · Pay-off {cp.payEnd}
-                      </div>
-                    </div>
-                    <div className="custom-balance">
-                      <div className="custom-balance-amt">{fmt(cp.balance)}</div>
-                      <div className="custom-balance-label">balance</div>
-                    </div>
-                    <StatusBadge status={cp.status} />
-                    <div className="custom-actions">
-                      <button className="btn btn-ghost btn-xs">Duplicate</button>
-                      <button className="btn btn-ghost btn-xs" style={{color:'var(--hz-indigo)'}}>Edit</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
 
       </div>
 
