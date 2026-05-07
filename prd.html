@@ -10681,6 +10681,7 @@ function toggleStatusPicker(item, reqId, btn) {
     opt.appendChild(dot);
     opt.appendChild(txt);
     cb.addEventListener('change', function() {
+      // Save to localStorage
       var d = loadStatusTags();
       var tags = d[reqId] || [];
       if (cb.checked) {
@@ -10690,11 +10691,28 @@ function toggleStatusPicker(item, reqId, btn) {
       }
       if (tags.length === 0) delete d[reqId]; else d[reqId] = tags;
       saveStatusTags(d);
-      // applyStatusTagsToItem destroys the picker (it removes the btn the picker lives in),
-      // so we re-open the picker on the new btn after rebuild.
-      applyStatusTagsToItem(item, true);
-      var newBtn = item.querySelector('.sophie-status-btn');
-      if (newBtn) { toggleStatusPicker(item, reqId, newBtn); }
+
+      // Update the visible tag span on the requirement — WITHOUT calling
+      // applyStatusTagsToItem (which would destroy btn and close this picker).
+      var tagsEl = ensureReqTags(item);
+      var existingTagEl = tagsEl.querySelector('[data-status-key="' + def.key + '"]');
+      if (cb.checked && !existingTagEl) {
+        var tagSpan = document.createElement('span');
+        tagSpan.className = 'tag ' + def.cls;
+        tagSpan.dataset.statusKey = def.key;
+        tagSpan.textContent = def.label;
+        tagsEl.insertBefore(tagSpan, btn); // insert before the status btn
+      } else if (!cb.checked && existingTagEl) {
+        existingTagEl.remove();
+      }
+
+      // Update btn label + class to reflect new count.
+      // btn.textContent clears children (including picker), so re-append picker after.
+      var currentTags = d[reqId] || [];
+      btn.textContent = currentTags.length > 0 ? '🏷 Edit Status' : '+ Status';
+      btn.appendChild(picker);
+      btn.className = 'sophie-status-btn' + (currentTags.length > 0 ? ' has-tags' : '');
+
       rebuildSophieStatusPanel();
       updateTagFilterCounts();
     });
