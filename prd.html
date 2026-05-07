@@ -10661,6 +10661,10 @@ function toggleStatusPicker(item, reqId, btn) {
 
   var picker = document.createElement('div');
   picker.className = 'status-picker';
+  // Prevent clicks inside the picker from bubbling to the btn's toggle listener
+  // (the btn is the picker's parent; without this, any click inside the picker
+  // would re-invoke toggleStatusPicker and immediately close it).
+  picker.addEventListener('click', function(e) { e.stopPropagation(); });
   var title = document.createElement('div');
   title.className = 'status-picker-title';
   title.textContent = 'Set status tag';
